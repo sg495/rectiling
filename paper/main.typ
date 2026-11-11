@@ -38,7 +38,10 @@ $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 @sec:search presents the search procedure, with the propositions that make it sound and complete.
 @sec:optimisations presents the optimisations that make thirteen tiles feasible, with the propositions that justify them.
 @sec:results reports the results.
-Soundness and completeness of the reference search have been formalised in Lean 4 with Mathlib, taking as hypotheses the specifications of the exact-arithmetic routines; #todo[extend this statement to the optimised search once its formalisation is complete, and cite the development.]
+The propositions of @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the reference search and of the optimised search.
+The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
+The implementation itself is not verified.
+@app:formal relates the statements of this paper to those of the formal development, and lists what the latter does not cover.
 
 = Tilings <sec:tilings>
 
@@ -1446,3 +1449,139 @@ There is one such proportion for three tiles, none for four, four for five, two 
   datatable(csv("data/full-degree.csv"), size: 0.85em),
   caption: [The proportions of degree $n$ achievable with $n <= 7$ tiles.],
 ) <tab:full>
+
+= Formalisation <app:formal>
+
+The statements of @sec:tilings, @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
+The development contains no unproved statement and no axiom of its own; its main theorems depend only on the three axioms `propext`, `Classical.choice` and `Quot.sound` of Lean and Mathlib.
+@tab:formal lists, for each definition and proposition of those sections, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
+The proofs given in this paper follow those of the development, statement by statement.
+
+#let lean-row(statement, ..declarations) = (statement, declarations.pos().join(linebreak()))
+
+#[
+#show figure.where(kind: table): set block(breakable: true)
+#figure(
+  kind: table,
+  block(breakable: true, {
+    set text(size: 0.82em)
+    set par(justify: false)
+    show raw: set text(size: 0.8em)
+    table(
+      columns: (auto, 1fr),
+      align: (left + top, left + top),
+      table.header([*Statement*], [*Module: declarations*]),
+      table.hline(stroke: 0.05em),
+      ..lean-row([@def:rectangle], [`Geometry`: `Rect`, `Rect.closed`, `Rect.inner`, `Rect.Nondegenerate`, `Rect.HasProportion`]),
+      ..lean-row([@def:tiling], [`Geometry`: `IsTiling`, `IsSimilarTiling`, `IsTiling.perm`, `IsTiling.eq_of_not_disjoint`, `Rect.separated_of_disjoint`]),
+      ..lean-row([@def:counts], [`Persistence`: `TilesWith`]),
+      ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`]),
+      ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`]),
+      ..lean-row([@prop:subdivision], [`Refinement`: `IsSimilarTiling.refine`], [`Persistence`: `Rect.isTiling_four`, `TilesWith.add_three`]),
+      ..lean-row([@def:staircase], [`Staircase`: `Algebra`, `Tier`, `initial`, `realAlgebra`, `unitAlgebra`, `Algebra.IsHom`, `Tier.map`]),
+      ..lean-row([@def:region], [`Layout`: `geom`, `GTier.Mem`, `unfilled`, `region`, `Positive`, `region_initial`]),
+      ..lean-row([@def:placement], [`Staircase`: `Fit`, `Placement`, `tileSize`, `positiveOf`, `equationOf`, `place`, `length_place`, `place_map`], [`Layout`: `tileAt`]),
+      ..lean-row([@def:admissible], [`Staircase`: `Allows`, `Admits`, `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`]),
+      ..lean-row([@prop:bound], [`Soundness`: `CompleteFrom.allowed`, `Complete.length`], [`Completeness`: `Allowed.completeFrom`]),
+      ..lean-row([@def:system], [`Staircase`: `positives`, `equations`, `Satisfies`, `run_congr`], [`Layout`: `tiles`]),
+      ..lean-row([@prop:count], [`Staircase`: `length_equations`], [`Solver`: `length_symEquations`], [`Reduced`: `length_homEquations`]),
+      ..lean-row([@prop:step], [`Layout`: `geom_place`], [`Region`: `StepHyp`, `step_region`], [`Soundness`: `positive_parts`]),
+      ..lean-row([@def:doom], [`Soundness`: `DoomF`, `DoomW`]),
+      ..lean-row([@prop:size], [`Soundness`: `size_facts`]),
+      ..lean-row([@prop:doom], [`Soundness`: `StepData.doomF`, `StepData.doomW`]),
+      ..lean-row([@prop:fit], [`Soundness`: `not_doom`, `StepData.positive_place`]),
+      ..lean-row([@prop:sound], [`Soundness`: `tiles_from`, `soundness`]),
+      ..lean-row([@def:extends], [`Extension`: `Ext`]),
+      ..lean-row([@prop:near], [`Extension`: `exists_gap`, `IsTiling.exists_tile_above_right`, `IsTiling.exists_tile_below_right`]),
+      ..lean-row([@def:state], [`Extension`: `GInv`, `FlagsOK`], [`Completeness`: `CInv`]),
+      ..lean-row([@prop:anchor], [`Extension`: `Around.not_mem`, `GInv.anchor_tile`]),
+      ..lean-row([@prop:extension], [`Extension`: `GInv.step`], [`Completeness`: `exists_first_tier`, `tileSize_of_tile`, `CInv.step`]),
+      ..lean-row([@prop:complete], [`Completeness`: `complete_from`, `completeness`]),
+      ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
+      ..lean-row([@def:mosaic], [not formalised]),
+      ..lean-row([@def:forms], [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`]),
+      ..lean-row([@prop:forms], [`Forms`: `formAlgebra_isHom`, `satisfies_iff_forms`]),
+      ..lean-row([@def:primitives], [`Solver`: `Primitives`, `Primitives.ideal`]),
+      ..lean-row([@def:reference], [`Solver`: `systemMatrix`, `systemRhs`, `target`, `numerator`, `NoRootTest`, `Solved`, `solve`]),
+      ..lean-row([@prop:noroot], [`Solver`: `NoRootTest.ne_zero`]),
+      ..lean-row([@prop:solve], [`Solver`: `map_mulVec_cramer`, `map_cramer_of_solution`, `solve_sound`, `solve_complete`, `solve_spec`]),
+      ..lean-row([@def:regular], [`Main`: `Reported`, `Certified`]),
+      ..lean-row([@prop:reference], [`Main`: `reported_sound`, `reported_complete`, `reported_iff`]),
+      ..lean-row([@def:hom], [`Elimination`: `Vec`, `unitVec`, `vecAlgebra`], [`BackSubstitution`: `dot`], [`Reduced`: `homInitial`, `homEquations`, `homPositives`, `val`], [`Certified`: `Coeff`, `propX`, `evalL`]),
+      ..lean-row([@prop:hom], [`Reduced`: `satisfies_iff_hom`, `satisfies_scale`], [`Fast`: `solvable_iff`]),
+      ..lean-row([@def:elimination], [`Elimination`: `Stage`, `Stage.side`, `Elim`, `Step`, `Divisible`, `elimForm`, `Run`, `Run.pivots`], [`Reduced`: `Stage.init`], [`Fast`: `Limits`, `advance`, `run`, `run_spec`]),
+      ..lean-row([@def:chain], [`Elimination`: `carryStep`, `carry`, `carry_isHom`, `mapVec_elimForm`, `Elims`]),
+      ..lean-row([@prop:trace], [`Elimination`: `step_link`, `Trace`, `Run.trace`], [`BackSubstitution`: `Trace.elims`, `Trace.size`]),
+      ..lean-row([@prop:chain], [`Determinant`: `Elims.carry_eq`, `Elims.row`], [`BackSubstitution`: `Elims.carry_pivot`, `Elims.pairwise`, `Elims.dot_carry`, `Elims.true_of_stage`, `Elims.stage_of_true`, `nodup_pivots`]),
+      ..lean-row([@prop:minor], [`Exact`: `Elims.pivot_eq_det`], [`Determinant`: `Elims.chain`, `Elims.det_eq`]),
+      ..lean-row([@prop:det], [`Reduced`: `Run.final_eq_det`, `Run.final_vanishes`]),
+      ..lean-row([@prop:exact], [`Exact`: `Elims.mapRecords`, `Elims.divisible`, `Stage.Linked`, `Stage.Linked.divisible`, `Reached`, `division_exact`]),
+      ..lean-row([@prop:target], [`Target`: `toHom`, `toHom_isHom`, `homEquations_eq`, `Run.final_eq_target`]),
+      ..lean-row([@prop:back], [`BackSubstitution`: `back`, `back_solves`, `back_unique`, `covers`], [`Reduced`: `solutionOf`, `Run.solution`, `Run.prev_ne_zero`]),
+      ..lean-row([@def:numerics], [`Certified`: `Numerics`, `Numerics.ideal`]),
+      ..lean-row([@def:check], [`Certified`: `rowSum`, `backIv`, `Numerics.ivAlgebra`, `carryExact`, `degenerate`, `Verdict`, `check`]),
+      ..lean-row([@prop:numeric], [`Certified`: `backIv_mem`, `Numerics.encl_positives`, `carryExact_spec`, `degenerate_spec`, `check_accept`, `check_reject`]),
+      ..lean-row([@prop:degenerate], [`Certified`: `dvd_iff_evalAt_eq_zero`]),
+      ..lean-row([@def:fastsolve], [`Fast`: `FastNoRoot`, `leaf`, `direct`, `fastSolve`, `Delegated`]),
+      ..lean-row([@prop:fastsolve], [`Fast`: `Solvable`, `leaf_spec`, `direct_spec`, `fastSolve_sound`, `fastSolve_complete`, `solve_subset_fastSolve`, `fastSolve_eq_solve`]),
+      ..lean-row([@def:enumeration], [`Enumeration`: `candidates`, `moves`, `completions`, `after`, `prefixes`]),
+      ..lean-row([@prop:enumeration], [`Enumeration`: `mem_completions`, `mem_completions_initial`, `mem_completions_iff_prefix`]),
+      ..lean-row([@def:explore], [`Search`: `explore`, `exploreForced`, `Searched`]),
+      ..lean-row([@prop:searched], [`Search`: `below`, `fastSolve_eq_below`, `explore_iff`, `exploreForced_sub`, `exploreForced_sup`, `searched_iff`]),
+      ..lean-row([@def:fastcert], [`Fast`: `FastReported`, `FastCertified`]),
+      ..lean-row([@prop:fast], [`Fast`: `fast_sound`, `fast_complete`, `fast_iff`, `reported_imp_fast`, `Certified.fast`, `fast_iff_reported`]),
+    )
+  }),
+  caption: [The definitions and propositions of @sec:tilings, @sec:search and @sec:optimisations, and the Lean declarations that formalise them.],
+) <tab:formal>
+]
+
+== Differences between the statements <sec:differences>
+
+The statements of the paper and those of the development differ in the following respects, none of which affects their content.
+
+- *Rectangles and tilings.* A rectangle of the development is a quadruple of real numbers with no condition on its sides; positivity is a separate predicate, which a tiling requires of its tiles and which the theorems assume of the main rectangle where they need it.
+  A tiling is a list of rectangles, and the number of its tiles is the length of the list.
+  The development has no notion of the proportion of a rectangle as a number: it states that a rectangle has proportion $x$, as in @def:rectangle, and the remark that follows that definition is not formalised.
+- *Sets of proportions.* The development does not define the sets $P_n (W, H)$.
+  Its statements are about the existence of a list of $n$ rectangles that is a similar tiling of proportion $x$ of the rectangle with corner at the origin and given sides, which is the membership of $x$ in $P_n (W, H)$.
+  @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow as in the proofs given; the consequence $P_n (w) = P_n (1 slash w)$ is not stated in the development.
+  @prop:subdivision is formalised for an arbitrary main rectangle with positive sides.
+- *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
+  The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
+- *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
+  The representation of a proportion by its minimal polynomial and an isolating interval belongs to the routines of @def:primitives, which are assumed.
+- *Indices.* The development numbers the inside placements, the free sides and the placements from zero, where the paper numbers them from one.
+  A linear form of the development has a coefficient for every natural number, with no condition of finiteness.
+- *Records.* A record is a list of placements, and the free sides are given by a function on the natural numbers.
+  In @prop:complete the development states the orientations as a relation between the list of placements and the list of tiles.
+- *Proofs by cases.* @prop:step is formalised in two parts, one on the region and one on positivity, and the description of the anchors after a placement is a separate statement.
+  @prop:fit combines two statements of the development.
+  The state of @def:state is formalised with the placed and remaining tiles as two lists whose concatenation is a rearrangement of the tiling.
+- *Rings.* The statements on elimination chains are formalised over an arbitrary commutative ring with a homomorphism to a field, and @prop:det over an integral domain; the paper assumes an integral domain throughout.
+  In the development the quotient of a division that is not exact is defined to be zero, and a successful pass is an inductive predicate that requires every division to be exact.
+- *The invariant of the pass.* @prop:trace is formalised for a pass that starts at any stage related to a staircase without eliminations as in its proof, and its three conclusions are derived from one inductive relation between the records of the pass and the homogeneous system.
+- *Minors.* The two statements of @prop:minor are proved separately in the development, by the same comparison of determinants; the paper derives the second from the first.
+- *Exactness.* @prop:exact is formalised for the stages reached by the model of the method, which are amongst those of its statement; the lemmas from which it follows hold for all of them.
+- *The search.* The sets of @def:enumeration are lists, in the order in which the search tries the placements.
+  The numbers found by the search of @def:explore form a predicate, defined by recursion, and the parallel execution is not modelled.
+  The development models the search in which a failure of the pass at a forced placement hands the whole subtree below that placement to the reference method; the implementation now restricts that subtree to the completions that continue with the remaining forced placements, and the remark after @prop:searched on this variant is not formalised.
+
+== What is not formalised <sec:unformalised>
+
+The formal development is about a model of the method, and the following lies outside it.
+
+- *The implementation.* The Rust code is not verified.
+  The model follows it closely, and the differences are listed in the documentation of the development; the main ones are that the model gives every inside placement its own unknown, where the code reuses a small number of slots, and that the caches are absent from the model.
+- *The arithmetic routines.* The routines of @def:primitives and @def:numerics are assumed to meet their specifications, and every statement on the two searches is quantified over them.
+  This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the test of divisibility.
+  Both sets of specifications are shown to be consistent by exhibiting routines that meet them.
+- *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for want of an unknown to eliminate.
+  It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the reference method, or returns the verdict unsure, when the check fails.
+- *Regularity.* It is not proved that every record is regular in the sense of @def:regular.
+  The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast have their absence as a hypothesis.
+- *Uniqueness.* It is not proved that a tiling, or a mosaic class, arises from a single record.
+  The agreement of the number of records with the Baxter numbers is checked by computation, and within the development for at most seven tiles.
+- *Counts and statistics.* The development is about the set of proportions reported.
+  Nothing is proved about the number of records that realise a proportion, the number of polynomials, or any other count or statistic of @sec:results.
+- *Degrees and minimal polynomials.* The algebraic degree of a proportion and its minimal polynomial are produced by the assumed routines and are not the subject of any formal statement.
