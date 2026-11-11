@@ -1421,8 +1421,15 @@ Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutt
   Replacing a tile of a tiling by a tiling of that tile gives a tiling, and a rectangle of proportion $x$ can be tiled by four rectangles of proportion $x$, and by six: this gives $k = 3$ and $k = 5$.
   For $k = 4$ and $x > 1$, let $p := x slash (x + 1)$.
   Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling.
-  For $x = 1$, the unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$, and $1 in P_n (1)$ with $n >= 2$ requires $n = 4$ or $n >= 6$.
+  For $k = 4$ and $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $m$ squares for every $m >= 6$.
 ]
+
+@fig:persistence shows the step of four for the tiling by three tiles whose proportion is the square of the plastic ratio.
+
+#figure(
+  image("figures/persistence.svg", width: 48%),
+  caption: [A tiling of the square by three tiles of proportion $1.7548...$, and the tiling by seven tiles of the same proportion obtained by placing a reduced copy of it at the centre of a pinwheel of four tiles; the second is drawn from its record.],
+) <fig:persistence>
 
 @prop:persistence has been formalised in Lean, except for the fact, not needed for the inclusion, that a square cannot be cut into two, three or five squares.
 The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
@@ -1836,7 +1843,7 @@ The lines are taken to be the connected components of the union of the horizonta
 
 #figure(
   image("figures/network.svg", width: 62%),
-  caption: [A tiling of a square, with the components of the union of the horizontal sides of its tiles in bold and each tile represented by the vertical segment through its centre; and its network, with the additional edge $e_0$ of @def:plane-network.],
+  caption: [The tiling of the square by six tiles of proportion $5 slash 3$ of @ex:sporadic, with the components of the union of the horizontal sides of its tiles in bold and each tile represented by the vertical segment through its centre; and its network, in which each tile is an edge of its own colour, with the additional edge $e_0$ of @def:plane-network.],
 ) <fig:network>
 
 Each component is a horizontal segment of positive length.
@@ -2454,7 +2461,7 @@ The two others are sporadic, and come from pinwheels whose central rectangle is 
 
 #figure(
   image("figures/sporadic.svg", width: 58%),
-  caption: [The tilings of @ex:sporadic, of proportion $5 slash 3$ with six tiles and of proportion $16 slash 5$ with nine.],
+  caption: [The tilings of @ex:sporadic, of proportion $5 slash 3$ with six tiles and of proportion $16 slash 5$ with nine, drawn from their records.],
 ) <fig:sporadic>
 
 That rectangles of sides $5$ and $3$, and of sides $16$ and $5$, cannot be dissected into six and into nine squares respectively is a result of the search, and is not proved here.

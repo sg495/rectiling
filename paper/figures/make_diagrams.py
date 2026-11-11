@@ -258,6 +258,145 @@ def corner_order(tiles):
     return out
 
 
+def record_of(tiles):
+    """Returns the witness of a tiling of the unit square given by the coordinates of its tiles, by placing at each stage the tile at the anchor of the first tier whose floor does not extend."""
+    tiers = (Tier(0.0, 0.0, 1.0, 1.0),)
+    codes = {v: k for k, v in CODES.items()}
+    words = []
+    left = list(tiles)
+    while tiers:
+        i = next(j for j, t in enumerate(tiers) if not extends(tiles, t.ax + t.floor, t.ay))
+        t = tiers[i]
+        tile = next(r for r in left if abs(r[0] - t.ax) < EPS and abs(r[1] - t.ay) < EPS)
+        left.remove(tile)
+        _, _, w, h = tile
+        narrow, low = w < t.floor - EPS, h < t.wall - EPS
+        fit = "inside" if narrow and low else "full-height" if narrow else "full-width" if low else "full"
+        words.append(f"{i}{codes[fit]}{'T' if h > w else 'W'}")
+        new = [Tier(u.ax, u.ay, u.floor, u.wall, True, u.started) for u in tiers[:i]]
+        if not low and i > 0:
+            new[i - 1] = Tier(new[i - 1].ax, new[i - 1].ay, new[i - 1].floor + w, new[i - 1].wall, False, new[i - 1].started)
+        if fit == "inside":
+            new += [Tier(t.ax, t.ay + h, w, t.wall - h), Tier(t.ax + w, t.ay, t.floor - w, h, False, True)]
+        elif fit == "full-height":
+            new.append(Tier(t.ax + w, t.ay, t.floor - w, t.wall, False, True))
+        elif fit == "full-width":
+            new.append(Tier(t.ax, t.ay + h, t.floor, t.wall - h))
+        rest = list(tiers[i + 1 :])
+        if not narrow and rest:
+            rest[0] = Tier(rest[0].ax, rest[0].ay, rest[0].floor, rest[0].wall + h, rest[0].stale, rest[0].started)
+        tiers = tuple(new + rest)
+    assert not left
+    return " ".join(words)
+
+
+def regenerated(coordinates, side, proportion):
+    """Returns the tiles that the figure generator computes from the record of a tiling given by integer coordinates, checking that they are the given ones."""
+    given = [tuple(sp.Rational(c, side) for c in tile) for tile in coordinates]
+    witness = record_of([tuple(float(c) for c in tile) for tile in given])
+    tiles = witness_tiles(str(sp.Rational(proportion).evalf(30)), witness)
+    assert all(abs(a - float(b)) < 1e-9 for t, g in zip(sorted(tiles), sorted(tuple(float(c) for c in g) for g in given)) for a, b in zip(t, g))
+    return tiles, witness
+
+
+SPORADIC_SIX = ([(0, 0, 75, 45), (75, 0, 30, 50), (72, 50, 33, 55), (0, 45, 36, 60), (36, 45, 36, 60), (72, 45, 3, 5)], 105, sp.Rational(5, 3))
+SPORADIC_NINE = (
+    [(0, 0, 2560, 800), (2560, 0, 480, 1536), (2100, 1536, 470, 1504), (2570, 1536, 470, 1504)]
+    + [(700 * k, 800, 700, 2240) for k in range(3)]
+    + [(2100, 800, 230, 736), (2330, 800, 230, 736)],
+    3040,
+    sp.Rational(16, 5),
+)
+
+
+def sporadic_figure(path):
+    """Draws the two sporadic tilings of proportions 5/3 with six tiles and 16/5 with nine, from their records."""
+    fig, axes = plt.subplots(1, 2, figsize=(3.6, 1.95))
+    out = []
+    for ax, (coordinates, side, proportion), label in zip(axes, (SPORADIC_SIX, SPORADIC_NINE), ("$5/3$", "$16/5$")):
+        tiles, witness = regenerated(coordinates, side, proportion)
+        draw(ax, tiles)
+        ax.set_title(label, fontsize=7, pad=2)
+        out.append(witness)
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+    return out
+
+
+def persistence_figure(path):
+    """Draws a listed tiling by three tiles and the tiling by seven obtained from it by the pinwheel, the latter from its record."""
+    value, witness = next((v, w) for v, w in listing(3) if abs(float(v) - 1.7548776662) < 1e-6)
+    inner = witness_tiles(value, witness)
+    x = float(value)
+    p = x / (x + 1)
+    scale = (x - 1) / (x + 1)
+    built = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
+    built += [(1 - p + scale * a, 1 - p + scale * b, scale * w, scale * h) for a, b, w, h in inner]
+    record = record_of(built)
+    tiles = witness_tiles(value, record)
+    assert all(abs(a - b) < 1e-8 for t, g in zip(sorted(tiles), sorted(built)) for a, b in zip(t, g))
+    fig, axes = plt.subplots(1, 2, figsize=(3.6, 1.85))
+    draw(axes[0], inner)
+    draw(axes[1], tiles)
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+    return record
+
+
+def components_of(tiles):
+    """Returns the connected components of the union of the horizontal sides of the tiles, as triples of the two ends and the height."""
+    out = []
+    for y in sorted({round(v, 9) for _, b, _, h in tiles for v in (b, b + h)}):
+        spans = sorted((x, x + w) for x, b, w, h in tiles if abs(b - y) < EPS or abs(b + h - y) < EPS)
+        start, end = spans[0]
+        for a, b in spans[1:]:
+            if a <= end + EPS:
+                end = max(end, b)
+            else:
+                out.append((start, end, y))
+                start, end = a, b
+        out.append((start, end, y))
+    return out
+
+
+def network_figure(path, tiles):
+    """Draws a tiling with the components of its horizontal sides, and the network of the tiling with the edge joining its poles."""
+    comps = components_of(tiles)
+    names = {c: f"v_{k}" for k, c in enumerate(c for c in comps if 0 < c[2] < 1 - EPS)}
+    names.update({c: "t" for c in comps if c[2] < EPS})
+    names.update({c: "s" for c in comps if c[2] > 1 - EPS})
+    nodes = {c: ((c[0] + c[1]) / 2, c[2]) for c in comps}
+    fig, (left, right) = plt.subplots(1, 2, figsize=(4.6, 2.3))
+    draw(left, tiles)
+    for x, y, w, h in tiles:
+        left.plot([x + w / 2, x + w / 2], [y, y + h], color="k", lw=0.5)
+    for c in comps:
+        left.plot([c[0], c[1]], [c[2], c[2]], color="k", lw=1.6, solid_capstyle="butt")
+        left.text(c[1] + 0.03 if c[1] > 1 - EPS else c[0] - 0.03, c[2], f"${names[c]}$", fontsize=7, va="center", ha="left" if c[1] > 1 - EPS else "right")
+    left.set_xlim(-0.14, 1.14)
+    for k, (x, y, w, h) in enumerate(tiles):
+        top = next(c for c in comps if abs(c[2] - y - h) < EPS and c[0] - EPS <= x and x + w <= c[1] + EPS)
+        bottom = next(c for c in comps if abs(c[2] - y) < EPS and c[0] - EPS <= x and x + w <= c[1] + EPS)
+        bend = 0.9 * (x + w / 2 - (nodes[top][0] + nodes[bottom][0]) / 2) / max(h, 0.2)
+        right.annotate("", xy=nodes[bottom], xytext=nodes[top], arrowprops=dict(arrowstyle="-|>", color=COLOURS[k % len(COLOURS)], lw=1.2, shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle=f"arc3,rad={bend:.3f}"))
+    top, bottom = next(c for c in comps if c[2] > 1 - EPS), next(c for c in comps if c[2] < EPS)
+    right.annotate("", xy=nodes[top], xytext=nodes[bottom], arrowprops=dict(arrowstyle="-|>", color="k", lw=0.6, ls="--", shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle="arc3,rad=1.1"))
+    right.text(1.16, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
+    for c, (x, y) in nodes.items():
+        right.plot([x], [y], marker="o", mfc="w", mec="k", ms=4, zorder=3)
+        right.text(x - 0.06, y, f"${names[c]}$", fontsize=7, va="center", ha="right")
+    right.set_xlim(-0.14, 1.34)
+    right.set_ylim(-0.07, 1.07)
+    right.set_aspect("equal")
+    right.axis("off")
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+    return len(comps)
+
+
 def mosaic_choice():
     """Selects listed tilings with the same placements, up to orientations, in which the corners along a vertical segment alternate differently."""
     groups = {}
@@ -374,6 +513,10 @@ def main():
     symmetry_figure(OUT / "symmetry.svg", value, witness)
     print("pinwheel:", pinwheel_figure(OUT / "pinwheel.svg"))
     print("two tiles:", two_tiles_figure(OUT / "two-tiles.svg"))
+    print("sporadic:", sporadic_figure(OUT / "sporadic.svg"))
+    print("persistence:", persistence_figure(OUT / "persistence.svg"))
+    tiles, witness = regenerated(*SPORADIC_SIX)
+    print("network:", witness, network_figure(OUT / "network.svg", tiles), "components")
 
 
 if __name__ == "__main__":
