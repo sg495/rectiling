@@ -554,13 +554,13 @@ impl<'a> Engine<'a> {
         if ok {
             self.explore(&next, remaining - 1, used, pivot, prefix);
         } else {
-            self.delegate(&next, remaining - 1);
+            self.delegate(&next, remaining - 1, prefix);
         }
         self.path.pop();
         self.symbols.arena.reset(mark);
     }
 
-    fn delegate(&mut self, stairs: &Staircase<Form>, remaining: usize) {
+    fn delegate(&mut self, stairs: &Staircase<Form>, remaining: usize, prefix: &[Placement]) {
         let mut moves: Vec<Placement> = self.path.iter().map(|s| s.mv).collect();
         let unit = Staircase {
             tiers: stairs
@@ -574,10 +574,10 @@ impl<'a> Engine<'a> {
                 })
                 .collect(),
         };
-        self.delegate_rec(&unit, remaining, &mut moves);
+        self.delegate_rec(&unit, remaining, &mut moves, prefix);
     }
 
-    fn delegate_rec(&mut self, stairs: &Staircase<()>, remaining: usize, moves: &mut Vec<Placement>) {
+    fn delegate_rec(&mut self, stairs: &Staircase<()>, remaining: usize, moves: &mut Vec<Placement>, prefix: &[Placement]) {
         if stairs.tiers.is_empty() {
             self.tally.stats.leaves += 1;
             self.exact(moves);
@@ -591,6 +591,9 @@ impl<'a> Engine<'a> {
                         fit,
                         tall,
                     };
+                    if prefix.get(moves.len()).is_some_and(|forced| *forced != mv) {
+                        continue;
+                    }
                     if stairs.admits(mv, remaining).is_none() || (tall && moves.is_empty() && self.width == self.height) {
                         continue;
                     }
@@ -601,7 +604,7 @@ impl<'a> Engine<'a> {
                     let mut next = stairs.clone();
                     next.place(&mut Unit, mv);
                     moves.push(mv);
-                    self.delegate_rec(&next, remaining - 1, moves);
+                    self.delegate_rec(&next, remaining - 1, moves, prefix);
                     moves.pop();
                 }
             }
