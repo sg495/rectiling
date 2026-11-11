@@ -135,7 +135,7 @@ Whether they grow along steps of one is not known to us.
 The search places tiles one at a time, starting at the bottom-left corner of the main rectangle, in such a way that the region already covered is always closed under moving left and down.
 The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile always sits in one of its concave corners.
 
-In the search the lengths of the steps of the staircase are not numbers but expressions in unknown quantities, and nothing guarantees beforehand that they take positive values.
+In the search the lengths of the steps of the staircase are expressions in unknown quantities, and nothing guarantees beforehand that they take positive values.
 The staircase is therefore defined first as a combinatorial object carrying lengths of an arbitrary kind, and its geometric reading is defined afterwards.
 
 #definition(name: [staircase])[
@@ -209,7 +209,7 @@ A tile that is as high as the wall has its height determined by the staircase, a
 Only an inside placement makes use of the free side.
 If $phi$ is not narrow then $w = L$, and if $phi$ is not low then $h = M$, by the definition of the size.
 In geometric terms, an inside placement replaces the anchor by two, one above the tile and one to its right; a full-height placement moves the anchor to the right and lengthens the floor of the previous tier by $w$; a full-width placement moves the anchor up and heightens the wall of the next tier by $h$; and a full placement removes the anchor, lengthening the floor of the previous tier by $L$ and heightening the wall of the next by $M$.
-The number of tiers thus increases by one with an inside placement, decreases by one with a full placement, and is unchanged otherwise.
+The number of tiers increases by one with an inside placement, decreases by one with a full placement, and is unchanged otherwise.
 Placing commutes with homomorphisms: if $f$ is a homomorphism, the image under $f$ of the staircase obtained by placing $p$ on $S$ with free side $s$ is obtained by placing $p$ on the image of $S$ with free side $f(s)$, and the positive quantity and the equation of $p$ on the image of $S$ are the images of those on $S$.
 In particular, the number of tiers and the flags of the staircases obtained by successive placements do not depend on the arithmetic of lengths or on the free sides: they are those of the bare staircases obtained by the same placements.
 
@@ -274,7 +274,7 @@ The short side of each tile placed inside its tier is a free unknown, and every 
 ] <def:system>
 
 The constraints depend only on those free sides that are used, namely $s_1, dots, s_k$ if $rho$ has $k$ inside placements.
-The unknowns are thus $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be given up to a common factor, and the following count shows that a complete record has as many equations as unknowns that remain.
+The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be given up to a common factor, and a complete record has as many equations as unknowns that remain.
 
 #proposition(name: [number of equations])[
   A record with $k$ inside placements that obeys the rules from a staircase with $m$ tiers has $k + m$ full placements.
@@ -305,9 +305,8 @@ The unknowns are thus $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will b
 
 == Soundness <sec:sound>
 
-The positivity constraints say only that tiles have positive size.
-They do not say that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
-For records that obey the rules this follows from the rules themselves, which are thus needed for every solution to be a tiling, and not only to avoid repetitions.
+The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
+For records that obey the rules this follows from the rules themselves, so that the rules, which were introduced to avoid repetitions, are also needed for every solution to be a tiling.
 The argument has two parts.
 The first is geometric: on a positive staircase, a tile that fits its tier as its fit says is cut out of the region.
 
@@ -354,7 +353,6 @@ The second part is combinatorial: a floor or a wall that has become non-positive
   A real staircase is _floor-doomed_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
   It is _wall-doomed_ if it has a tier whose wall is not positive and before which every tier is stale.
 ] <def:doom>
-
 
 The empty staircase is neither.
 The next statement records what the constraints of a single placement give.
