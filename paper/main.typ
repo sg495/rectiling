@@ -21,8 +21,7 @@ The qualitative question was settled in the 1990s.
 Dehn had shown that a rectangle can be cut into squares only if its sides are commensurable @dehn1903, and Brooks, Smith, Stone and Tutte had recast dissections of rectangles as planar electrical networks @bsst1940.
 Freiling and Rinne @freiling1994, and independently Laczkovich and Szekeres @laczkovich1995, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; the case of a rectangle cut into rectangles was treated by Freiling, Laczkovich and Rinne @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
 
-The quantitative question is recent.
-In December 2022 Baez asked how many proportions are possible when the number $n$ of pieces is fixed @baez2022, and a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
+The quantitative question dates from December 2022, when Baez asked how many proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
 The resulting sequence $a(n)$ is entry A359146 of the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
 The values for $n <= 7$ were obtained by exhaustive searches of Henderson @henderson2023 and of Gerbet, reported in @baez2023; Henderson also found $a(8) = 8522$.
 Taams proved that the proportion is algebraic of degree at most $n$ @taams2023.
@@ -35,9 +34,8 @@ We reproduce all the values above, by a method independent of both earlier ones,
 $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 
 @sec:tilings fixes definitions.
-@sec:search presents the search procedure, with the propositions that make it sound and complete.
-@sec:optimisations presents the optimisations that make thirteen tiles feasible, with the propositions that justify them.
-@sec:results reports the results.
+@sec:search presents the search procedure, with the propositions that make it sound and complete, and @sec:optimisations the optimisations that make thirteen tiles feasible, with the propositions that justify them.
+The results are in @sec:results.
 The propositions of @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the reference search and of the optimised search.
 The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
 The implementation itself is not verified.
@@ -71,8 +69,7 @@ Both remarks are used repeatedly below.
 ] <def:counts>
 
 The sets $P_n (w)$ are finite in every case treated in this paper, as a by-product of the computation; see @sec:solving.
-Three elementary observations are used throughout.
-The first is that scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
+Scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
 
 #proposition(name: [scaling])[
   For all $W, H, c > 0$ and $n >= 0$, $P_n (c W, c H) = P_n (W, H)$.
@@ -85,7 +82,7 @@ The first is that scaling the plane preserves proportions, so that only the aspe
   This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
 ]
 
-The second is that exchanging the two axes turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, turning wide tiles into tall ones.
+Exchanging the two axes turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, and wide tiles into tall ones.
 
 #proposition(name: [transposition])[
   For all $W, H > 0$ and $n >= 0$, $P_n (W, H) = P_n (H, W)$.
@@ -100,7 +97,7 @@ The second is that exchanging the two axes turns a tiling of a rectangle into a 
   Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
 ]
 
-The third is that the sets of proportions grow with $n$ along steps of three.
+The sets of proportions grow with $n$ along steps of three.
 Whether they grow along steps of one is not known to us.
 
 #proposition(name: [subdivision])[
