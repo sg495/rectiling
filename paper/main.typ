@@ -1700,3 +1700,844 @@ The formal development is about a model of the method, and the following lies ou
 - *Counts and statistics.* The development is about the set of proportions reported.
   Nothing is proved about the number of records that realise a proportion, the number of polynomials, or any other count or statistic of @sec:results.
 - *Degrees and minimal polynomials.* The algebraic degree of a proportion and its minimal polynomial are produced by the assumed routines and are not the subject of any formal statement.
+
+#let re = math.op("Re")
+#let lft = math.op("left")
+#let rgt = math.op("right")
+#let rct = math.op("rect")
+#let adj = math.op("adj")
+
+= Proofs for the structure of the sequence <app:structure>
+
+This appendix proves the propositions of @sec:structure other than @prop:persistence, which is proved there.
+The proofs are complete, except that the following classical results are used without proof, each being named where it is used.
+Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
+Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold only, for the explicit threshold.
+Tutte's enumeration of rooted non-separable planar maps is used in @prop:upper-full only, for the upper bound.
+A few remarks rest on computations made with the search of @sec:search; they are marked as such, and no proof depends on them.
+Nothing in this appendix has been formalised.
+
+Throughout, an _orientation vector_ for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
+An orientation vector $epsilon$ on the tiles of a similar tiling of proportion $x$ is _an orientation vector of the tiling_ if every tile $T$ is tall for $x$ when $epsilon_T = +1$ and wide for $x$ when $epsilon_T = -1$.
+For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector will do, the tiles being squares.
+
+== Networks <sec:networks>
+
+Brooks, Smith, Stone and Tutte associate with a tiling of a rectangle an electrical network, in which the tiles are resistors @bsst1940.
+For a similar tiling the resistances are $x$ and $1 slash x$, and the properties of the aspect ratio as a function of $x$ come from letting $x$ be a complex number.
+Networks are therefore defined with complex resistances.
+
+#definition(name: [network and flow])[
+  A _network_ $frak(N) = (G, s, t)$ consists of a finite connected graph $G$, with set of vertices $V$ and set of edges $E$, possibly with multiple edges but without loops, and of two distinct vertices $s$ and $t$ of $G$, its _poles_.
+  Every edge $e$ is given a reference direction, from its _tail_ $e^-$ to its _head_ $e^+$.
+  A family of _resistances_ is a function $r : E -> CC without {0}$, and the numbers $y_e := 1 slash r_e$ are the _conductances_.
+  For a complex number $I$, a _flow of value $I$_ is a pair of functions $phi : V -> CC$, the _potential_, and $i : E -> CC$, the _current_, such that
+  $ phi(e^-) - phi(e^+) = r_e i_e quad "for every edge" e, $
+  which is the _law of Ohm_, and
+  $ sum_(e : e^- = v) i_e - sum_(e : e^+ = v) i_e = I (delta_(v s) - delta_(v t)) quad "for every vertex" v, $
+  which is the _law of Kirchhoff_.
+  The _incidence matrix_ $B$ has rows indexed by $V$ and columns indexed by $E$, with $B_(v e) = 1$ if $v = e^-$, $B_(v e) = -1$ if $v = e^+$, and $B_(v e) = 0$ otherwise.
+  With $Y$ the diagonal matrix of the conductances, the _Laplacian_ is $L := B Y B^top$.
+  We write $L_t$ for $L$ with the row and the column of $t$ removed, and $L_(s t)$ for $L$ with the rows and the columns of $s$ and $t$ removed; the determinant of an empty matrix is $1$.
+] <def:network>
+
+A pair $(phi, i)$ is a flow of value $I$ exactly when $i = Y B^top phi$ and $L phi = I (delta_s - delta_t)$, where $delta_v$ is the vector with entry $1$ at $v$ and $0$ elsewhere.
+Reversing the reference direction of an edge changes the sign of a column of $B$, hence leaves $L$ unchanged, and turns flows into flows when the sign of the current in that edge is changed as well; nothing below depends on the reference directions, except where they are fixed explicitly.
+
+The quadratic form of the Laplacian is the power dissipated in the network.
+When the real parts of the resistances have one sign, its real part is definite on the potentials that are not constant, and this gives the existence and the uniqueness of flows.
+
+#proposition(name: [flows and impedance])[
+  Let $frak(N)$ be a network with resistances such that $re r_e > 0$ for every edge $e$, or such that $re r_e < 0$ for every edge $e$.
+  + For every $I$ there is a flow of value $I$, and its potential is unique up to an additive constant.
+  + $det L_t != 0$, and for a flow of value $I != 0$ the _impedance_ $Z := (phi(s) - phi(t)) slash I$ equals $det L_(s t) slash det L_t$.
+  + The real part of $Z$ has the sign of the numbers $re r_e$.
+] <prop:flow>
+
+#proof[
+  The numbers $re y_e = re r_e slash abs(r_e)^2$ have the sign of the numbers $re r_e$; suppose that they are positive, the other case being the same.
+  For $phi in CC^V$,
+  $ overline(phi)^top L phi = sum_e y_e abs(phi(e^-) - phi(e^+))^2. $
+  If $L phi = 0$, the real part of this identity shows that $phi$ takes equal values at the two ends of every edge, hence is constant, as $G$ is connected.
+  So the kernel of $L$ is the line of the constants, and $L$ has rank $abs(V) - 1$.
+  The image of $L$ lies in the hyperplane of the vectors with zero sum, because $bold(1)^top L = 0$, where $bold(1)$ is the vector with all entries $1$, and so equals it.
+  This gives the first statement.
+
+  If $L_t phi' = 0$, extend $phi'$ to $phi$ by $phi(t) := 0$; then $(L phi)_v = 0$ for $v != t$, so that $overline(phi)^top L phi = overline(phi(t)) (L phi)_t = 0$, whence $phi$ is constant and $phi' = 0$.
+  So $L_t$ is invertible.
+  The flow of value $1$ with $phi(t) = 0$ has $phi(s) = (L_t^(-1))_(s s) = det L_(s t) slash det L_t$ by Cramer's rule, and the potential of a flow of value $I$ is $I$ times this one, up to an additive constant; this is the second statement.
+
+  For the flow of value $1$, $overline(phi)^top L phi = overline(phi)^top (delta_s - delta_t) = overline(Z)$, so that
+  $ re Z = sum_e re(y_e) abs(phi(e^-) - phi(e^+))^2. $
+  This is positive, since $phi$ is not constant.
+]
+
+For real positive resistances the potential is largest at one pole and smallest at the other, and the impedance cannot be much smaller than the resistances of the edges at a pole.
+In such a network the matrix $L_t$ is real and invertible, so that a flow of real value has a real potential, up to an additive constant.
+
+#proposition(name: [maximum principle])[
+  Let the resistances of a network be real and positive, and let $(phi, i)$ be a flow of value $I > 0$ with real potential.
+  Then $phi(t) <= phi(v) <= phi(s)$ for every vertex $v$, and
+  $ 1 / Z <= sum_(e in.rev s) y_e, $
+  the sum being over the edges with an end at $s$.
+] <prop:maximum>
+
+#proof[
+  For an edge $e$ with an end at a vertex $v$, write $v_e$ for its other end.
+  Let $A$ be the set of the vertices at which $phi$ is largest, and suppose that $s in.not A$.
+  At a vertex $v in A$ the law of Kirchhoff reads
+  $ sum_(e in.rev v) y_e (phi(v) - phi(v_e)) = -I delta_(v t) <= 0, $
+  and every term is non-negative, so that every neighbour of $v$ lies in $A$.
+  By connectedness $A = V$, which contradicts the fact that $phi$ is not constant, as $I > 0$.
+  So $s in A$, and likewise $phi$ is smallest at $t$.
+  The law of Kirchhoff at $s$ then gives
+  $ I = sum_(e in.rev s) y_e (phi(s) - phi(v_e)) <= (phi(s) - phi(t)) sum_(e in.rev s) y_e. $
+]
+
+The dependence of the two determinants on the conductances is as simple as it can be.
+
+#proposition(name: [the determinants as polynomials])[
+  The determinants $det L_t$ and $det L_(s t)$ are polynomials in the conductances $y_e$ with integer coefficients, homogeneous of degrees $abs(V) - 1$ and $abs(V) - 2$, and of degree at most one in each variable.
+] <prop:multilinear>
+
+#proof[
+  We have $L = sum_e y_e b_e b_e^top$, where $b_e$ is the column of $B$ of index $e$, and the same holds for the two submatrices, with the vectors $b_e$ truncated.
+  Homogeneity is clear, and for a square matrix $A$, a vector $u$ and a variable $y$,
+  $ det(A + y u u^top) = det A + y u^top adj(A) u, $
+  which has degree at most one in $y$.
+]
+
+== The network of a tiling <sec:tiling-network>
+
+The vertices of the network of a tiling are the horizontal lines of the picture, and its edges are the tiles; the current in a tile is its width, and the potential of a line is its height.
+The lines are taken to be the connected components of the union of the horizontal sides, so that the network is defined also when four tiles meet at a point.
+@fig:network shows an example.
+
+#definition(name: [network of a tiling])[
+  Let $R_1, dots, R_n$ be a tiling $tau$ of the rectangle $[0, W] times [0, H]$, and let $U$ be the union of the top sides and of the bottom sides of its tiles.
+  The _network_ $frak(N)(tau)$ of the tiling has as its vertices the connected components of $U$, as its poles the top side $s$ and the bottom side $t$ of the main rectangle, and one edge for each tile, whose tail is the component that contains the top side of the tile and whose head is the component that contains its bottom side.
+  The _height_ of a component is the common ordinate of its points, and the _resistance_ of a tile $T$ of width $w_T$ and height $h_T$ is $r_T := h_T slash w_T$.
+] <def:tiling-network>
+
+#figure(
+  image("figures/network.svg", width: 62%),
+  caption: [A tiling of a square, with the components of the union of the horizontal sides of its tiles in bold and each tile represented by the vertical segment through its centre; and its network, with the additional edge $e_0$ of @def:plane-network.],
+) <fig:network>
+
+Each component is a horizontal segment of positive length.
+A point of the top side of the main rectangle whose abscissa is not that of a corner of a tile lies on the top side of the tile that contains the points just below it; the top side of the main rectangle is the closure of the set of these points, so it is contained in $U$, and it is a component of $U$ because no other point of $U$ has ordinate $H$.
+The same holds for the bottom side.
+The tiles of the tiling may have any shapes.
+
+#proposition(name: [the flow of a tiling])[
+  Let $tau$ be a tiling of $[0, W] times [0, H]$.
+  Then $frak(N)(tau)$ is a network.
+  With $phi(C)$ the height of the component $C$ and $i_T := w_T$ for every tile $T$, the pair $(phi, i)$ is a flow of value $W$ for the resistances $r_T$, with $phi(s) - phi(t) = H$.
+  Hence $H slash W$ is the impedance of $frak(N)(tau)$ for the resistances $r_T$.
+  Moreover $frak(N)(tau)$ has an embedding in the plane in which both poles lie on the outer face.
+] <prop:tiling-network>
+
+#proof[
+  The law of Ohm holds by the choice of the resistances.
+  Let $C = [p, q] times {c}$ be a component with $c < H$, and let $(u, c)$ be a point of $C$ whose abscissa is not that of a corner of a tile.
+  For small $eta > 0$ the point $(u, c + eta)$ is interior to a tile $T$, the same for all small $eta$.
+  If $c$ were interior to the vertical extent of $T$, the point $(u, c)$ would be interior to $T$; but it lies on a side of some tile $T'$, so the interiors of $T$ and $T'$ would meet, and $T' = T$ is impossible.
+  So the bottom side of $T$ is at height $c$; it meets $C$ and is connected, so it lies in $C$.
+  The tiles whose bottom side lies in $C$ thus cover $C$ up to finitely many points, and their bottom sides do not overlap, so their widths add up to $q - p$.
+  In the same way, if $c > 0$, the widths of the tiles whose top side lies in $C$ add up to $q - p$.
+  This is the law of Kirchhoff at a component other than the poles, and for $s$ and $t$ it gives the value $W$.
+
+  Every component at positive height carries the top side of some tile, whose bottom side lies on a lower component; descending, one reaches $t$, so the graph is connected.
+  A tile joins components at different heights, so there are no loops, and $s != t$ because $H > 0$.
+  For the embedding, represent each tile by the vertical segment through its centre, between its top and bottom sides, and contract each component to a point.
+  The poles are joined by a curve outside the main rectangle, so they lie on a common face, which may be taken as the outer one.
+]
+
+== The aspect-ratio function <sec:function>
+
+For a similar tiling of proportion $x$, a tall tile has resistance $x$ and a wide one resistance $1 slash x$.
+Keeping the network and the orientations and letting $x$ vary gives a rational function of $x$.
+
+#definition(name: [impedance function])[
+  Let $frak(N)$ be a network with $n$ edges and $epsilon$ an orientation vector for its edges.
+  The _impedance function_ $Z_(frak(N), epsilon) in QQ(x)$ is the rational function $det L_(s t) slash det L_t$ evaluated at the conductances $y_e = x^(-epsilon_e)$, that is, for the resistances $x^(epsilon_e)$.
+  A rational function $F in QQ(x)$ is written _in lowest terms_ as $F = N slash D$ with $N, D in ZZ[x]$ coprime in $QQ[x]$, with no common integer factor other than $plus.minus 1$, and with the leading coefficient of $D$ positive; this determines $N$ and $D$.
+] <def:impedance>
+
+By @prop:multilinear the two determinants are then Laurent polynomials in $x$, and the denominator does not vanish at $x = 1$, by @prop:flow; so the definition makes sense, and by @prop:flow the value of $Z_(frak(N), epsilon)$ at any $x > 0$ is the impedance of the network for the resistances $x^(epsilon_e)$.
+By @prop:tiling-network, a similar tiling $tau$ of $[0, W] times [0, H]$ of proportion $x$, with an orientation vector $epsilon$, satisfies
+$ H / W = Z_(frak(N)(tau), epsilon) (x), $
+since the resistance $h_T slash w_T$ of a tile is $x$ if the tile is tall and $1 slash x$ if it is wide.
+The impedance function thus gives the height of the main rectangle over its width.
+The aspect ratio $W slash H$ of @def:counts is the value at $x$ of the inverse $1 slash Z_(frak(N)(tau), epsilon)$, which is again an impedance function: by @prop:dual, which applies to the network of a tiling by @prop:nonseparable, it is that of the dual network with the orientations reversed.
+The statements below are therefore made for impedance functions only.
+
+The next statement collects the properties of these functions.
+The second, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile playing the part of an inductor and a wide one that of a capacitor, and constitute Foster's reactance theorem @foster1924; they are proved here from @prop:flow, since the proof is short.
+
+#proposition(name: [properties of the impedance function])[
+  Let $F = Z_(frak(N), epsilon)$ for a network with $n$ edges, and let $F = N slash D$ in lowest terms.
+  + $F(-x) = -F(x)$.
+  + For every complex number $x$ with $re x > 0$, $D(x) != 0$ and $re F(x) > 0$. In particular $F$ is finite and positive on $(0, infinity)$.
+  + All complex roots of $N$ and of $D$ are simple and lie on the imaginary axis.
+  + The coefficients of $N$ and $D$ are non-negative integers. One of $N$ and $D$ is an even polynomial with non-zero constant term, and the other is an odd polynomial in which $x$ has multiplicity one.
+  + $deg N - deg D = plus.minus 1$, and $deg N <= n$ and $deg D <= n$. If at most $k$ edges have orientation $+1$, or at most $k$ edges have orientation $-1$, then $deg N <= 2 k + 1$ and $deg D <= 2 k + 1$.
+  + There are real numbers $c_infinity >= 0$ and $c_0 >= 0$, and finitely many real numbers $kappa_j > 0$ and $omega_j > 0$, the $omega_j$ being distinct, such that
+    $ F(x) = c_infinity x + c_0 / x + sum_j (2 kappa_j x) / (x^2 + omega_j^2). $
+    Consequently $F(x) slash x$ is non-increasing and $x F(x)$ is non-decreasing on $(0, infinity)$.
+] <prop:reactance>
+
+#proof[
+  _First statement._
+  Replacing $x$ by $-x$ replaces every conductance $y_e = x^(minus.plus 1)$ by $-y_e$.
+  By @prop:multilinear this multiplies $det L_(s t)$ by $(-1)^(abs(V) - 2)$ and $det L_t$ by $(-1)^(abs(V) - 1)$.
+
+  _Second statement._
+  If $re x > 0$ then $re x^(plus.minus 1) > 0$.
+  By @prop:flow the Laurent polynomial $q := det L_t$ does not vanish at $x$, and $p(x) slash q(x)$, with $p := det L_(s t)$, has positive real part there.
+  As rational functions $N q = D p$.
+  If $D(x) = 0$ then $N(x) q(x) = 0$, so that $N(x) = 0$, which contradicts coprimality.
+  So $D(x) != 0$ and $F(x) = p(x) slash q(x)$.
+
+  _Third statement._
+  By the first statement, $N(-x) D(x) = -N(x) D(-x)$.
+  As $N$ and $D$ are coprime, $N(x)$ divides $N(-x)$, which has the same degree, so that $N(-x) = plus.minus N(x)$, and then $D(-x) = minus.plus D(x)$.
+  So each of $N$ and $D$ is an even or an odd polynomial, and its roots are symmetric about the origin.
+  By the second statement neither has a root with positive real part: for $D$ this was shown, and $N(x) = 0$ would give $F(x) = 0$.
+  By symmetry neither has a root with negative real part.
+  Let $upright(i) omega$, with $omega$ real, be a root of $N$ of multiplicity $m$.
+  Then
+  $ F(upright(i) omega + rho e^(upright(i) theta)) = A rho^m e^(upright(i) m theta) (1 + O(rho)) $
+  with $A != 0$, and by the second statement the real part is positive for $abs(theta) < pi slash 2$.
+  Letting $rho$ tend to $0$ gives $re (A e^(upright(i) m theta)) >= 0$ for all $abs(theta) < pi slash 2$.
+  For $m >= 2$ the argument $m theta$ covers an interval of length at least $2 pi$, on which this fails.
+  So $m = 1$; the same argument applied to $1 slash F$, which also has positive real part on the right half-plane, treats the roots of $D$.
+
+  _Fourth statement._
+  A real polynomial with positive leading coefficient whose roots are simple and purely imaginary is a positive multiple of $x^a product_j (x^2 + omega_j^2)$ with $a in {0, 1}$, and has non-negative coefficients.
+  The leading coefficient of $N$ is positive because $F > 0$ on $(0, infinity)$.
+  By the first statement $N$ and $D$ have opposite parities, so exactly one of them is odd; it is divisible by $x$, exactly once by the third statement, and the other is not divisible by $x$, by coprimality.
+
+  _Fifth statement._
+  Let $delta := deg N - deg D$, an odd number by the fourth statement.
+  For large $abs(x)$,
+  $ F(rho e^(upright(i) theta)) = A rho^delta e^(upright(i) delta theta) (1 + O(1 slash rho)) $
+  with $A != 0$, and the argument of the third statement gives $abs(delta) <= 1$.
+  Let
+  $ P(r) := product_e r_e dot.op det L_(s t) (1 slash r), quad Q(r) := product_e r_e dot.op det L_t (1 slash r), $
+  the determinants being evaluated at the conductances $1 slash r_e$.
+  By @prop:multilinear these are polynomials in the resistances, of degree at most one in each, and homogeneous of degrees $c + 1$ and $c$, where $c := n - abs(V) + 1$.
+  A monomial of $Q$ is a product of $c$ distinct resistances, $j$ of them equal to $x$ and $c - j$ equal to $1 slash x$, so it is $x^(2 j - c)$; if $m$ edges have orientation $-1$ then $c - j <= m$ and $j <= n - m$, so that $x^m$ times the monomial is a power of $x$ with exponent between $0$ and $n$.
+  The same holds for $P$.
+  So $F = x^m P slash x^m Q$ is a quotient of two polynomials of degree at most $n$, and $N$ and $D$ divide them.
+  If at most $k$ edges have orientation $+1$, then $j <= k$ in every monomial, so that the exponents of $Q$ lie between $-c$ and $2 k - c$, and those of $P$ between $-c - 1$ and $2 k - c - 1$; after multiplication by $x^(c + 1)$ both are polynomials of degree at most $2 k + 1$.
+  If at most $k$ edges have orientation $-1$, apply this to the function $F(1 slash x)$, which is the impedance function for the reversed orientations.
+
+  _Sixth statement._
+  By the third and fifth statements, $F$ has simple poles at some points $plus.minus upright(i) omega_j$ with $omega_j > 0$, possibly a simple pole at $0$, and at infinity $F(x) - c_infinity x$ is bounded, where $c_infinity >= 0$ is the quotient of the leading coefficients of $N$ and $D$ if $deg N > deg D$, and zero otherwise.
+  Near a pole $upright(i) omega$, with $omega >= 0$,
+  $ F(upright(i) omega + rho e^(upright(i) theta)) = kappa rho^(-1) e^(-upright(i) theta) (1 + O(rho)), $
+  and the positivity of the real part for $abs(theta) < pi slash 2$ forces $kappa > 0$.
+  For $omega = 0$ this residue is $c_0$, which is taken to be zero if $0$ is not a pole.
+  By the first statement the residue at $-upright(i) omega$ is the same as that at $upright(i) omega$, and
+  $ kappa / (x - upright(i) omega) + kappa / (x + upright(i) omega) = (2 kappa x) / (x^2 + omega^2). $
+  The difference between $F$ and the right-hand side of the formula of the statement is a rational function without poles that is bounded at infinity, hence a constant, and it is odd, hence zero.
+  Finally
+  $ F(x) / x = c_infinity + c_0 / x^2 + sum_j (2 kappa_j) / (x^2 + omega_j^2), quad x F(x) = c_infinity x^2 + c_0 + sum_j (2 kappa_j x^2) / (x^2 + omega_j^2). $
+]
+
+By the fifth statement $F(x)$ tends to $0$ or to $infinity$ as $x$ tends to infinity, and by the fourth it does likewise as $x$ tends to $0$ from the right.
+Reversing all orientations replaces $F(x)$ by $F(1 slash x)$, since it inverts every resistance as a function of $x$.
+
+For the square, the proportions are the roots in $[1, infinity)$ of the polynomials $N - D$.
+Since $N$ and $D$ have opposite parities, such a polynomial retains all the information of the function.
+
+#proposition(name: [the difference determines the function])[
+  For $F = N slash D$ as in @prop:reactance, the polynomial $N - D$ is primitive, and it determines the unordered pair ${F, 1 slash F}$; so does $D - N$, and so does the pair ${N - D, D - N}$.
+] <prop:difference>
+
+#proof[
+  By the fourth statement of @prop:reactance, $N$ and $D$ have no monomial in common, so the coefficients of $N - D$ are those of $N$ and of $-D$, whose greatest common divisor is $1$.
+  Let $P := plus.minus (N - D)$, and let $P_0$ and $P_1$ be its even and odd parts.
+  Then ${N, D} = {plus.minus P_0, plus.minus P_1}$, and the signs are those that make the leading coefficients positive.
+  So $P$ determines ${N, D}$, and with it ${N slash D, D slash N}$.
+]
+
+The behaviour of $F$ at the two ends of $(0, infinity)$ fixes the signs of $N - D$ there, and with them the parity of the number of its positive roots.
+
+#proposition(name: [parity law])[
+  For $F = N slash D$ as in @prop:reactance, let $d := deg(N - D)$, and let $rho.alt$ be the number of roots of $N - D$ in $(0, infinity)$, counted with multiplicity; these roots are the solutions of $F(x) = 1$.
+  If $F$ tends to $0$ at one end of $(0, infinity)$ and to $infinity$ at the other, then $d$ and $rho.alt$ are odd; otherwise both are even.
+] <prop:parity-full>
+
+#proof[
+  We have $d = max(deg N, deg D)$, and the leading coefficient of $N - D$ is positive if $deg N > deg D$, that is, if $F$ tends to $infinity$ at infinity, and negative otherwise.
+  Exactly one of $N(0)$ and $D(0)$ is zero, so $N(0) - D(0)$ is negative if $N$ is the odd polynomial, that is, if $F$ tends to $0$ at $0$, and positive otherwise.
+  The number $rho.alt$ is odd exactly when the value at $0$ and the leading coefficient have opposite signs.
+  The four cases are as follows.
+  - If $F$ tends to $0$ at $0$ and to $infinity$ at infinity, the signs are opposite, and $d = deg N$ is odd, as $N$ is odd.
+  - If $F$ tends to $infinity$ at $0$ and to $0$ at infinity, the signs are opposite, and $d = deg D$ is odd, as $D$ is odd.
+  - If $F$ tends to $0$ at both ends, the signs agree, and $d = deg D = deg N + 1$ is even, as $N$ is odd.
+  - If $F$ tends to $infinity$ at both ends, the signs agree, and $d = deg N = deg D + 1$ is even, as $D$ is odd.
+]
+
+In the first case of the statement $F(x) = 1$ has a positive solution $x$, and either $x >= 1$, or $1 slash x >= 1$ is a solution for the reversed orientations.
+The number $d$ is the degree of $N - D$, and not that of the minimal polynomial of a proportion, which divides $N - D$; the relation between this law and the distribution of the degrees in @tab:degrees and @tab:degrees-high therefore remains heuristic.
+
+== From a network to a tiling <sec:converse>
+
+The correspondence of Brooks, Smith, Stone and Tutte has a converse: a planar network with positive resistances in which every current is different from zero is the network of a tiling.
+The abscissas of the tiling are given by a potential on the faces of the network, which exists by planarity.
+
+#definition(name: [plane network])[
+  A _plane network_ is a network together with an embedding of its graph $G$ in the plane in which both poles lie on the outer face.
+  For a plane network, $G^+$ is the plane graph obtained from $G$ by adding an edge $e_0$ from $t$ to $s$ inside the outer face.
+  For an edge $e$ of $G^+$ with a direction, $lft(e)$ and $rgt(e)$ are the faces of $G^+$ on the left and on the right of $e$, and we put $f_R := lft(e_0)$ and $f_L := rgt(e_0)$.
+] <def:plane-network>
+
+Embeddings are taken to be piecewise linear, so that the two sides of a closed curve are well defined, and the dual of a plane graph is a multigraph, in which a minimal cut of two edges gives a cycle of length two.
+By @prop:tiling-network the network of a tiling is a plane network, for the embedding constructed there, and it is always considered with that embedding.
+
+The first step is the potential on the faces, whose differences across the edges are the currents.
+It uses Euler's formula, by which a connected plane graph with $v$ vertices and $m$ edges has $m - v + 2$ faces.
+
+#proposition(name: [potential on the faces])[
+  Let $(phi, i)$ be a flow of value $I$ on a plane network.
+  Then there is a function $psi$ on the faces of $G^+$, unique up to an additive constant, such that $psi(lft(e)) - psi(rgt(e)) = i_e$ for every edge $e$ of $G$, taken in its reference direction, and $psi(f_R) - psi(f_L) = I$.
+] <prop:face-potential>
+
+#proof[
+  Put $j_e := i_e$ for the edges of $G$ and $j_(e_0) := I$; by the law of Kirchhoff $j$ is a circulation on $G^+$, that is, at every vertex the values of $j$ on the edges that leave it and on those that enter it have equal sums.
+  The map $partial$ that sends a function $psi$ on the faces to the function $e |-> psi(lft(e)) - psi(rgt(e))$ on the edges takes its values in the circulations, because around a vertex the contributions telescope.
+  Its kernel consists of the constants, because the dual graph is connected.
+  The space of the circulations of the connected plane graph $G^+$, which has $n + 1$ edges if $G$ has $n$, has dimension $(n + 1) - abs(V) + 1$, which by Euler's formula is one less than the number of faces; so $partial$ maps onto it.
+]
+
+The second step is the construction of the tiling.
+Its proof is complete given three standard facts: Euler's formula, used in @prop:face-potential; the Jordan curve theorem; and the duality between the bonds and the cycles of a connected plane graph, by which a set of edges is a minimal cut exactly when the dual edges form a cycle of the dual graph @diestel2017[Section 4.6].
+The duality is used in its oriented form: if the edges of a minimal cut are all directed from one side of the cut to the other, they all cross the dual cycle in the same sense.
+This follows from the unoriented statement, since the dual cycle separates the two sides of the cut, by the Jordan curve theorem.
+
+#proposition(name: [from a network to a tiling])[
+  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current $i_e$ is zero.
+  Direct every edge so that $i_e > 0$, and let $psi$ be as in @prop:face-potential.
+  Then the rectangles
+  $ rct(e) := [psi(rgt(e)), psi(lft(e))] times [phi(e^+), phi(e^-)], quad e in E, $
+  form a tiling of the rectangle $[psi(f_L), psi(f_R)] times [phi(t), phi(s)]$ with $abs(E)$ tiles, and $rct(e)$ has width $i_e$ and height $r_e i_e$.
+] <prop:bsst>
+
+#proof[
+  By the law of Ohm, $phi$ decreases strictly along every directed edge, so the directions are acyclic.
+  By @prop:maximum, $phi$ is largest at $s$ and smallest at $t$, so no edge enters $s$ or leaves $t$.
+  A vertex $v$ other than the poles has an edge, and by the law of Kirchhoff the currents entering it and those leaving it have equal sums, so it has both an entering and a leaving edge.
+  Following entering edges backwards from any vertex therefore leads to $s$, and following leaving edges leads to $t$.
+
+  Let $c$ be a real number with $phi(t) < c < phi(s)$, different from every value of $phi$, let $U_c$ be the set of the vertices at which $phi > c$, and let $D_c$ be its complement.
+  A directed path from $s$ to a vertex of $U_c$ stays in $U_c$, so $U_c$ induces a connected subgraph; so does $D_c$.
+  Let $E_c$ be the set of the edges of $G$ between the two; every one of them is directed from $U_c$ to $D_c$, and $E_c$ is the set of the edges $e$ with $phi(e^+) < c < phi(e^-)$.
+  In $G^+$ the set $E_c union {e_0}$ is a cut both of whose sides are connected, hence a minimal cut.
+  By duality there is a closed curve $gamma$ that passes through distinct faces $f_0, f_1, dots, f_(m - 1)$ of $G^+$ in cyclic order, meets $G^+$ only in one interior point of each edge of the cut, and crosses these edges one at a time.
+  By the Jordan curve theorem $gamma$ separates the plane into two regions; the connected sets $U_c$ and $D_c$ lie in different ones, since an edge of the cut crosses $gamma$ once.
+  Traverse $gamma$ with $U_c$ on the left.
+  Each edge $e in E_c$ runs from the left of $gamma$ to its right, so $gamma$ crosses it from $rgt(e)$ to $lft(e)$, and $psi$ increases by $i_e$ at the crossing.
+  The edge $e_0$ runs from the right of $gamma$ to its left, so $gamma$ crosses it from $lft(e_0) = f_R$ to $rgt(e_0) = f_L$.
+  Starting after that crossing, $gamma$ visits $f_L = f_0, f_1, dots, f_(m - 1) = f_R$ and crosses the edges $e_1, dots, e_(m - 1)$ of $E_c$, the interval $[psi(f_(j - 1)), psi(f_j)]$ being the horizontal extent of $rct(e_j)$.
+  So the rectangles that meet the horizontal line at height $c$ are those of the edges of $E_c$, and their sections subdivide the segment $[psi(f_L), psi(f_R)] times {c}$.
+
+  This holds for all but finitely many $c$.
+  Every rectangle meets such a line, so it lies in the main rectangle.
+  Two rectangles whose interiors met would have overlapping sections on such a line.
+  The union of the rectangles is closed and contains every point of the main rectangle at such a height, hence all of it.
+  The width of $rct(e)$ is $i_e$ by the choice of $psi$, and its height is $r_e i_e$ by the law of Ohm.
+]
+
+The additive constants of $phi$ and $psi$ may be chosen so that the main rectangle is $[0, I] times [0, Z I]$, where $Z$ is the impedance.
+
+The third step is that the inverse of an impedance function of a plane network is the impedance function of the dual network, in which currents and differences of potential exchange their parts.
+For a tiling this is transposition.
+
+#proposition(name: [duality])[
+  Let $frak(N)$ be a plane network such that $G^+$ has no bridge.
+  Let $frak(N)^*$ consist of the graph whose vertices are the faces of $G^+$, with an edge $e^*$ joining $lft(e)$ and $rgt(e)$ for every edge $e$ of $G$, and of the poles $f_R$ and $f_L$.
+  + $frak(N)^*$ is a plane network, and $Z_(frak(N)^*, -epsilon) = 1 slash Z_(frak(N), epsilon)$ for every orientation vector $epsilon$.
+  + For real positive resistances $r_e$ on $frak(N)$ and $1 slash r_e$ on $frak(N)^*$, the current in $e^*$ for a flow of non-zero value on $frak(N)^*$ vanishes exactly when the current in $e$ for a flow of non-zero value on $frak(N)$ does.
+] <prop:dual>
+
+#proof[
+  The graph of $frak(N)^*$ is the dual of $G^+$ with the edge dual to $e_0$ removed, that is, the dual of the plane graph $G^+ slash e_0$ obtained by contracting $e_0$.
+  It is connected, it has no loop because $G^+$ has no bridge, its poles are distinct because $e_0$ is not a bridge, and they lie on the face that corresponds to the vertex of $G^+ slash e_0$ made of $s$ and $t$.
+  Let $(phi, i)$ be a flow of value $I != 0$ on $frak(N)$ for real positive resistances $r$, and let $psi$ be as in @prop:face-potential.
+  On $frak(N)^*$ take the potential $psi$ and, in the edge $e^*$ directed from $lft(e)$ to $rgt(e)$, the current $r_e i_e = phi(e^-) - phi(e^+)$.
+  The law of Ohm holds with the resistance $1 slash r_e$.
+  The law of Kirchhoff at a face says that the differences of $phi$ along the edges of its boundary, other than $e_0$, add up to zero, or to $plus.minus (phi(s) - phi(t))$ for the two faces at $e_0$; this holds because the boundary is a closed walk.
+  So this is a flow of value $phi(s) - phi(t)$ on $frak(N)^*$ with difference of potential $I$ between the poles, and the impedance of $frak(N)^*$ is the inverse of that of $frak(N)$.
+  For the resistances $x^(epsilon_e)$ this holds for all $x > 0$, hence as an identity of rational functions.
+  In the flow constructed, the current in $e^*$ is $r_e$ times the current in $e$; every flow of non-zero value on either network is a non-zero multiple of the one considered, up to an additive constant of the potential, by @prop:flow, which gives the second statement.
+]
+
+== Wide rectangles <sec:wide>
+
+For a network with an orientation vector, the current $i_e$ of the flow of value $1$ is a rational function of $x$, by Cramer's rule.
+It may vanish identically, and the pair then has no tile for that edge at any proportion; such pairs must be left out of the count of the functions.
+
+#definition(name: [proper pair])[
+  A pair $(frak(N), epsilon)$ of a plane network with $n$ edges and an orientation vector for its edges is _proper_ if no current $i_e$ of the flow of value $1$ for the resistances $x^(epsilon_e)$ vanishes identically as a function of $x$.
+  We write $cal(F)_n$ for the set of the impedance functions $Z_(frak(N), epsilon)$ of the proper pairs with $n$ edges, and $cal(F)_n^infinity$ for the set of those $F in cal(F)_n$ that tend to $infinity$ at infinity.
+] <def:proper>
+
+The set $cal(F)_n$ is what the tilings with $n$ tiles see of the impedance functions, in the following sense.
+
+#proposition(name: [the set of functions])[
+  Let $n >= 1$.
+  + The set $cal(F)_n$ is finite and closed under $F |-> 1 slash F$, and $F != 1 slash F$ for every $F in cal(F)_n$. So $abs(cal(F)_n)$ is even, and we put $E(n) := abs(cal(F)_n) slash 2$.
+  + If $tau$ is a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $n$ tiles, and $epsilon$ is an orientation vector of $tau$, then $(frak(N)(tau), epsilon)$ is proper and $Z_(frak(N)(tau), epsilon) (x) = H slash W$.
+  + If $(frak(N), epsilon)$ is proper, then for every $x > 0$ at which no current vanishes, in particular for all but finitely many $x > 0$, there is a tiling of the rectangle $[0, 1] times [0, Z_(frak(N), epsilon) (x)]$ with $n$ tiles in which the tile of the edge $e$ has height $x^(epsilon_e)$ times its width.
+] <prop:functions>
+
+#proof[
+  For the first statement, there are finitely many networks with $n$ edges up to isomorphism, and the function depends only on the isomorphism class of the network with its orientation vector.
+  A bridge of $G^+$ carries no current: its removal leaves both poles in one component, as they are joined by $e_0$, and the sum of the law of Kirchhoff over the vertices of the other component is, up to sign, the current in the bridge.
+  The edge $e_0$ is not a bridge, since $G$ is connected.
+  So $G^+$ has no bridge when the pair is proper, and @prop:dual applies; its second statement, applied at every $x > 0$, shows that the dual pair $(frak(N)^*, -epsilon)$ is proper, and its first statement that the impedance function of the dual pair is $1 slash F$.
+  Finally $F = 1 slash F$ would give $F^2 = 1$, which is impossible for an odd function.
+
+  The second statement is @prop:tiling-network, with the remark that the currents of the flow of the tiling are the widths of the tiles, which are not zero, and that the flow of value $1$ at the proportion $x$ is that flow divided by $W$, by @prop:flow.
+
+  The third statement is @prop:bsst with $I = 1$, the edges being directed so that the currents are positive and the additive constants being chosen as in the remark that follows that proposition.
+]
+
+In the third statement, the tiling is similar of proportion $x$ if $x >= 1$.
+By the second and third statements, $cal(F)_n$ is also the set of the functions $Z_(frak(N)(tau), epsilon)$ over all similar tilings $tau$ with $n$ tiles, of any proportion and of any main rectangle, and their orientation vectors $epsilon$.
+Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tiling $tau_x$ for all but finitely many $x >= 1$; the networks $frak(N)(tau_x)$, with their edges labelled by those of $frak(N)$, take finitely many values up to isomorphism, so one of them occurs for infinitely many $x$, and by the second statement its function agrees with $Z_(frak(N), epsilon)$ at these $x$, hence everywhere.
+
+#example[
+  It is essential that the pairs with an identically vanishing current are left out.
+  Consider the network of a pinwheel of five tiles, four around a central one as in @fig:network, with all orientations equal.
+  The current in the central edge vanishes identically, and the impedance function is $x$ or $1 slash x$.
+  This function does not belong to $cal(F)_5$.
+  Since $cal(F)_5$ is closed under inversion, it suffices to consider $1 slash x$.
+  The non-zero currents of a proper pair with five edges have no zero at $x >= 17$, by the fourth step of the proof of @prop:threshold below; if $1 slash x$ were the impedance function of a proper pair with five edges, the third statement of @prop:functions would therefore give a similar tiling of proportion $1009$ of the rectangle $[0, 1] times [0, 1 slash 1009]$ with five tiles, so that $1009 in P_5 (1009)$ by @prop:scaling, and the search finds that this is not so.
+  The exclusion therefore rests on a computation, and on Kirchhoff's formulas, which @prop:threshold assumes.
+] <ex:improper>
+
+By the fifth statement of @prop:reactance, each $F in cal(F)_n$ tends to $infinity$ or to $0$ at infinity.
+Inversion exchanges the two kinds, so that $abs(cal(F)_n^infinity) = E(n)$.
+A function of the first kind takes each large value exactly once on $[1, infinity)$, and for a wide main rectangle this identifies the proportions with these functions.
+
+#proposition(name: [wide rectangles count the functions])[
+  For every $n >= 1$ there is a real number $W(n)$ such that, for every real number $w > W(n)$:
+  + every $F in cal(F)_n^infinity$ has exactly one solution $x_F (w)$ of $F(x) = w$ in $[1, infinity)$;
+  + the map $F |-> x_F (w)$ is a bijection from $cal(F)_n^infinity$ onto $P_n (w)$.
+  In particular $a_w (n) = E(n)$ for every real number $w > W(n)$.
+] <prop:wide-full>
+
+#proof[
+  Each $F in cal(F)_n$ is continuous on $[1, infinity)$, by the second statement of @prop:reactance.
+  The proof consists of five steps, each of which gives finitely many lower bounds on $w$.
+
+  _First step._
+  If $F in cal(F)_n without cal(F)_n^infinity$ then $F$ is bounded on $[1, infinity)$, by $beta_F$ say.
+
+  _Second step._
+  If $F in cal(F)_n^infinity$ then $F(x) slash x$ tends to $c_infinity > 0$ and $F'(x)$ tends to $c_infinity$ at infinity, as for any rational function.
+  So there is $X_F >= 1$ such that $F$ is strictly increasing on $[X_F, infinity)$.
+  For $X >= X_F$ put $mu_F (X) := max_([1, X]) F$.
+  If $w > mu_F (X)$ then $F(x) = w$ has exactly one solution in $[1, infinity)$, and it is larger than $X$.
+
+  _Third step._
+  If $F != G$ in $cal(F)_n^infinity$, the two functions agree at finitely many points; let $X_(F G) >= X_F$ exceed all of them.
+  If $w > mu_F (X_(F G))$ and $w > mu_G (X_G)$ then $x_F (w) != x_G (w)$.
+
+  _Fourth step._
+  For $F in cal(F)_n^infinity$ choose a proper pair $(frak(N), epsilon)$ with $Z_(frak(N), epsilon) = 1 slash F$, which exists by the first statement of @prop:functions, and let $X'_F >= X_F$ exceed every positive zero of its currents.
+  If $w > mu_F (X'_F)$ then no current vanishes at $x = x_F (w)$, and the third statement of @prop:functions gives a similar tiling of proportion $x$ of the rectangle $[0, 1] times [0, 1 slash w]$ with $n$ tiles.
+  By @prop:scaling, $x_F (w) in P_n (w)$.
+
+  _Fifth step._
+  Let $x in P_n (w)$, and let $tau$ be a similar tiling of $[0, w] times [0, 1]$ of proportion $x$ with $n$ tiles, with an orientation vector $epsilon$.
+  By the second and first statements of @prop:functions, $F := 1 slash Z_(frak(N)(tau), epsilon)$ belongs to $cal(F)_n$ and $F(x) = w$.
+  If $w$ exceeds every bound $beta_F$ of the first step, then $F in cal(F)_n^infinity$, and $x = x_F (w)$ by the second step.
+
+  Let $W(n)$ be the largest of the finitely many bounds of the five steps.
+]
+
+The rationality of $w$ plays no part.
+
+The threshold can be made explicit by bounding the coefficients of the polynomials involved, which is done by counting spanning trees.
+The following formulas of Kirchhoff, for a network with conductances $y$, are assumed @kirchhoff1847; in the generality needed they are instances of the all-minors matrix-tree theorem @chaiken1982.
+- $det L_t = sum_T product_(e in T) y_e$, the sum being over the spanning trees $T$ of $G$.
+- $det L_(s t) = sum_Phi product_(e in Phi) y_e$, the sum being over the spanning forests $Phi$ of $G$ with two components, one containing each pole.
+- For the flow of value $1$, $i_e det L_t = sum_T plus.minus product_(f in T) y_f$, the sum being over the spanning trees $T$ that contain $e$ and whose path between the poles passes through $e$.
+
+#proposition(name: [explicit threshold])[
+  @prop:wide-full holds with $W(n) = n (1 + 4^n slash 2)$.
+] <prop:threshold>
+
+#proof[
+  Let $(frak(N), epsilon)$ be a pair of a plane network with $n$ edges and an orientation vector, $m$ of the edges having orientation $-1$, and let $F = Z_(frak(N), epsilon) = N slash D$ in lowest terms.
+  Multiply the three sums of Kirchhoff's formulas by $x^m product_e r_e$, where $r_e = x^(epsilon_e)$: as in the proof of the fifth statement of @prop:reactance, this gives polynomials $tilde(P)$, $tilde(Q)$ and $nu_e$ in $x$ with integer coefficients such that $F = tilde(P) slash tilde(Q)$ and $i_e = nu_e slash tilde(Q)$, where the coefficients of $tilde(P)$ and $tilde(Q)$ are non-negative.
+  The number $tilde(Q)(1)$ is the number of spanning trees, which is at most $binom(n, abs(V) - 1)$; $tilde(P)(1)$ is at most $binom(n, abs(V) - 2)$; and the sum of the absolute values of the coefficients of $nu_e$ is at most $tilde(Q)(1)$.
+  Each binomial coefficient is at most $binom(n, floor(n slash 2)) <= 2^(n - 1)$.
+  Write $tilde(P) = g N$ and $tilde(Q) = g D$.
+  Then $g in ZZ[x]$: write $g = (a slash b) g_0$ with $g_0 in ZZ[x]$ primitive and $a slash b$ a fraction in lowest terms; by Gauss's lemma $b$ divides the content of $N$ and that of $D$, which have no common factor since $N slash D$ is in lowest terms, so that $b = 1$.
+  The roots of $g$ are roots of $tilde(Q)$, which lie on the imaginary axis: $tilde(Q)$ has no root with positive real part by @prop:flow, and none with negative real part because $tilde(Q)(-x) = plus.minus tilde(Q)(x)$ by @prop:multilinear.
+  So $g$ is a real multiple of a product of factors $x$ and $x^2 + omega^2$, its coefficients have one sign, and $abs(g(1)) >= 1$.
+  Hence $N(1) <= 2^(n - 1)$ and $D(1) <= 2^(n - 1)$, and these numbers bound every coefficient of $N$ and of $D$.
+  We use Cauchy's bound: a root $z$ of a polynomial with integer coefficients $a_0, dots, a_d$, where $a_d != 0$, satisfies $abs(z) < 1 + max_j abs(a_j)$.
+  By @prop:maximum, every $F in cal(F)_n$ satisfies $F(x) <= n x$ for $x >= 1$, because $1 slash F in cal(F)_n$ is an impedance function, and the conductances are at most $x$.
+  Now let $w > n (1 + 4^n slash 2)$, and follow the five steps of the proof of @prop:wide-full.
+
+  _First step._
+  If $F in cal(F)_n without cal(F)_n^infinity$, then $x F(x)$ is non-decreasing, with limit the quotient of the leading coefficients of $N$ and $D$, which is at most $2^(n - 1)$; so $F <= 2^(n - 1) < w$ on $[1, infinity)$.
+
+  _Second step._
+  Let $F in cal(F)_n^infinity$, and write $F(x) = c_infinity x + G(x)$ in the notation of the sixth statement of @prop:reactance.
+  Then $G'(x) >= -K slash x^2$ with $K := c_0 + sum_j 2 kappa_j = lim_(x -> infinity) x G(x)$, because $abs(omega^2 - x^2) <= omega^2 + x^2$.
+  If $N = a_d x^d + a_(d - 2) x^(d - 2) + dots.c$ and $D = b_(d - 1) x^(d - 1) + dots.c$, then $c_infinity = a_d slash b_(d - 1)$ and $K <= a_(d - 2) slash b_(d - 1)$, so that $K slash c_infinity <= a_(d - 2) slash a_d <= 2^(n - 1)$.
+  So $F$ is strictly increasing on $[X_0, infinity)$, where $X_0 := 2^((n - 1) slash 2)$.
+  A solution $x >= 1$ of $F(x) = w$ satisfies $x >= w slash n > X_0$, and $F(X_0) <= n X_0 < w$; so there is exactly one solution $x_F (w)$, and $x_F (w) >= w slash n > 1 + 4^n slash 2$.
+
+  _Third step._
+  If $F != G$ in $cal(F)_n^infinity$, with $F = N_F slash D_F$ and $G = N_G slash D_G$ in lowest terms, a common solution of $F(x) = w$ and $G(x) = w$ is a root of $N_F D_G - N_G D_F$, a non-zero polynomial with integer coefficients of absolute value at most $2 dot.op 4^(n - 1)$; its roots are smaller than $1 + 4^n slash 2$.
+
+  _Fourth step._
+  A zero of a current of a proper pair is a root of some $nu_e != 0$, hence smaller than $1 + 2^(n - 1)$.
+
+  _Fifth step._
+  This step is covered by the first and the second.
+]
+
+The bound is far from the truth: for $n <= 9$ the counts are observed to be constant from $w = floor(n^2 slash 4) + 2$ onwards.
+The next statement shows that the two statements of @prop:wide-full cannot both hold below that width, by exhibiting two functions with a common solution.
+
+#proposition(name: [a coincidence])[
+  Let $n >= 2$, and let $a, b >= 1$ be integers with $a + b = n$.
+  For $w = a b + 1$, two distinct functions of $cal(F)_n^infinity$ have the common solution $x = b$ of $F(x) = w$, and $b in P_n (w)$.
+  Consequently the two statements of @prop:wide-full do not both hold for $w = floor(n^2 slash 4) + 1$, and every $W(n)$ for which that proposition holds is at least $floor(n^2 slash 4) + 1$.
+] <prop:coincidence>
+
+#proof[
+  Place $a$ wide tiles of height $1$ side by side, of total width $a x$, and beside them a block of $b$ tiles, of height $1$ in all.
+  If the $b$ tiles are tall and side by side, the block has width $b slash x$; if they are wide and stacked, it has width $x slash b$.
+  The functions $a x + b slash x$ and $a x + x slash b$ are different; they are the inverses of the impedance functions of these two tilings, so they belong to $cal(F)_n$ by the second and first statements of @prop:functions, and they tend to $infinity$ at infinity; and they take the value $a b + 1$ at $x = b$.
+  The largest value of $a b$ is $floor(n^2 slash 4)$.
+]
+
+@prop:coincidence does not give $a_w (n) < E(n)$ at the width $w = a b + 1$, because a function may contribute several solutions when $w$ is small.
+It exhibits one coincidence for even $n$, where $a = b$, and two for odd $n$, where $(a, b)$ and $(b, a)$ give the same width; in the computations, which cover $2 <= n <= 9$, $a_w (n)$ at $w = floor(n^2 slash 4) + 1$ is accordingly $E(n) - 1$ for even $n$ and $E(n) - 2$ for odd $n$.
+What is missing for the second part of @conj:threshold is a proof that beyond that width no two functions share a solution, every function of $cal(F)_n^infinity$ has one solution, the functions of the other kind have none, and no tile vanishes.
+The gap between the width proved sufficient, which is exponential in $n$, and the conjectured one, which is quadratic, comes from the use of Cauchy's bound on the roots of $N_F D_G - N_G D_F$.
+For the first part of @conj:threshold we have no argument: for small $w$ a function can have several solutions and the functions of the other kind contribute as well, and the trivial bound is $a_w (n) <= 2 n E(n)$.
+
+== Rational proportions that need both orientations <sec:rational>
+
+A _dissection of a rectangle into squares_ is a tiling of the rectangle all of whose tiles are squares.
+A similar tiling of the unit square of proportion $x$ whose tiles are all wide becomes, when the ordinates are multiplied by $x$, a dissection of the rectangle $[0, 1] times [0, x]$ into squares, and conversely; a tiling whose tiles are all tall is the transpose of one whose tiles are all wide.
+So a proportion $x in P_n (1)$ is achieved by $n$ tiles of a single orientation exactly when a rectangle of sides $x$ and $1$ can be dissected into $n$ squares.
+
+The three proportions of @prop:exceptional are obtained by surrounding with a pinwheel the three most elongated rectangles that can be dissected into $n - 4$ squares.
+
+#proposition(name: [the three proportions occur])[
+  The proportion $n - 4$ belongs to $P_n (1)$ for every $n >= 6$, the proportion $n - 11 slash 2$ for every $n >= 7$, and the proportion $n - 19 slash 3$ for every $n >= 8$.
+] <prop:three-occur>
+
+#proof[
+  Let $m := n - 4$.
+  A rectangle of sides $m$ and $1$ is dissected into $m$ squares of side $1$.
+  For $m >= 3$, a rectangle of sides $2 m - 3$ and $2$ is dissected into $m - 2$ squares of side $2$ and two of side $1$.
+  For $m >= 4$, a rectangle of sides $3 m - 7$ and $3$ is dissected into $m - 3$ squares of side $3$, one of side $2$ and two of side $1$.
+  So $m$, $m - 3 slash 2$ and $m - 7 slash 3$ belong to $P_m (1)$ for $m >= 2$, $m >= 3$ and $m >= 4$ respectively, and they exceed $1$.
+  By @prop:persistence with $k = 4$, they belong to $P_(m + 4) (1)$.
+]
+
+That the three rectangles cannot be dissected into $n$ squares is reduced below to three finite statements, of which the first is the following.
+
+#proposition(name: [five squares])[
+  A square cannot be dissected into five squares.
+] <prop:five-squares>
+
+#proof[
+  Suppose that the unit square is dissected into five squares.
+  Each corner of the unit square lies in exactly one of the squares, and no square contains two corners.
+  Let $A$, $B$, $C$ and $D$ be the squares at the corners, in order around the unit square from the bottom-left corner, of sides $a$, $b$, $c$ and $d$, and let $Q$ be the fifth square.
+  A square that has a segment in common with two sides of the unit square contains a corner or has side $1$, so $Q$ has a segment in common with at most one side, say not with the bottom, right or top side.
+  Each of these three sides is then covered by its two corner squares, so that $a + b = b + c = c + d = 1$.
+  Hence $c = a$ and $d = b$, so that $a + d = 1$, and the left side is covered by $A$ and $D$ as well.
+  The squares $A = [0, a]^2$ and $C = [1 - a, 1]^2$ have disjoint interiors, so $a <= 1 slash 2$; likewise $b <= 1 slash 2$.
+  So $a = b = 1 slash 2$, the four corner squares fill the unit square, and there is no room for $Q$.
+]
+
+The other reductions rest on one identity, which counts the squares of a dissection by integrating over the vertical lines.
+Let a rectangle $[0, L] times [0, H]$ be dissected into $k$ squares of sides $s_1, dots, s_k$, and for $u in [0, L]$, not the abscissa of a corner of a square, let $h(u)$ be the sum of the numbers $1 slash s_i$ over the squares that the vertical line of abscissa $u$ crosses.
+Since the $i$-th square is crossed for $u$ in an interval of length $s_i$,
+$ k = integral_0^L h(u) dif u. $ <eq:reciprocals>
+The squares crossed by one line have sides that add up to $H$; if there are $m$ of them, then $h(u) >= m^2 slash H$, by the inequality between the arithmetic and the harmonic mean.
+
+The first use of the identity removes the squares of the largest possible size.
+
+#proposition(name: [removing the unit squares])[
+  Let a rectangle $[0, L] times [0, 1]$ be dissected into $n$ squares, $f$ of which have side $1$.
+  Then there is a dissection of $[0, L - f] times [0, 1]$ into $n - f$ squares of side less than $1$, and $n - f >= 4 (L - f)$.
+] <prop:unit-squares>
+
+#proof[
+  A square of side $1$ occupies a full column, so the squares of side $1$ cut the rectangle into rectangles of height $1$, each of which is dissected by the squares that it contains.
+  Pushing these together gives the dissection.
+  In it every vertical line crosses at least two squares, so that $h >= 4$, and @eq:reciprocals gives the inequality.
+]
+
+The second finite statement is obtained by measuring how far the function $h$ exceeds its least possible value.
+
+#proposition(name: [seven squares])[
+  A rectangle of sides $3$ and $2$ cannot be dissected into seven squares of side less than $2$.
+] <prop:seven-squares>
+
+#proof[
+  Suppose that there is such a dissection, take $L = 3$ and $H = 2$, and let $d(u) := h(u) - 2$.
+  Every line crosses at least two squares, so that $d >= 0$, and $integral_0^3 d(u) dif u = 1$ by @eq:reciprocals.
+  A line is of _type a_ if it crosses two squares of side $1$, where $d = 0$; of _type b_ if it crosses two squares of sides $sigma > 1$ and $2 - sigma$, where $d = delta(sigma) := 2 slash (sigma (2 - sigma)) - 2$; and of _type c_ if it crosses at least three squares, where $d >= 9 slash 2 - 2 = 5 slash 2$.
+  The lines of type c therefore have total length at most $2 slash 5$.
+  Call a square _big_ if its side exceeds $1$.
+  No line crosses two big squares, so the horizontal extents of the big squares do not overlap, and there are at most two of them.
+  A line of type a crosses a square of side $1$ that touches the bottom side; the extent of such a square has length $1$ and does not overlap the extent of a big square.
+  Put $eta(sigma) := sigma delta(sigma) = 2 (sigma - 1)^2 slash (2 - sigma)$.
+  There are three cases.
+
+  _No big square._
+  Every line is of type a or c, so the lines of type a have total length at least $13 slash 5$.
+  Each crosses two squares of side $1$, and a square of side $1$ is crossed over a length $1$, so there are at least $26 slash 5$, hence six, squares of side $1$.
+  Their area is $6$, which leaves no room for the seventh square.
+
+  _One big square_, of side $sigma$.
+  The lines through it are of type b or c, so that $1 >= sigma min(delta(sigma), 5 slash 2)$; as $sigma > 1$ this gives $eta(sigma) <= 1$, that is, $sigma <= 3 slash 2$.
+  The lines outside its extent are of type a or c, so those of type a have total length at least $3 - sigma - 2 slash 5 >= 11 slash 10$.
+  But the complement of the extent consists of at most two intervals of total length $3 - sigma < 2$, so it contains the extent of at most one square of side $1$ touching the bottom side, and the lines of type a have total length at most $1$.
+
+  _Two big squares_, of sides $sigma_1$ and $sigma_2$.
+  The complement of their extents has length $3 - sigma_1 - sigma_2 < 1$, so it contains no line of type a, and all its lines are of type c.
+  Hence
+  $ 1 >= sum_j sigma_j min(delta(sigma_j), 5 slash 2) + 5 / 2 (3 - sigma_1 - sigma_2). $
+  With $v := 2 - sigma$ we have $eta(sigma) - (5 slash 2) sigma = 2 slash v + (9 slash 2) v - 9 >= -3$, with equality at $v = 2 slash 3$; so $sigma min(delta(sigma), 5 slash 2) >= (5 slash 2) sigma - 3$ in all cases.
+  The right-hand side of the inequality displayed is therefore at least $15 slash 2 - 6 = 3 slash 2$, a contradiction.
+]
+
+The third finite statement needs a longer analysis, by the number of squares that touch neither the top nor the bottom side.
+
+#proposition(name: [eight squares])[
+  A rectangle of sides $5$ and $3$ cannot be dissected into eight squares of side less than $3$.
+] <prop:eight-squares>
+
+#proof[
+  Take $L = 5$ and $H = 3$, and suppose that such a dissection exists.
+  Call a square _lower_ if it touches the bottom side, _upper_ if it touches the top side, and _middle_ otherwise; no square is both lower and upper.
+  A vertical line that avoids the corners crosses one lower square, of side $sigma$, one upper square, of side $theta$, and possibly middle squares, of sides $c_i$; and $1 slash sigma + 1 slash theta >= 4 slash (sigma + theta) >= 4 slash 3$.
+  By @eq:reciprocals, $8 >= 5 dot.op 4 slash 3 + integral_0^5 sum_i 1 slash c_i dif u$, and the integral is the number of middle squares, so there is at most one.
+  A _cut_ is a vertical line, other than the two vertical sides of the rectangle, that crosses the interior of no square; the cuts divide the rectangle into _blocks_, each of which is dissected by the squares that it contains.
+
+  _Blocks without a middle square._
+  Every line crosses a lower and an upper square with $sigma + theta = 3$.
+  Where the lower square changes, inside the block, the upper square does not, as the line is not a cut; so consecutive lower squares have the same side, and likewise the upper ones.
+  The block thus consists of $a$ lower squares of side $sigma$ and $b$ upper squares of side $3 - sigma$ with $a sigma = b (3 - sigma)$, and $a$ and $b$ are coprime, as otherwise there would be a cut inside.
+  It has $a + b$ squares and width $3 a b slash (a + b)$: the widths are $3 slash 2$ for two squares, $2$ for three, $9 slash 4$ for four, $12 slash 5$ or $18 slash 5$ for five, $5 slash 2$ for six, $18 slash 7$, $30 slash 7$ or $36 slash 7$ for seven, and $21 slash 8$ or $45 slash 8$ for eight.
+
+  _No middle square._
+  The numbers of squares of the blocks form a partition of $8$ into parts at least $2$, and the widths add up to $5$.
+  The partitions $8$; $6 + 2$; $5 + 3$; $4 + 4$; $4 + 2 + 2$; $3 + 3 + 2$; $2 + 2 + 2 + 2$ give the total widths $21 slash 8$ or $45 slash 8$; $4$; $22 slash 5$ or $28 slash 5$; $9 slash 2$; $21 slash 4$; $11 slash 2$; $6$, none of which is $5$.
+
+  _One middle square_ $Q$, of side $c$.
+  The lines through $Q$ cross three squares, so that $h >= 3$ on a length $c$, and @eq:reciprocals gives $8 >= 20 slash 3 + (5 slash 3) c$, that is, $c <= 4 slash 5$.
+  On these lines the lower squares have their top at the bottom of $Q$ and the upper squares their bottom at its top; so the lower squares below $Q$ have a common side $sigma$, the upper squares above $Q$ a common side $theta^*$, and $sigma + c + theta^* = 3$.
+  Let the block that contains $Q$ have width $omega$ and $k$ squares, and let it be $[0, omega] times [0, 3]$, with $Q$ above the interval $[u_Q, u_Q + c]$.
+  The other blocks have no middle square, so their numbers of squares form a partition of $8 - k$ into parts at least $2$.
+  It is shown below that $k >= 4$; hence $(k, omega)$ is one of $(8, 5)$, $(6, 7 slash 2)$, $(5, 3)$, $(4, 11 slash 4)$ and $(4, 2)$.
+
+  Suppose that $u_Q > 0$.
+  To the left of $Q$ the lines cross two squares, and as before all the lower squares there have one side $sigma_L$ and all the upper squares the side $3 - sigma_L$.
+  The line of abscissa $u_Q$ is not a cut, so it crosses the interior of a lower or of an upper square.
+  If of a lower one, then $sigma_L = sigma$; if of an upper one, then $3 - sigma_L = theta^*$; these exclude each other because $c > 0$.
+  So exactly one of the two kinds of square straddles the line of abscissa $u_Q$, and the squares of the other kind end there.
+  The same holds at $u_Q + c$ if $u_Q + c < omega$.
+  Up to the reflections of the rectangle in its two axes, four cases remain.
+
+  _Case (i): $u_Q = 0$ and $u_Q + c = omega$._
+  Then $c = a sigma = b theta^*$ with integers $a, b >= 1$, so that $3 = c (1 + 1 slash a + 1 slash b) <= 3 c$, contrary to $c <= 4 slash 5$.
+
+  _Case (ii): $u_Q = 0$, and a lower square straddles the line of abscissa $c$._
+  All $p$ lower squares have side $sigma = omega slash p$; $a >= 1$ upper squares lie above $Q$; and $b >= 1$ upper squares of side $3 - sigma$ fill the rest, so that $c = omega - b (3 - sigma) = omega (1 + b slash p) - 3 b$, with $k = p + a + b + 1$ and $p + b <= k - 2$.
+  For $k = 4$: $c = 2 omega - 3 >= 1$.
+  For $(k, omega) = (5, 3)$: $c = 3 - 3 b (p - 1) slash p >= 3 slash 2$, as $p + b <= 3$.
+  For $(6, 7 slash 2)$: $c = 7 slash 2 + b (7 slash (2 p) - 3)$, which for $p + b <= 4$ is at least $1$.
+  For $(8, 5)$: $c = 5 - b (3 - 5 slash p)$, which for $p + b <= 6$ is at least $1$.
+  All contradict $c <= 4 slash 5$.
+
+  _Case (iii): $0 < u_Q$, $u_Q + c < omega$, and lower squares straddle both lines._
+  All $p$ lower squares have side $sigma = omega slash p$; $a >= 1$ upper squares lie above $Q$, and $t >= 2$ upper squares of side $3 - sigma$ lie to its left and right, so that $c = omega (1 + t slash p) - 3 t$, with $k = p + a + t + 1$ and $p + t <= k - 2$.
+  For $(5, 3)$: $c = 3$.
+  For $(6, 7 slash 2)$: $c >= 1$.
+  For $(8, 5)$: $c = 5 + t (5 slash p - 3)$, which for $p + t <= 6$ is at least $1$.
+  All contradict $c <= 4 slash 5$.
+
+  _Case (iv): $0 < u_Q$, $u_Q + c < omega$, a lower square straddles the line of abscissa $u_Q$ and an upper square that of abscissa $u_Q + c$._
+  From the left, there are $a$ lower squares of side $sigma$, ending at $u_Q + c$, then $b$ lower squares of side $3 - theta^* = sigma + c$; and $a'$ upper squares of side $3 - sigma$, ending at $u_Q$, then $b'$ upper squares of side $theta^* = 3 - sigma - c$.
+  So $k = a + b + a' + b' + 1$ and
+  $ (a + b) sigma + b c = omega, quad (a' + b') (3 - sigma) - b' c = omega, quad a sigma - c = a' (3 - sigma). $
+  The rotation of the rectangle by a half-turn exchanges $(a, b, a', b')$ with $(b', a', b, a)$.
+  For $(5, 3)$, all four numbers are $1$, and the first and third equations give $c = 0$.
+  For $(6, 7 slash 2)$, up to the half-turn $(a, b, a', b')$ is $(2, 1, 1, 1)$ or $(1, 2, 1, 1)$: the first and third equations give $(sigma, c) = (13 slash 12, 1 slash 4)$, which violates the second, and $(19 slash 14, -2 slash 7)$.
+  For $(8, 5)$, $a + b + a' + b' = 7$; up to the half-turn $a + b <= 3$.
+  If $a + b = 2$, the first equation gives $sigma >= (5 - 4 slash 5) slash 2 > 2$ and the second $5 (3 - sigma) > 5$, a contradiction.
+  If $a + b = 3$, the first and third equations give, for $(a, b; a', b')$ equal to $(1, 2; 1, 3)$, $(1, 2; 2, 2)$, $(1, 2; 3, 1)$, $(2, 1; 1, 3)$, $(2, 1; 2, 2)$ and $(2, 1; 3, 1)$, the values $(sigma, c) = (11 slash 7, 1 slash 7)$, $(17 slash 9, -1 slash 3)$, $(23 slash 11, -7 slash 11)$, $(4 slash 3, 1)$, $(11 slash 7, 2 slash 7)$ and $(7 slash 4, -1 slash 4)$.
+  Three have $c < 0$; for the others the left-hand side of the second equation is $37 slash 7$, $11 slash 3$ and $36 slash 7$, not $5$.
+
+  In the cases (ii) to (iv) the block has at least four squares, as was used above.
+]
+
+Independently of this proof, the search finds that a rectangle of sides $5$ and $3$ cannot be dissected into eight squares of any sides: restricted to tiles of a single orientation, it does not report the proportion $1$ for eight tiles in that rectangle, and the run is certified.
+
+The three finite statements give the three impossibilities for every $n$.
+
+#proposition(name: [the three rectangles cannot be dissected])[
+  + For $n >= 5$, a rectangle of sides $n - 4$ and $1$ cannot be dissected into $n$ squares.
+  + For $n >= 6$, a rectangle of sides $n - 11 slash 2$ and $1$ cannot be dissected into $n$ squares.
+  + For $n >= 7$, a rectangle of sides $n - 19 slash 3$ and $1$ cannot be dissected into $n$ squares.
+] <prop:no-squares>
+
+#proof[
+  Suppose that a rectangle of sides $L$ and $1$ is dissected into $n$ squares, and apply @prop:unit-squares: there is a dissection of a rectangle of sides $ell$ and $1$ into $k$ squares of side less than $1$, where $ell := L - f$ and $k := n - f$, so that $k - ell = n - L$, and $k >= 4 ell$.
+
+  For the first statement, $k - ell = 4$ and $ell$ is an integer, so that $4 ell <= ell + 4$ gives $ell <= 1$.
+  If $ell = 0$ then $k = 0$, which contradicts $k - ell = 4$.
+  If $ell = 1$ then $k = 5$, which contradicts @prop:five-squares.
+
+  For the second statement, $k = ell + 11 slash 2$, so that $ell <= 11 slash 6$, and $ell - 1 slash 2$ is an integer: $ell = 1 slash 2$ or $ell = 3 slash 2$.
+  If $ell = 1 slash 2$ then $k = 6$, and a rectangle of sides $2$ and $1$ would be dissected into six squares, contrary to the first statement for $n = 6$.
+  If $ell = 3 slash 2$ then $k = 7$, and a rectangle of sides $3$ and $2$ would be dissected into seven squares of side less than $2$, contrary to @prop:seven-squares.
+
+  For the third statement, $k = ell + 19 slash 3$, so that $ell <= 19 slash 9$, and $ell - 2 slash 3$ is an integer: $ell = 2 slash 3$ or $ell = 5 slash 3$.
+  If $ell = 2 slash 3$ then $k = 7$, and a rectangle of sides $3$ and $2$ would be dissected into seven squares, contrary to the second statement for $n = 7$.
+  If $ell = 5 slash 3$ then $k = 8$, and a rectangle of sides $5$ and $3$ would be dissected into eight squares of side less than $3$, contrary to @prop:eight-squares.
+]
+
+So, for $n >= 8$, the proportions $n - 4$, $n - 11 slash 2$ and $n - 19 slash 3$ belong to $P_n (1)$ and are achieved with $n$ tiles only by tilings with both orientations; the same holds for $n - 4$ from $n = 6$ and for $n - 11 slash 2$ from $n = 7$.
+
+The same argument shows that, for $m >= 4$, the numbers $m$, $m - 3 slash 2$ and $m - 7 slash 3$ are the three largest $L$ for which a rectangle of sides $L$ and $1$ can be dissected into $m$ squares, which is the sense in which the rectangles used in the proof of @prop:three-occur are the most elongated.
+Indeed, in the notation of the proof of @prop:no-squares with $n = m$, if $0 < m - L < 7 slash 3$ then $3 ell <= k - ell = m - L$ gives $ell < 7 slash 9$, and $k = ell + (m - L) < 28 slash 9$, so that $k <= 3$.
+Two squares of side less than $1$ dissect a rectangle of sides $ell$ and $1$ only for $ell = 1 slash 2$, which gives $m - L = 3 slash 2$.
+Three such squares do so only for $ell = 1 slash 3$ and $ell = 2 slash 3$: one of them contains a left and a right corner, so it has side $ell$, and the other two dissect a rectangle of sides $ell$ and $1 - ell$, one of which is then twice the other.
+These give $m - L = 8 slash 3$ and $7 slash 3$.
+
+It remains to account for the exceptions for small $n$.
+For $6 <= n <= 9$, the rational proportions in $P_n (1)$ that are not achieved by $n$ tiles of a single orientation are, according to the search, $5 slash 3$ and $2$ for six tiles; $3 slash 2$ and $3$ for seven; $5 slash 3$, $5 slash 2$ and $4$ for eight; and $8 slash 3$, $16 slash 5$, $7 slash 2$ and $5$ for nine; the first three lists are those of @tab:rational.
+@prop:three-occur and @prop:no-squares account for all of them except two, since $n - 11 slash 2 > 1$ requires $n >= 7$ and $n - 19 slash 3 > 1$ requires $n >= 8$.
+The two others are sporadic, and come from pinwheels whose central rectangle is not a square.
+
+#example[
+  @fig:sporadic shows the two sporadic tilings.
+  For $5 slash 3 in P_6 (1)$, in a square of side $105$: a wide tile of width $75$ and height $45$ at the bottom-left corner, a tall tile of width $30$ and height $50$ at the bottom-right corner, a tall tile of width $33$ and height $55$ at the top-right corner, two tall tiles of width $36$ and height $60$ side by side at the top-left corner, and a tall tile of width $3$ and height $5$ in the centre.
+  For $16 slash 5 in P_9 (1)$, in a square of side $3040$: a wide tile of width $2560$ and height $800$ at the bottom-left corner, a tall tile of width $480$ and height $1536$ at the bottom-right corner, two tall tiles of width $470$ and height $1504$ at the top-right corner, three tall tiles of width $700$ and height $2240$ at the top-left corner, and two tall tiles of width $230$ and height $736$ in the centre.
+] <ex:sporadic>
+
+#figure(
+  image("figures/sporadic.svg", width: 58%),
+  caption: [The tilings of @ex:sporadic, of proportion $5 slash 3$ with six tiles and of proportion $16 slash 5$ with nine.],
+) <fig:sporadic>
+
+That rectangles of sides $5$ and $3$, and of sides $16$ and $5$, cannot be dissected into six and into nine squares respectively is a result of the search, and is not proved here.
+Why no such sporadic proportion occurs for $10 <= n <= 13$ is not explained.
+For @conj:exceptional we know of no argument that would bound the rational proportions of tilings with both orientations, and of no general construction that adds four squares to a dissection into squares, which is what would be needed to achieve with $n$ squares the remaining rational elements of $P_(n - 4) (1)$.
+
+== Upper bounds <sec:upper>
+
+The network of a tiling, with the edge that joins its poles, is a planar map of a kind that has been enumerated, and each such map with orientations contributes at most $n$ proportions.
+
+A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere that preserve its orientation.
+It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
+A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
+The following result of Tutte @tutte1963 is used without proof: the number of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
+For $m = n + 1$ this is
+$ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
+
+#proposition(name: [the map of a tiling])[
+  Let $tau$ be a tiling of a rectangle with $n >= 1$ tiles.
+  Then the plane graph $G^+$ of the plane network $frak(N)(tau)$ is a non-separable planar map with $n + 1$ edges.
+] <prop:nonseparable>
+
+#proof[
+  Direct each edge from the top of its tile to the bottom.
+  The height decreases along the edges, every component other than $s$ carries the bottom side of a tile, and every component other than $t$ the top side of one, by the proof of @prop:tiling-network.
+  So from every vertex $v$ a directed path leads down to $t$, and one leads up from $v$ to $s$ against the directions; the first passes only through vertices lower than $v$ and the second only through higher ones.
+  Remove a vertex $u$.
+  If $u = s$, every other vertex still reaches $t$; similarly if $u = t$.
+  Otherwise each remaining vertex $v$ still has its path to $t$ or its path to $s$, since $u$ is not both lower and higher than $v$, and $s$ and $t$ are joined by $e_0$.
+  So $G^+$ has no vertex whose removal disconnects it; it has no loop, and it has $n + 1$ edges.
+]
+
+In particular $G^+$ has no bridge, for a bridge of a connected graph without loops that has at least two edges has an end whose removal disconnects the graph; this is what the application of @prop:dual to the network of a tiling requires.
+
+#proposition(name: [upper bound])[
+  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$.
+] <prop:upper-full>
+
+#proof[
+  Let $x in P_n (1)$, and let $tau$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
+  Transposing if necessary, by @prop:transposition, the tile at the bottom-left corner is wide; let $epsilon$ be an orientation vector of $tau$ for which that tile has orientation $-1$, all orientations being taken to be $-1$ if $x = 1$.
+  Root the map $G^+$ of $frak(N)(tau)$ at $e_0$; the edge of the bottom-left tile is then the first edge after $e_0$ in the rotation at $t$, on a side fixed once and for all.
+  By @prop:tiling-network, $Z_(frak(N)(tau), epsilon) (x) = 1$, so that $x$ is a root of $N - D$, where $N slash D$ is this function in lowest terms.
+  By @prop:reactance, $N - D$ is not zero and has degree at most $n$, and it depends only on the isomorphism class of the rooted map with its orientation vector.
+  By @prop:nonseparable and the result of Tutte there are at most $M(n)$ rooted maps, each with at most $2^(n - 1)$ orientation vectors in which the distinguished edge has orientation $-1$, and each pair contributes at most $n$ roots.
+]
+
+By Stirling's formula $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$, so that $limsup a(n)^(1 slash n) <= 27 slash 2$.
+
+The same bound for the number of tilings in the sense of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
+The proof of @prop:upper-full bounds the number of triples of a rooted map, an orientation vector and a proportion.
+The map that sends a record with orientations and a proportion to such a triple is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, and, secondly, a mosaic class is determined by its plane network together with the directions of its edges.
+Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
+The first condition is the statement of @sec:mosaic that we have not proved.
+The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
+So the number of tilings with $n$ tiles in the sense of @tab:counts is at most $n 2^(n - 1) M(n)$ if both conditions hold, and we do not claim the bound otherwise.
+The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
+
+For guillotine tilings the functions can be described directly, and are those of the series–parallel circuits.
+
+#definition(name: [guillotine tilings and their functions])[
+  A tiling is _guillotine_ if it consists of a single tile, or of two guillotine tilings of the two rectangles into which a segment, parallel to a side and joining two opposite sides, divides its main rectangle.
+  Let $cal(G)_1 := {x, 1 slash x}$, and for $n >= 2$ let $cal(G)_n$ be the set of the rational functions $A + B$ and $(A^(-1) + B^(-1))^(-1)$ with $A in cal(G)_j$, $B in cal(G)_(n - j)$ and $1 <= j < n$.
+  Let $g(n)$ be the number of those $x in P_n (1)$ for which the unit square has a similar guillotine tiling of proportion $x$ with $n$ tiles.
+  Let $sigma_n$ be the number of the expressions that define the elements of $cal(G)_n$, considered up to the commutativity and the associativity of the two operations; these are the series–parallel networks with $n$ edges of two kinds.
+] <def:guillotine>
+
+By induction on $n$, the ratio of the width to the height of the main rectangle of a similar guillotine tiling of proportion $x$ with $n$ tiles, with an orientation vector, is $F(x)$ for some $F in cal(G)_n$: the function is $x$ for a wide tile and $1 slash x$ for a tall one, two tilings side by side give the sum, and two tilings one above the other give the other operation.
+Conversely every $F in cal(G)_n$ and every $x > 0$ arise in this way, from a tiling whose tiles have height $x^(plus.minus 1)$ times their width.
+The numbers $sigma_n$ begin $2, 6, 20, 80, 340, 1570, 7540$.
+The sequence A338781 of the OEIS @oeisA338781 is half the largest number of distinct resistances obtainable from $n$ resistors of two kinds by series and parallel combinations.
+
+#proposition(name: [guillotine tilings])[
+  Let $n >= 1$.
+  + The set $cal(G)_n$ is closed under inversion, $F != 1 slash F$ for every $F in cal(G)_n$, and $abs(cal(G)_n) slash 2$ is the $n$-th term of A338781.
+  + $g(n) <= n abs(cal(G)_n) slash 2 <= n sigma_n slash 2$.
+] <prop:guillotine>
+
+#proof[
+  For the first statement, $1 slash (A + B)$ is obtained from $1 slash A$ and $1 slash B$ by the second operation, and conversely, so that $cal(G)_n$ is closed under inversion by induction.
+  Every element of $cal(G)_n$ is the inverse of the impedance function of the network of a tiling, so that $F != 1 slash F$ by the first statement of @prop:reactance.
+  The resistance of a series–parallel circuit of resistors of values $u$ and $v$ is a rational function $rho(u, v)$, homogeneous of degree one, so that $rho(u, v) = sqrt(u v) thin rho(sqrt(u slash v), sqrt(v slash u))$.
+  Hence $rho$ is determined by $F(x) = rho(x, 1 slash x)$, and $rho |-> F$ is a bijection from the set of these functions to $cal(G)_n$; the largest number of resistances is the number of distinct functions $rho$, attained when $u$ and $v$ are algebraically independent.
+  Under this bijection $1 slash F$ corresponds to $u v slash rho(u, v) = 1 slash rho(1 slash v, 1 slash u)$, the resistance of the circuit with series and parallel exchanged and the two kinds of resistor swapped.
+
+  For the second statement, a proportion of a similar guillotine tiling of the square is a solution $x >= 1$ of $F(x) = 1$ with $F in cal(G)_n$; the functions $F$ and $1 slash F$ have the same solutions, and there are at most $n$ of them, by the fifth statement of @prop:reactance.
+  The map from expressions to functions is onto $cal(G)_n$.
+]
+
+In particular the resistances of the first statement come in pairs, exchanged by swapping the two kinds of resistor and exchanging series with parallel.
+A comment in the entry A338781 presents this as unproved, but the entry also links a note by Einstein with a proof that the largest number of resistances is even, so the pairing is not new.
+
+The proof of @prop:wide-full applies to guillotine tilings, with $cal(F)_n$ replaced by $cal(G)_n$; its fourth step is then immediate, since a guillotine tiling exists for every $x > 0$.
+So, for $w$ large enough, the number of the proportions of the similar guillotine tilings of $[0, w] times [0, 1]$ with $n$ tiles is $abs(cal(G)_n) slash 2$.
+
+A series–parallel network is a single edge, or a multiset of at least two networks joined in series, none of them itself a series composition, or the same in parallel.
+So the numbers $sigma_n$ satisfy
+$ product_(j >= 1) (1 - z^j)^(-beta_j) = 1 + sum_(n >= 1) sigma_n z^n, quad beta_1 = 2, quad beta_j = sigma_j slash 2 quad "for" j >= 2. $
+The quotients $sigma_(n + 1) slash sigma_n$, corrected by the factor $(1 - 3 slash (2 n + 2))^(-1)$, are $6.15881$, $6.15887$ and $6.15889$ at $n = 100$, $200$ and $399$.
+So the growth constant of $g(n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
+That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is numerical.
