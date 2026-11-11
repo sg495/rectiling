@@ -10,5 +10,7 @@ import Rectiling.Completeness
 import Rectiling.Forms
 import Rectiling.Solver
 import Rectiling.Main
+import Rectiling.Elimination
+import Rectiling.BackSubstitution
 import Rectiling.Audit
 import Rectiling.Check
