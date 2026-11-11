@@ -42,8 +42,27 @@ A *case* is a placement sequence together with an orientation vector, with the b
 
 The number of cases is 2ⁿ⁻¹ times the Baxter number.
 The run for n = 12 used 6.5 GB of memory and that for n = 13 about 41 GB.
+These timings and memory figures are those of the runs that produced the values; the tables were made more compact afterwards, see below.
 About one case in ten thousand is passed to the reference method.
 The search spends about 0.6 microseconds of processor time per case; a term further would take some twelve times longer than n = 13 and was not attempted.
+
+### Memory and bands
+
+The shared tables were later made more compact and the search was given the option of running in bands of proportions (see [solving.md](solving.md)).
+The values, the degree distributions and the counters are unchanged; the figures below are for the same machine, with peak resident memory.
+
+| n  | run          | seconds, before | seconds, after | memory, before | memory, after |
+| -- | ------------ | --------------- | -------------- | -------------- | ------------- |
+| 10 | single       | 6.7             | 7.0            | 0.26 GB        | 0.15 GB       |
+| 11 | single       | 78              | 78             | 1.86 GB        | 1.07 GB       |
+| 11 | with tilings | 128             | 125            | 1.8 GB         | 1.06 GB       |
+| 11 | 8 bands      |                 | 319            |                | 0.28 GB       |
+| 12 | single       | 888             | 915            | 6.5 GB         | 4.4 GB        |
+| 12 | 8 bands      |                 | 4037           |                | 1.2 GB        |
+
+- A single search takes the same time as before and about two thirds of the memory; between n = 11 and n = 12 the memory grows by some 120 bytes for each further proportion equation, against 170 before.
+- A pass over one of K bands takes a fraction of about 1/2 + 1/(2K) of the time of a single search, so eight bands take 4.4 times as long, with a peak memory smaller by a factor of 3.7 for n = 12. The factor is below eight because a few hundred megabytes belong to the threads and not to the tables.
+- The eight passes for n = 12 give 28799493 proportions, the same degree distribution and the same 4758270004 tilings as the single search, which is a further check of a(12), though not an independent one.
 
 ### Algebraic degrees
 
