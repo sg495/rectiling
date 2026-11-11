@@ -7,6 +7,7 @@ use crate::poly::Poly;
 use crate::roots::{RealRoot, isolate_roots_above_one, sign_at_rational};
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
+use smallvec::SmallVec;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
@@ -71,7 +72,6 @@ struct Entry {
 struct Inner {
     entries: Vec<Entry>,
     by_factor: HashMap<Poly<BigInt>, Arc<Vec<RootRef>>>,
-    by_poly: HashMap<Poly<BigInt>, Arc<Vec<RootRef>>>,
 }
 
 /// Registry assigning stable identifiers to the algebraic numbers encountered during a computation.
@@ -80,44 +80,24 @@ pub struct Registry {
     inner: Mutex<Inner>,
 }
 
-impl Inner {
-    fn factor_roots(&mut self, f: &Poly<BigInt>) -> Arc<Vec<RootRef>> {
-        if let Some(r) = self.by_factor.get(f) {
-            return r.clone();
+fn locate(f: &Poly<BigInt>) -> Vec<(f64, f64, Location)> {
+    let mut out = Vec::new();
+    if f.degree() == Some(1) {
+        let (b, a) = (&f.coeffs()[0], &f.coeffs()[1]);
+        let num = -b;
+        if &num >= a {
+            let v = num.to_f64().unwrap_or(f64::NAN) / a.to_f64().unwrap_or(f64::NAN);
+            let (lo, hi) = if &num == a { (1.0, 1.0) } else { (v * (1.0 - 1e-14), v * (1.0 + 1e-14)) };
+            out.push((lo, hi, Location::Rational(num, a.clone())));
         }
-        let mut refs = Vec::new();
-        if f.degree() == Some(1) {
-            let (b, a) = (&f.coeffs()[0], &f.coeffs()[1]);
-            let num = -b;
-            if &num >= a {
-                let v = num.to_f64().unwrap_or(f64::NAN) / a.to_f64().unwrap_or(f64::NAN);
-                let (lo, hi) = if &num == a { (1.0, 1.0) } else { (v * (1.0 - 1e-14), v * (1.0 + 1e-14)) };
-                refs.push(self.push(f, 0, lo, hi, Location::Rational(num, a.clone())));
-            }
-        } else {
-            for (i, mut root) in isolate_roots_above_one(f).into_iter().enumerate() {
-                root.refine_to(64);
-                let (lo, hi) = root.enclosure();
-                refs.push(self.push(f, i, lo, hi, Location::Isolated(root)));
-            }
+    } else {
+        for mut root in isolate_roots_above_one(f) {
+            root.refine_to(64);
+            let (lo, hi) = root.enclosure();
+            out.push((lo, hi, Location::Isolated(root)));
         }
-        let refs = Arc::new(refs);
-        self.by_factor.insert(f.clone(), refs.clone());
-        refs
     }
-
-    fn push(&mut self, f: &Poly<BigInt>, index: usize, lo: f64, hi: f64, location: Location) -> RootRef {
-        let id = self.entries.len() as u32;
-        self.entries.push(Entry {
-            value: Algebraic {
-                min_poly: f.clone(),
-                index,
-                approx: (lo.to_bits(), hi.to_bits()),
-            },
-            location,
-        });
-        RootRef { id, lo, hi }
-    }
+    out
 }
 
 impl Registry {
@@ -126,29 +106,52 @@ impl Registry {
         Self::default()
     }
 
-    /// The distinct real roots not smaller than one of a non-zero polynomial, in no particular order.
-    pub fn roots_from_one(&self, p: &Poly<BigInt>) -> Arc<Vec<RootRef>> {
-        let key = p.primitive();
+    fn factor_roots(&self, f: &Poly<BigInt>) -> Arc<Vec<RootRef>> {
+        if let Some(r) = self.inner.lock().expect("registry lock").by_factor.get(f) {
+            return r.clone();
+        }
+        let located = locate(f);
         let mut inner = self.inner.lock().expect("registry lock");
-        if let Some(r) = inner.by_poly.get(&key) {
+        if let Some(r) = inner.by_factor.get(f) {
             return r.clone();
         }
         let mut refs = Vec::new();
-        for (f, _) in factor(&key) {
-            refs.extend(inner.factor_roots(&f).iter().copied());
+        for (index, (lo, hi, location)) in located.into_iter().enumerate() {
+            let id = inner.entries.len() as u32;
+            inner.entries.push(Entry {
+                value: Algebraic {
+                    min_poly: f.clone(),
+                    index,
+                    approx: (lo.to_bits(), hi.to_bits()),
+                },
+                location,
+            });
+            refs.push(RootRef { id, lo, hi });
         }
         let refs = Arc::new(refs);
-        inner.by_poly.insert(key, refs.clone());
+        inner.by_factor.insert(f.clone(), refs.clone());
+        refs
+    }
+
+    /// The distinct real roots not smaller than one of a non-zero polynomial, in no particular order.
+    pub fn roots_from_one(&self, p: &Poly<BigInt>) -> SmallVec<[RootRef; 2]> {
+        let mut refs = SmallVec::new();
+        for (f, _) in factor(p) {
+            refs.extend(self.factor_roots(&f).iter().copied());
+        }
         refs
     }
 
     /// Sign of a polynomial at a registered number.
     pub fn sign_at(&self, id: u32, q: &Poly<BigInt>) -> i32 {
-        let mut inner = self.inner.lock().expect("registry lock");
-        match &mut inner.entries[id as usize].location {
-            Location::Rational(num, den) => sign_at_rational(q, num, den),
-            Location::Isolated(root) => root.sign_of(q),
-        }
+        let mut location = {
+            let inner = self.inner.lock().expect("registry lock");
+            match &inner.entries[id as usize].location {
+                Location::Rational(num, den) => return sign_at_rational(q, num, den),
+                Location::Isolated(root) => root.clone(),
+            }
+        };
+        location.sign_of(q)
     }
 
     /// The registered number with the given identifier.

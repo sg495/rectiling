@@ -33,7 +33,7 @@ fn main() {
     }
     println!("tiles = {tiles}, main rectangle = {width}:{height}");
     println!("proportions = {}", outcome.proportions.len());
-    println!("{:?}", outcome.stats);
+    println!("{:?}, polynomials = {}", outcome.stats, outcome.polynomials);
     println!("elapsed = {:.3}s", elapsed.as_secs_f64());
 }
 

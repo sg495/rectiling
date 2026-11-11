@@ -20,7 +20,7 @@ fn degrees(outcome: &Outcome, max: usize) -> Vec<usize> {
 #[test]
 fn layout_counts() {
     let counts: Vec<u64> = (1..=8).map(count_layouts).collect();
-    assert_eq!(counts, [1, 2, 6, 23, 104, 530, 2958, 17734]);
+    assert_eq!(counts, [1, 2, 6, 22, 92, 422, 2074, 10754]);
 }
 
 #[test]
@@ -73,11 +73,47 @@ fn square_with_seven_tiles() {
 }
 
 #[test]
-#[ignore = "takes several seconds in release mode"]
 fn square_with_eight_tiles() {
     let outcome = Search::square(8).run();
     certified(&outcome);
     assert_eq!(outcome.proportions.len(), 8522);
+    assert_eq!(outcome.stats.leaves, 128 * 10754);
+}
+
+#[test]
+#[ignore = "takes a minute in release mode"]
+fn square_with_nine_and_ten_tiles() {
+    for (n, expected) in [(9, 58347), (10, 433926)] {
+        let outcome = Search::square(n).run();
+        certified(&outcome);
+        assert_eq!(outcome.proportions.len(), expected);
+    }
+}
+
+fn summary(outcome: &Outcome) -> Vec<(String, usize, u64)> {
+    outcome.proportions.iter().map(|f| (f.proportion.min_poly().to_string(), f.proportion.index(), f.tilings)).collect()
+}
+
+#[test]
+fn default_method_agrees_with_exact_elimination() {
+    for (w, h) in [(1, 1), (2, 1), (3, 2), (7, 4)] {
+        for n in 1..=6 {
+            let fast = Search::new(n, w, h).run();
+            let exact = Search::new(n, w, h).run_exact();
+            certified(&exact);
+            assert_eq!(summary(&fast), summary(&exact), "n = {n}, w = {w}/{h}");
+            assert_eq!(fast.stats.leaves, exact.stats.leaves);
+        }
+    }
+}
+
+#[test]
+fn witnesses_are_complete_sequences() {
+    let outcome = Search::square(6).run();
+    for found in &outcome.proportions {
+        assert_eq!(found.witness.len(), 6);
+        assert!(found.tilings >= 1);
+    }
 }
 
 #[test]
