@@ -813,21 +813,21 @@ To keep the system homogeneous, the main rectangle is given sides $a t$ and $b t
   A _form_ over $R$ is a sequence $F = (F_0, F_1, F_2, dots)$ of elements of $R$; it stands for the expression $F_0 t + F_1 s_1 + F_2 s_2 + dots.c$.
   The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $X$ and by $X^(-1)$.
   We write $u_j$ for the form whose coefficient of index $j$ is $1$ and whose other coefficients are zero.
-  For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $p_1, p_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, the free sides being $u_1, u_2, dots$.
-  For a homomorphism $phi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) phi(F_j) v_j$; for a form $G$ over $K$ we write likewise $G[v] := sum_(j < N) G_j v_j$.
+  For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $kappa_1, kappa_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, the free sides being $u_1, u_2, dots$.
+  For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we write likewise $G[v] := sum_(j < N) G_j v_j$.
 ] <def:hom>
 
 For a record with $k$ inside placements, values are always taken with $N = k + 1$, so that $v_0$ is the value of the scale and $v_1, dots, v_k$ are the free sides.
 The homogeneous system at scale one is the system of the main rectangle of sides $a$ and $b$, which is that of the main rectangle of sides $a slash b$ and $1$ up to a change of scale.
 
 #proposition(name: [homogeneous system])[
-  Let $rho$ be a record with $k$ inside placements, let $a$ and $b$ be integers, let $phi$ be a homomorphism from $R$ to the real numbers with $alpha := phi(X) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
-  Then $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$ if and only if $p_q [v] > 0$ for every positivity constraint and $e_i [v] = 0$ for every equation of the homogeneous system of $rho$.
+  Let $rho$ be a record with $k$ inside placements, let $a$ and $b$ be integers, let $chi$ be a homomorphism from $R$ to the real numbers with $alpha := chi(X) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
+  Then $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$ if and only if $kappa_q [v] > 0$ for every positivity constraint and $e_i [v] = 0$ for every equation of the homogeneous system of $rho$.
   Moreover, if $b >= 1$, then for every real number $alpha > 0$ there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if there is $s'$ such that $(a, b, s')$ satisfy them.
 ] <prop:hom>
 
 #proof[
-  The map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers, with proportion $alpha$: it is additive, and $phi(X F_j) = alpha phi(F_j)$ and $phi(X^(-1) F_j) = phi(F_j) slash alpha$.
+  The map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers, with proportion $alpha$: it is additive, and $chi(X F_j) = alpha chi(F_j)$ and $chi(X^(-1) F_j) = chi(F_j) slash alpha$.
   It sends $a u_0$ to $a$, $b u_0$ to $b$, and $u_j$ to $v_j$ for $1 <= j <= k$.
   The first statement follows as in the proof of @prop:forms, since placing commutes with homomorphisms and only the first $k$ free sides are used.
   For the second, multiplication by a real number $c > 0$ is a homomorphism of the real numbers to themselves, which preserves the sign of every number.
@@ -879,18 +879,18 @@ Nothing in the definition of a chain requires the current pivot to have a non-ze
   Then the homogeneous system of $rho$ has $r + 1$ equations $e_1, dots, e_(r + 1)$, and
   + the eliminations $epsilon_1, dots, epsilon_r$ form an elimination chain over $psi$ with originals $e_1, dots, e_r$, and $psi(pi_r) != 0$;
   + $psi(E_"fin") = Gamma_r (psi(e_(r + 1)))$;
-  + for every $q <= ell$, the size recorded with $p_q$ satisfies $psi(sigma_q) = Gamma_(r(q)) (psi(p_q))$, where $r(q)$ is the number of eliminations recorded with $p_1, dots, p_(q - 1)$.
+  + for every $q <= ell$, the size recorded with $p_q$ satisfies $psi(sigma_q) = Gamma_(r(q)) (psi(kappa_q))$, where $r(q)$ is the number of eliminations recorded with $p_1, dots, p_(q - 1)$.
 ] <prop:trace>
 
 #proof[
-  Let $hat(S)_j$ be the staircase obtained by placing $p_1, dots, p_j$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$, so that the $p_q$ and the $e_i$ are the positive quantities and the equations of the placements on these staircases.
+  Let $hat(S)_j$ be the staircase obtained by placing $p_1, dots, p_j$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$, so that the $kappa_q$ and the $e_i$ are the positive quantities and the equations of the placements on these staircases.
   We show by induction on $j < ell$ that the stage $Sigma_j = (S, pi, k)$, reached after $r'$ eliminations, has the following properties: the eliminations $epsilon_1, dots, epsilon_(r')$ form a chain over $psi$ whose originals are the equations of the full placements amongst $p_1, dots, p_j$ and whose current pivot is $pi$, with $psi(pi) != 0$; the staircase $S$ has the tiers of $hat(S)_j$, and $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S$ and the corresponding floor or wall $hat(F)$ of $hat(S)_j$; the number of inside placements amongst $p_1, dots, p_j$ is $k$; and $Gamma_(r') (u_i) = psi(pi) u_i$ for every $i > k$.
   For $j = 0$ these hold with $r' = 0$, $Gamma_0$ the identity and $pi = 1$.
 
   Suppose that they hold for $Sigma_(j - 1) = (S, pi, k)$, and consider the placement $p_j$.
   The maps $F |-> psi(F)$ and $F |-> Gamma_(r') (psi(F))$ are homomorphisms from the forms over $R$ to the forms over $K$.
   The first sends the staircase $S$ and the free side $pi u_(k + 1)$ to the same staircase and the same form as the second sends $hat(S)_(j - 1)$ and the free side $u_(k + 1)$, by the induction hypothesis, the last property being used for $i = k + 1$.
-  Since placing commutes with homomorphisms, $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S^+$ and the corresponding one of $hat(S)_j$, the size recorded satisfies $psi(sigma_j) = Gamma_(r') (psi(p_j))$, and $p_j$ has an equation $E$ on $S$ exactly if it has an equation $e$ on $hat(S)_(j - 1)$, in which case $psi(E) = Gamma_(r') (psi(e))$.
+  Since placing commutes with homomorphisms, $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S^+$ and the corresponding one of $hat(S)_j$, the size recorded satisfies $psi(sigma_j) = Gamma_(r') (psi(kappa_j))$, and $p_j$ has an equation $E$ on $S$ exactly if it has an equation $e$ on $hat(S)_(j - 1)$, in which case $psi(E) = Gamma_(r') (psi(e))$.
   This proves the third statement for $q = j$, with $r(j) = r'$, and, when $j = ell$, the second statement and the count of the equations.
   Let $j < ell$.
   If $p_j$ has no equation, $Sigma_j = (S^+, pi, k^+)$ and the properties hold for it, with the same chain.
@@ -955,7 +955,7 @@ It is the polynomial whose roots are the candidate proportions.
   Let $e_1, dots, e_(k + 1)$ be the equations of the homogeneous system of $rho$, and let $M$ be the square matrix of size $k + 1$ over $R$ with entries $(e_i)_j$, for $1 <= i <= k + 1$ and $0 <= j <= k$.
   Then the pass records $k$ eliminations, and
   $ (E_"fin")_0 = plus.minus det M. $
-  Consequently, if $phi$ is a homomorphism from $R$ to the real numbers and $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i$, then $phi((E_"fin")_0) = 0$.
+  Consequently, if $chi$ is a homomorphism from $R$ to the real numbers and $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i$, then $chi((E_"fin")_0) = 0$.
 ] <prop:det>
 
 #proof[
@@ -965,7 +965,7 @@ It is the polynomial whose roots are the candidate proportions.
   The triple $(E_"fin", 0, pi_k)$, with the original $e_(k + 1)$, therefore extends the chain to one of length $k + 1$ with current pivot $(E_"fin")_0$.
   The indices $m_1, dots, m_k$ lie between $1$ and $k$, by the definition of a pass, and are pairwise distinct, by the last statement of @prop:chain; with the index $0$ they are $k + 1$ distinct indices smaller than $k + 1$.
   By @prop:minor, $psi((E_"fin")_0) = plus.minus det psi(M)$, and $psi$ is injective.
-  For the consequence, the real matrix $phi(M)$ sends the vector $w != 0$ to zero, so that $phi(det M) = det phi(M) = 0$.
+  For the consequence, the real matrix $chi(M)$ sends the vector $w != 0$ to zero, so that $chi(det M) = det chi(M) = 0$.
 ]
 
 The consequence holds whether or not a pivot vanishes at the point considered: every solution of the system is amongst the roots of the final coefficient.
@@ -1021,31 +1021,31 @@ Away from the zeros of the pivots, the recorded eliminations determine the solut
 
 #proposition(name: [back-substitution])[
   Let $rho$ be a complete admissible record with $k$ inside placements and $n$ placements in all, and consider a successful pass along $rho$, with recorded eliminations $epsilon_1, dots, epsilon_k$, where $epsilon_i = (E_i, m_i, pi_(i - 1))$, final equation $E_"fin"$ and recorded sizes $sigma_1, dots, sigma_n$.
-  Let $phi$ be a homomorphism from $R$ to the real numbers such that $phi((E_i)_(m_i)) != 0$ for every $i$.
+  Let $chi$ be a homomorphism from $R$ to the real numbers such that $chi((E_i)_(m_i)) != 0$ for every $i$.
   Let $v in RR^(k + 1)$ be obtained from $(1, 0, dots, 0)$ by replacing, for $i = k, k - 1, dots, 1$ in turn, the coordinate $v_(m_i)$ by
-  $ -1 / phi((E_i)_(m_i)) sum_(j <= k, thin j != m_i) phi((E_i)_j) v_j. $
+  $ -1 / chi((E_i)_(m_i)) sum_(j <= k, thin j != m_i) chi((E_i)_j) v_j. $
   + $v_0 = 1$.
-  + If $phi((E_"fin")_j) = 0$ for every $j >= 1$, then $e_i [v] = 0$ for every $i <= k + 1$ if and only if $phi((E_"fin")_0) = 0$.
+  + If $chi((E_"fin")_j) = 0$ for every $j >= 1$, then $e_i [v] = 0$ for every $i <= k + 1$ if and only if $chi((E_"fin")_0) = 0$.
   + If $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i <= k + 1$, then $w = v$.
-  + There is $pi in R$ with $phi(pi) != 0$ such that, for every $q <= n$, the form $phi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements, in order, has the value $phi(pi) p_q [v]$ at $v$.
+  + There is $pi in R$ with $chi(pi) != 0$ such that, for every $q <= n$, the form $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements, in order, has the value $chi(pi) kappa_q [v]$ at $v$.
 ] <prop:back>
 
 #proof[
-  By @prop:trace with $psi = phi$, and by the count of @prop:det, the eliminations form a chain over $phi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $phi(pi) != 0$, and $phi(E_"fin") = Gamma_k (phi(e_(k + 1)))$.
-  By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $phi((E_i)_(m_l)) = 0$ for $l < i$.
+  By @prop:trace with $psi = chi$, and by the count of @prop:det, the eliminations form a chain over $chi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $chi(pi) != 0$, and $chi(E_"fin") = Gamma_k (chi(e_(k + 1)))$.
+  By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
   In particular no replacement changes $v_0$, which proves the first statement.
 
-  When $v_(m_i)$ is replaced, the equation $phi(E_i)[v] = 0$ comes to hold; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
-  Hence $phi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
-  The fourth statement of @prop:chain then gives $phi(E_"fin")[v] = Gamma_k (phi(e_(k + 1)))[v] = phi(pi) e_(k + 1) [v]$.
-  Under the hypothesis of the second statement, $phi(E_"fin")[v] = phi((E_"fin")_0) v_0 = phi((E_"fin")_0)$, and the statement follows because $phi(pi) != 0$.
+  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ comes to hold; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
+  Hence $chi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
+  The fourth statement of @prop:chain then gives $chi(E_"fin")[v] = Gamma_k (chi(e_(k + 1)))[v] = chi(pi) e_(k + 1) [v]$.
+  Under the hypothesis of the second statement, $chi(E_"fin")[v] = chi((E_"fin")_0) v_0 = chi((E_"fin")_0)$, and the statement follows because $chi(pi) != 0$.
 
-  For the third statement, $phi(E_i)[w] = 0$ for every $i <= k$, by the fifth statement of @prop:chain.
+  For the third statement, $chi(E_i)[w] = 0$ for every $i <= k$, by the fifth statement of @prop:chain.
   We show that $w_(m_i) = v_(m_i)$ by descending induction on $i$.
-  In the equation $phi(E_i)[w] = 0$ the coefficients of the unknowns of index $m_l$ with $l < i$ are zero; the other unknowns are that of index $0$, with $w_0 = v_0$, those of index $m_l$ with $l > i$, with $w_(m_l) = v_(m_l)$ by induction, and that of index $m_i$, whose coefficient is not zero.
+  In the equation $chi(E_i)[w] = 0$ the coefficients of the unknowns of index $m_l$ with $l < i$ are zero; the other unknowns are that of index $0$, with $w_0 = v_0$, those of index $m_l$ with $l > i$, with $w_(m_l) = v_(m_l)$ by induction, and that of index $m_i$, whose coefficient is not zero.
   Hence $w_(m_i)$ is given by the same expression as $v_(m_i)$, whose value was computed from coordinates that did not change afterwards.
 
-  For the fourth, $phi(sigma_q) = Gamma_(r(q)) (phi(p_q))$ by @prop:trace, so that carrying it through the eliminations $epsilon_(r(q) + 1), dots, epsilon_k$ gives $Gamma_k (phi(p_q))$, whose value at $v$ is $phi(pi) p_q [v]$ by the fourth statement of @prop:chain.
+  For the fourth, $chi(sigma_q) = Gamma_(r(q)) (chi(kappa_q))$ by @prop:trace, so that carrying it through the eliminations $epsilon_(r(q) + 1), dots, epsilon_k$ gives $Gamma_k (chi(kappa_q))$, whose value at $v$ is $chi(pi) kappa_q [v]$ by the fourth statement of @prop:chain.
 ]
 
 == Candidate roots <sec:candidates>
@@ -1107,26 +1107,26 @@ An accepted root is a solution, and a rejected one is not, whichever way the rej
 ] <prop:numeric>
 
 #proof[
-  Let $phi$ be the evaluation of Laurent polynomials at $alpha$.
+  Let $chi$ be the evaluation of Laurent polynomials at $alpha$.
   In both cases the verdict is not unsure, so the back-substitution on intervals has succeeded.
-  For each $i$, the interval $(E_i)_(m_i) (I)$ encloses $phi((E_i)_(m_i))$ and is certainly away from zero, so that $phi((E_i)_(m_i)) != 0$, and @prop:back applies; let $v$ be the vector defined there.
+  For each $i$, the interval $(E_i)_(m_i) (I)$ encloses $chi((E_i)_(m_i))$ and is certainly away from zero, so that $chi((E_i)_(m_i)) != 0$, and @prop:back applies; let $v$ be the vector defined there.
   The interval $V_j$ encloses $v_j$ at every moment of the two back-substitutions, carried out side by side: this holds at the start, and each replacement preserves it by the specifications of the arithmetic and of the enclosures, the terms omitted from the sum of intervals being those whose coefficient is zero.
 
   The pairs $(xi, J)$ of a real number and an interval that encloses it form an arithmetic of lengths, with the operations of the real numbers for the proportion $alpha$ on the first component and those of the intervals for the interval $I$ on the second; the specifications say that these operations lead from pairs to pairs, the quotient by $I$ being allowed because $I$ is certainly away from zero.
   The two projections are homomorphisms.
-  Placing $rho$ on the initial staircase with floor $(a, [a])$ and wall $(b, [b])$, with free sides $(v_j, V_j)$, therefore shows that each $P_q$ encloses the corresponding positivity constraint of $rho$ for $(a, b, (v_1, dots, v_k))$ at $alpha$, which is $p_q [v]$ by the proof of @prop:hom.
+  Placing $rho$ on the initial staircase with floor $(a, [a])$ and wall $(b, [b])$, with free sides $(v_j, V_j)$, therefore shows that each $P_q$ encloses the corresponding positivity constraint of $rho$ for $(a, b, (v_1, dots, v_k))$ at $alpha$, which is $kappa_q [v]$ by the proof of @prop:hom.
 
-  For the first statement, the second statement of @prop:back shows that $e_i [v] = 0$ for every $i$, and $p_q [v] > 0$ for every $q$ because every $P_q$ is certainly positive.
+  For the first statement, the second statement of @prop:back shows that $e_i [v] = 0$ for every $i$, and $kappa_q [v] > 0$ for every $q$ because every $P_q$ is certainly positive.
   By @prop:hom, $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$.
 
   For the second statement, suppose that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$, and let $w := (1, s_1, dots, s_k)$.
-  By @prop:hom, $e_i [w] = 0$ for every $i$ and $p_q [w] > 0$ for every $q$, and $w = v$ by the third statement of @prop:back.
-  Hence $p_q [v] > 0$ for every $q$, and no $P_q$ is certainly not positive.
+  By @prop:hom, $e_i [w] = 0$ for every $i$ and $kappa_q [w] > 0$ for every $q$, and $w = v$ by the third statement of @prop:back.
+  Hence $kappa_q [v] > 0$ for every $q$, and no $P_q$ is certainly not positive.
   The verdict being reject, there is a certificate for some placement $p_q$: a form $F$ over $ZZ[x, x^(-1)]$, obtained from $sigma_q$ by exact eliminations, with $F_j = 0$ for $j >= 1$, and such that $F_0 = 0$ or $mu_alpha$ divides $"coeffs"(F_0)$.
   In the second case $"coeffs"(F_0)$ vanishes at $alpha$, because $mu_alpha$ does, and it equals $F_0$ multiplied by a power of $x$, with $alpha != 0$; so $F_0 (alpha) = 0$ in both cases.
-  The previous pivots of the eliminations are $1$ and the pivots $(E_i)_(m_i)$, whose values at $alpha$ are not zero, so each exact elimination agrees with the corresponding map $gamma$ after evaluation, and $phi(F)$ is $phi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements.
-  By the fourth statement of @prop:back, $phi(F)[v] = phi(pi) p_q [v]$ with $phi(pi) != 0$, while $phi(F)[v] = F_0 (alpha) v_0 = 0$.
-  Hence $p_q [v] = 0$, a contradiction.
+  The previous pivots of the eliminations are $1$ and the pivots $(E_i)_(m_i)$, whose values at $alpha$ are not zero, so each exact elimination agrees with the corresponding map $gamma$ after evaluation, and $chi(F)$ is $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements.
+  By the fourth statement of @prop:back, $chi(F)[v] = chi(pi) kappa_q [v]$ with $chi(pi) != 0$, while $chi(F)[v] = F_0 (alpha) v_0 = 0$.
+  Hence $kappa_q [v] = 0$, a contradiction.
 ]
 
 The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles, whose central tile degenerates to a point.
