@@ -223,15 +223,27 @@ impl Arena {
         id
     }
 
+    /// Encloses the value of a polynomial over an interval of positive floats.
+    ///
+    /// The parts with positive and with negative coefficients are evaluated separately at both endpoints; each is a sum of non-negative terms, so its relative rounding error is bounded in terms of its length.
     fn eval(&self, id: u32, x: Iv) -> Option<Iv> {
         let (c, lo) = self.slice(id);
-        let mut acc = Iv::point(0.0);
+        let (mut pl, mut ph, mut nl, mut nh) = (0.0f64, 0.0f64, 0.0f64, 0.0f64);
         for &v in c.iter().rev() {
             if v.unsigned_abs() > 1 << 53 {
                 return None;
             }
-            acc = acc.mul(x).add(Iv::point(v as f64));
+            let (p, n) = if v >= 0 { (v as f64, 0.0) } else { (0.0, -(v as f64)) };
+            pl = pl * x.lo + p;
+            ph = ph * x.hi + p;
+            nl = nl * x.lo + n;
+            nh = nh * x.hi + n;
         }
+        let e = (2 * c.len() + 2) as f64 * f64::EPSILON;
+        let acc = Iv {
+            lo: (pl * (1.0 - e) - nh * (1.0 + e)).next_down(),
+            hi: (ph * (1.0 + e) - nl * (1.0 - e)).next_up(),
+        };
         Some(if lo == 0 { acc } else { acc.mul(x.powi(lo)) })
     }
 }
@@ -402,6 +414,9 @@ impl<'a> Engine<'a> {
     fn explore(&mut self, stairs: &Staircase<Form>, remaining: usize, used: u8, pivot: u32, prefix: &[Placement]) {
         let depth = self.path.len();
         let forced = prefix.get(depth).copied();
+        if remaining == 1 && forced.is_none() && depth > 0 && self.last(stairs) {
+            return;
+        }
         for tier in 0..stairs.tiers.len() {
             for fit in FITS {
                 let probe = Placement {
@@ -424,6 +439,48 @@ impl<'a> Engine<'a> {
                 }
             }
         }
+    }
+
+    /// Treats both orientations of the last tile directly, if the staircase has the expected shape.
+    fn last(&mut self, stairs: &Staircase<Form>) -> bool {
+        let tier = &stairs.tiers[0];
+        if stairs.tiers.len() != 1 || tier.stale || tier.floor[0] == 0 || tier.wall[0] == 0 {
+            return false;
+        }
+        if tier.floor[1..].iter().chain(tier.wall[1..].iter()).any(|&e| e != 0) {
+            return false;
+        }
+        let (floor, wall) = (tier.floor[0], tier.wall[0]);
+        for tall in [false, true] {
+            let (plain, scaled) = if tall { (wall, floor) } else { (floor, wall) };
+            let (cp, lp) = self.symbols.arena.slice(plain);
+            let (cs, ls) = self.symbols.arena.slice(scaled);
+            let ls = ls + 1;
+            let lo = lp.min(ls);
+            let hi = (lp + cp.len() as i32).max(ls + cs.len() as i32);
+            self.key.clear();
+            self.key.resize((hi - lo) as usize, 0);
+            for (i, &c) in cp.iter().enumerate() {
+                self.key[(lp - lo) as usize + i] = c;
+            }
+            for (i, &c) in cs.iter().enumerate() {
+                self.key[(ls - lo) as usize + i] -= c;
+            }
+            self.path.push(Step {
+                mv: Placement {
+                    tier: 0,
+                    fit: Fit::Full,
+                    tall,
+                },
+                slot: NO_SLOT,
+                size: tier.floor,
+                eliminated: None,
+            });
+            self.tally.stats.leaves += 1;
+            self.finish();
+            self.path.pop();
+        }
+        true
     }
 
     fn step(&mut self, stairs: &Staircase<Form>, remaining: usize, used: u8, pivot: u32, prefix: &[Placement], mv: Placement) {
@@ -571,9 +628,28 @@ impl<'a> Engine<'a> {
             return;
         }
         let (coeffs, _) = self.symbols.arena.slice(eq[0]);
-        let sign = if coeffs[coeffs.len() - 1] < 0 { -1 } else { 1 };
         self.key.clear();
-        self.key.extend(coeffs.iter().map(|&c| sign * c));
+        self.key.extend_from_slice(coeffs);
+        self.finish();
+    }
+
+    /// Decides the leaf at the end of the current path, whose proportion equation is held in the key buffer.
+    fn finish(&mut self) {
+        while self.key.last() == Some(&0) {
+            self.key.pop();
+        }
+        let zeros = self.key.iter().take_while(|&&c| c == 0).count();
+        self.key.drain(..zeros);
+        if self.key.is_empty() {
+            let moves: Vec<Placement> = self.path.iter().map(|s| s.mv).collect();
+            self.exact(&moves);
+            return;
+        }
+        if self.key[self.key.len() - 1] < 0 {
+            for c in self.key.iter_mut() {
+                *c = -*c;
+            }
+        }
         let n = self.key.len();
         let mut shifted: SmallVec<[i128; 32]> = self.key.iter().map(|&c| c as i128).collect();
         for i in 0..n {

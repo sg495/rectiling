@@ -206,23 +206,33 @@ impl Field for SmallField {
     }
 }
 
-/// Whether a polynomial with machine-integer coefficients is certified irreducible over the rationals by its reduction modulo a small prime.
-pub(crate) fn certified_irreducible(coeffs: &[i64]) -> bool {
+/// What the reduction of a polynomial modulo a small prime certifies about it.
+#[derive(PartialEq, Eq)]
+enum Certificate {
+    Irreducible,
+    SquareFree,
+    Nothing,
+}
+
+/// Examines a primitive polynomial with machine-integer coefficients modulo a small prime.
+fn certify(coeffs: &[i64]) -> Certificate {
     let f = SmallField;
     let image: Vec<u64> = coeffs.iter().map(|&c| c.rem_euclid(SMALL_MERSENNE as i64) as u64).collect();
     let d = image.len() - 1;
-    if d < 2 || image[d] == 0 {
-        return d == 1 && image[d] != 0;
+    if image[d] == 0 {
+        return Certificate::Nothing;
     }
-    let deriv: Vec<u64> = (1..=d).map(|i| f.mul(&image[i], &(i as u64))).collect();
-    let mut deriv = deriv;
+    if d == 1 {
+        return Certificate::Irreducible;
+    }
+    let mut deriv: Vec<u64> = (1..=d).map(|i| f.mul(&image[i], &(i as u64))).collect();
     trim(&f, &mut deriv);
     if fgcd(&f, &image, &deriv).len() != 1 {
-        return false;
+        return Certificate::Nothing;
     }
     let g = fmonic(&f, &image);
     let frobenius = frobenius_of_x(&f, &g);
-    nullity_of_frobenius(&f, &frobenius, &g) == 1
+    if nullity_of_frobenius(&f, &frobenius, &g) == 1 { Certificate::Irreducible } else { Certificate::SquareFree }
 }
 
 /// The power of the indeterminate by the modulus of the field, reduced by a monic polynomial.
@@ -623,8 +633,16 @@ pub fn factor(p: &Poly<BigInt>) -> Vec<(Poly<BigInt>, usize)> {
                 *c = -*c;
             }
         }
-        if w.len() >= 2 && certified_irreducible(&w) {
-            return vec![(Poly::from_i64s(&w), 1)];
+        if w.len() >= 2 {
+            match certify(&w) {
+                Certificate::Irreducible => return vec![(Poly::from_i64s(&w), 1)],
+                Certificate::SquareFree => {
+                    let mut out: Vec<(Poly<BigInt>, usize)> = factor_squarefree(&Poly::from_i64s(&w)).into_iter().map(|f| (f, 1)).collect();
+                    out.sort_by(|a, b| (a.0.degree(), a.0.coeffs()).cmp(&(b.0.degree(), b.0.coeffs())));
+                    return out;
+                }
+                Certificate::Nothing => {}
+            }
         }
     }
     let mut rest = p.primitive();

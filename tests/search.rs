@@ -109,6 +109,17 @@ fn default_method_agrees_with_exact_elimination() {
 }
 
 #[test]
+#[ignore = "takes a few minutes in release mode"]
+fn default_method_agrees_with_exact_elimination_for_more_tiles() {
+    for (n, w, h) in [(7, 1, 1), (8, 1, 1), (9, 1, 1), (7, 5, 3), (8, 2, 1)] {
+        let fast = Search::new(n, w, h).run();
+        let exact = Search::new(n, w, h).run_exact();
+        certified(&exact);
+        assert_eq!(summary(&fast), summary(&exact), "n = {n}, w = {w}/{h}");
+    }
+}
+
+#[test]
 fn witnesses_are_complete_sequences() {
     let outcome = Search::square(6).run();
     for found in &outcome.proportions() {
