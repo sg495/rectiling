@@ -5,8 +5,8 @@ import Rectiling.Enumeration
 /-!
 # The search by the default method
 
-Model of the depth-first search of `src/fast.rs` and of its driver in `src/search.rs`: `Engine::explore` below a stage, the passage of a whole subtree to the reference method when the symbolic pass fails (`Engine::delegate`), and the splitting of the search by forced prefixes (`Search::run` and `Engine::run`).
-The proportions found by the search are those of `FastReported`.
+Model of the depth-first search of `src/fast.rs` and of its driver in `src/search.rs`: `Engine::explore` below a stage, the passage of a subtree to the reference method when the symbolic pass fails (`Engine::delegate`), which keeps to the forced placements still to be followed, and the splitting of the search by forced prefixes (`Search::run` and `Engine::run`).
+The proportions found by the search are those of `FastReported`, and every complete sequence is examined once, under one prefix.
 -/
 
 namespace Rectiling
@@ -89,7 +89,7 @@ noncomputable def explore (square : Bool) :
           | none => (solve P a b (done ++ [mv])).feasible)
       | .next st' step => explore square r st' (done ++ [mv]) (sd ++ [step]) x
 
-/-- The proportions found below a stage when the first placements are forced, as in `Engine::explore` with a prefix; a failure of the symbolic pass on a forced placement passes the whole subtree below it to the reference method. -/
+/-- The proportions found below a stage when the first placements are forced, as in `Engine::explore` with a prefix; after a failure of the symbolic pass on a forced placement, the reference method receives the sequences below it that follow the forced placements still to come, as in `Engine::delegate` with a prefix. -/
 noncomputable def exploreForced (square : Bool) :
     List Placement → ℕ → Stage Coeff → List Placement → List (Step Coeff) → ℝ → Prop
   | [], r, st, done, sd => explore M P N a b square r st done sd
@@ -97,13 +97,41 @@ noncomputable def exploreForced (square : Bool) :
     f ∈ moves square (flags st.stairs) r done.isEmpty ∧
       match advance M st done f with
       | .fail =>
-        ∃ q ∈ completions square (r - 1) false (place unitAlgebra (flags st.stairs) f ()),
+        ∃ q ∈ forcedCompletions square fs (r - 1) false
+            (place unitAlgebra (flags st.stairs) f ()),
           x ∈ (solve P a b (done ++ f :: q)).feasible
       | .final step E =>
         x ∈ (match leaf P N a b (done ++ [f]) (sd ++ [step]) E with
           | some S => S
           | none => (solve P a b (done ++ [f])).feasible)
       | .next st' step => exploreForced square fs (r - 1) st' (done ++ [f]) (sd ++ [step]) x
+
+/-- The complete sequences examined below a stage, in the order of `explore` and each as often as it is examined. -/
+noncomputable def examined (square : Bool) :
+    ℕ → Stage Coeff → List Placement → List (List Placement)
+  | 0, _, _ => []
+  | r + 1, st, done =>
+    (moves square (flags st.stairs) (r + 1) done.isEmpty).flatMap fun mv =>
+      match advance M st done mv with
+      | .fail =>
+        (completions square r false (place unitAlgebra (flags st.stairs) mv ())).map fun q =>
+          mv :: q
+      | .final _ _ => [[mv]]
+      | .next st' _ => (examined square r st' (done ++ [mv])).map fun q => mv :: q
+
+/-- The complete sequences examined below a stage when the first placements are forced, in the order of `exploreForced` and each as often as it is examined. -/
+noncomputable def examinedForced (square : Bool) :
+    List Placement → ℕ → Stage Coeff → List Placement → List (List Placement)
+  | [], r, st, done => examined M square r st done
+  | f :: fs, r, st, done =>
+    if f ∈ moves square (flags st.stairs) r done.isEmpty then
+      match advance M st done f with
+      | .fail =>
+        (forcedCompletions square fs (r - 1) false
+          (place unitAlgebra (flags st.stairs) f ())).map fun q => f :: q
+      | .final _ _ => [[f]]
+      | .next st' _ => (examinedForced square fs (r - 1) st' (done ++ [f])).map fun q => f :: q
+    else []
 
 /-- The proportions found by the search for `n` tiles, split by the prefixes of length at most `d`, as in `Search::run`. -/
 def Searched (d n : ℕ) (x : ℝ) : Prop :=
@@ -115,26 +143,6 @@ variable {M P N a b}
 theorem isEmpty_concat (done : List Placement) (mv : Placement) :
     (done ++ [mv]).isEmpty = false := by
   cases done <;> rfl
-
-theorem cons_mem_completions_iff (square : Bool) (r : ℕ) (first : Bool) (s : List (Tier Unit))
-    (mv : Placement) (q : List Placement) :
-    (mv :: q) ∈ completions square r first s ↔
-      mv ∈ moves square s r first ∧
-        q ∈ completions square (r - 1) false (place unitAlgebra s mv ()) := by
-  rw [mem_completions, mem_moves, mem_completions]
-  simp only [CompleteFrom, FirstWide, List.head?_cons, Option.mem_def, Option.some.injEq,
-    forall_eq', Bool.false_eq_true, false_implies, and_true]
-  tauto
-
-theorem mem_completions_nil (square : Bool) (r : ℕ) (first : Bool) (q : List Placement) :
-    q ∈ completions square r first [] ↔ q = [] := by
-  cases r <;> simp [completions]
-
-theorem nil_not_mem_completions (square : Bool) (r : ℕ) (first : Bool) {s : List (Tier Unit)}
-    (hs : s ≠ []) : [] ∉ completions square r first s := by
-  rw [mem_completions]
-  rintro ⟨h, -⟩
-  exact hs h
 
 theorem flags_next {st st' : Stage Coeff} {done : List Placement} {mv : Placement}
     {step : Step Coeff} (h : advance M st done mv = .next st' step) :
@@ -236,6 +244,7 @@ theorem exploreForced_sub (square : Bool) :
     | fail =>
       rw [hadv] at h
       obtain ⟨q, hq, hx⟩ := h
+      replace hq := ((mem_forcedCompletions _ _ _ _ _ _).mp hq).1
       exact ⟨f :: q, (cons_mem_completions_iff _ _ _ _ _ _).mpr ⟨hmv, hq⟩, by
         rw [below_fail hadv]
         exact hx⟩
@@ -279,7 +288,8 @@ theorem exploreForced_sup (square : Bool) :
     cases hadv : advance M st done f with
     | fail =>
       rw [below_fail hadv] at hx
-      exact ⟨fs ++ q, hq', hx⟩
+      exact ⟨fs ++ q, (mem_forcedCompletions _ _ _ _ _ _).mpr ⟨hq', .inl (List.prefix_append _ _)⟩,
+        hx⟩
     | final step E =>
       obtain ⟨-, -, -, -, hempty⟩ := advance_final hadv
       rw [← flags_place (side := st.side), hempty] at hq'
@@ -314,6 +324,206 @@ theorem searched_iff (d n : ℕ) (x : ℝ) :
       exact hp
     · rw [← fastSolve_eq_below]
       exact hx
+
+/-! ### The sequences examined -/
+
+/-- The proportions found below a stage are those reported for the sequences examined below it. -/
+theorem explore_iff_examined (square : Bool) :
+    ∀ (r : ℕ) (st : Stage Coeff) (done : List Placement) (sd : List (Step Coeff)) (x : ℝ),
+      explore M P N a b square r st done sd x ↔
+        ∃ p ∈ examined M square r st done, x ∈ below M P N a b st done sd p := by
+  intro r
+  induction r with
+  | zero =>
+    intro st done sd x
+    simp [explore, examined]
+  | succ r ih =>
+    intro st done sd x
+    rw [explore, examined]
+    simp only [List.mem_flatMap]
+    constructor
+    · rintro ⟨mv, hmv, h⟩
+      cases hadv : advance M st done mv with
+      | fail =>
+        rw [hadv] at h
+        obtain ⟨q, hq, hx⟩ := h
+        refine ⟨mv :: q, ⟨mv, hmv, ?_⟩, by
+          rw [below_fail hadv]
+          exact hx⟩
+        rw [hadv]
+        exact List.mem_map.mpr ⟨q, hq, rfl⟩
+      | final step E =>
+        rw [hadv] at h
+        refine ⟨[mv], ⟨mv, hmv, ?_⟩, by
+          rw [below_final hadv]
+          exact h⟩
+        rw [hadv]
+        exact List.mem_singleton.mpr rfl
+      | next st' step =>
+        rw [hadv] at h
+        obtain ⟨q, hq, hx⟩ := (ih st' _ _ x).mp h
+        refine ⟨mv :: q, ⟨mv, hmv, ?_⟩, by
+          rw [below_next hadv]
+          exact hx⟩
+        rw [hadv]
+        exact List.mem_map.mpr ⟨q, hq, rfl⟩
+    · rintro ⟨p, ⟨mv, hmv, hp⟩, hx⟩
+      refine ⟨mv, hmv, ?_⟩
+      cases hadv : advance M st done mv with
+      | fail =>
+        rw [hadv] at hp
+        obtain ⟨q, hq, rfl⟩ := List.mem_map.mp hp
+        rw [below_fail hadv] at hx
+        exact ⟨q, hq, hx⟩
+      | final step E =>
+        rw [hadv] at hp
+        obtain rfl := List.mem_singleton.mp hp
+        rw [below_final hadv] at hx
+        exact hx
+      | next st' step =>
+        rw [hadv] at hp
+        obtain ⟨q, hq, rfl⟩ := List.mem_map.mp hp
+        rw [below_next hadv] at hx
+        exact (ih st' _ _ x).mpr ⟨q, hq, hx⟩
+
+/-- The proportions found with forced placements are those reported for the sequences examined. -/
+theorem exploreForced_iff_examined (square : Bool) :
+    ∀ (fs : List Placement) (r : ℕ) (st : Stage Coeff) (done : List Placement)
+      (sd : List (Step Coeff)) (x : ℝ),
+      exploreForced M P N a b square fs r st done sd x ↔
+        ∃ p ∈ examinedForced M square fs r st done, x ∈ below M P N a b st done sd p := by
+  intro fs
+  induction fs with
+  | nil =>
+    intro r st done sd x
+    exact explore_iff_examined square r st done sd x
+  | cons f fs ih =>
+    intro r st done sd x
+    rw [exploreForced, examinedForced]
+    by_cases hmv : f ∈ moves square (flags st.stairs) r done.isEmpty
+    · simp only [hmv, true_and, ↓reduceIte]
+      cases hadv : advance M st done f with
+      | fail =>
+        simp only [List.mem_map]
+        constructor
+        · rintro ⟨q, hq, hx⟩
+          exact ⟨f :: q, ⟨q, hq, rfl⟩, by
+            rw [below_fail hadv]
+            exact hx⟩
+        · rintro ⟨_, ⟨q, hq, rfl⟩, hx⟩
+          rw [below_fail hadv] at hx
+          exact ⟨q, hq, hx⟩
+      | final step E =>
+        simp only [List.mem_singleton, exists_eq_left, below_final hadv]
+      | next st' step =>
+        simp only [List.mem_map]
+        rw [ih]
+        constructor
+        · rintro ⟨q, hq, hx⟩
+          exact ⟨f :: q, ⟨q, hq, rfl⟩, by
+            rw [below_next hadv]
+            exact hx⟩
+        · rintro ⟨_, ⟨q, hq, rfl⟩, hx⟩
+          rw [below_next hadv] at hx
+          exact ⟨q, hq, hx⟩
+    · simp [hmv]
+
+/-- The sequences examined below a stage are those enumerated below its staircase, each as often and in the same order. -/
+theorem examined_eq (square : Bool) :
+    ∀ (r : ℕ) (st : Stage Coeff) (done : List Placement), st.stairs ≠ [] →
+      examined M square r st done = completions square r done.isEmpty (flags st.stairs) := by
+  intro r
+  induction r with
+  | zero =>
+    intro st done hne
+    have hf : flags st.stairs ≠ [] := by simpa [flags] using hne
+    cases hfs : flags st.stairs with
+    | nil => exact absurd hfs hf
+    | cons t s => simp [examined, completions]
+  | succ r ih =>
+    intro st done hne
+    have hf : flags st.stairs ≠ [] := by simpa [flags] using hne
+    rw [examined]
+    obtain ⟨t, s, hfs⟩ := List.exists_cons_of_ne_nil hf
+    rw [hfs, completions_cons, ← hfs]
+    refine List.flatMap_congr fun mv _ => ?_
+    simp only [Nat.add_sub_cancel]
+    cases hadv : advance M st done mv with
+    | fail => rfl
+    | final step E =>
+      obtain ⟨-, -, -, -, hempty⟩ := advance_final hadv
+      rw [← flags_place (side := st.side), hempty]
+      simp [flags, completions_nil]
+    | next st' step =>
+      obtain ⟨hne', hfl⟩ := flags_next hadv
+      simp only [ih st' _ hne', isEmpty_concat, hfl]
+
+/-- The sequences examined with forced placements are those that the fallback enumerates with the same placements forced, each as often and in the same order. -/
+theorem examinedForced_eq (square : Bool) :
+    ∀ (fs : List Placement) (r : ℕ) (st : Stage Coeff) (done : List Placement), st.stairs ≠ [] →
+      examinedForced M square fs r st done =
+        forcedCompletions square fs r done.isEmpty (flags st.stairs) := by
+  intro fs
+  induction fs with
+  | nil =>
+    intro r st done hne
+    exact examined_eq square r st done hne
+  | cons f fs ih =>
+    intro r st done hne
+    have hf : flags st.stairs ≠ [] := by simpa [flags] using hne
+    rw [examinedForced, forcedCompletions]
+    obtain ⟨t, s, hfs⟩ := List.exists_cons_of_ne_nil hf
+    have hne' : (flags st.stairs).isEmpty = false := by simp [hfs]
+    simp only [hne', Bool.false_eq_true, ↓reduceIte]
+    by_cases hmv : f ∈ moves square (flags st.stairs) r done.isEmpty
+    · simp only [hmv, ↓reduceIte]
+      cases hadv : advance M st done f with
+      | fail => rfl
+      | final step E =>
+        obtain ⟨-, -, -, -, hempty⟩ := advance_final hadv
+        rw [← flags_place (side := st.side), hempty]
+        simp [flags, forcedCompletions_nil]
+      | next st' step =>
+        obtain ⟨hne'', hfl⟩ := flags_next hadv
+        simp only [ih _ st' _ hne'', isEmpty_concat, hfl]
+    · simp only [hmv, ↓reduceIte]
+
+/-- **The prefixes split the search.** The sequences examined under the prefixes of length at most `d`, taken in order, are the sequences enumerated for `n` tiles, each as often and in the same order. -/
+theorem examined_split (square : Bool) (d n : ℕ) :
+    ((prefixes square d n true (initial () ())).flatMap fun pre =>
+      examinedForced M square pre n (Stage.init a b) []) =
+        completions square n true (initial () ()) := by
+  have hinit : flags (Stage.init a b : Stage Coeff).stairs = initial () () := rfl
+  have hne : (Stage.init a b : Stage Coeff).stairs ≠ [] := by simp [Stage.init, homInitial, initial]
+  rw [← flatMap_forcedCompletions square d n true]
+  refine List.flatMap_congr fun pre _ => ?_
+  rw [examinedForced_eq square pre n _ [] hne, hinit]
+  rfl
+
+/-- **Every sequence is examined once.** Whatever the length of the prefixes by which the search is split, a complete admissible sequence, with the first tile wide for a square, is examined once in all: the numbers of times that it is examined under the prefixes add up to one. -/
+theorem examined_once (d n : ℕ) {p : List Placement} (hp : Complete n p)
+    (hwide : a = b → FirstWide p) :
+    ((prefixes (decide (a = b)) d n true (initial () ())).map fun pre =>
+      (examinedForced M (decide (a = b)) pre n (Stage.init a b) []).count p).sum = 1 := by
+  have h := List.count_flatMap (x := p) (l := prefixes (decide (a = b)) d n true (initial () ()))
+    (f := fun pre => examinedForced M (decide (a = b)) pre n (Stage.init a b) [])
+  rw [examined_split] at h
+  rw [show (fun pre => (examinedForced M (decide (a = b)) pre n (Stage.init a b) []).count p) =
+    List.count p ∘ fun pre => examinedForced M (decide (a = b)) pre n (Stage.init a b) [] from rfl,
+    ← h]
+  exact List.count_eq_one_of_mem (nodup_completions _ _ _ _)
+    ((mem_completions_initial _ n p).mpr ⟨hp, fun hab => hwide (by simpa using hab)⟩)
+
+/-- Only complete admissible sequences are examined, with the first tile wide for a square. -/
+theorem examined_complete (d n : ℕ) {pre p : List Placement}
+    (hpre : pre ∈ prefixes (decide (a = b)) d n true (initial () ()))
+    (hp : p ∈ examinedForced M (decide (a = b)) pre n (Stage.init a b) []) :
+    Complete n p ∧ (a = b → FirstWide p) := by
+  have h : p ∈ completions (decide (a = b)) n true (initial () ()) := by
+    rw [← examined_split (M := M) (a := a) (b := b)]
+    exact List.mem_flatMap.mpr ⟨pre, hpre, hp⟩
+  obtain ⟨hcomplete, hw⟩ := (mem_completions_initial _ n p).mp h
+  exact ⟨hcomplete, fun hab => hw (by simpa using hab)⟩
 
 end Tree
 

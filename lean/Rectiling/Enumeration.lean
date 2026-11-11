@@ -4,7 +4,7 @@ import Rectiling.Check
 /-!
 # Enumeration of the placement sequences
 
-Model of the enumerations of `src/search.rs` and `src/fast.rs`: the placements tried at a staircase, the complete sequences below a staircase (`Search::sequences` at full depth, `Engine::delegate_rec`, and the sequences visited by `Engine::explore`), and the splitting of the search by prefixes of bounded length (`Search::sequences` and the forced placements of `Engine::explore`).
+Model of the enumerations of `src/search.rs` and `src/fast.rs`: the placements tried at a staircase, the complete sequences below a staircase (`Search::sequences` at full depth, `Engine::delegate_rec` beyond the forced placements, and the sequences visited by `Engine::explore`), the splitting of the search by prefixes of bounded length (`Search::sequences` and the forced placements of `Engine::explore`), and the complete sequences that follow forced placements (`Engine::delegate_rec`).
 The sequences enumerated are exactly the complete admissible ones, with the first tile wide when the main rectangle is a square.
 -/
 
@@ -108,6 +108,89 @@ theorem mem_completions (square : Bool) :
           exact ⟨mv, ⟨hadm, fun hf hs => hrule hf hs mv (by simp)⟩, rest,
             (ih false _ rest).mpr ⟨hrest, by simp⟩, rfl⟩
 
+theorem cons_mem_completions_iff (square : Bool) (r : ℕ) (first : Bool) (s : List (Tier Unit))
+    (mv : Placement) (q : List Placement) :
+    (mv :: q) ∈ completions square r first s ↔
+      mv ∈ moves square s r first ∧
+        q ∈ completions square (r - 1) false (place unitAlgebra s mv ()) := by
+  rw [mem_completions, mem_moves, mem_completions]
+  simp only [CompleteFrom, FirstWide, List.head?_cons, Option.mem_def, Option.some.injEq,
+    forall_eq', Bool.false_eq_true, false_implies, and_true]
+  tauto
+
+theorem completions_nil (square : Bool) (r : ℕ) (first : Bool) :
+    completions square r first [] = [[]] := by
+  cases r <;> simp [completions]
+
+theorem mem_completions_nil (square : Bool) (r : ℕ) (first : Bool) (q : List Placement) :
+    q ∈ completions square r first [] ↔ q = [] := by
+  simp [completions_nil]
+
+theorem nil_not_mem_completions (square : Bool) (r : ℕ) (first : Bool) {s : List (Tier Unit)}
+    (hs : s ≠ []) : [] ∉ completions square r first s := by
+  rw [mem_completions]
+  rintro ⟨h, -⟩
+  exact hs h
+
+theorem moves_zero (square : Bool) (s : List (Tier Unit)) (first : Bool) :
+    moves square s 0 first = [] := by
+  rw [List.eq_nil_iff_forall_not_mem]
+  intro mv hmv
+  exact absurd ((mem_moves _ _ _ _ _).mp hmv).1.2.1 (lt_irrefl 0)
+
+theorem completions_cons (square : Bool) (r : ℕ) (first : Bool) (t : Tier Unit)
+    (s : List (Tier Unit)) :
+    completions square r first (t :: s) =
+      (moves square (t :: s) r first).flatMap fun mv =>
+        (completions square (r - 1) false (place unitAlgebra (t :: s) mv ())).map fun p =>
+          mv :: p := by
+  cases r with
+  | zero => simp [completions, moves_zero]
+  | succ r => simp [completions]
+
+theorem nodup_candidates (count : ℕ) : (candidates count).Nodup := by
+  rw [candidates, List.nodup_flatMap]
+  refine ⟨fun tier _ => by simp [fits], List.nodup_range.imp ?_⟩
+  intro i j hij
+  rw [Function.onFun, List.disjoint_left]
+  intro mv hi hj
+  have h1 : mv.tier = i := by
+    simp only [fits, List.mem_flatMap, List.mem_map] at hi
+    obtain ⟨_, -, _, -, rfl⟩ := hi
+    rfl
+  have h2 : mv.tier = j := by
+    simp only [fits, List.mem_flatMap, List.mem_map] at hj
+    obtain ⟨_, -, _, -, rfl⟩ := hj
+    rfl
+  exact hij (h1.symm.trans h2)
+
+theorem nodup_moves (square : Bool) (s : List (Tier Unit)) (remaining : ℕ) (first : Bool) :
+    (moves square s remaining first).Nodup :=
+  (nodup_candidates _).filter _
+
+/-- No sequence is enumerated twice below a staircase. -/
+theorem nodup_completions (square : Bool) :
+    ∀ (r : ℕ) (first : Bool) (s : List (Tier Unit)), (completions square r first s).Nodup := by
+  intro r
+  induction r with
+  | zero =>
+    intro first s
+    cases s <;> simp [completions]
+  | succ r ih =>
+    intro first s
+    cases s with
+    | nil => simp [completions]
+    | cons t s =>
+      rw [completions_cons, List.nodup_flatMap]
+      refine ⟨fun mv _ => (ih _ _).map fun p q h => (List.cons.inj h).2,
+        (nodup_moves _ _ _ _).imp ?_⟩
+      intro mv mv' hne
+      rw [Function.onFun, List.disjoint_left]
+      intro p h h'
+      obtain ⟨_, -, rfl⟩ := List.mem_map.mp h
+      obtain ⟨_, -, heq⟩ := List.mem_map.mp h'
+      exact hne (List.cons.inj heq).1.symm
+
 /-- The sequences enumerated for `n` tiles are the complete admissible ones, with the first tile wide for a square. -/
 theorem mem_completions_initial (square : Bool) (n : ℕ) (p : List Placement) :
     p ∈ completions square n true (initial () ()) ↔
@@ -149,11 +232,7 @@ theorem mem_completions_iff_prefix (square : Bool) :
     | cons t s =>
       cases r with
       | zero =>
-        have hmoves : moves square (t :: s) 0 first = [] := by
-          rw [List.eq_nil_iff_forall_not_mem]
-          intro mv hmv
-          exact absurd ((mem_moves _ _ _ _ _).mp hmv).1.2.1 (lt_irrefl 0)
-        simp [completions, hmoves]
+        simp [completions, moves_zero]
       | succ r =>
         rw [completions]
         simp only [List.isEmpty_cons, Bool.false_eq_true, ↓reduceIte, List.mem_flatMap,
@@ -166,5 +245,87 @@ theorem mem_completions_iff_prefix (square : Bool) :
         · rintro ⟨_, ⟨mv, hmv, pre, hpre, rfl⟩, q, rfl, hq⟩
           refine ⟨mv, hmv, pre ++ q, (ih r false _ _).mpr ⟨pre, hpre, q, rfl, ?_⟩, rfl⟩
           simpa [after] using hq
+
+/-! ### The fallback within a prefix -/
+
+/-- The complete sequences below a staircase that follow the given placements as far as these go, as in `Engine::delegate_rec`. -/
+def forcedCompletions (square : Bool) :
+    List Placement → ℕ → Bool → List (Tier Unit) → List (List Placement)
+  | [], r, first, s => completions square r first s
+  | f :: fs, r, first, s =>
+    if s.isEmpty then [[]]
+    else if f ∈ moves square s r first then
+      (forcedCompletions square fs (r - 1) false (place unitAlgebra s f ())).map fun p => f :: p
+    else []
+
+theorem forcedCompletions_nil (square : Bool) (fs : List Placement) (r : ℕ) (first : Bool) :
+    forcedCompletions square fs r first [] = [[]] := by
+  cases fs <;> simp [forcedCompletions, completions_nil]
+
+/-- The sequences enumerated when placements are forced are the enumerated sequences that begin with the forced placements, or that end before these do. -/
+theorem mem_forcedCompletions (square : Bool) :
+    ∀ (fs : List Placement) (r : ℕ) (first : Bool) (s : List (Tier Unit)) (p : List Placement),
+      p ∈ forcedCompletions square fs r first s ↔
+        p ∈ completions square r first s ∧ (fs <+: p ∨ p <+: fs) := by
+  intro fs
+  induction fs with
+  | nil =>
+    intro r first s p
+    simp [forcedCompletions]
+  | cons f fs ih =>
+    intro r first s p
+    rw [forcedCompletions]
+    cases s with
+    | nil =>
+      rw [mem_completions_nil]
+      constructor
+      · rintro h
+        obtain rfl : p = [] := by simpa using h
+        simp
+      · rintro ⟨rfl, -⟩
+        simp
+    | cons t s =>
+      simp only [List.isEmpty_cons, Bool.false_eq_true, ↓reduceIte]
+      cases p with
+      | nil =>
+        have hnil := nil_not_mem_completions square r first (List.cons_ne_nil t s)
+        by_cases hf : f ∈ moves square (t :: s) r first <;> simp [hf, hnil]
+      | cons mv q =>
+        rw [cons_mem_completions_iff, List.cons_prefix_cons, List.cons_prefix_cons]
+        by_cases hf : f ∈ moves square (t :: s) r first
+        · simp only [hf, ↓reduceIte, List.mem_map, List.cons.injEq, exists_eq_right_right, ih]
+          constructor
+          · rintro ⟨⟨hq, hpre⟩, rfl⟩
+            exact ⟨⟨hf, hq⟩, hpre.imp (fun h => ⟨rfl, h⟩) fun h => ⟨rfl, h⟩⟩
+          · rintro ⟨⟨-, hq⟩, ⟨rfl, hpre⟩ | ⟨rfl, hpre⟩⟩
+            · exact ⟨⟨hq, .inl hpre⟩, rfl⟩
+            · exact ⟨⟨hq, .inr hpre⟩, rfl⟩
+        · simp only [hf, ↓reduceIte, List.not_mem_nil, false_iff]
+          rintro ⟨⟨hmv, -⟩, ⟨rfl, -⟩ | ⟨rfl, -⟩⟩
+          · exact hf hmv
+          · exact hf hmv
+
+/-- **The fallback within the prefixes splits the enumeration.** The sequences enumerated with the placements of each prefix forced, taken over the prefixes in order, are the sequences enumerated below the staircase, each as often and in the same order. -/
+theorem flatMap_forcedCompletions (square : Bool) :
+    ∀ (d r : ℕ) (first : Bool) (s : List (Tier Unit)),
+      ((prefixes square d r first s).flatMap fun pre => forcedCompletions square pre r first s) =
+        completions square r first s := by
+  intro d
+  induction d with
+  | zero =>
+    intro r first s
+    simp [prefixes, forcedCompletions]
+  | succ d ih =>
+    intro r first s
+    rw [prefixes]
+    cases s with
+    | nil => simp [forcedCompletions, completions_nil]
+    | cons t s =>
+      simp only [List.isEmpty_cons, Bool.false_eq_true, ↓reduceIte]
+      rw [completions_cons, List.flatMap_assoc]
+      refine List.flatMap_congr fun mv hmv => ?_
+      rw [List.flatMap_map, ← ih (r - 1) false, List.map_flatMap]
+      refine List.flatMap_congr fun pre _ => ?_
+      simp [forcedCompletions, hmv]
 
 end Rectiling

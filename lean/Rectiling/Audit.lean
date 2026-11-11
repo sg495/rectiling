@@ -42,7 +42,15 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.Fast.fastSolve_eq_solve
 #print axioms Rectiling.mem_completions
 #print axioms Rectiling.mem_completions_iff_prefix
+#print axioms Rectiling.mem_forcedCompletions
+#print axioms Rectiling.flatMap_forcedCompletions
+#print axioms Rectiling.nodup_completions
 #print axioms Rectiling.Fast.searched_iff
+#print axioms Rectiling.Fast.exploreForced_iff_examined
+#print axioms Rectiling.Fast.examinedForced_eq
+#print axioms Rectiling.Fast.examined_split
+#print axioms Rectiling.Fast.examined_once
+#print axioms Rectiling.Fast.examined_complete
 #print axioms Rectiling.Fast.fast_sound
 #print axioms Rectiling.Fast.fast_complete
 #print axioms Rectiling.Fast.fast_iff
