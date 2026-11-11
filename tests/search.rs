@@ -159,3 +159,26 @@ fn square_search_ignores_transposed_duplicates() {
     let scaled = Search::new(5, 3, 3).run();
     assert_eq!(square.count(), scaled.count());
 }
+
+#[test]
+fn rational_proportions_needing_both_orientations() {
+    let mut mixed = Vec::new();
+    let mut aligned = 0;
+    for found in Search::square(6).run().proportions() {
+        if found.proportion.degree() != 1 {
+            continue;
+        }
+        let poly = found.proportion.min_poly().to_string();
+        let (q, p) = poly.split_once("x - ").expect("linear polynomial");
+        let q: u32 = q.trim_end_matches('*').parse().unwrap_or(1);
+        let p: u32 = p.parse().expect("numerator");
+        let squares = Search::new(6, p, q).run().proportions().iter().any(|f| f.proportion.min_poly().to_string() == "x - 1");
+        if squares {
+            aligned += 1;
+        } else {
+            mixed.push((p, q));
+        }
+    }
+    assert_eq!(aligned, 28);
+    assert_eq!(mixed, [(5, 3), (2, 1)]);
+}

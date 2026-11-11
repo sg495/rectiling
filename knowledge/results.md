@@ -67,6 +67,30 @@ The number of proportions of each algebraic degree.
 For n = 13 the counts by degree, from 1 to 13, are 52230, 13531, 3226298, 912764, 27008697, 8173821, 77488650, 19961337, 76665843, 13546609, 20575413, 1782742 and 649048.
 
 The first column counts the rational proportions.
+
+### Rational proportions
+
+When all tiles have the same orientation, stretching one axis by the proportion turns the tiling into a dissection of a rectangle into n squares, and the proportion is the aspect ratio of that rectangle.
+The proportions obtained in this way are counted by [OEIS A210517](https://oeis.org/A210517), the number of rectangles that can be dissected into n squares: 1, 1, 2, 5, 11, 28, 74, 211.
+
+The first column of the table agrees with that sequence up to n = 5 and exceeds it afterwards, and the excess consists of rational proportions that can be realised with n tiles only by using both orientations.
+They were identified by searching, for each rational proportion p/q found with n tiles, for a dissection of the p × q rectangle into n squares.
+
+| n | rational proportions | with one orientation | only with both orientations |
+| - | -------------------- | -------------------- | --------------------------- |
+| 4 | 5                    | 5                    | none                        |
+| 5 | 11                   | 11                   | none                        |
+| 6 | 30                   | 28                   | 5/3, 2                      |
+| 7 | 76                   | 74                   | 3/2, 3                      |
+| 8 | 214                  | 211                  | 5/3, 5/2, 4                 |
+
+For example, a 2 × 1 rectangle cannot be cut into exactly six squares, but a square can be cut into six rectangles of proportion 2 if some are wide and some are tall.
+The middle column reproduces the published sequence, which is a further check on the search.
+A proportion listed for one n may well be realised with a single orientation for another n: 2 is, for two tiles.
+
+For n = 13 the counts by degree, from 1 to 13, are 52230, 13531, 3226298, 912764, 27008697, 8173821, 77488650, 19961337, 76665843, 13546609, 20575413, 1782742 and 649048.
+
+The first column counts the rational proportions.
 A rational proportion arises whenever all tiles have the same orientation, the main square then being cut into smaller squares after a change of scale along one axis.
 The number of rectangles that can be dissected into n squares ([OEIS A210517](https://oeis.org/A210517): 1, 1, 2, 5, 11, 28, 74, 211) agrees with the column up to n = 5 and is exceeded by it from n = 6 onwards (30, 76 and 214 against 28, 74 and 211).
 This suggests that some rational proportions are obtained with n tiles only by using both orientations; the comparison has not been examined case by case.
