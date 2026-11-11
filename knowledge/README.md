@@ -8,3 +8,4 @@ Curated notes on the problem that `rectiling` addresses and on the methods it us
 - [solving.md](solving.md) — how each enumerated tiling is turned into exact algebraic data.
 - [validation.md](validation.md) — external data against which the implementation is checked.
 - [results.md](results.md) — the values computed with the library, including new terms of the sequence.
+- [analysis.md](analysis.md) — structural laws, derived sequences and conjectures found in the search for a formula.

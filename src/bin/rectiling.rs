@@ -9,9 +9,17 @@ fn main() {
     let args: Vec<String> = std::env::args().skip(1).collect();
     let mut numbers: Vec<u32> = Vec::new();
     let mut list = false;
-    for arg in &args {
+    let mut guillotine = false;
+    let mut minority: Option<usize> = None;
+    let mut args = args.iter();
+    while let Some(arg) = args.next() {
         match arg.as_str() {
             "--list" => list = true,
+            "--guillotine" => guillotine = true,
+            "--minority" => match args.next().and_then(|v| v.parse().ok()) {
+                Some(v) => minority = Some(v),
+                None => usage(),
+            },
             other => match other.parse() {
                 Ok(v) => numbers.push(v),
                 Err(_) => usage(),
@@ -24,7 +32,11 @@ fn main() {
         _ => usage(),
     };
     let start = Instant::now();
-    let outcome = Search::new(tiles as usize, width, height).run();
+    let mut search = Search::new(tiles as usize, width, height);
+    if let Some(limit) = minority {
+        search = search.with_minority(limit);
+    }
+    let outcome = if guillotine { search.run_guillotine() } else { search.run() };
     let elapsed = start.elapsed();
     if list {
         for found in outcome.proportions() {
@@ -32,6 +44,12 @@ fn main() {
         }
     }
     println!("tiles = {tiles}, main rectangle = {width}:{height}");
+    if guillotine {
+        println!("guillotine tilings only; leaves are aspect ratio functions");
+    }
+    if let Some(limit) = minority {
+        println!("at most {limit} tiles in the less frequent orientation");
+    }
     println!("degrees = {:?}", outcome.degrees());
     println!("proportions = {}", outcome.count());
     println!("{:?}, polynomials = {}", outcome.stats(), outcome.polynomials());
@@ -39,6 +57,6 @@ fn main() {
 }
 
 fn usage() -> ! {
-    eprintln!("usage: rectiling [--list] TILES [WIDTH HEIGHT]");
+    eprintln!("usage: rectiling [--list] [--guillotine] [--minority LIMIT] TILES [WIDTH HEIGHT]");
     std::process::exit(2)
 }

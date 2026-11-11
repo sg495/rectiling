@@ -6,7 +6,7 @@ use crate::algebraic::{Registry, RootRef};
 use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
-use crate::search::{Shared, Tally, encode_witness};
+use crate::search::{Shared, Tally, encode_witness, within};
 use crate::staircase::{Algebra, FITS, Fit, Placement, Staircase, Unit};
 use smallvec::SmallVec;
 
@@ -351,6 +351,7 @@ pub(crate) struct Engine<'a> {
     width: i64,
     height: i64,
     tiles: usize,
+    minority: usize,
     registry: &'a Registry,
     cache: &'a PolyCache,
     shared: &'a Shared,
@@ -370,11 +371,12 @@ impl Drop for Engine<'_> {
 }
 
 impl<'a> Engine<'a> {
-    pub(crate) fn new(tiles: usize, width: i64, height: i64, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
+    pub(crate) fn new(tiles: usize, width: i64, height: i64, minority: usize, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
         Engine {
             width,
             height,
             tiles,
+            minority,
             registry,
             cache,
             shared,
@@ -414,7 +416,8 @@ impl<'a> Engine<'a> {
     fn explore(&mut self, stairs: &Staircase<Form>, remaining: usize, used: u8, pivot: u32, prefix: &[Placement]) {
         let depth = self.path.len();
         let forced = prefix.get(depth).copied();
-        if remaining == 1 && forced.is_none() && depth > 0 && self.last(stairs) {
+        let talls = if 2 * self.minority < self.tiles { self.path.iter().filter(|s| s.mv.tall).count() } else { 0 };
+        if remaining == 1 && forced.is_none() && depth > 0 && self.last(stairs, talls) {
             return;
         }
         for tier in 0..stairs.tiers.len() {
@@ -435,6 +438,9 @@ impl<'a> Engine<'a> {
                     if tall && depth == 0 && self.width == self.height {
                         continue;
                     }
+                    if !within(self.minority, talls + tall as usize, depth + 1) {
+                        continue;
+                    }
                     self.step(stairs, remaining, used, pivot, prefix, mv);
                 }
             }
@@ -442,7 +448,7 @@ impl<'a> Engine<'a> {
     }
 
     /// Treats both orientations of the last tile directly, if the staircase has the expected shape.
-    fn last(&mut self, stairs: &Staircase<Form>) -> bool {
+    fn last(&mut self, stairs: &Staircase<Form>, talls: usize) -> bool {
         let tier = &stairs.tiers[0];
         if stairs.tiers.len() != 1 || tier.stale || tier.floor[0] == 0 || tier.wall[0] == 0 {
             return false;
@@ -452,6 +458,9 @@ impl<'a> Engine<'a> {
         }
         let (floor, wall) = (tier.floor[0], tier.wall[0]);
         for tall in [false, true] {
+            if !within(self.minority, talls + tall as usize, self.tiles) {
+                continue;
+            }
             let (plain, scaled) = if tall { (wall, floor) } else { (floor, wall) };
             let (cp, lp) = self.symbols.arena.slice(plain);
             let (cs, ls) = self.symbols.arena.slice(scaled);
@@ -583,6 +592,10 @@ impl<'a> Engine<'a> {
                         tall,
                     };
                     if stairs.admits(mv, remaining).is_none() || (tall && moves.is_empty() && self.width == self.height) {
+                        continue;
+                    }
+                    let talls = moves.iter().filter(|m| m.tall).count() + tall as usize;
+                    if !within(self.minority, talls, moves.len() + 1) {
                         continue;
                     }
                     let mut next = stairs.clone();
