@@ -166,11 +166,12 @@ A real staircase is read geometrically inside a main rectangle $[0, W] times [0,
 
 By definition $a_(i + 1) = a_i + L_i$ and $b_(i - 1) = b_i + M_i$, with the conventions $a_m := W$ and $b_(-1) := H$: the floor of a tier runs from its anchor to the next anchor, or to the right side of the main rectangle, and its wall runs from its anchor up to the level of the previous anchor, or to the top side.
 The region of the initial staircase of $W$ and $H$ is the main rectangle $[0, W] times [0, H]$, and the region of the empty staircase is empty.
-@fig:staircase shows a positive staircase with four tiers.
+@fig:staircase shows a positive staircase with three tiers.
+This and the other figures of this section are drawn from tilings found by the search, at their exact proportions.
 
 #figure(
-  image("figures/staircase.svg", width: 52%),
-  caption: [A partial tiling by three tiles and its staircase, with four tiers. Each anchor $(a_i, b_i)$ is circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
+  image("figures/staircase.svg", width: 55%),
+  caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$; the tiles still to be placed are outlined. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
 
 A tile placed at the anchor of a tier may or may not be as wide as the floor, and may or may not be as high as the wall.
@@ -201,11 +202,11 @@ A tile that is as high as the wall has its height determined by the staircase, a
   A placement with $i >= m$, at a tier that does not exist, leaves the staircase unchanged and has no positive quantity, no equation and no tile.
 ] <def:placement>
 
-@fig:fits shows the four fits at the last anchor of the staircase of @fig:staircase.
+@fig:fits shows one placement of each fit, taken from the record of the tiling of @fig:staircase.
 
 #figure(
   image("figures/fits.svg", width: 100%),
-  caption: [The four fits of a tile placed at the anchor of $T_3$ in the staircase of @fig:staircase, with the anchors of the resulting staircase. An inside tile creates an anchor; a tile of full height moves the anchor to the right and one of full width moves it up; a full tile removes it.],
+  caption: [Four of the seven placements of the record of the tiling of @fig:staircase, one of each fit. In each panel the tile just placed is outlined, the floor and the wall of its tier before the placement are drawn thick, the rectangle that they span is hatched, and the anchors of the staircase after the placement are circled. The inside tile is narrower than the floor and lower than the wall; the tile of full height is as high as the wall, and the one of full width as wide as the floor; the full tile, which is the last, is both.],
 ) <fig:fits>
 
 Only an inside placement makes use of the free side.
@@ -230,14 +231,14 @@ The search therefore restricts the sequences of placements by two rules, which a
   The _first tile is wide_ in $rho$ if $rho$ is empty or $p_1$ is wide.
 ] <def:admissible>
 
-@fig:rules shows the flags of the staircase of @fig:staircase, which arose from an inside placement at $T_0$, a second inside placement at $T_0$ and an inside placement at $T_2$, and the placements that the two rules exclude.
-The last placement made $T_0$ and $T_1$ stale, so no tile can be placed at them; the tiers $T_1$ and $T_3$ lie to the right of inside tiles, so their floors are started.
-At $T_2$ the inside and full-width placements are allowed, but a tile of full height, or a full tile, would lengthen the started floor of $T_1$.
-At $T_3$ all four fits are allowed, as far as the two rules are concerned.
+@fig:rules shows the flags along the record of the tiling of @fig:staircase.
+After the first placement, which is inside, the tier $T_1$ to the right of the tile has a started floor.
+The third placement is made at $T_1$ and makes $T_0$ stale: no tile can be placed there until its floor is lengthened.
+The fourth placement, of full height at $T_1$, does lengthen the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ with a started floor, so that a tile of full height or a full tile at $T_2$, which would lengthen that floor, is excluded.
 
 #figure(
   image("figures/rules.svg", width: 100%),
-  caption: [Left: the flags of the staircase of @fig:staircase. Anchors of stale tiers are grey, and started floors are drawn dashed in red. Centre and right: the two placements at $T_2$ that the rule on started floors forbids; each would extend the started floor of $T_1$ to the right.],
+  caption: [The staircases after one, three and four placements of the record of the tiling of @fig:staircase. The anchor of a stale tier is grey, and started floors are drawn dashed in red.],
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
@@ -357,12 +358,6 @@ The second part is combinatorial: a floor or a wall that has become non-positive
   It is _wall-doomed_ if it has a tier whose wall is not positive and before which every tier is stale.
 ] <def:doom>
 
-@fig:doom shows how a non-positive floor arises from positive tiles.
-
-#figure(
-  image("figures/doomed.svg", width: 62%),
-  caption: [Two inside placements, the second at the tier to the right of the first tile. The positivity constraints say only that both tiles have positive sides. On the left the second tile is narrower than its floor; on the right it is wider, and the tier to its right has a negative floor, which is started and last: the staircase is doomed.],
-) <fig:doom>
 
 The empty staircase is neither.
 The next statement records what the constraints of a single placement give.
@@ -522,7 +517,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/construction.svg", width: 100%),
-  caption: [The construction of the record of a tiling by six tiles, in the proof of @prop:complete. Before each placement, the floors that extend in the tiling are drawn dashed in red and the others in black; the tile placed next is the one at the anchor of the first tier whose floor does not extend, marked in black.],
+  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, the floors that extend in the tiling are drawn dashed in red and the others in black; the tile placed next is the one at the anchor of the first tier whose floor does not extend, marked in black.],
 ) <fig:construction>
 
 #proof[
@@ -614,11 +609,11 @@ This section records that point of view, which motivates the placement rules; no
   Two tilings with $n$ tiles are _mosaic equivalent_ if their tiles can be numbered so that, for each side of each tile, the tiles whose opposite side lies on the same segment are the same in both, and the segments carrying the four sides of the main rectangle correspond.
 ] <def:mosaic>
 
-@fig:mosaic shows three tilings with the same segments.
+@fig:mosaic shows two tilings of the same mosaic class.
 
 #figure(
-  image("figures/mosaic.svg", width: 72%),
-  caption: [Tilings by four rectangles in which each column is cut at a different height. The first and the third are mosaic equivalent: the same tiles lie on either side of each segment, and only the order of the two junctions on the vertical segment differs. In the second, four tiles meet at a point.],
+  image("figures/mosaic.svg", width: 48%),
+  caption: [Two tilings of the square by five tiles, of proportions $6 slash 5$ and $1.6823...$, whose records have the same placements and differ in the orientation of the last tile. The same tiles lie on either side of each segment, but along the vertical segment the junction on the right lies between the two on the left in the first tiling, and below both in the second.],
 ) <fig:mosaic>
 
 Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
@@ -801,8 +796,8 @@ The smallest case in which the search has anything to decide is that of two tile
 ) <tab:two>
 
 #figure(
-  image("figures/two-tiles.svg", width: 72%),
-  caption: [The search for two tiles in a square, drawn for $x = 1.6$: the staircase after each of the two admissible first placements, and the tiling found. After a wide tile of full height the remaining floor is $1 - x$.],
+  image("figures/two-tiles.svg", width: 44%),
+  caption: [The two placements of the only record that yields a tiling of the square by two tiles, at its proportion $2$.],
 ) <fig:two>
 
 = Optimisations <sec:optimisations>
@@ -1147,7 +1142,7 @@ When the stored polynomial is the minimal polynomial of the root, the certificat
 
 #figure(
   image("figures/pinwheel.svg", width: 100%),
-  caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall, for three values of the proportion. The central tile has height proportional to $x^2 - 1$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
+  caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall: the exact solution of the system of its record, with the width of the main rectangle left free, for three values of the proportion. The central tile has height $(x^2 - 1) slash (5 x^2 + 3)$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
 ) <fig:pinwheel>
 
 
