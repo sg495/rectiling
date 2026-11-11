@@ -21,6 +21,7 @@ Every run reported no singular system, no case with aspect ratio independent of 
 | 12 | 28799493 | new                                                 |
 
 The values for n = 11 and n = 12 come from this computation alone and have not been confirmed by a second method.
+The value for n = 12 was obtained twice, before and after a substantial reworking of the search, with identical counts of tilings and identical degree distributions.
 
 ### Work performed
 
