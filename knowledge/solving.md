@@ -53,8 +53,9 @@ For eight tiles, 1.4 million cases lead to some 12 thousand distinct polynomials
 **Numerical check.**
 For each root, the eliminations along the path are undone in reverse order in interval arithmetic, which yields enclosures for the free sides, and the placements are then replayed on intervals to obtain enclosures for the size of every tile.
 The root is accepted if every size is certainly positive, and rejected if some size is certainly not.
-If an enclosure contains zero, or a pivot cannot be separated from zero, the case is passed to the reference method.
-This happens for about one case in a hundred, typically when a tile degenerates to a segment.
+If the enclosure of some size contains zero, the size is tested for being exactly zero: its linear form is carried through the remaining eliminations of the path, which leaves a polynomial multiple of the scale, and the size vanishes at the root exactly when the minimal polynomial of the root divides that polynomial.
+A tile of size zero rejects the root, and this settles nearly all doubtful cases, which arise when a tile degenerates to a segment.
+Only if no doubtful size is exactly zero, or a pivot cannot be separated from zero, is the case passed to the reference method; for ten tiles this happens for about one case in ten thousand.
 
 The default method falls back to the reference method also when a coefficient exceeds the range of machine integers or an elimination finds no pivot, so its results are exact.
 
@@ -62,7 +63,7 @@ The default method falls back to the reference method also when a coefficient ex
 
 - **Coefficients.** Both methods run on machine integers with every operation checked; a case in which an operation overflows is recomputed with arbitrary-precision integers.
 - **Canonical form.** A proportion is identified by its minimal polynomial, primitive with positive leading coefficient, and its position amongst the roots of that polynomial in [1, ∞).
-- **Factorisation.** A polynomial is split into square-free layers by repeated greatest common divisors with the derivative; each layer is factorised modulo a single large prime exceeding twice the Landau–Mignotte bound on the coefficients of any factor, by distinct-degree and equal-degree splitting, and the modular factors are recombined by trial division over ℤ.
+- **Factorisation.** A polynomial that is irreducible modulo the prime 2³¹ − 1 is irreducible, and this is tried first. Otherwise the polynomial is split into square-free layers by repeated greatest common divisors with the derivative, unless it is already square-free modulo that prime; each layer is factorised modulo a single large prime exceeding twice the Landau–Mignotte bound on the coefficients of any factor, by Berlekamp's method, and the modular factors are recombined by trial division over ℤ. The large prime is 2⁶¹ − 1 whenever the bound allows, so that no lifting is needed.
 - **Root isolation.** Real roots above one of an irreducible polynomial are isolated by Descartes' rule of signs with bisection, on dyadic intervals.
 - **Signs.** The sign of a polynomial q at a root α of an irreducible polynomial f is zero exactly when f divides q; otherwise it is found by interval evaluation, first in floating point with outward rounding and, when that is inconclusive, in exact dyadic arithmetic with the isolating interval refined until the sign is determined.
-- **Caching.** Irreducible factors and their isolated roots are shared between all cases through a registry, which assigns each algebraic number a stable identifier.
+- **Caching.** Irreducible factors and their isolated roots are shared between all cases through a registry, which assigns each algebraic number a stable identifier. The registry and the cache of polynomials store coefficients as variable-length bytes in arenas indexed by hash tables, which keeps the memory per proportion below a hundred bytes or so.

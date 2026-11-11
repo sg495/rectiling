@@ -19,26 +19,31 @@ Every run reported no singular system, no case with aspect ratio independent of 
 | 10 | 433926   | agrees with Einstein; first independent confirmation |
 | 11 | 3446981  | new                                                 |
 | 12 | 28799493 | new                                                 |
+| 13 | 250056983 | new                                                |
 
-The values for n = 11 and n = 12 come from this computation alone and have not been confirmed by a second method.
+The values for n = 11, 12 and 13 come from this computation alone and have not been confirmed by a second method.
+The values for n = 11 and n = 12 were each obtained twice, before and after a substantial reworking of the search, with identical counts of tilings and identical degree distributions; the value for n = 13 was computed once.
 
 ### Work performed
 
 A *case* is a placement sequence together with an orientation vector, with the bottom-left tile wide; a *tiling* is a case together with a proportion that it realises.
 
-| n  | cases       | cases with a candidate root | tilings    | distinct polynomials | seconds |
-| -- | ----------- | --------------------------- | ---------- | -------------------- | ------- |
-| 5  | 1472        | 453                         | 421        | 73                   | 0.01    |
-| 6  | 13504       | 4217                        | 3981       | 351                  | 0.01    |
-| 7  | 132736      | 41159                       | 37219      | 1978                 | 0.03    |
-| 8  | 1376512     | 427063                      | 368663     | 12171                | 0.13    |
-| 9  | 14899712    | 4623709                     | 3793179    | 81190                | 1.0     |
-| 10 | 167034880   | 51902438                    | 40013433   | 584399               | 10.3    |
-| 11 | 1928151040  | 600220519                   | 432396494  | 4476286              | 116     |
-| 12 | 22815866880 | 7116079030                  | 4758270004 | 36174631             | 1353    |
+| n  | cases        | cases with a candidate root | tilings     | distinct polynomials | seconds |
+| -- | ------------ | --------------------------- | ----------- | -------------------- | ------- |
+| 5  | 1472         | 453                         | 421         | 63                   | 0.01    |
+| 6  | 13504        | 4217                        | 3981        | 310                  | 0.01    |
+| 7  | 132736       | 41159                       | 37219       | 1660                 | 0.02    |
+| 8  | 1376512      | 427063                      | 368663      | 10123                | 0.10    |
+| 9  | 14899712     | 4623709                     | 3793179     | 67035                | 0.66    |
+| 10 | 167034880    | 51902438                    | 40013433    | 485269               | 6.6     |
+| 11 | 1928151040   | 600220519                   | 432396494   | 3774031              | 75      |
+| 12 | 22815866880  | 7116079030                  | 4758270004  | 30989074             | 888     |
+| 13 | 275783647232 | 86194353821                 | 53198408925 | 264866132            | 11175   |
 
-The run for n = 12 used 21.6 GB of memory.
-About 0.8% of the cases are passed to the reference method, almost always because a tile degenerates to a segment at the candidate root.
+The number of cases is 2ⁿ⁻¹ times the Baxter number.
+The run for n = 12 used 6.5 GB of memory and that for n = 13 about 41 GB.
+About one case in ten thousand is passed to the reference method.
+The search spends about 0.6 microseconds of processor time per case; a term further would take some twelve times longer than n = 13 and was not attempted.
 
 ### Algebraic degrees
 
@@ -58,6 +63,8 @@ The number of proportions of each algebraic degree.
 | 10 | 1904  | 476  | 38540  | 10695  | 149454  | 33780   | 149433   | 20498   | 27943   | 1203   |        |        |
 | 11 | 5775  | 1392 | 164780 | 47420  | 861112  | 226177  | 1320602  | 243220  | 508761  | 45842  | 21900  |       |
 | 12 | 17422 | 4333 | 721574 | 208870 | 4849698 | 1396981 | 10497127 | 2360993 | 6867895 | 928974 | 906538 | 39088 |
+
+For n = 13 the counts by degree, from 1 to 13, are 52230, 13531, 3226298, 912764, 27008697, 8173821, 77488650, 19961337, 76665843, 13546609, 20575413, 1782742 and 649048.
 
 The first column counts the rational proportions.
 A rational proportion arises whenever all tiles have the same orientation, the main square then being cut into smaller squares after a change of scale along one axis.
@@ -87,9 +94,9 @@ The counts for w = 1/2, 1/3 and 2/3 were computed separately for n = 6, 7 and 8 
 
 ```console
 $ cargo build --release
-$ ./target/release/rectiling 12
+$ ./target/release/rectiling 13
 $ ./target/release/rectiling --list 7
 $ ./target/release/rectiling 9 3 2
 ```
 
-The first command line computes a(12), the second lists the 1372 proportions for seven tiles with their minimal polynomials, and the third treats a main rectangle of aspect ratio 3/2 with nine tiles.
+The first command line computes a(13), which takes about three hours and 41 GB of memory on the machine above, the second lists the 1372 proportions for seven tiles with their minimal polynomials, and the third treats a main rectangle of aspect ratio 3/2 with nine tiles.

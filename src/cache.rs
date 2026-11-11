@@ -3,7 +3,9 @@
 //! Shared cache from integer polynomials to their roots not smaller than one.
 
 use crate::algebraic::{Registry, RootRef};
+use crate::pack::{pack, packed_len};
 use crate::poly::Poly;
+use hashbrown::HashTable;
 use num_bigint::BigInt;
 use num_traits::ToPrimitive;
 use smallvec::SmallVec;
@@ -29,6 +31,10 @@ impl Hasher for WordHasher {
         }
     }
     #[inline]
+    fn write_u32(&mut self, v: u32) {
+        self.write_u64(v as u64);
+    }
+    #[inline]
     fn write_u64(&mut self, v: u64) {
         self.0 = (self.0.rotate_left(5) ^ v).wrapping_mul(0x517c_c1b7_2722_0a95);
     }
@@ -44,41 +50,76 @@ impl Hasher for WordHasher {
 
 pub(crate) type WordMap<K, V> = HashMap<K, V, BuildHasherDefault<WordHasher>>;
 
+/// Hash of a byte string.
+pub(crate) fn hash_bytes(bytes: &[u8]) -> u64 {
+    let mut h = WordHasher::default();
+    h.write(bytes);
+    h.finish().wrapping_mul(0x9E37_79B9_7F4A_7C15)
+}
+
 /// Roots of a polynomial, as references into a registry.
 pub(crate) type Roots = SmallVec<[RootRef; 2]>;
 
-const SHARDS: usize = 1 << 12;
+const SHARD_BITS: u32 = 12;
+
+#[derive(Default)]
+struct Shard {
+    table: HashTable<u32>,
+    arena: Vec<u8>,
+}
+
+impl Shard {
+    fn find(&self, key: &[u8], hash: u64) -> Option<SmallVec<[u32; 2]>> {
+        let arena = &self.arena;
+        let at = *self.table.find(hash, |&o| arena[o as usize..].starts_with(key))? as usize + key.len();
+        let count = arena[at] as usize;
+        Some((0..count).map(|i| u32::from_le_bytes(arena[at + 1 + 4 * i..at + 5 + 4 * i].try_into().expect("four bytes"))).collect())
+    }
+
+    fn insert(&mut self, key: &[u8], hash: u64, ids: &[u32]) {
+        let offset = self.arena.len() as u32;
+        self.arena.extend_from_slice(key);
+        self.arena.push(ids.len() as u8);
+        for id in ids {
+            self.arena.extend_from_slice(&id.to_le_bytes());
+        }
+        let arena = &self.arena;
+        self.table.insert_unique(hash, offset, |&o| {
+            let rest = &arena[o as usize..];
+            hash_bytes(&rest[..packed_len(rest)])
+        });
+    }
+}
 
 /// Concurrent map from polynomials with machine-integer coefficients to their roots not smaller than one.
 pub(crate) struct PolyCache {
-    shards: Box<[Mutex<WordMap<Box<[i64]>, SmallVec<[RootRef; 1]>>>]>,
-}
-
-fn hash_words(key: &[i64]) -> u64 {
-    let mut h = WordHasher::default();
-    for &v in key {
-        h.write_i64(v);
-    }
-    h.finish()
+    shards: Box<[Mutex<Shard>]>,
 }
 
 impl PolyCache {
     /// An empty cache.
     pub(crate) fn new() -> Self {
         PolyCache {
-            shards: (0..SHARDS).map(|_| Mutex::new(WordMap::default())).collect(),
+            shards: (0..1usize << SHARD_BITS).map(|_| Mutex::new(Shard::default())).collect(),
         }
     }
 
     /// The roots not smaller than one of the non-zero polynomial with the given coefficients, listed from the constant term upwards.
-    pub(crate) fn roots(&self, key: &[i64], registry: &Registry) -> Roots {
-        let shard = &self.shards[(hash_words(key).wrapping_mul(0x9E37_79B9_7F4A_7C15) >> 52) as usize];
-        if let Some(r) = shard.lock().expect("cache lock").get(key) {
-            return r.iter().copied().collect();
+    pub(crate) fn roots(&self, key: &[i64], scratch: &mut Vec<u8>, registry: &Registry) -> Roots {
+        scratch.clear();
+        pack(key, scratch);
+        let hash = hash_bytes(scratch);
+        let shard = &self.shards[(hash >> (64 - SHARD_BITS)) as usize];
+        let found = shard.lock().expect("cache lock").find(scratch, hash);
+        if let Some(ids) = found {
+            return registry.refs(&ids);
         }
         let roots = registry.roots_from_one(&Poly::from_i64s(key));
-        let stored: SmallVec<[RootRef; 1]> = roots.iter().copied().collect();
-        shard.lock().expect("cache lock").insert(key.into(), stored);
+        let ids: SmallVec<[u32; 2]> = roots.iter().map(|r| r.id).collect();
+        let mut guard = shard.lock().expect("cache lock");
+        if guard.find(scratch, hash).is_none() {
+            guard.insert(scratch, hash, &ids);
+        }
         roots
     }
 
@@ -86,13 +127,13 @@ impl PolyCache {
     pub(crate) fn roots_big(&self, p: &Poly<BigInt>, registry: &Registry) -> Roots {
         let words: Option<Vec<i64>> = p.coeffs().iter().map(|c| c.to_i64()).collect();
         match words {
-            Some(w) => self.roots(&w, registry),
-            None => registry.roots_from_one(p),
+            Some(w) if w.len() <= u8::MAX as usize => self.roots(&w, &mut Vec::new(), registry),
+            _ => registry.roots_from_one(p),
         }
     }
 
     /// The number of cached polynomials.
     pub(crate) fn len(&self) -> usize {
-        self.shards.iter().map(|s| s.lock().expect("cache lock").len()).sum()
+        self.shards.iter().map(|s| s.lock().expect("cache lock").table.len()).sum()
     }
 }

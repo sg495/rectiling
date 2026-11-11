@@ -26,7 +26,7 @@ $ ./target/release/rectiling 7 3 2
 It prints the number of distinct proportions, their distribution by algebraic degree and counters describing the search; with `--list` it also prints each proportion with its degree, the number of tilings that realise it and its minimal polynomial.
 The same search is available from Rust as `rectiling::Search`.
 
-The library reproduces the known values of a(n) for n ≤ 10 and extends the sequence to a(11) = 3446981 and a(12) = 28799493; see [knowledge/results.md](knowledge/results.md).
+The library reproduces the known values of a(n) for n ≤ 10 and extends the sequence with a(11) = 3446981, a(12) = 28799493 and a(13) = 250056983; see [knowledge/results.md](knowledge/results.md).
 
 ## Structure
 

@@ -10,6 +10,7 @@ mod fast;
 mod form;
 pub mod int;
 pub mod interval;
+mod pack;
 pub mod poly;
 pub mod roots;
 pub mod search;

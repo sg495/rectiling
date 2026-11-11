@@ -22,6 +22,10 @@ trait Field {
     fn from_u64(&self, a: u64) -> Self::E {
         self.from_big(&BigInt::from(a))
     }
+    /// The exponent k, if the modulus is the Mersenne number 2^k - 1.
+    fn mersenne_exponent(&self) -> Option<u32> {
+        None
+    }
 }
 
 struct WordField {
@@ -135,7 +139,117 @@ impl Field for MersenneField {
     fn from_u64(&self, a: u64) -> u64 {
         a % MERSENNE
     }
+    fn mersenne_exponent(&self) -> Option<u32> {
+        Some(61)
+    }
 }
+
+const SMALL_MERSENNE: u64 = (1 << 31) - 1;
+
+struct SmallField;
+
+impl Field for SmallField {
+    type E = u64;
+    fn modulus(&self) -> BigInt {
+        BigInt::from(SMALL_MERSENNE)
+    }
+    fn zero(&self) -> u64 {
+        0
+    }
+    fn one(&self) -> u64 {
+        1
+    }
+    #[inline]
+    fn is_zero(&self, a: &u64) -> bool {
+        *a == 0
+    }
+    #[inline]
+    fn add(&self, a: &u64, b: &u64) -> u64 {
+        let s = a + b;
+        if s >= SMALL_MERSENNE { s - SMALL_MERSENNE } else { s }
+    }
+    #[inline]
+    fn sub(&self, a: &u64, b: &u64) -> u64 {
+        if a >= b { a - b } else { SMALL_MERSENNE - (b - a) }
+    }
+    #[inline]
+    fn mul(&self, a: &u64, b: &u64) -> u64 {
+        let t = a * b;
+        let folded = (t & SMALL_MERSENNE) + (t >> 31);
+        let folded = (folded & SMALL_MERSENNE) + (folded >> 31);
+        if folded >= SMALL_MERSENNE { folded - SMALL_MERSENNE } else { folded }
+    }
+    fn inv(&self, a: &u64) -> u64 {
+        let mut result = 1u64;
+        let mut base = *a;
+        let mut e = SMALL_MERSENNE - 2;
+        while e > 0 {
+            if e & 1 == 1 {
+                result = self.mul(&result, &base);
+            }
+            base = self.mul(&base, &base);
+            e >>= 1;
+        }
+        result
+    }
+    fn from_big(&self, a: &BigInt) -> u64 {
+        a.mod_floor(&BigInt::from(SMALL_MERSENNE)).to_u64().unwrap_or(0)
+    }
+    fn to_big(&self, a: &u64) -> BigInt {
+        BigInt::from(*a)
+    }
+    fn from_u64(&self, a: u64) -> u64 {
+        a % SMALL_MERSENNE
+    }
+    fn mersenne_exponent(&self) -> Option<u32> {
+        Some(31)
+    }
+}
+
+/// What the reduction of a polynomial modulo a small prime certifies about it.
+#[derive(PartialEq, Eq)]
+enum Certificate {
+    Irreducible,
+    SquareFree,
+    Nothing,
+}
+
+/// Examines a primitive polynomial with machine-integer coefficients modulo a small prime.
+fn certify(coeffs: &[i64]) -> Certificate {
+    let f = SmallField;
+    let image: Vec<u64> = coeffs.iter().map(|&c| c.rem_euclid(SMALL_MERSENNE as i64) as u64).collect();
+    let d = image.len() - 1;
+    if image[d] == 0 {
+        return Certificate::Nothing;
+    }
+    if d == 1 {
+        return Certificate::Irreducible;
+    }
+    let mut deriv: Vec<u64> = (1..=d).map(|i| f.mul(&image[i], &(i as u64))).collect();
+    trim(&f, &mut deriv);
+    if fgcd(&f, &image, &deriv).len() != 1 {
+        return Certificate::Nothing;
+    }
+    let g = fmonic(&f, &image);
+    let frobenius = frobenius_of_x(&f, &g);
+    if nullity_of_frobenius(&f, &frobenius, &g) == 1 { Certificate::Irreducible } else { Certificate::SquareFree }
+}
+
+/// The power of the indeterminate by the modulus of the field, reduced by a monic polynomial.
+fn frobenius_of_x<F: Field>(f: &F, g: &FPoly<F>) -> FPoly<F> {
+    let x: FPoly<F> = vec![f.zero(), f.one()];
+    let Some(k) = f.mersenne_exponent() else {
+        return fpowmod(f, &x, &f.modulus(), g);
+    };
+    let mut r = fdivrem(f, &x, g).1;
+    for _ in 1..k {
+        let mut sq = fmul(f, &r, &r);
+        sq.insert(0, f.zero());
+        r = fdivrem(f, &sq, g).1;
+    }
+    r
+}
+
 
 struct BigField {
     p: BigInt,
@@ -259,32 +373,80 @@ fn fpowmod<F: Field>(f: &F, base: &FPoly<F>, exp: &BigInt, m: &FPoly<F>) -> FPol
     result
 }
 
-fn equal_degree_split<F: Field>(f: &F, g: FPoly<F>, d: usize, seed: &mut u64, out: &mut Vec<FPoly<F>>) {
-    if g.len() - 1 == d {
-        out.push(g);
-        return;
+fn frobenius_matrix<F: Field>(f: &F, frobenius: &FPoly<F>, g: &FPoly<F>) -> Vec<FPoly<F>> {
+    let d = g.len() - 1;
+    let mut rows: Vec<FPoly<F>> = Vec::with_capacity(d);
+    let mut power: FPoly<F> = vec![f.one()];
+    for i in 0..d {
+        let mut row = power.clone();
+        row.resize(d, f.zero());
+        row[i] = f.sub(&row[i], &f.one());
+        rows.push(row);
+        power = fdivrem(f, &fmul(f, &power, frobenius), g).1;
     }
-    let exp: BigInt = (f.modulus().pow(d as u32) - 1) / 2;
-    loop {
-        let mut r: FPoly<F> = (0..g.len() - 1)
-            .map(|_| {
-                *seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
-                f.from_u64(*seed >> 11)
-            })
-            .collect();
-        trim(f, &mut r);
-        if r.len() < 2 {
+    rows
+}
+
+/// A basis of the polynomials fixed by the Frobenius map modulo a monic square-free polynomial.
+fn fixed_space<F: Field>(f: &F, frobenius: &FPoly<F>, g: &FPoly<F>) -> Vec<FPoly<F>> {
+    let d = g.len() - 1;
+    let rows = frobenius_matrix(f, frobenius, g);
+    let mut m: Vec<FPoly<F>> = (0..d).map(|r| (0..d).map(|c| rows[c][r].clone()).collect()).collect();
+    let mut pivots: Vec<Option<usize>> = vec![None; d];
+    let mut rank = 0;
+    for col in 0..d {
+        let Some(pivot) = (rank..d).find(|&r| !f.is_zero(&m[r][col])) else {
+            continue;
+        };
+        m.swap(rank, pivot);
+        let inv = f.inv(&m[rank][col]);
+        for c in col..d {
+            m[rank][c] = f.mul(&m[rank][c], &inv);
+        }
+        for r in 0..d {
+            if r == rank || f.is_zero(&m[r][col]) {
+                continue;
+            }
+            let factor = m[r][col].clone();
+            for c in col..d {
+                let delta = f.mul(&factor, &m[rank][c]);
+                m[r][c] = f.sub(&m[r][c], &delta);
+            }
+        }
+        pivots[col] = Some(rank);
+        rank += 1;
+    }
+    let mut basis = Vec::new();
+    for free in 0..d {
+        if pivots[free].is_some() {
             continue;
         }
-        let t = fsub(f, &fpowmod(f, &r, &exp, &g), &vec![f.one()]);
-        let s = fgcd(f, &t, &g);
-        if s.len() > 1 && s.len() < g.len() {
-            let (q, _) = fdivrem(f, &g, &s);
-            equal_degree_split(f, s, d, seed, out);
-            equal_degree_split(f, fmonic(f, &q), d, seed, out);
-            return;
+        let mut v = vec![f.zero(); d];
+        v[free] = f.one();
+        for col in 0..d {
+            if let Some(r) = pivots[col] {
+                v[col] = f.sub(&f.zero(), &m[r][free]);
+            }
         }
+        trim(f, &mut v);
+        basis.push(v);
     }
+    basis
+}
+
+/// The power of a polynomial by half the order of the multiplicative group of the field, reduced by a monic polynomial.
+fn half_power<F: Field>(f: &F, v: &FPoly<F>, u: &FPoly<F>) -> FPoly<F> {
+    let base = fdivrem(f, v, u).1;
+    let Some(k) = f.mersenne_exponent() else {
+        let exp: BigInt = (f.modulus() - 1) / 2;
+        return fpowmod(f, &base, &exp, u);
+    };
+    let mut r = base.clone();
+    for _ in 2..k {
+        let sq = fdivrem(f, &fmul(f, &r, &r), u).1;
+        r = fdivrem(f, &fmul(f, &sq, &base), u).1;
+    }
+    r
 }
 
 fn modular_factors<F: Field>(f: &F, p: &Poly<BigInt>) -> Option<Vec<FPoly<F>>> {
@@ -296,46 +458,50 @@ fn modular_factors<F: Field>(f: &F, p: &Poly<BigInt>) -> Option<Vec<FPoly<F>>> {
     if fgcd(f, &image, &deriv).len() != 1 {
         return None;
     }
-    let mut g = fmonic(f, &image);
-    let x: FPoly<F> = vec![f.zero(), f.one()];
-    let modulus = f.modulus();
-    let frobenius = fpowmod(f, &x, &modulus, &g);
-    if nullity_of_frobenius(f, &frobenius, &g) == 1 {
-        return Some(vec![g]);
-    }
-    let mut h = x.clone();
-    let mut out = Vec::new();
+    let g = fmonic(f, &image);
+    let frobenius = frobenius_of_x(f, &g);
+    let basis = fixed_space(f, &frobenius, &g);
+    let count = basis.len();
+    let mut factors = vec![g];
     let mut seed = 0x9E3779B97F4A7C15u64;
-    let mut d = 0;
-    while g.len() > 1 {
-        d += 1;
-        if 2 * d > g.len() - 1 {
-            out.push(g);
-            break;
+    while factors.len() < count {
+        let mut v: FPoly<F> = Vec::new();
+        for b in &basis {
+            seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            let c = f.from_u64(seed >> 11);
+            if v.len() < b.len() {
+                v.resize(b.len(), f.zero());
+            }
+            for (i, x) in b.iter().enumerate() {
+                v[i] = f.add(&v[i], &f.mul(&c, x));
+            }
         }
-        h = fpowmod(f, &h, &modulus, &g);
-        let s = fgcd(f, &fsub(f, &h, &x), &g);
-        if s.len() > 1 {
-            g = fmonic(f, &fdivrem(f, &g, &s).0);
-            equal_degree_split(f, s, d, &mut seed, &mut out);
-            h = fdivrem(f, &h, &g).1;
+        trim(f, &mut v);
+        let mut next = Vec::with_capacity(count);
+        for u in factors {
+            if u.len() <= 2 || next.len() + 1 >= count {
+                next.push(u);
+                continue;
+            }
+            let w = fsub(f, &half_power(f, &v, &u), &vec![f.one()]);
+            let t = fgcd(f, &w, &u);
+            if t.len() > 1 && t.len() < u.len() {
+                let q = fmonic(f, &fdivrem(f, &u, &t).0);
+                next.push(t);
+                next.push(q);
+            } else {
+                next.push(u);
+            }
         }
+        factors = next;
     }
-    Some(out)
+    Some(factors)
 }
 
 /// The number of irreducible factors of a monic square-free polynomial, as the dimension of the fixed space of the Frobenius map.
 fn nullity_of_frobenius<F: Field>(f: &F, frobenius: &FPoly<F>, g: &FPoly<F>) -> usize {
     let d = g.len() - 1;
-    let mut rows: Vec<FPoly<F>> = Vec::with_capacity(d);
-    let mut power: FPoly<F> = vec![f.one()];
-    for i in 0..d {
-        let mut row = power.clone();
-        row.resize(d, f.zero());
-        row[i] = f.sub(&row[i], &f.one());
-        rows.push(row);
-        power = fdivrem(f, &fmul(f, &power, frobenius), g).1;
-    }
+    let mut rows = frobenius_matrix(f, frobenius, g);
     let mut rank = 0;
     for col in 0..d {
         let Some(pivot) = (rank..d).find(|&r| !f.is_zero(&rows[r][col])) else {
@@ -448,6 +614,37 @@ fn factor_squarefree(p: &Poly<BigInt>) -> Vec<Poly<BigInt>> {
 /// Factorises a non-zero integer polynomial into primitive irreducible factors with positive leading coefficients, with multiplicities.
 pub fn factor(p: &Poly<BigInt>) -> Vec<(Poly<BigInt>, usize)> {
     let mut out: Vec<(Poly<BigInt>, usize)> = Vec::new();
+    let words: Option<Vec<i64>> = p.coeffs().iter().map(|c| c.to_i64()).collect();
+    if let Some(mut w) = words {
+        let content = w.iter().fold(0u64, |g, &c| {
+            let (mut a, mut b) = (g, c.unsigned_abs());
+            while b != 0 {
+                (a, b) = (b, a % b);
+            }
+            a
+        });
+        if content > 1 && content <= i64::MAX as u64 {
+            for c in w.iter_mut() {
+                *c /= content as i64;
+            }
+        }
+        if w.last().is_some_and(|&l| l < 0) && w.iter().all(|&c| c != i64::MIN) {
+            for c in w.iter_mut() {
+                *c = -*c;
+            }
+        }
+        if w.len() >= 2 {
+            match certify(&w) {
+                Certificate::Irreducible => return vec![(Poly::from_i64s(&w), 1)],
+                Certificate::SquareFree => {
+                    let mut out: Vec<(Poly<BigInt>, usize)> = factor_squarefree(&Poly::from_i64s(&w)).into_iter().map(|f| (f, 1)).collect();
+                    out.sort_by(|a, b| (a.0.degree(), a.0.coeffs()).cmp(&(b.0.degree(), b.0.coeffs())));
+                    return out;
+                }
+                Certificate::Nothing => {}
+            }
+        }
+    }
     let mut rest = p.primitive();
     let mut mult = 1;
     while rest.degree().is_some_and(|d| d > 0) {
