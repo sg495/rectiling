@@ -14,6 +14,11 @@ keywords = ["tiling", "rectangles", "combinatorics", "algebraic-numbers"]
 categories = ["mathematics", "science"]
 
 [dependencies]
+num-bigint = "0.4"
+num-integer = "0.1.47"
+num-traits = "0.2.19"
+rayon = "1.12.0"
+smallvec = "1.16.5"
 
 [profile.release]
 opt-level = 3
