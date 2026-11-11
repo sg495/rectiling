@@ -12,8 +12,12 @@ In a tiling by similar rectangles of proportion x, every resistance is x or 1/x,
 For positive resistances the currents in a network are uniquely determined by the potential difference between the poles, so for a fixed arrangement and fixed orientations the sizes of all tiles are determined by x, and the aspect ratio of the main rectangle is a rational function of x.
 By the matrix-tree theorem this function is a ratio of two polynomials in the resistances with positive coefficients, one summing over the spanning trees of the network and the other over the spanning trees of the network with its poles identified.
 
-The arrangement is realised by an actual tiling exactly when all currents are positive and the tiles meet as the arrangement prescribes.
-A current that vanishes corresponds to a tile that degenerates to a segment, as happens for the pinwheel arrangement of five tiles.
+The system depends only on which tiles border each maximal segment, that is, on the mosaic class of the tiling.
+The order in which the junctions on the two sides of a segment alternate does not enter it.
+Conversely, a solution of the system in which every tile has positive width and height is a tiling of that class, whatever order of junctions it exhibits.
+A solution in which some tile has zero size is a tiling with fewer tiles, as happens for the pinwheel arrangement of five tiles, whose central tile degenerates to a point.
+
+A tiling in which four tiles meet at a point lies in the closure of two classes, and arises in each as the solution at a value of x for which two junctions coincide.
 
 ## The degree bound
 
@@ -34,4 +38,6 @@ For guillotine tilings the aspect ratio is built from x and 1/x by sums, which j
 
 - For fixed arrangement and orientations, the linear system has a unique solution for every x > 0, so a search can solve it symbolically in x and need only examine the roots of a single polynomial.
 - The search does not rely on this: it detects singular systems and reports their number, which has been zero in every run.
-- The conjugate condition of Freiling and Rinne is a property of the result and is not used as a filter, since the root is in any case tested against the full set of inequalities.
+- One system per mosaic class and orientation vector suffices, with positivity of the tile sizes as the only test.
+- The conjugate condition of Freiling and Rinne cannot serve as a filter: the aspect ratio is an odd rational function of the kind that arises as the impedance of a network of inductors and capacitors, and every root of the resulting equation already has positive real part.
+- Distinct arrangements often share the same rational function, so caching the roots by polynomial removes most of the algebraic work.

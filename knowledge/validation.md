@@ -45,6 +45,7 @@ The row for n = 7 comes from Henderson's data file, which lists all 1372 proport
 
 ## Internal consistency checks
 
-- The number of placement sequences of the staircase enumeration, disregarding orientations, is 1, 2, 6, 23, 104, 530, 2958, 17734, 112657 for n = 1 to 9; see [enumeration.md](enumeration.md).
+- The number of placement sequences of the staircase enumeration, disregarding orientations, equals the Baxter number; see [enumeration.md](enumeration.md).
+- The default and reference methods must agree on every proportion and on the number of tilings realising it.
 - Counts for a main rectangle of aspect ratio w and 1/w must agree, since transposition maps tilings of one to tilings of the other.
 - The search reports the number of tilings whose linear system is singular, or whose main aspect ratio does not depend on x; both must be zero for the result to be certified.

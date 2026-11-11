@@ -17,31 +17,52 @@ The sides of every other tile are determined by the floor or wall it spans:
 All lengths are thus linear forms in W and the inside unknowns, with coefficients in ℤ[x] up to a common power of x in the denominator.
 A sequence with k inside tiles has k + 1 full tiles, so there are k + 1 equations in the k + 1 unknowns.
 
-Each placement also contributes strict inequalities: a narrow tile is narrower than its floor and, on a locked tier, wider than the recorded length; a low tile is lower than its wall; an inside unknown is positive.
-These are exactly the conditions under which the sequence is the canonical one for an actual tiling.
+The sequence describes a genuine tiling exactly when the system has a solution in which every tile has positive size; no further inequality is needed, because the system does not depend on the order of junctions along a segment.
 
-## Solving
+## Reference method
 
+The reference method treats one complete sequence at a time.
 Fraction-free Gaussian elimination over ℤ[x] reduces the system to triangular form, with the width W in the last column.
 The last row reads D(x)·W = N(x), so the main rectangle has aspect ratio W = N(x)/D(x), and back-substitution expresses every unknown as a polynomial numerator over the same denominator D.
 For a main rectangle of aspect ratio a/b, the proportion must be a root of b·N(x) − a·D(x).
 
-The procedure for one sequence and orientation vector is as follows.
-
 1. Eliminate, and form the polynomial b·N − a·D.
 2. Discard the case if the polynomial has no root in [1, ∞); a sufficient test is that its expansion in x − 1 has coefficients of one sign.
 3. Otherwise find its distinct roots in [1, ∞) as canonical algebraic numbers.
-4. Back-substitute, and express each inequality as a polynomial numerator over D.
+4. Back-substitute, and express the size of each tile as a polynomial numerator over D.
 5. For each root, determine the sign of D and of every numerator; the root is a proportion if no sign is zero and all agree.
 
 If D vanishes at a root, or the elimination meets a column without pivot, the system is singular and uniqueness of the solution fails; if b·N − a·D is identically zero, the aspect ratio does not depend on x.
 Neither is expected to occur, by the theory in [theory.md](theory.md), and the search counts both so that their absence is verified and not assumed.
 
+## Default method
+
+The default method shares work between sequences with a common beginning, and replaces most exact sign computations by certified numerical ones.
+
+**Eager elimination.**
+The main rectangle is given sides a·t and b·t, for integers a and b and an unknown scale t, so that the system is homogeneous.
+Whenever a full tile contributes an equation, one unknown is eliminated at once from every floor and wall of the staircase, by a step of Bareiss's fraction-free elimination: a form F becomes (E_m·F − F_m·E)/π, where E is the equation, m the eliminated unknown and π the previous pivot, and the division is exact.
+A staircase with t tiers thus involves only t − 1 unknowns besides the scale, and the cost of a step shrinks towards the leaves of the search tree, where most of the work lies.
+At the last placement nothing but the scale is left, and the final equation is the polynomial in x itself.
+
+**Candidate roots.**
+The polynomial is discarded if its expansion in x − 1 has non-negative coefficients and positive constant term.
+Otherwise its roots in [1, ∞) are looked up in a cache shared by all threads, keyed by the coefficients; a polynomial is factorised only the first time it is met.
+For eight tiles, 1.4 million cases lead to some 12 thousand distinct polynomials.
+
+**Numerical check.**
+For each root, the eliminations along the path are undone in reverse order in interval arithmetic, which yields enclosures for the free sides, and the placements are then replayed on intervals to obtain enclosures for the size of every tile.
+The root is accepted if every size is certainly positive, and rejected if some size is certainly not.
+If an enclosure contains zero, or a pivot cannot be separated from zero, the case is passed to the reference method.
+This happens for about one case in a hundred, typically when a tile degenerates to a segment.
+
+The default method falls back to the reference method also when a coefficient exceeds the range of machine integers or an elimination finds no pivot, so its results are exact.
+
 ## Exact arithmetic
 
-- **Coefficients.** The search runs on machine integers with every operation checked; a subtree in which any operation overflows is recomputed with arbitrary-precision integers.
+- **Coefficients.** Both methods run on machine integers with every operation checked; a case in which an operation overflows is recomputed with arbitrary-precision integers.
 - **Canonical form.** A proportion is identified by its minimal polynomial, primitive with positive leading coefficient, and its position amongst the roots of that polynomial in [1, ∞).
 - **Factorisation.** A polynomial is split into square-free layers by repeated greatest common divisors with the derivative; each layer is factorised modulo a single large prime exceeding twice the Landau–Mignotte bound on the coefficients of any factor, by distinct-degree and equal-degree splitting, and the modular factors are recombined by trial division over ℤ.
 - **Root isolation.** Real roots above one of an irreducible polynomial are isolated by Descartes' rule of signs with bisection, on dyadic intervals.
 - **Signs.** The sign of a polynomial q at a root α of an irreducible polynomial f is zero exactly when f divides q; otherwise it is found by interval evaluation, first in floating point with outward rounding and, when that is inconclusive, in exact dyadic arithmetic with the isolating interval refined until the sign is determined.
-- **Caching.** Factorisations and isolated roots are shared between all cases through a registry, so that each distinct polynomial is factorised once.
+- **Caching.** Irreducible factors and their isolated roots are shared between all cases through a registry, which assigns each algebraic number a stable identifier.

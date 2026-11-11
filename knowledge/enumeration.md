@@ -27,23 +27,25 @@ The number of tiers grows by one with an inside placement and shrinks by one wit
 Each tiling admits many compatible orders, and the search must visit it once.
 The canonical order places, at every step, the tile at the lowest-numbered tier whose tile is *ready*, meaning that it fits on the floor and against the wall as they currently stand.
 
-This rule is enforced locally by locks.
-Placing a tile at tier i asserts that no tile at a tier j < i was ready, so every such tier is locked at the current length of its floor: the tile eventually placed there must be strictly wider than that length.
-A locked tier is *stale* until its floor grows, which happens when a tile of full height is placed at the next tier, and no tile can be placed on a stale tier.
-Once the floor has grown, the tile placed there is either of full width, or narrower but strictly wider than the length recorded by the lock.
-A lock is cleared when a tile is placed at the tier, since the anchor then moves.
+This rule is enforced locally.
+Placing a tile at tier i asserts that no tile at a tier j < i was ready, so every such tier becomes *stale*: no tile can be placed on it until its floor grows, which happens when a tile of full height is placed at the next tier.
+Staleness is cleared when the floor grows, and when a tile is placed at the tier, since the anchor then moves.
 
-The wall of a locked tier cannot grow before its tile is placed: that would require a full-width tile at the previous tier, which is itself locked and can only become ready after a full-height tile at the locked tier.
-Hence the width condition captures readiness exactly, and each concrete tiling corresponds to exactly one placement sequence.
+## One sequence per mosaic class
 
-## What a placement sequence determines
+The linear system that determines the sizes of the tiles (see [solving.md](solving.md)) depends only on which tiles border each maximal segment of the tiling, and not on the order in which the junctions on the two sides of a segment alternate; see [theory.md](theory.md).
+Tilings that agree in this respect form a *mosaic class*, and it is enough to visit one placement sequence per class.
 
-A placement sequence fixes which tiles touch along each segment, and the order of the junctions on the two sides of each horizontal segment, but not the order of junctions on the two sides of a vertical segment.
-A tiling in which four tiles meet at a point belongs to the sequence in which the vertical segment through that point is unbroken.
-The sequences are therefore coarser than generic rectangulations (1, 2, 6, 24, 116, 642, … for n tiles) and finer than diagonal rectangulations (1, 2, 6, 22, 92, 422, …): their numbers are 1, 2, 6, 23, 104, 530, 2958, 17734, 112657 for n = 1 to 9.
+The staircase construction never distinguishes the order of junctions along a vertical segment, but it does along a horizontal one: a tile standing on a segment can be placed before or after the tiles hanging below the segment are complete.
+The search keeps the second alternative only.
+A floor is *started* once a tile narrower than it stands on it, and a tile of full height may not be placed at a tier when the floor of the previous tier is started, since that would extend a segment on which tiles already stand.
+With this rule every mosaic class has exactly one placement sequence.
+
+The numbers of placement sequences for n = 1 to 12 are accordingly the Baxter numbers 1, 2, 6, 22, 92, 422, 2074, 10754, 58202, 326240, 1882960, 11140560 ([OEIS A001181](https://oeis.org/A001181)), which count mosaic classes.
+A tiling in which four tiles meet at a point belongs to the closure of two classes and is found through either.
 
 ## Orientations and symmetry
 
 Each tile is either wide or tall, so a sequence of n placements is examined with 2ⁿ orientation vectors.
 Transposition of the plane maps tilings of a main rectangle of aspect ratio w to tilings of one of aspect ratio 1/w, exchanging wide and tall tiles and preserving the proportion.
-For a square, it is therefore enough to consider tilings whose bottom-left tile is wide.
+For a square, it is therefore enough to consider tilings whose bottom-left tile is wide, which leaves 2ⁿ⁻¹ orientation vectors per sequence.
