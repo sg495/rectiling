@@ -8,6 +8,7 @@ use crate::exact;
 use crate::fast::Engine;
 use crate::staircase::{FITS, Placement, Staircase, Unit};
 use rayon::prelude::*;
+use std::sync::Mutex;
 
 /// Counters describing the work performed by a search.
 #[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
@@ -62,24 +63,48 @@ pub struct Outcome {
     pub polynomials: usize,
 }
 
+/// Results accumulated by one thread, before they are merged into the shared table.
 #[derive(Default)]
 pub(crate) struct Tally {
-    pub(crate) found: WordMap<u32, (u64, Vec<Placement>)>,
+    pub(crate) found: WordMap<u32, (u64, Option<Box<[Placement]>>)>,
     pub(crate) stats: Stats,
 }
 
+/// Results shared by all threads of a search.
+#[derive(Default)]
+pub(crate) struct Shared {
+    table: Mutex<Vec<(u64, Option<Box<[Placement]>>)>>,
+    stats: Mutex<Stats>,
+}
+
+const FLUSH_LIMIT: usize = 1 << 18;
+
 impl Tally {
-    pub(crate) fn record(&mut self, id: u32, witness: impl FnOnce() -> Vec<Placement>) {
+    pub(crate) fn record(&mut self, id: u32, witness: impl FnOnce() -> Box<[Placement]>) {
         self.stats.tilings += 1;
-        self.found.entry(id).and_modify(|e| e.0 += 1).or_insert_with(|| (1, witness()));
+        self.found.entry(id).and_modify(|e| e.0 += 1).or_insert_with(|| (1, Some(witness())));
     }
 
-    fn merge(mut self, o: Tally) -> Tally {
-        self.stats.merge(&o.stats);
-        for (id, (count, witness)) in o.found {
-            self.found.entry(id).and_modify(|e| e.0 += count).or_insert((count, witness));
+    /// Merges the results into the shared table if they have grown large, or unconditionally.
+    pub(crate) fn flush(&mut self, shared: &Shared, force: bool) {
+        if !force && self.found.len() < FLUSH_LIMIT {
+            return;
         }
-        self
+        {
+            let mut table = shared.table.lock().expect("results lock");
+            for (id, (count, witness)) in self.found.drain() {
+                let id = id as usize;
+                if table.len() <= id {
+                    table.resize_with(id + 1, || (0, None));
+                }
+                table[id].0 += count;
+                if table[id].1.is_none() {
+                    table[id].1 = witness;
+                }
+            }
+        }
+        shared.stats.lock().expect("results lock").merge(&self.stats);
+        self.stats = Stats::default();
     }
 }
 
@@ -149,20 +174,22 @@ impl Search {
         out
     }
 
-    fn outcome(&self, tally: Tally, registry: &Registry, cache: &PolyCache) -> Outcome {
-        let mut proportions: Vec<Found> = tally
-            .found
+    fn outcome(&self, shared: Shared, registry: &Registry, cache: &PolyCache) -> Outcome {
+        let table = shared.table.into_inner().expect("results lock");
+        let mut proportions: Vec<Found> = table
             .into_iter()
+            .enumerate()
+            .filter(|(_, (tilings, _))| *tilings > 0)
             .map(|(id, (tilings, witness))| Found {
-                proportion: registry.get(id),
+                proportion: registry.get(id as u32),
                 tilings,
-                witness,
+                witness: witness.map(Vec::from).unwrap_or_default(),
             })
             .collect();
         proportions.sort_by(|a, b| a.proportion.approx().total_cmp(&b.proportion.approx()));
         Outcome {
             proportions,
-            stats: tally.stats,
+            stats: shared.stats.into_inner().expect("results lock"),
             polynomials: cache.len(),
         }
     }
@@ -171,29 +198,22 @@ impl Search {
     pub fn run(&self) -> Outcome {
         let registry = Registry::new();
         let cache = PolyCache::new();
-        let tally = self
-            .sequences(4)
-            .par_iter()
-            .fold(
-                || Engine::new(self.tiles, self.width, self.height, &registry, &cache),
-                |mut engine, prefix| {
-                    engine.run(prefix);
-                    engine
-                },
-            )
-            .map(|engine| engine.tally)
-            .reduce(Tally::default, Tally::merge);
-        self.outcome(tally, &registry, &cache)
+        let shared = Shared::default();
+        self.sequences(4).par_iter().for_each_init(
+            || Engine::new(self.tiles, self.width, self.height, &registry, &cache, &shared),
+            |engine, prefix| engine.run(prefix),
+        );
+        self.outcome(shared, &registry, &cache)
     }
 
     /// Runs the search with every tiling solved by exact symbolic elimination, as a reference for the default method.
     pub fn run_exact(&self) -> Outcome {
         let registry = Registry::new();
         let cache = PolyCache::new();
-        let tally = self
-            .sequences(self.tiles)
-            .par_iter()
-            .fold(Tally::default, |mut tally, path| {
+        let shared = Shared::default();
+        self.sequences(self.tiles).par_chunks(1024).for_each(|paths| {
+            let mut tally = Tally::default();
+            for path in paths {
                 let solved = exact::solve(self.width, self.height, &registry, &cache, path);
                 tally.stats.leaves += 1;
                 tally.stats.exact += 1;
@@ -202,11 +222,11 @@ impl Search {
                 tally.stats.constant += solved.constant as u64;
                 tally.stats.overflows += solved.overflow as u64;
                 for &id in &solved.feasible {
-                    tally.record(id, || path.clone());
+                    tally.record(id, || path.as_slice().into());
                 }
-                tally
-            })
-            .reduce(Tally::default, Tally::merge);
-        self.outcome(tally, &registry, &cache)
+            }
+            tally.flush(&shared, true);
+        });
+        self.outcome(shared, &registry, &cache)
     }
 }

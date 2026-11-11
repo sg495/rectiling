@@ -6,7 +6,7 @@ use crate::algebraic::{Registry, RootRef};
 use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
-use crate::search::Tally;
+use crate::search::{Shared, Tally};
 use crate::staircase::{Algebra, FITS, Placement, Staircase, Unit};
 use smallvec::SmallVec;
 
@@ -334,21 +334,29 @@ pub(crate) struct Engine<'a> {
     tiles: usize,
     registry: &'a Registry,
     cache: &'a PolyCache,
+    shared: &'a Shared,
     symbols: Symbols,
     path: Vec<Step>,
     local: WordMap<Box<[i64]>, Roots>,
     key: Vec<i64>,
-    pub(crate) tally: Tally,
+    tally: Tally,
+}
+
+impl Drop for Engine<'_> {
+    fn drop(&mut self) {
+        self.tally.flush(self.shared, true);
+    }
 }
 
 impl<'a> Engine<'a> {
-    pub(crate) fn new(tiles: usize, width: i64, height: i64, registry: &'a Registry, cache: &'a PolyCache) -> Self {
+    pub(crate) fn new(tiles: usize, width: i64, height: i64, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
         Engine {
             width,
             height,
             tiles,
             registry,
             cache,
+            shared,
             symbols: Symbols {
                 arena: Arena::new(),
                 used: 1,
@@ -376,6 +384,7 @@ impl<'a> Engine<'a> {
         self.path.clear();
         self.explore(&Staircase::new(floor, wall), self.tiles, 1, one, prefix);
         self.symbols.arena.reset(mark);
+        self.tally.flush(self.shared, false);
     }
 
     fn explore(&mut self, stairs: &Staircase<Form>, remaining: usize, used: u8, pivot: u32, prefix: &[Placement]) {
@@ -520,7 +529,7 @@ impl<'a> Engine<'a> {
         stats.overflows += solved.overflow as u64;
         stats.candidates += solved.candidate as u64;
         for &id in &solved.feasible {
-            self.tally.record(id, || moves.to_vec());
+            self.tally.record(id, || moves.into());
         }
     }
 

@@ -110,6 +110,6 @@ fn signs_at_algebraic_numbers() {
     assert_eq!(registry.sign_at(sqrt2.id, &poly(&[-141421356237309504, 100000000000000000])), 1);
     assert_eq!(registry.sign_at(half.id, &poly(&[-3, 2])), 0);
     assert_eq!(registry.sign_at(half.id, &poly(&[-9, 0, 4, 1])), 1);
-    assert_eq!(registry.get(sqrt2.id).min_poly(), &poly(&[-2, 0, 1]));
+    assert_eq!(registry.get(sqrt2.id).min_poly(), poly(&[-2, 0, 1]));
     assert_eq!(registry.get(half.id).degree(), 1);
 }

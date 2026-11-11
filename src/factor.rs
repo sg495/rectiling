@@ -72,6 +72,71 @@ impl Field for WordField {
     }
 }
 
+const MERSENNE: u64 = (1 << 61) - 1;
+
+struct MersenneField;
+
+impl MersenneField {
+    #[inline]
+    fn reduce(t: u128) -> u64 {
+        let folded = (t & MERSENNE as u128) + (t >> 61);
+        let folded = (folded & MERSENNE as u128) as u64 + (folded >> 61) as u64;
+        if folded >= MERSENNE { folded - MERSENNE } else { folded }
+    }
+}
+
+impl Field for MersenneField {
+    type E = u64;
+    fn modulus(&self) -> BigInt {
+        BigInt::from(MERSENNE)
+    }
+    fn zero(&self) -> u64 {
+        0
+    }
+    fn one(&self) -> u64 {
+        1
+    }
+    #[inline]
+    fn is_zero(&self, a: &u64) -> bool {
+        *a == 0
+    }
+    #[inline]
+    fn add(&self, a: &u64, b: &u64) -> u64 {
+        let s = a + b;
+        if s >= MERSENNE { s - MERSENNE } else { s }
+    }
+    #[inline]
+    fn sub(&self, a: &u64, b: &u64) -> u64 {
+        if a >= b { a - b } else { MERSENNE - (b - a) }
+    }
+    #[inline]
+    fn mul(&self, a: &u64, b: &u64) -> u64 {
+        Self::reduce(*a as u128 * *b as u128)
+    }
+    fn inv(&self, a: &u64) -> u64 {
+        let mut result = 1u64;
+        let mut base = *a;
+        let mut e = MERSENNE - 2;
+        while e > 0 {
+            if e & 1 == 1 {
+                result = self.mul(&result, &base);
+            }
+            base = self.mul(&base, &base);
+            e >>= 1;
+        }
+        result
+    }
+    fn from_big(&self, a: &BigInt) -> u64 {
+        a.mod_floor(&BigInt::from(MERSENNE)).to_u64().unwrap_or(0)
+    }
+    fn to_big(&self, a: &u64) -> BigInt {
+        BigInt::from(*a)
+    }
+    fn from_u64(&self, a: u64) -> u64 {
+        a % MERSENNE
+    }
+}
+
 struct BigField {
     p: BigInt,
 }
@@ -144,7 +209,8 @@ fn fdivrem<F: Field>(f: &F, a: &FPoly<F>, b: &FPoly<F>) -> (FPoly<F>, FPoly<F>) 
     if r.len() < b.len() {
         return (Vec::new(), r);
     }
-    let inv = f.inv(&b[b.len() - 1]);
+    let lead = &b[b.len() - 1];
+    let inv = if *lead == f.one() { f.one() } else { f.inv(lead) };
     let qn = r.len() - b.len() + 1;
     let mut q = vec![f.zero(); qn];
     for i in (0..qn).rev() {
@@ -232,11 +298,15 @@ fn modular_factors<F: Field>(f: &F, p: &Poly<BigInt>) -> Option<Vec<FPoly<F>>> {
     }
     let mut g = fmonic(f, &image);
     let x: FPoly<F> = vec![f.zero(), f.one()];
+    let modulus = f.modulus();
+    let frobenius = fpowmod(f, &x, &modulus, &g);
+    if nullity_of_frobenius(f, &frobenius, &g) == 1 {
+        return Some(vec![g]);
+    }
     let mut h = x.clone();
     let mut out = Vec::new();
     let mut seed = 0x9E3779B97F4A7C15u64;
     let mut d = 0;
-    let modulus = f.modulus();
     while g.len() > 1 {
         d += 1;
         if 2 * d > g.len() - 1 {
@@ -252,6 +322,40 @@ fn modular_factors<F: Field>(f: &F, p: &Poly<BigInt>) -> Option<Vec<FPoly<F>>> {
         }
     }
     Some(out)
+}
+
+/// The number of irreducible factors of a monic square-free polynomial, as the dimension of the fixed space of the Frobenius map.
+fn nullity_of_frobenius<F: Field>(f: &F, frobenius: &FPoly<F>, g: &FPoly<F>) -> usize {
+    let d = g.len() - 1;
+    let mut rows: Vec<FPoly<F>> = Vec::with_capacity(d);
+    let mut power: FPoly<F> = vec![f.one()];
+    for i in 0..d {
+        let mut row = power.clone();
+        row.resize(d, f.zero());
+        row[i] = f.sub(&row[i], &f.one());
+        rows.push(row);
+        power = fdivrem(f, &fmul(f, &power, frobenius), g).1;
+    }
+    let mut rank = 0;
+    for col in 0..d {
+        let Some(pivot) = (rank..d).find(|&r| !f.is_zero(&rows[r][col])) else {
+            continue;
+        };
+        rows.swap(rank, pivot);
+        let inv = f.inv(&rows[rank][col]);
+        for r in rank + 1..d {
+            if f.is_zero(&rows[r][col]) {
+                continue;
+            }
+            let factor = f.mul(&rows[r][col], &inv);
+            for c in col..d {
+                let delta = f.mul(&factor, &rows[rank][c]);
+                rows[r][c] = f.sub(&rows[r][c], &delta);
+            }
+        }
+        rank += 1;
+    }
+    d - rank
 }
 
 fn symmetric_lift<F: Field>(f: &F, a: &FPoly<F>, scale: &BigInt) -> Poly<BigInt> {
@@ -316,7 +420,12 @@ fn factor_squarefree(p: &Poly<BigInt>) -> Vec<Poly<BigInt>> {
     let norm2: BigInt = p.coeffs().iter().map(|c| c * c).sum();
     let lead = p.leading().cloned().unwrap_or_default().abs();
     let bound: BigInt = ((norm2.sqrt() + 1) * &lead << (d + 1)) + 1;
-    for &w in &[(1u64 << 61) - 1, (1u64 << 62) - 57, (1u64 << 63) - 25] {
+    if bound < BigInt::from(MERSENNE) {
+        if let Some(mods) = modular_factors(&MersenneField, p) {
+            return recombine(&MersenneField, p, mods);
+        }
+    }
+    for &w in &[(1u64 << 62) - 57, (1u64 << 63) - 25] {
         if bound < BigInt::from(w) {
             let f = WordField { p: w };
             if let Some(mods) = modular_factors(&f, p) {
