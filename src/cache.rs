@@ -57,6 +57,14 @@ pub(crate) fn hash_bytes(bytes: &[u8]) -> u64 {
     h.finish().wrapping_mul(0x9E37_79B9_7F4A_7C15)
 }
 
+/// Appends bytes to a buffer, which grows by a quarter of its length when full.
+pub(crate) fn append(buffer: &mut Vec<u8>, bytes: &[u8]) {
+    if buffer.len() + bytes.len() > buffer.capacity() {
+        buffer.reserve_exact((buffer.len() / 4).max(1 << 10) + bytes.len());
+    }
+    buffer.extend_from_slice(bytes);
+}
+
 /// Roots of a polynomial, as references into a registry.
 pub(crate) type Roots = SmallVec<[RootRef; 2]>;
 
@@ -78,10 +86,10 @@ impl Shard {
 
     fn insert(&mut self, key: &[u8], hash: u64, ids: &[u32]) {
         let offset = self.arena.len() as u32;
-        self.arena.extend_from_slice(key);
-        self.arena.push(ids.len() as u8);
+        append(&mut self.arena, key);
+        append(&mut self.arena, &[ids.len() as u8]);
         for id in ids {
-            self.arena.extend_from_slice(&id.to_le_bytes());
+            append(&mut self.arena, &id.to_le_bytes());
         }
         let arena = &self.arena;
         self.table.insert_unique(hash, offset, |&o| {
@@ -91,7 +99,68 @@ impl Shard {
     }
 }
 
-/// Concurrent map from polynomials with machine-integer coefficients to their roots not smaller than one.
+/// Map from encoded polynomials to their roots, for the use of one thread, which empties itself when it reaches a given size.
+pub(crate) struct LocalCache {
+    table: HashTable<u32>,
+    arena: Vec<u8>,
+    limit: usize,
+}
+
+const ROOT_BYTES: usize = 20;
+
+impl LocalCache {
+    /// An empty map holding at most the given number of polynomials.
+    pub(crate) fn new(limit: usize) -> Self {
+        LocalCache {
+            table: HashTable::new(),
+            arena: Vec::new(),
+            limit,
+        }
+    }
+
+    /// The roots stored for the polynomial with the given encoding and hash.
+    pub(crate) fn find(&self, key: &[u8], hash: u64) -> Option<Roots> {
+        let arena = &self.arena;
+        let at = *self.table.find(hash, |&o| arena[o as usize..].starts_with(key))? as usize + key.len();
+        let count = arena[at] as usize;
+        let field = |from: usize| -> [u8; 8] { arena[from..from + 8].try_into().expect("eight bytes") };
+        Some(
+            (0..count)
+                .map(|i| {
+                    let from = at + 1 + ROOT_BYTES * i;
+                    RootRef {
+                        id: u32::from_le_bytes(arena[from..from + 4].try_into().expect("four bytes")),
+                        lo: f64::from_le_bytes(field(from + 4)),
+                        hi: f64::from_le_bytes(field(from + 12)),
+                    }
+                })
+                .collect(),
+        )
+    }
+
+    /// Stores the roots of the polynomial with the given encoding and hash, which must not be present.
+    pub(crate) fn insert(&mut self, key: &[u8], hash: u64, roots: &Roots) {
+        if self.table.len() >= self.limit {
+            self.table.clear();
+            self.arena.clear();
+        }
+        let offset = self.arena.len() as u32;
+        self.arena.extend_from_slice(key);
+        self.arena.push(roots.len() as u8);
+        for root in roots {
+            self.arena.extend_from_slice(&root.id.to_le_bytes());
+            self.arena.extend_from_slice(&root.lo.to_le_bytes());
+            self.arena.extend_from_slice(&root.hi.to_le_bytes());
+        }
+        let arena = &self.arena;
+        self.table.insert_unique(hash, offset, |&o| {
+            let rest = &arena[o as usize..];
+            hash_bytes(&rest[..packed_len(rest)])
+        });
+    }
+}
+
+/// Concurrent map to their roots not smaller than one from the polynomials with machine-integer coefficients that are not registered irreducible polynomials.
 pub(crate) struct PolyCache {
     shards: Box<[Mutex<Shard>]>,
 }
@@ -108,13 +177,23 @@ impl PolyCache {
     pub(crate) fn roots(&self, key: &[i64], scratch: &mut Vec<u8>, registry: &Registry) -> Roots {
         scratch.clear();
         pack(key, scratch);
-        let hash = hash_bytes(scratch);
+        self.roots_packed(key, scratch, hash_bytes(scratch), registry)
+    }
+
+    /// The roots not smaller than one of the non-zero polynomial with the given coefficients, encoding and hash.
+    pub(crate) fn roots_packed(&self, key: &[i64], scratch: &[u8], hash: u64, registry: &Registry) -> Roots {
+        if let Some(roots) = registry.equation_roots(scratch, hash) {
+            return roots;
+        }
         let shard = &self.shards[(hash >> (64 - SHARD_BITS)) as usize];
         let found = shard.lock().expect("cache lock").find(scratch, hash);
         if let Some(ids) = found {
             return registry.refs(&ids);
         }
         let roots = registry.roots_from_one(&Poly::from_i64s(key));
+        if registry.equation_roots(scratch, hash).is_some() {
+            return roots;
+        }
         let ids: SmallVec<[u32; 2]> = roots.iter().map(|r| r.id).collect();
         let mut guard = shard.lock().expect("cache lock");
         if guard.find(scratch, hash).is_none() {

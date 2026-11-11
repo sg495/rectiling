@@ -2,7 +2,7 @@
 
 //! Command-line interface to the search for tilings by similar rectangles.
 
-use rectiling::{Census, Fit, Outcome, SYMMETRIES, Search};
+use rectiling::{Band, Census, Fit, Outcome, SYMMETRIES, Search, Stats};
 use std::time::Instant;
 
 fn main() {
@@ -15,6 +15,8 @@ fn main() {
     let mut bags = false;
     let mut exact = false;
     let mut minority: Option<usize> = None;
+    let mut band: Option<(usize, usize)> = None;
+    let mut bands: Option<usize> = None;
     let mut args = args.iter();
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -27,6 +29,14 @@ fn main() {
             "--minority" => match args.next().and_then(|v| v.parse().ok()) {
                 Some(v) => minority = Some(v),
                 None => usage(),
+            },
+            "--band" => match (args.next().and_then(|v| v.parse().ok()), args.next().and_then(|v| v.parse().ok())) {
+                (Some(index), Some(count)) if valid(count) && (1..=count).contains(&index) => band = Some((index, count)),
+                _ => usage(),
+            },
+            "--bands" => match args.next().and_then(|v| v.parse().ok()) {
+                Some(count) if valid(count) => bands = Some(count),
+                _ => usage(),
             },
             other => match other.parse() {
                 Ok(v) => numbers.push(v),
@@ -52,13 +62,27 @@ fn main() {
     } else if tilings {
         search = search.counting_tilings();
     }
-    let outcome = if guillotine {
-        search.run_guillotine()
-    } else if exact {
-        search.run_exact()
-    } else {
-        search.run()
+    let run = |search: Search| {
+        if guillotine {
+            search.run_guillotine()
+        } else if exact {
+            search.run_exact()
+        } else {
+            search.run()
+        }
     };
+    if let Some(count) = bands {
+        if list || classes || tilings || bags || band.is_some() {
+            usage();
+        }
+        sweep(search, count, run);
+        println!("elapsed = {:.3}s", start.elapsed().as_secs_f64());
+        return;
+    }
+    if let Some((index, count)) = band {
+        search = search.in_band(Band::new(index - 1, count));
+    }
+    let outcome = run(search);
     let elapsed = start.elapsed();
     if list {
         for found in outcome.proportions() {
@@ -109,6 +133,9 @@ fn main() {
     if let Some(limit) = minority {
         println!("at most {limit} tiles in the less frequent orientation");
     }
+    if let Some(band) = search.band() {
+        println!("proportions from {} and below {} only", band.lower(), band.upper());
+    }
     println!("degrees = {:?}", outcome.degrees());
     println!("proportions = {}", outcome.count());
     println!("{:?}, polynomials = {}", outcome.stats(), outcome.polynomials());
@@ -116,6 +143,46 @@ fn main() {
         print_census(census);
     }
     println!("elapsed = {:.3}s", elapsed.as_secs_f64());
+}
+
+fn valid(count: usize) -> bool {
+    count >= 1 && rectiling::band::CELLS.is_multiple_of(count)
+}
+
+/// Runs the search once for each of the given number of bands and prints the totals.
+fn sweep(search: Search, count: usize, run: impl Fn(Search) -> Outcome) {
+    let mut degrees: Vec<usize> = Vec::new();
+    let mut total = 0;
+    let mut tilings = 0;
+    let mut worst = Stats::default();
+    println!("tiles = {}, in {count} bands", search.tiles());
+    for index in 0..count {
+        let band = Band::new(index, count);
+        let outcome = run(search.in_band(band));
+        let stats = outcome.stats();
+        println!(
+            "band {}: from {} and below {}, proportions = {}, {:?}, polynomials = {}",
+            index + 1,
+            band.lower(),
+            band.upper(),
+            outcome.count(),
+            stats,
+            outcome.polynomials()
+        );
+        for (d, c) in outcome.degrees().into_iter().enumerate() {
+            if degrees.len() <= d {
+                degrees.resize(d + 1, 0);
+            }
+            degrees[d] += c;
+        }
+        total += outcome.count();
+        tilings += stats.tilings;
+        worst.singular = worst.singular.max(stats.singular);
+        worst.constant = worst.constant.max(stats.constant);
+    }
+    println!("degrees = {degrees:?}");
+    println!("proportions = {total}");
+    println!("tilings = {tilings}, singular = {}, constant = {}", worst.singular, worst.constant);
 }
 
 fn print_classes(outcome: &Outcome) {
@@ -182,6 +249,6 @@ fn trimmed(counts: &[u64]) -> &[u64] {
 }
 
 fn usage() -> ! {
-    eprintln!("usage: rectiling [--list] [--tilings] [--classes] [--bags] [--exact] [--guillotine] [--minority LIMIT] TILES [WIDTH HEIGHT]");
+    eprintln!("usage: rectiling [--list] [--tilings] [--classes] [--bags] [--exact] [--guillotine] [--minority LIMIT] [--band INDEX COUNT] [--bands COUNT] TILES [WIDTH HEIGHT]");
     std::process::exit(2)
 }

@@ -2,7 +2,7 @@
 
 //! Tests of the search against published results.
 
-use rectiling::{Outcome, Search, count_layouts};
+use rectiling::{Band, Outcome, Search, count_layouts};
 
 fn certified(outcome: &Outcome) {
     assert_eq!(outcome.stats().singular, 0);
@@ -181,4 +181,47 @@ fn rational_proportions_needing_both_orientations() {
     }
     assert_eq!(aligned, 28);
     assert_eq!(mixed, [(5, 3), (2, 1)]);
+}
+
+fn banded(search: Search, count: usize, run: impl Fn(&Search) -> Outcome) -> Vec<(String, usize, u64)> {
+    let mut all = Vec::new();
+    for index in 0..count {
+        let band = Band::new(index, count);
+        let outcome = run(&search.in_band(band));
+        certified(&outcome);
+        for found in outcome.proportions() {
+            let x = found.proportion.approx();
+            assert!(band.lower() <= x && x < band.upper());
+        }
+        all.extend(summary(&outcome));
+    }
+    all
+}
+
+#[test]
+fn bands_partition_the_proportions() {
+    let search = Search::square(7);
+    let whole = summary(&search.run());
+    for count in [2, 8, 64] {
+        assert_eq!(banded(search, count, Search::run), whole);
+    }
+    assert_eq!(banded(Search::square(6), 4, Search::run_exact), summary(&Search::square(6).run()));
+    let wide = Search::new(6, 3, 2);
+    assert_eq!(banded(wide, 16, Search::run), summary(&wide.run()));
+}
+
+#[test]
+fn bands_partition_the_tilings() {
+    let search = Search::square(7).counting_bags();
+    let whole = search.run();
+    let census = whole.census().expect("census");
+    let (mut tilings, mut classes, mut bags) = (0, 0, 0);
+    for index in 0..4 {
+        let outcome = search.in_band(Band::new(index, 4)).run();
+        let part = outcome.census().expect("census");
+        tilings += part.tilings();
+        classes += part.classes();
+        bags += part.bags().expect("bags");
+    }
+    assert_eq!((tilings, classes, Some(bags)), (census.tilings(), census.classes(), census.bags()));
 }

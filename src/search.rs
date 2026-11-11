@@ -4,7 +4,9 @@
 
 use crate::algebraic::{Algebraic, Registry};
 use crate::bags::Bags;
+use crate::band::Band;
 use crate::cache::{PolyCache, WordMap};
+use crate::chunked::Chunked;
 use crate::exact;
 use crate::fast::Engine;
 use crate::guillotine;
@@ -130,14 +132,54 @@ pub(crate) fn decode_witness(w: &Witness) -> Vec<Placement> {
         .collect()
 }
 
+const SATURATED: u32 = u32::MAX;
+
+/// Counts and witnesses of the proportions found, indexed by the identifiers of the registry.
+#[derive(Default)]
+pub(crate) struct Table {
+    counts: Chunked<u32>,
+    overflow: WordMap<u32, u64>,
+    witnesses: Chunked<Witness>,
+    extras: Chunked<[u64; 2]>,
+}
+
+impl Table {
+    fn count(&self, id: u32) -> u64 {
+        match self.counts.find(id as usize) {
+            None => 0,
+            Some(SATURATED) => self.overflow[&id],
+            Some(c) => c as u64,
+        }
+    }
+
+    fn add(&mut self, id: u32, count: u64, witness: Witness) {
+        self.counts.grow(id as usize + 1, 0);
+        self.witnesses.grow(id as usize + 1, [NO_PLACEMENT; 14]);
+        let slot = self.counts.at(id as usize);
+        if *slot == 0 {
+            *self.witnesses.at(id as usize) = witness;
+        }
+        if *slot == SATURATED {
+            *self.overflow.entry(id).or_default() += count;
+        } else if *slot as u64 + count >= SATURATED as u64 {
+            self.overflow.insert(id, *slot as u64 + count);
+            *slot = SATURATED;
+        } else {
+            *slot += count as u32;
+        }
+    }
+
+    fn ids(&self) -> impl Iterator<Item = u32> + '_ {
+        self.counts.iter().enumerate().filter(|(_, c)| *c > 0).map(|(id, _)| id as u32)
+    }
+}
+
 /// Result of a search.
 pub struct Outcome {
     registry: Registry,
-    counts: Vec<u64>,
-    witnesses: Vec<Witness>,
+    table: Table,
     stats: Stats,
     polynomials: usize,
-    extras: Vec<[u64; 2]>,
     bags: Vec<u64>,
     census: Option<Census>,
 }
@@ -174,14 +216,14 @@ impl Outcome {
 
     /// The number of distinct proportions found.
     pub fn count(&self) -> usize {
-        self.counts.iter().filter(|&&c| c > 0).count()
+        self.table.ids().count()
     }
 
     /// The number of proportions found of each algebraic degree, starting from degree one.
     pub fn degrees(&self) -> Vec<usize> {
         let mut histogram = Vec::new();
-        for (id, _) in self.counts.iter().enumerate().filter(|(_, c)| **c > 0) {
-            let d = self.registry.degree(id as u32);
+        for id in self.table.ids() {
+            let d = self.registry.degree(id);
             if histogram.len() < d {
                 histogram.resize(d, 0);
             }
@@ -192,17 +234,17 @@ impl Outcome {
 
     /// The proportions found, in increasing order.
     pub fn proportions(&self) -> Vec<Found> {
-        let mut ids: Vec<u32> = (0..self.counts.len() as u32).filter(|&id| self.counts[id as usize] > 0).collect();
+        let mut ids: Vec<u32> = self.table.ids().collect();
         ids.sort_by(|&a, &b| self.registry.approx(a).total_cmp(&self.registry.approx(b)));
         ids.into_iter()
             .map(|id| {
-                let [examined, classes] = self.extras.get(id as usize).copied().unwrap_or_default();
+                let [examined, classes] = self.table.extras.find(id as usize).unwrap_or_default();
                 let unit = self.registry.approx(id) == 1.0;
                 let doubled = self.census.as_ref().is_some_and(|c| c.square) && !unit;
                 Found {
                     proportion: self.registry.get(id),
-                    tilings: self.counts[id as usize],
-                    witness: decode_witness(&self.witnesses[id as usize]),
+                    tilings: self.table.count(id),
+                    witness: decode_witness(&self.table.witnesses.get(id as usize)),
                     distinct: examined * (1 + doubled as u64),
                     classes,
                     bags: self.bags.get(id as usize).copied().unwrap_or(0),
@@ -233,13 +275,13 @@ pub(crate) struct Tally {
 /// Results shared by all threads of a search.
 #[derive(Default)]
 pub(crate) struct Shared {
-    table: Mutex<(Vec<u64>, Vec<Witness>, Vec<[u64; 2]>)>,
+    table: Mutex<Table>,
     stats: Mutex<Stats>,
     census: Mutex<Census>,
     counting: bool,
 }
 
-const FLUSH_LIMIT: usize = 1 << 18;
+const FLUSH_LIMIT: usize = 1 << 16;
 
 impl Tally {
     pub(crate) fn record(&mut self, id: u32, verdict: Verdict, witness: impl FnOnce() -> Witness) {
@@ -257,24 +299,14 @@ impl Tally {
         }
         {
             let mut table = shared.table.lock().expect("results lock");
-            let (counts, witnesses, extras) = &mut *table;
             for (id, (count, witness, extra)) in self.found.drain() {
-                let id = id as usize;
-                if counts.len() <= id {
-                    counts.resize(id + 1, 0);
-                    witnesses.resize(id + 1, [NO_PLACEMENT; 14]);
-                }
+                table.add(id, count, witness);
                 if shared.counting {
-                    if extras.len() <= id {
-                        extras.resize(id + 1, [0; 2]);
-                    }
-                    extras[id][0] += extra[0];
-                    extras[id][1] += extra[1];
+                    table.extras.grow(id as usize + 1, [0; 2]);
+                    let slot = table.extras.at(id as usize);
+                    slot[0] += extra[0];
+                    slot[1] += extra[1];
                 }
-                if counts[id] == 0 {
-                    witnesses[id] = witness;
-                }
-                counts[id] += count;
             }
         }
         shared.stats.lock().expect("results lock").merge(&self.stats);
@@ -295,6 +327,7 @@ pub struct Search {
     counting: bool,
     listing: bool,
     bags: bool,
+    band: Option<Band>,
 }
 
 /// Whether a partial tiling with the given numbers of tall and of placed tiles has at most the given number of tiles in its less frequent orientation.
@@ -315,7 +348,25 @@ impl Search {
             counting: false,
             listing: false,
             bags: false,
+            band: None,
         }
+    }
+
+    /// The same search restricted to the proportions in the given band, with the roots outside it disregarded throughout.
+    pub fn in_band(self, band: Band) -> Self {
+        Search {
+            band: Some(band),
+            ..self
+        }
+    }
+
+    /// The band to which the search is restricted, if any.
+    pub fn band(&self) -> Option<&Band> {
+        self.band.as_ref()
+    }
+
+    fn registry(&self) -> Registry {
+        self.band.map_or_else(Registry::new, Registry::banded)
     }
 
     /// The same search, which also counts the tilings and the distinct bags of tiles: the proportion with the multiset of the short sides of the tiles.
@@ -329,7 +380,10 @@ impl Search {
 
     /// The same search, which also identifies the tilings as sets of rectangles and counts them, up to the symmetries of the main rectangle as well.
     pub fn counting_tilings(self) -> Self {
-        Search { counting: true, ..self }
+        Search {
+            counting: true,
+            ..self
+        }
     }
 
     /// The same search, which also counts the tilings and keeps one from each class under the symmetries of the main rectangle.
@@ -418,17 +472,15 @@ impl Search {
 
     fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache, bags: Option<Bags>) -> Outcome {
         let bags = bags.map(|b| b.counts()).unwrap_or_default();
-        let (counts, witnesses, extras) = shared.table.into_inner().expect("results lock");
+        let table = shared.table.into_inner().expect("results lock");
         let mut census = shared.census.into_inner().expect("results lock");
         census.square = self.is_square();
         census.bags = self.bags.then(|| bags.iter().sum());
         Outcome {
+            polynomials: cache.len() + registry.equations(),
             registry,
-            counts,
-            witnesses,
+            table,
             stats: shared.stats.into_inner().expect("results lock"),
-            polynomials: cache.len(),
-            extras,
             bags,
             census: self.counting.then_some(census),
         }
@@ -436,29 +488,28 @@ impl Search {
 
     /// Runs the search, enumerating every tiling.
     pub fn run(&self) -> Outcome {
-        let registry = Registry::new();
+        let registry = self.registry();
         let cache = PolyCache::new();
         let shared = self.shared();
         let bags = self.bags.then(Bags::new);
-        self.sequences(4).par_iter().for_each_init(
-            || Engine::new(self, &registry, &cache, &shared, bags.as_ref()),
-            |engine, prefix| engine.run(prefix),
-        );
+        self.sequences(4).par_iter().for_each_init(|| Engine::new(self, &registry, &cache, &shared, bags.as_ref()), |engine, prefix| engine.run(prefix));
         self.outcome(shared, registry, cache, bags)
     }
 
     /// Finds the proportions of all guillotine tilings by series and parallel composition of aspect ratios, counting for each the aspect ratio functions that realise it.
     pub fn run_guillotine(&self) -> Outcome {
-        let registry = Registry::new();
+        let registry = self.registry();
         let cache = PolyCache::new();
         let (counts, stats) = guillotine::solve(self.tiles, self.width, self.height, &registry, &cache);
+        let mut table = Table::default();
+        for (id, &count) in counts.iter().enumerate().filter(|(_, c)| **c > 0) {
+            table.add(id as u32, count, [NO_PLACEMENT; 14]);
+        }
         Outcome {
-            witnesses: vec![[NO_PLACEMENT; 14]; counts.len()],
+            polynomials: cache.len() + registry.equations(),
             registry,
-            counts,
+            table,
             stats,
-            polynomials: cache.len(),
-            extras: Vec::new(),
             bags: Vec::new(),
             census: None,
         }
@@ -466,7 +517,7 @@ impl Search {
 
     /// Runs the search with every tiling solved by exact symbolic elimination, as a reference for the default method.
     pub fn run_exact(&self) -> Outcome {
-        let registry = Registry::new();
+        let registry = self.registry();
         let cache = PolyCache::new();
         let shared = self.shared();
         let bags = self.bags.then(Bags::new);
