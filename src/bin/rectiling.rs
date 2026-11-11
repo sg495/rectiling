@@ -62,19 +62,40 @@ fn main() {
     let elapsed = start.elapsed();
     if list {
         for found in outcome.proportions() {
+            let witness: Vec<String> = found
+                .witness
+                .iter()
+                .map(|mv| {
+                    let fit = match mv.fit {
+                        Fit::Inside => 'i',
+                        Fit::FullHeight => 'h',
+                        Fit::FullWidth => 'w',
+                        Fit::Full => 'f',
+                    };
+                    format!("{}{}{}", mv.tier, fit, if mv.tall { 'T' } else { 'W' })
+                })
+                .collect();
             if outcome.census().is_some() {
                 println!(
-                    "{:.15}\t{}\t{}\t{}\t{}\t{}\t{}",
+                    "{:.15}\t{}\t{}\t{}\t{}\t{}\t{}\t{}",
                     found.proportion.approx(),
                     found.proportion.degree(),
                     found.tilings,
                     found.distinct,
                     found.classes,
                     found.bags,
-                    found.proportion.min_poly()
+                    found.proportion.min_poly(),
+                    witness.join(" ")
                 );
             } else {
-                println!("{:.15}\t{}\t{}\t{}", found.proportion.approx(), found.proportion.degree(), found.tilings, found.proportion.min_poly());
+                println!(
+                    "{:.15}\t{}\t{}\t{}\t{}",
+                    found.proportion.approx(),
+                    found.proportion.degree(),
+                    found.tilings,
+                    found.proportion.min_poly(),
+                    witness.join(" ")
+                );
             }
         }
     }
