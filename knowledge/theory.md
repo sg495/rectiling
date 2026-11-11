@@ -14,7 +14,7 @@ By the matrix-tree theorem this function is a ratio of two polynomials in the re
 
 The system depends only on which tiles border each maximal segment, that is, on the mosaic class of the tiling.
 The order in which the junctions on the two sides of a segment alternate does not enter it.
-Conversely, a solution of the system in which every tile has positive width and height is a tiling of that class, whatever order of junctions it exhibits.
+Conversely, a solution of the system in which every tile has positive width and height is a tiling of that class, whatever order of junctions it exhibits; for the systems that the search actually forms, this is proved formally, see [enumeration.md](enumeration.md).
 A solution in which some tile has zero size is a tiling with fewer tiles, as happens for the pinwheel arrangement of five tiles, whose central tile degenerates to a point.
 
 A tiling in which four tiles meet at a point lies in the closure of two classes, and arises in each as the solution at a value of x for which two junctions coincide.
@@ -38,6 +38,6 @@ For guillotine tilings the aspect ratio is built from x and 1/x by sums, which j
 
 - For fixed arrangement and orientations, the linear system has a unique solution for every x > 0, so a search can solve it symbolically in x and need only examine the roots of a single polynomial.
 - The search does not rely on this: it detects singular systems and reports their number, which has been zero in every run.
-- One system per mosaic class and orientation vector suffices, with positivity of the tile sizes as the only test.
+- One system per mosaic class and orientation vector suffices, with positivity of the tile sizes as the only test, provided the system is formed from a placement sequence that obeys the rules of the search.
 - The conjugate condition of Freiling and Rinne cannot serve as a filter: the aspect ratio is an odd rational function of the kind that arises as the impedance of a network of inductors and capacitors, and every root of the resulting equation already has positive real part.
 - Distinct arrangements often share the same rational function, so caching the roots by polynomial removes most of the algebraic work.

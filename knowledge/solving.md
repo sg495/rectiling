@@ -17,7 +17,8 @@ The sides of every other tile are determined by the floor or wall it spans:
 All lengths are thus linear forms in W and the inside unknowns, with coefficients in ℤ[x] up to a common power of x in the denominator.
 A sequence with k inside tiles has k + 1 full tiles, so there are k + 1 equations in the k + 1 unknowns.
 
-The sequence describes a genuine tiling exactly when the system has a solution in which every tile has positive size; no further inequality is needed, because the system does not depend on the order of junctions along a segment.
+The sequence describes a genuine tiling exactly when the system has a solution in which every tile has positive size.
+No further inequality is needed: for a sequence that obeys the two placement rules of [enumeration.md](enumeration.md), positivity of the tiles implies that each tile fits its tier.
 
 ## Reference method
 
@@ -34,6 +35,7 @@ For a main rectangle of aspect ratio a/b, the proportion must be a root of b·N(
 
 If D vanishes at a root, or the elimination meets a column without pivot, the system is singular and uniqueness of the solution fails; if b·N − a·D is identically zero, the aspect ratio does not depend on x.
 Neither is expected to occur, by the theory in [theory.md](theory.md), and the search counts both so that their absence is verified and not assumed.
+The formal proof that the method finds every tiling takes the absence of both as its hypothesis; the proof that every reported proportion belongs to a tiling needs no such hypothesis.
 
 ## Default method
 

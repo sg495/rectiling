@@ -22,27 +22,42 @@ A tile placed at the anchor of tier i, with floor of length L and wall of height
 
 The number of tiers grows by one with an inside placement and shrinks by one with a full placement, so a complete tiling has exactly one more full placement than inside placements, and a partial tiling can be abandoned when fewer tiles remain than there are tiers.
 
-## Canonical order
+## The two placement rules
 
-Each tiling admits many compatible orders, and the search must visit it once.
-The canonical order places, at every step, the tile at the lowest-numbered tier whose tile is *ready*, meaning that it fits on the floor and against the wall as they currently stand.
+Each tiling admits many compatible orders, and tilings that differ only in how the corners of tiles alternate along a segment lead to the same linear system (see [solving.md](solving.md) and [theory.md](theory.md)).
+The search restricts the placement sequences by two rules, each recorded by a flag on the tiers.
 
-This rule is enforced locally.
-Placing a tile at tier i asserts that no tile at a tier j < i was ready, so every such tier becomes *stale*: no tile can be placed on it until its floor grows, which happens when a tile of full height is placed at the next tier.
-Staleness is cleared when the floor grows, and when a tile is placed at the tier, since the anchor then moves.
+- **Stale tiers.** When a tile is placed at tier i, every tier j < i becomes *stale*. A stale tier ceases to be stale when its floor grows, which happens when a tile of full height is placed at the next tier, and the flag is cleared when a tile is placed at the tier, since the anchor then moves. No tile may be placed at a stale tier.
+- **Started floors.** The floor of a tier is *started* when the tier lies to the right of a tile that stands on the same segment: the tier created to the right of an inside tile, and the tier whose anchor has been moved right by a full-height tile. A tile of full height, or a full tile, may not be placed at a tier when the floor of the previous tier is started, since it would lengthen a floor on which tiles already stand.
+
+A sequence of placements that obeys both rules is *admissible*.
+
+## Why the rules lose nothing
+
+Say that the floor of a tier *extends*, in a given tiling, when the horizontal segment carrying the floor continues to the right beyond the end of the floor: the tile lying below that segment just to the right of the end of the floor has its top side at the level of the floor.
+Every tiling is produced by the admissible sequence that places, at every step, the tile at the anchor of the first tier whose floor does not extend.
+Such a tier exists, because the floor of the last tier ends at the right side of the main rectangle, and the tile at its anchor fits the tier.
+Along this sequence a stale tier always has a floor that extends, and a started floor never does, so both rules are obeyed.
+In effect, the tiles standing on a horizontal segment are placed only after all the tiles hanging below it.
+
+This order is not the one that places the tile at the first tier whose tile fits: with the rule on started floors, that order can break the rules.
+
+## Why the rules are needed
+
+The constraints attached to a sequence say only that every tile has positive size; none says that a tile placed inside is narrower than its floor or lower than its wall.
+For an admissible sequence these facts follow: a floor that has become non-positive and is started or last, or a wall that has become non-positive behind stale tiers, stays so under every further admissible placement with positive tiles, so the staircase could never be emptied.
+The two rules are therefore part of what makes every solution a genuine tiling, and not only a device to avoid repetitions.
+
+Both statements, that every solution of an admissible complete sequence is a tiling and that every tiling arises from one, are proved formally in the Lean development.
 
 ## One sequence per mosaic class
 
-The linear system that determines the sizes of the tiles (see [solving.md](solving.md)) depends only on which tiles border each maximal segment of the tiling, and not on the order in which the junctions on the two sides of a segment alternate; see [theory.md](theory.md).
-Tilings that agree in this respect form a *mosaic class*, and it is enough to visit one placement sequence per class.
+The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal segments.
+The numbers of complete admissible sequences of n placements, for n = 1 to 13, are the Baxter numbers 1, 2, 6, 22, 92, 422, 2074, 10754, 58202, 326240, 1882960, 11140560, 67329992 ([OEIS A001181](https://oeis.org/A001181)), which count the mosaic classes of tilings.
+This agreement has been observed by computation; that each mosaic class has exactly one admissible sequence has not been proved here.
+A repeated sequence would in any case affect only the amount of work, and not the set of proportions found.
 
-The staircase construction never distinguishes the order of junctions along a vertical segment, but it does along a horizontal one: a tile standing on a segment can be placed before or after the tiles hanging below the segment are complete.
-The search keeps the second alternative only.
-A floor is *started* once a tile narrower than it stands on it, and a tile of full height may not be placed at a tier when the floor of the previous tier is started, since that would extend a segment on which tiles already stand.
-With this rule every mosaic class has exactly one placement sequence.
-
-The numbers of placement sequences for n = 1 to 12 are accordingly the Baxter numbers 1, 2, 6, 22, 92, 422, 2074, 10754, 58202, 326240, 1882960, 11140560 ([OEIS A001181](https://oeis.org/A001181)), which count mosaic classes.
-A tiling in which four tiles meet at a point belongs to the closure of two classes and is found through either.
+The bound on the number of tiles still to place, by which a partial sequence is abandoned when fewer tiles remain than there are tiers, only prunes sequences that cannot be completed.
 
 ## Orientations and symmetry
 
