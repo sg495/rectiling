@@ -342,6 +342,8 @@ The next statement records what the constraints of a single placement give.
   For a full placement the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
 ]
 
+A doomed staircase stays doomed under every allowed placement whose constraints hold, because the floor or the wall at fault could be made positive only by a placement that one of the two rules forbids.
+
 #proposition(name: [persistence of doom])[
   Let $x > 0$, let $S$ be a real staircase, and let $p$ be a placement that is allowed at $S$, made with a free side for which its positive quantity is positive and its equation, if it has one, is zero.
   Let $S'$ be the staircase after the placement.
@@ -387,6 +389,8 @@ It follows that doom cannot occur along a record that empties the staircase, and
   If $phi$ is low and $h >= M$, then every tier before $T_i$ is stale in $S'$ and the first of the tiers that replace $T_i$ has wall $M - h <= 0$, so that $S'$ is wall-doomed.
   Hence $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, and $S'$ is positive by @prop:step.
 ]
+
+Soundness follows by removing the tiles from the region one at a time.
 
 #proposition(name: [soundness])[
   Let $x >= 1$, let $rho$ be a complete admissible record for $n$ tiles, and let $W$, $H$ and $s = (s_1, s_2, dots)$ be real numbers that satisfy the constraints of $rho$ at $x$.
@@ -521,6 +525,8 @@ The placement made in a state is that of the tile at the anchor of the first tie
   The tiers after $T_i$ have the same anchors, floors and flags as in $S$.
 ]
 
+Repeating the step until no tile remains gives the record.
+
 #proposition(name: [completeness])[
   Let $x >= 1$, let $W, H > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$.
   Then there are a complete admissible record $rho$ for $n$ tiles and real numbers $s = (s_1, s_2, dots)$ such that $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are $R_1, dots, R_n$ in some order, and each placement of $rho$ is wide exactly if its tile $(a, b, w, h)$ satisfies $w = x h$.
@@ -591,6 +597,8 @@ Every floor and wall arising along a record is then a linear form in $1$, $W$ an
   The _symbolic system_ of a record $rho$ consists of the positivity constraints and of the equations obtained by placing $rho$ on the initial staircase whose floor is the form $W$ and whose wall is the form $1$, the free sides being the forms $s_1, s_2, dots$.
 ] <def:forms>
 
+Evaluating the forms recovers the constraints of @def:system, so that the symbolic system may be used in their place.
+
 #proposition(name: [symbolic system])[
   Let $rho$ be a record with $k$ inside placements, and let $x != 0$, $W$ and $s = (s_1, s_2, dots)$ be real numbers.
   Then $(W, 1, s)$ satisfy the constraints of $rho$ at $x$ if and only if $"val"_k (f) > 0$ for every positivity constraint $f$ of the symbolic system of $rho$ and $"val"_k (g) = 0$ for every equation $g$ of it.
@@ -648,6 +656,8 @@ The third step is justified by the following test.
   Let $q(x + 1) = sum_j q_j x^j$, so that $q(r) = q_0 + sum_(j >= 1) q_j (r - 1)^j$ with $r - 1 >= 0$.
   If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then $q(r) < 0$ likewise.
 ]
+
+With routines that meet their specifications, the method reports solutions of the system only, and it reports all of them when it counts no singular situation.
 
 #proposition(name: [reference method on a record])[
   Let $a$ and $b != 0$ be integers, and let $rho$ be a complete admissible record.
@@ -752,6 +762,8 @@ The homogeneous system at scale one is the system of the main rectangle of sides
   Hence $(W, H, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if $(c W, c H, c s)$ do, and the statement follows with $c = b$.
 ]
 
+The pass along a record keeps, besides the staircase, the coefficient by which the last unknown was eliminated, by which the next elimination divides.
+
 #definition(name: [symbolic pass])[
   A _stage_ is a triple $(S, pi, k)$ of a staircase $S$ over the forms over $R$, a _pivot_ $pi in R$ with $pi != 0$, and an integer $k >= 0$; the _initial stage_ for integers $a$ and $b$ consists of the initial staircase with floor $a u_0$ and wall $b u_0$, the pivot $1$ and $k = 0$.
   An _elimination_ is a triple $epsilon = (E, m, pi)$ of a form $E$ over $R$, an index $m$ and an element $pi != 0$ of $R$.
@@ -815,6 +827,8 @@ Nothing in the definition of a chain requires the current pivot to have a non-ze
   Finally, for $i > k^+$ we have $i != m$, so the coefficient of index $m$ of $u_i$ is zero and $gamma_epsilon (psi(pi) u_i) = psi(E_m) psi(pi) u_i slash psi(pi) = psi(E_m) u_i$.
   The properties therefore hold for $Sigma_j$, and the first statement is the first property for $j = ell - 1$.
 ]
+
+The properties of elimination chains that are used below are the following; they do not depend on the chain arising from a pass.
 
 #proposition(name: [elimination chains])[
   Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$, let $G$ be a form over $K$, let $N >= 1$ and let $v in K^N$.
@@ -1012,6 +1026,8 @@ The intervals form an arithmetic of lengths for a given interval $I$ of the prop
     Otherwise, if $r$ has no stored polynomial, the examination ends; if the test of divisibility succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
 ] <def:check>
 
+An accepted root is a solution, and a rejected one is not, whichever way the rejection came about.
+
 #proposition(name: [verdicts of the numerical check])[
   Let $rho$ be a complete admissible record, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$, and let $alpha > 0$ be a real number whose stored interval encloses $alpha$ and is certainly away from zero.
   + If $(E_"fin")_j = 0$ for every $j >= 1$, if $(E_"fin")_0 (alpha) = 0$, and if the verdict of the numerical check of $alpha$ is accept, then there is $s$ such that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$.
@@ -1076,6 +1092,7 @@ The formal development does not prove that the exact eliminations applied to $si
 ] <def:fastsolve>
 
 For ten tiles, one record in ten thousand is passed to the reference method.
+Whenever the default method settles a record itself, it reports exactly the solutions of its system, with no proviso.
 
 #proposition(name: [default method on a record])[
   Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
@@ -1114,6 +1131,8 @@ The search is split into tasks by the first few placements, and a failure of the
   For an integer $d >= 0$, the set $cal(P)_d (r, "first", S)$ of the _prefixes_ consists of the empty record alone if $d = 0$ or $S$ is empty, and otherwise of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(P)_(d - 1) (r - 1, "false", S')$.
 ] <def:enumeration>
 
+The completions are the records of @def:admissible, and the prefixes cut them at a given depth.
+
 #proposition(name: [enumeration])[
   + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide in case both _square_ and _first_ hold.
     In particular, for the bare initial staircase $S_0$, the set $cal(C)(n, "true", S_0)$ consists of the complete admissible records for $n$ tiles, with the first tile wide if _square_ holds.
@@ -1145,6 +1164,8 @@ The search is split into tasks by the first few placements, and a failure of the
 ] <def:explore>
 
 In the implementation the prefixes are the tasks distributed to the threads.
+
+The search reports what the default method reports for the records taken one at a time.
 
 #proposition(name: [the search and the records])[
   Let $a$ and $b$ be integers.
