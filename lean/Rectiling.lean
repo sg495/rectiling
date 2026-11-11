@@ -18,5 +18,6 @@ import Rectiling.Certified
 import Rectiling.Fast
 import Rectiling.Enumeration
 import Rectiling.Search
+import Rectiling.Exact
 import Rectiling.Audit
 import Rectiling.Check

@@ -539,6 +539,85 @@ theorem check_reject (hpath : Complete n path) (hrun : Run propX (Stage.init a b
 
 end Verdicts
 
+/-! ### Consistency and the minimal polynomial -/
+
+open Classical in
+/-- Numerical primitives that meet the specifications, which are therefore consistent: intervals are single real numbers and arithmetic is exact. -/
+noncomputable def Numerics.ideal : Numerics where
+  Iv := ℝ
+  mem a A := a = A
+  ofInt z := z
+  add A B := A + B
+  sub A B := A - B
+  mul A B := A * B
+  div A B := A / B
+  neg A := -A
+  straddles B := decide (B = 0)
+  nonpos A := decide (A ≤ 0)
+  pos A := decide (0 < A)
+  eval p Xi := if h : Xi = 0 then none else some (evalL (Units.mk0 Xi h) p)
+  rootIv r := r
+  minPoly _ := none
+  divides _ _ := false
+  key c := (LaurentPolynomial.exists_T_pow c).choose_spec.choose
+  coeffs c := (LaurentPolynomial.exists_T_pow c).choose_spec.choose
+  mem_ofInt _ := rfl
+  mem_add := by rintro a b A B rfl rfl; rfl
+  mem_sub := by rintro a b A B rfl rfl; rfl
+  mem_mul := by rintro a b A B rfl rfl; rfl
+  mem_div := by rintro a b A B rfl rfl _; rfl
+  mem_neg := by rintro a A rfl; rfl
+  ne_zero := by
+    rintro b B rfl h
+    simpa using h
+  nonpos_le := by
+    rintro a A rfl h
+    simpa using h
+  pos_lt := by
+    rintro a A rfl h
+    simpa using h
+  mem_eval := by
+    rintro x Xi p V - rfl - h
+    simp only [Units.ne_zero, ↓reduceDIte, Option.some.injEq] at h
+    rw [← h, Units.mk0_val]
+  mem_rootIv := by
+    intro p r _ hr _
+    refine ⟨rfl, ?_⟩
+    have : r ≠ 0 := by linarith
+    simpa using this
+  minPoly_root := by
+    intro r f h
+    cases h
+  divides_dvd := by
+    intro f q h
+    cases h
+  key_spec c := ⟨(LaurentPolynomial.exists_T_pow c).choose, 1, by
+    rw [(LaurentPolynomial.exists_T_pow c).choose_spec.choose_spec]
+    simp [mul_comm]⟩
+  coeffs_spec c := ⟨(LaurentPolynomial.exists_T_pow c).choose, by
+    rw [(LaurentPolynomial.exists_T_pow c).choose_spec.choose_spec, mul_comm]⟩
+
+/-- **The certificate of a degenerate tile.** A primitive integer polynomial that is irreducible over the rationals and vanishes at a real number divides exactly the integer polynomials that vanish there. -/
+theorem dvd_iff_evalAt_eq_zero {f q : ℤ[X]} (hprim : f.IsPrimitive)
+    (hirr : Irreducible (f.map (Int.castRingHom ℚ))) {r : ℝ} (hr : evalAt r f = 0) :
+    f ∣ q ↔ evalAt r q = 0 := by
+  have haeval : ∀ p : ℤ[X], Polynomial.aeval r (p.map (Int.castRingHom ℚ)) = evalAt r p := by
+    intro p
+    rw [Polynomial.aeval_def, Polynomial.eval₂_map]
+    have : (algebraMap ℚ ℝ).comp (Int.castRingHom ℚ) = Int.castRingHom ℝ := RingHom.ext_int _ _
+    rw [this]
+    rfl
+  constructor
+  · rintro ⟨g, rfl⟩
+    rw [map_mul, hr, zero_mul]
+  · intro hq
+    rw [IsPrimitive.Int.dvd_iff_map_cast_dvd_map_cast f q hprim]
+    have h1 : minpoly ℚ r ∣ f.map (Int.castRingHom ℚ) := minpoly.dvd ℚ r (by rw [haeval, hr])
+    have h2 : minpoly ℚ r ∣ q.map (Int.castRingHom ℚ) := minpoly.dvd ℚ r (by rw [haeval, hq])
+    rcases hirr.dvd_iff.mp h1 with hu | ha
+    · exact absurd hu (minpoly.not_isUnit ℚ r)
+    · exact ha.dvd.trans h2
+
 end Fast
 
 end Rectiling
