@@ -4,6 +4,7 @@
 Every diagram is drawn from tilings found by the search, read from the listings in the data folder, or from exact solutions of the system of a record; the tiles are drawn by the figure generator and the annotations are added on top.
 """
 
+import re
 from pathlib import Path
 
 import matplotlib
@@ -345,6 +346,47 @@ def persistence_figure(path):
     return record
 
 
+def classes(n):
+    """Reads the classes of tilings under symmetry listed by the search for n tiles, as triples of a proportion, the size of the class and a witness."""
+    fits = {"inside": "i", "full height": "h", "full width": "w", "full": "f"}
+    values = [v for v, _ in listing(n)]
+    out = []
+    for block in re.split(r"(?m)^class \d+: ", (DATA / f"classes-{n}.txt").read_text())[1:]:
+        lines = block.splitlines()
+        lines = [lines[0]] + [line for line in lines[1:] if line.startswith("  ")]
+        approx = float(lines[0].split("proportion ")[1].split(",")[0])
+        value = min(values, key=lambda v: abs(float(v) - approx))
+        size = int(lines[1].split("=")[1].split(",")[0])
+        words = []
+        for line in lines:
+            if "(tier" in line:
+                orientation = line.split(",")[4].split("(")[0].strip()
+                tier, fit = line.split("(tier ")[1].rstrip(")").split(", ")
+                words.append(f"{tier}{fits[fit]}{'T' if orientation == 'tall' else 'W'}")
+        out.append((value, size, " ".join(words)))
+    return out
+
+
+def classes_figure(path, n, columns, size):
+    """Draws one tiling for each class of tilings under the symmetries of the square, from the records listed by the search."""
+    items = classes(n)
+    rows = -(-len(items) // columns)
+    fig, axes = plt.subplots(rows, columns, figsize=(size * columns, size * 1.2 * rows), squeeze=False)
+    for ax in axes.flat:
+        ax.axis("off")
+    total = 0
+    for ax, (value, count, witness) in zip(axes.flat, items):
+        tiles = witness_tiles(value, witness)
+        assert abs(sum(w * h for _, _, w, h in tiles) - 1) < 1e-9
+        draw(ax, tiles)
+        ax.set_title(f"{float(value):.4f} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
+        total += count
+    fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
+    fig.savefig(path)
+    plt.close(fig)
+    return len(items), total
+
+
 def components_of(tiles):
     """Returns the connected components of the union of the horizontal sides of the tiles, as triples of the two ends and the height."""
     out = []
@@ -515,6 +557,7 @@ def main():
     print("two tiles:", two_tiles_figure(OUT / "two-tiles.svg"))
     print("sporadic:", sporadic_figure(OUT / "sporadic.svg"))
     print("persistence:", persistence_figure(OUT / "persistence.svg"))
+    print("classes:", classes_figure(OUT / "classes-4.svg", 4, 8, 0.8), classes_figure(OUT / "classes-5.svg", 5, 11, 0.6))
     tiles, witness = regenerated(*SPORADIC_SIX)
     print("network:", witness, network_figure(OUT / "network.svg", tiles), "components")
 

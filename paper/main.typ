@@ -620,7 +620,7 @@ Mosaic classes of tilings in which no four tiles meet at a point are the mosaic 
 The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
 Accordingly, for every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
 This agreement is an observation, made by computation.
-We have not proved that each mosaic class has exactly one such record, nor that a tiling without a point where four tiles meet arises from only one record; the correctness of the search does not depend on either statement, since a repeated record affects the amount of work and not the set of proportions found.
+That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
 
 In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
@@ -1548,7 +1548,108 @@ The guillotine count is at most $n slash 2$ times the number of series–paralle
 @conj:logconvex holds for $n <= 12$, and @conj:guillotine is supported by the values for $n <= 12$.
 The first part of @conj:threshold holds for $n <= 8$ on the thirty integers and sixteen fractions tried, and we have no argument for it; the second holds for $n <= 8$ and $w <= 30$, and was predicted and then confirmed for $n = 9$.
 
-#todo[add the counts of tilings up to symmetry and of bags of tiles, once computed.]
+== Tilings, classes and bags <sec:tilings-counts>
+
+The numbers $a(n)$ count proportions, and each proportion is in general realised by many tilings.
+We now count the tilings themselves, in three ways.
+
+#definition(name: [tilings, classes and bags])[
+  For $n >= 1$, let $t(n)$ be the number of similar tilings of the unit square with $n$ tiles, a tiling being regarded as a set of rectangles.
+  Let $b(n)$ be the number of orbits of these tilings under the group of the eight symmetries of the square.
+  The _bag_ of a similar tiling of proportion $x$ is the pair of $x$ and the multiset of the short sides of its tiles, and $c(n)$ is the number of bags of similar tilings of the unit square with $n$ tiles.
+] <def:tbc>
+
+Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
+A tiling determines its bag, and symmetric tilings have the same bag, so that
+$ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
+The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
+@tab:tbc gives the values that we computed, and @fig:classes shows the sixteen classes for four tiles.
+
+#figure(
+  kind: table,
+  datatable(csv("data/tilings-counts.csv")),
+  caption: [Bags, classes under symmetry and tilings for the unit square, with the number of proportions for comparison.],
+) <tab:tbc>
+
+#figure(
+  image("figures/classes-4.svg", width: 100%),
+  caption: [One tiling from each of the $16$ classes of tilings of the square by four similar rectangles, labelled by proportion, with the number of tilings of the class in brackets; the numbers add up to $t(4) = 89$.],
+) <fig:classes>
+
+The search of @sec:search counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
+A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
+A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
+Tilings are compared through the exact coordinates of their tiles, which are elements of the number field of the proportion: floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
+
+#proposition(name: [representative record])[
+  Let $cal(T)$ be a similar tiling, with a choice of orientation for each tile.
+  A complete admissible record that yields $cal(T)$, as in @prop:complete, places at every stage the tile at the anchor of the first tier whose floor does not extend in $cal(T)$, provided that at every crossing of $cal(T)$ the tile to the lower right of the crossing is placed before the tile to its upper left.
+  In particular a tiling without crossings is yielded by exactly one complete admissible record for each choice of orientations.
+] <prop:representative>
+
+#proof[
+  Consider a placement of the record at a tier $T_i$ of the current staircase.
+  Every tier $T_j$ with $j < i$ has a floor that extends: otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile of full height at the next tier, whose top side then continues the floor to the right, so that the floor does extend; and a stale tier is never removed, so that the record could not be complete.
+  Suppose that the floor of $T_i$ extends, let $Q$ be its right end, and let $U$ be the tile of $cal(T)$ whose top left corner is $Q$.
+  If the tile placed at $T_i$ is narrower than the floor, the remainder of the floor is started, and it remains so until a tile $V$ is placed whose bottom side ends at $Q$; if it is as wide as the floor, it is itself such a tile $V$.
+  As long as the floor is started, $U$ cannot be placed, since it would lengthen the floor.
+  Hence $V$ is placed before $U$, and $Q$ is a crossing with $V$ to its upper left and $U$ to its lower right, against the hypothesis.
+  So the floor of $T_i$ does not extend, and $T_i$ is the first tier with that property.
+  The record is thus determined by $cal(T)$ and the orientations.
+]
+
+@prop:representative has not been formalised.
+It shows that, among tilings without crossings, the records correspond to the tilings with a choice of orientations, which explains the agreement of the number of placement sequences with the Baxter numbers observed in @sec:mosaic.
+For tilings with crossings the computation finds, for $n <= 12$, exactly $2^k$ records for each orientation vector of a tiling with $k$ crossings, one for each choice, at each crossing, of which of the two tiles is placed first; we have verified this count but not written out a proof.
+The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the sequence from the exact coordinates.
+
+The values of @tab:tbc were checked as follows.
+For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
+For $n <= 10$ they agree with a run in which every record is solved by the reference method and every comparison of coordinates is exact.
+For $n <= 12$ the number of classes obtained from canonical representatives agrees with the number given by Burnside's lemma from the tilings fixed by each symmetry, and the number of records agrees with the count $sum 2^k$ described above.
+The values of $t$ and $b$ for $n = 11$ and $n = 12$, and of $c$ for $n = 11$, rest on the search alone.
+
+Some features of the table can be proved.
+
+#proposition(name: [symmetric tilings])[
+  + The number $t(n)$ has the parity of the number of tilings of the unit square by $n$ squares.
+  + A similar tiling of the square that is fixed by the reflection in a diagonal consists of squares.
+  + A similar tiling of the square of proportion $x > 1$ that is fixed by a quarter turn has a crossing at the centre of the square, and its number of tiles is a multiple of four.
+] <prop:symmetric>
+
+#proof[
+  For the first statement, transposition is an involution on the similar tilings of proportion $x > 1$, and it has no fixed point among them, since it exchanges wide and tall tiles.
+  For the second, the reflection fixes two corners of the square, hence the tile that contains one of them, and a rectangle fixed by the reflection in a diagonal through one of its corners is a square.
+  For the third, the centre of the square cannot lie in the interior of a tile, since the tile would be mapped to itself by the quarter turn, which a rectangle of proportion $x > 1$ is not; nor can it lie in the interior of a side of a tile without being a corner of another, since the quarter turn would map that side to a perpendicular segment through the centre, which meets the interior of a tile and is not contained in the sides of the tiles.
+  So the centre is a corner of every tile that contains it; there are four such tiles, and the centre is a crossing.
+  No tile is then fixed by the half turn, so the quarter turn permutes the tiles in orbits of four.
+]
+
+Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$.
+Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388789$ tilings with twelve tiles, and $8 b(12) slash t(12) = 1.0003$.
+
+#proposition(name: [bags])[
+  For every $n >= 6$, $c(n) > a(n)$.
+] <prop:bags>
+
+#proof[
+  Let $cal(T)$ be a similar tiling of the square with $n - 3$ tiles in which two tiles have different short sides $s != s'$.
+  Cutting the first of these tiles into four, as in @prop:subdivision, gives a tiling with $n$ tiles whose bag is obtained from that of $cal(T)$ by replacing one copy of $s$ by four copies of $s slash 2$; cutting the second gives the bag in which one copy of $s'$ is replaced by four copies of $s' slash 2$.
+  The two bags have the same proportion, and they differ: the sums of the short sides differ by $s - s'$.
+  Tilings with tiles of two sizes exist for every number of tiles from three onwards: for $m >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles.
+]
+
+For $n <= 5$ every proportion has a single bag.
+For larger $n$ nearly every proportion still has a single bag: the quotient $c(n) slash a(n)$ rises only from $1.020$ for six tiles to $1.055$ for eleven.
+The proportion $2$ has the most bags, and the most classes, for every $n$ from $8$ to $11$.
+
+#conjecture[
+  The sequence $t(n + 1) slash t(n)$ is increasing for $n >= 5$, the quotient $8 b(n) slash t(n)$ tends to $1$, and $t(n)^(1 slash n)$ tends to $27 slash 2$.
+] <conj:growth>
+
+The first two statements hold for $n <= 12$.
+For the third, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
+
 
 #bibliography("refs.bib", style: "ieee")
 

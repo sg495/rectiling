@@ -1,0 +1,993 @@
+class 1: proportion 1.166666666667, root of 6*x - 7
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.285714, wide (tier 0, inside)
+  x = 0.000000, y = 0.285714, width = 0.333333, height = 0.285714, wide (tier 0, full width)
+  x = 0.333333, y = 0.000000, width = 0.666667, height = 0.571429, wide (tier 1, full)
+  x = 0.000000, y = 0.571429, width = 0.500000, height = 0.428571, wide (tier 0, full height)
+  x = 0.500000, y = 0.571429, width = 0.500000, height = 0.428571, wide (tier 0, full)
+class 2: proportion 1.200000000000, root of 5*x - 6
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.400000, height = 0.333333, wide (tier 0, inside)
+  x = 0.000000, y = 0.333333, width = 0.400000, height = 0.333333, wide (tier 0, full width)
+  x = 0.000000, y = 0.666667, width = 0.400000, height = 0.333333, wide (tier 0, full)
+  x = 0.400000, y = 0.000000, width = 0.600000, height = 0.500000, wide (tier 0, full width)
+  x = 0.400000, y = 0.500000, width = 0.600000, height = 0.500000, wide (tier 0, full)
+class 3: proportion 1.211659172377, root of 2*x^3 - 3*x^2 + 4*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.711659, height = 0.587343, wide (tier 0, inside)
+  x = 0.711659, y = 0.000000, width = 0.288341, height = 0.237972, wide (tier 1, full width)
+  x = 0.711659, y = 0.237972, width = 0.288341, height = 0.349371, tall (tier 1, full)
+  x = 0.000000, y = 0.587343, width = 0.500000, height = 0.412657, wide (tier 0, full height)
+  x = 0.500000, y = 0.587343, width = 0.500000, height = 0.412657, wide (tier 0, full)
+class 4: proportion 1.211659172377, root of 2*x^3 - 3*x^2 + 4*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.412657, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.412657, wide (tier 1, full)
+  x = 0.000000, y = 0.412657, width = 0.288341, height = 0.237972, wide (tier 0, inside)
+  x = 0.000000, y = 0.650629, width = 0.288341, height = 0.349371, tall (tier 0, full)
+  x = 0.288341, y = 0.412657, width = 0.711659, height = 0.587343, wide (tier 0, full)
+class 5: proportion 1.250000000000, root of 4*x - 5
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.250000, height = 0.200000, wide (tier 0, inside)
+  x = 0.250000, y = 0.000000, width = 0.250000, height = 0.200000, wide (tier 1, full height)
+  x = 0.500000, y = 0.000000, width = 0.250000, height = 0.200000, wide (tier 1, full height)
+  x = 0.750000, y = 0.000000, width = 0.250000, height = 0.200000, wide (tier 1, full)
+  x = 0.000000, y = 0.200000, width = 1.000000, height = 0.800000, wide (tier 0, full)
+class 6: proportion 1.260689853402, root of 4*x^3 - 6*x^2 + 2*x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.301696, height = 0.239310, wide (tier 0, inside)
+  x = 0.301696, y = 0.000000, width = 0.301696, height = 0.239310, wide (tier 1, full height)
+  x = 0.000000, y = 0.239310, width = 0.603392, height = 0.760690, tall (tier 0, full)
+  x = 0.603392, y = 0.000000, width = 0.396608, height = 0.500000, tall (tier 0, full width)
+  x = 0.603392, y = 0.500000, width = 0.396608, height = 0.500000, tall (tier 0, full)
+class 7: proportion 1.276742279844, root of 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 0, inside)
+  x = 0.276742, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 1, full height)
+  x = 0.553485, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 1, full height)
+  x = 0.830227, y = 0.000000, width = 0.169773, height = 0.216757, tall (tier 1, full)
+  x = 0.000000, y = 0.216757, width = 1.000000, height = 0.783243, wide (tier 0, full)
+class 8: proportion 1.276742279844, root of 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 0, inside)
+  x = 0.276742, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 1, full height)
+  x = 0.553485, y = 0.000000, width = 0.169773, height = 0.216757, tall (tier 1, full height)
+  x = 0.723258, y = 0.000000, width = 0.276742, height = 0.216757, wide (tier 1, full)
+  x = 0.000000, y = 0.216757, width = 1.000000, height = 0.783243, wide (tier 0, full)
+class 9: proportion 1.292049520111, root of 3*x^3 - 5*x^2 + 3*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.257988, wide (tier 0, inside)
+  x = 0.000000, y = 0.257988, width = 0.333333, height = 0.257988, wide (tier 0, full width)
+  x = 0.333333, y = 0.000000, width = 0.666667, height = 0.515976, wide (tier 1, full)
+  x = 0.000000, y = 0.515976, width = 0.625383, height = 0.484024, wide (tier 0, full height)
+  x = 0.625383, y = 0.515976, width = 0.374617, height = 0.484024, tall (tier 0, full)
+class 10: proportion 1.292049520111, root of 3*x^3 - 5*x^2 + 3*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.257988, wide (tier 0, inside)
+  x = 0.000000, y = 0.257988, width = 0.333333, height = 0.257988, wide (tier 0, full width)
+  x = 0.333333, y = 0.000000, width = 0.666667, height = 0.515976, wide (tier 1, full)
+  x = 0.000000, y = 0.515976, width = 0.374617, height = 0.484024, tall (tier 0, full height)
+  x = 0.374617, y = 0.515976, width = 0.625383, height = 0.484024, wide (tier 0, full)
+class 11: proportion 1.295597742522, root of x^3 - 2*x^2 + 4*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.352201, height = 0.271845, wide (tier 0, inside)
+  x = 0.000000, y = 0.271845, width = 0.352201, height = 0.271845, wide (tier 0, full width)
+  x = 0.000000, y = 0.543689, width = 0.352201, height = 0.456311, tall (tier 0, full)
+  x = 0.352201, y = 0.000000, width = 0.647799, height = 0.500000, wide (tier 0, full width)
+  x = 0.352201, y = 0.500000, width = 0.647799, height = 0.500000, wide (tier 0, full)
+class 12: proportion 1.295597742522, root of x^3 - 2*x^2 + 4*x - 4
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.647799, height = 0.500000, wide (tier 0, inside)
+  x = 0.000000, y = 0.500000, width = 0.647799, height = 0.500000, wide (tier 0, full)
+  x = 0.647799, y = 0.000000, width = 0.352201, height = 0.271845, wide (tier 0, full width)
+  x = 0.647799, y = 0.271845, width = 0.352201, height = 0.456311, tall (tier 0, full width)
+  x = 0.647799, y = 0.728155, width = 0.352201, height = 0.271845, wide (tier 0, full)
+class 13: proportion 1.317182646507, root of 2*x^3 - 3*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 0, inside)
+  x = 0.317183, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 1, full height)
+  x = 0.634365, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full height)
+  x = 0.817183, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full)
+  x = 0.000000, y = 0.240804, width = 1.000000, height = 0.759196, wide (tier 0, full)
+class 14: proportion 1.317182646507, root of 2*x^3 - 3*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 0, inside)
+  x = 0.317183, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full height)
+  x = 0.500000, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 1, full height)
+  x = 0.817183, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full)
+  x = 0.000000, y = 0.240804, width = 1.000000, height = 0.759196, wide (tier 0, full)
+class 15: proportion 1.317182646507, root of 2*x^3 - 3*x^2 + 2*x - 2
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 0, inside)
+  x = 0.317183, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full height)
+  x = 0.500000, y = 0.000000, width = 0.182817, height = 0.240804, tall (tier 1, full height)
+  x = 0.682817, y = 0.000000, width = 0.317183, height = 0.240804, wide (tier 1, full)
+  x = 0.000000, y = 0.240804, width = 1.000000, height = 0.759196, wide (tier 0, full)
+class 16: proportion 1.317182646507, root of 2*x^3 - 3*x^2 + 2*x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.240804, height = 0.182817, wide (tier 0, inside)
+  x = 0.000000, y = 0.182817, width = 0.240804, height = 0.317183, tall (tier 0, full width)
+  x = 0.000000, y = 0.500000, width = 0.240804, height = 0.317183, tall (tier 0, full width)
+  x = 0.000000, y = 0.817183, width = 0.240804, height = 0.182817, wide (tier 0, full)
+  x = 0.240804, y = 0.000000, width = 0.759196, height = 1.000000, tall (tier 0, full)
+class 17: proportion 1.392646781703, root of x^3 - 2*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.281943, height = 0.202451, wide (tier 0, inside)
+  x = 0.000000, y = 0.202451, width = 0.281943, height = 0.202451, wide (tier 0, full width)
+  x = 0.000000, y = 0.404902, width = 0.281943, height = 0.202451, wide (tier 0, full width)
+  x = 0.000000, y = 0.607353, width = 0.281943, height = 0.392647, tall (tier 0, full)
+  x = 0.281943, y = 0.000000, width = 0.718057, height = 1.000000, tall (tier 0, full)
+class 18: proportion 1.392646781703, root of x^3 - 2*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.281943, height = 0.202451, wide (tier 0, inside)
+  x = 0.000000, y = 0.202451, width = 0.281943, height = 0.202451, wide (tier 0, full width)
+  x = 0.000000, y = 0.404902, width = 0.281943, height = 0.392647, tall (tier 0, full width)
+  x = 0.000000, y = 0.797549, width = 0.281943, height = 0.202451, wide (tier 0, full)
+  x = 0.281943, y = 0.000000, width = 0.718057, height = 1.000000, tall (tier 0, full)
+class 19: proportion 1.400000000000, root of 5*x - 7
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.400000, height = 0.285714, wide (tier 0, inside)
+  x = 0.400000, y = 0.000000, width = 0.200000, height = 0.142857, wide (tier 1, inside)
+  x = 0.400000, y = 0.142857, width = 0.200000, height = 0.142857, wide (tier 1, full)
+  x = 0.600000, y = 0.000000, width = 0.400000, height = 0.285714, wide (tier 1, full)
+  x = 0.000000, y = 0.285714, width = 1.000000, height = 0.714286, wide (tier 0, full)
+class 20: proportion 1.400000000000, root of 5*x - 7
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.400000, height = 0.285714, wide (tier 0, inside)
+  x = 0.400000, y = 0.000000, width = 0.400000, height = 0.285714, wide (tier 1, full height)
+  x = 0.800000, y = 0.000000, width = 0.200000, height = 0.142857, wide (tier 1, full width)
+  x = 0.800000, y = 0.142857, width = 0.200000, height = 0.142857, wide (tier 1, full)
+  x = 0.000000, y = 0.285714, width = 1.000000, height = 0.714286, wide (tier 0, full)
+class 21: proportion 1.419022222087, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + 2*x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.750849, height = 0.529131, wide (tier 0, inside)
+  x = 0.750849, y = 0.000000, width = 0.249151, height = 0.175580, wide (tier 1, full width)
+  x = 0.750849, y = 0.175580, width = 0.249151, height = 0.353551, tall (tier 1, full)
+  x = 0.000000, y = 0.529131, width = 0.668174, height = 0.470869, wide (tier 0, full height)
+  x = 0.668174, y = 0.529131, width = 0.331826, height = 0.470869, tall (tier 0, full)
+class 22: proportion 1.419022222087, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + 2*x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.750849, height = 0.529131, wide (tier 0, inside)
+  x = 0.750849, y = 0.000000, width = 0.249151, height = 0.175580, wide (tier 1, full width)
+  x = 0.750849, y = 0.175580, width = 0.249151, height = 0.353551, tall (tier 1, full)
+  x = 0.000000, y = 0.529131, width = 0.331826, height = 0.470869, tall (tier 0, full height)
+  x = 0.331826, y = 0.529131, width = 0.668174, height = 0.470869, wide (tier 0, full)
+class 23: proportion 1.419022222087, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + 2*x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.353551, height = 0.249151, wide (tier 0, inside)
+  x = 0.353551, y = 0.000000, width = 0.175580, height = 0.249151, tall (tier 1, full height)
+  x = 0.000000, y = 0.249151, width = 0.529131, height = 0.750849, tall (tier 0, full)
+  x = 0.529131, y = 0.000000, width = 0.470869, height = 0.331826, wide (tier 0, full width)
+  x = 0.529131, y = 0.331826, width = 0.470869, height = 0.668174, tall (tier 0, full)
+class 24: proportion 1.419022222087, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + 2*x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.353551, height = 0.249151, wide (tier 0, inside)
+  x = 0.353551, y = 0.000000, width = 0.175580, height = 0.249151, tall (tier 1, full height)
+  x = 0.000000, y = 0.249151, width = 0.529131, height = 0.750849, tall (tier 0, full)
+  x = 0.529131, y = 0.000000, width = 0.470869, height = 0.668174, tall (tier 0, full width)
+  x = 0.529131, y = 0.668174, width = 0.470869, height = 0.331826, wide (tier 0, full)
+class 25: proportion 1.429444535936, root of 2*x^3 - 3*x^2 + 3*x - 4
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 0, inside)
+  x = 0.429445, y = 0.000000, width = 0.141111, height = 0.098717, wide (tier 1, inside)
+  x = 0.429445, y = 0.098717, width = 0.141111, height = 0.201710, tall (tier 1, full)
+  x = 0.570555, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 1, full)
+  x = 0.000000, y = 0.300428, width = 1.000000, height = 0.699572, wide (tier 0, full)
+class 26: proportion 1.429444535936, root of 2*x^3 - 3*x^2 + 3*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 0, inside)
+  x = 0.429445, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 1, full height)
+  x = 0.858889, y = 0.000000, width = 0.141111, height = 0.098717, wide (tier 1, full width)
+  x = 0.858889, y = 0.098717, width = 0.141111, height = 0.201710, tall (tier 1, full)
+  x = 0.000000, y = 0.300428, width = 1.000000, height = 0.699572, wide (tier 0, full)
+class 27: proportion 1.429444535936, root of 2*x^3 - 3*x^2 + 3*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 0, inside)
+  x = 0.429445, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 1, full height)
+  x = 0.858889, y = 0.000000, width = 0.141111, height = 0.201710, tall (tier 1, full width)
+  x = 0.858889, y = 0.201710, width = 0.141111, height = 0.098717, wide (tier 1, full)
+  x = 0.000000, y = 0.300428, width = 1.000000, height = 0.699572, wide (tier 0, full)
+class 28: proportion 1.429444535936, root of 2*x^3 - 3*x^2 + 3*x - 4
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 0, inside)
+  x = 0.429445, y = 0.000000, width = 0.141111, height = 0.201710, tall (tier 1, inside)
+  x = 0.429445, y = 0.201710, width = 0.141111, height = 0.098717, wide (tier 1, full)
+  x = 0.570555, y = 0.000000, width = 0.429445, height = 0.300428, wide (tier 1, full)
+  x = 0.000000, y = 0.300428, width = 1.000000, height = 0.699572, wide (tier 0, full)
+class 29: proportion 1.440619700538, root of 2*x^3 - 4*x^2 + 3*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.402927, height = 0.279690, wide (tier 0, inside)
+  x = 0.402927, y = 0.000000, width = 0.402927, height = 0.279690, wide (tier 1, full height)
+  x = 0.805854, y = 0.000000, width = 0.194146, height = 0.279690, tall (tier 1, full)
+  x = 0.000000, y = 0.279690, width = 0.500000, height = 0.720310, tall (tier 0, full height)
+  x = 0.500000, y = 0.279690, width = 0.500000, height = 0.720310, tall (tier 0, full)
+class 30: proportion 1.440619700538, root of 2*x^3 - 4*x^2 + 3*x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.720310, height = 0.500000, wide (tier 0, inside)
+  x = 0.000000, y = 0.500000, width = 0.720310, height = 0.500000, wide (tier 0, full)
+  x = 0.720310, y = 0.000000, width = 0.279690, height = 0.402927, tall (tier 0, full width)
+  x = 0.720310, y = 0.402927, width = 0.279690, height = 0.194146, wide (tier 0, full width)
+  x = 0.720310, y = 0.597073, width = 0.279690, height = 0.402927, tall (tier 0, full)
+class 31: proportion 1.446644598152, root of 4*x^3 - 6*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.154373, height = 0.106711, wide (tier 0, inside)
+  x = 0.154373, y = 0.000000, width = 0.154373, height = 0.106711, wide (tier 1, full height)
+  x = 0.000000, y = 0.106711, width = 0.308745, height = 0.446645, tall (tier 0, full width)
+  x = 0.000000, y = 0.553355, width = 0.308745, height = 0.446645, tall (tier 0, full)
+  x = 0.308745, y = 0.000000, width = 0.691255, height = 1.000000, tall (tier 0, full)
+class 32: proportion 1.446644598152, root of 4*x^3 - 6*x^2 + x - 1
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.446645, height = 0.308745, wide (tier 0, inside)
+  x = 0.446645, y = 0.000000, width = 0.106711, height = 0.154373, tall (tier 1, inside)
+  x = 0.446645, y = 0.154373, width = 0.106711, height = 0.154373, tall (tier 1, full)
+  x = 0.553355, y = 0.000000, width = 0.446645, height = 0.308745, wide (tier 1, full)
+  x = 0.000000, y = 0.308745, width = 1.000000, height = 0.691255, wide (tier 0, full)
+class 33: proportion 1.516904354771, root of 3*x^3 - 5*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.516904, height = 0.340763, wide (tier 0, inside)
+  x = 0.516904, y = 0.000000, width = 0.258452, height = 0.170381, wide (tier 1, inside)
+  x = 0.516904, y = 0.170381, width = 0.258452, height = 0.170381, wide (tier 1, full)
+  x = 0.775357, y = 0.000000, width = 0.224643, height = 0.340763, tall (tier 1, full)
+  x = 0.000000, y = 0.340763, width = 1.000000, height = 0.659237, wide (tier 0, full)
+class 34: proportion 1.516904354771, root of 3*x^3 - 5*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.258452, height = 0.170381, wide (tier 0, inside)
+  x = 0.000000, y = 0.170381, width = 0.258452, height = 0.170381, wide (tier 0, full width)
+  x = 0.258452, y = 0.000000, width = 0.516904, height = 0.340763, wide (tier 1, full height)
+  x = 0.775357, y = 0.000000, width = 0.224643, height = 0.340763, tall (tier 1, full)
+  x = 0.000000, y = 0.340763, width = 1.000000, height = 0.659237, wide (tier 0, full)
+class 35: proportion 1.516904354771, root of 3*x^3 - 5*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.258452, height = 0.170381, wide (tier 0, inside)
+  x = 0.000000, y = 0.170381, width = 0.258452, height = 0.170381, wide (tier 0, full width)
+  x = 0.258452, y = 0.000000, width = 0.224643, height = 0.340763, tall (tier 1, full height)
+  x = 0.483096, y = 0.000000, width = 0.516904, height = 0.340763, wide (tier 1, full)
+  x = 0.000000, y = 0.340763, width = 1.000000, height = 0.659237, wide (tier 0, full)
+class 36: proportion 1.520020906251, root of 2*x^4 - 4*x^3 + 3*x^2 - 3*x + 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.270422, height = 0.177907, wide (tier 0, inside)
+  x = 0.270422, y = 0.000000, width = 0.270422, height = 0.177907, wide (tier 1, full height)
+  x = 0.000000, y = 0.177907, width = 0.540843, height = 0.822093, tall (tier 0, full)
+  x = 0.540843, y = 0.000000, width = 0.459157, height = 0.302072, wide (tier 0, full width)
+  x = 0.540843, y = 0.302072, width = 0.459157, height = 0.697928, tall (tier 0, full)
+class 37: proportion 1.520020906251, root of 2*x^4 - 4*x^3 + 3*x^2 - 3*x + 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.270422, height = 0.177907, wide (tier 0, inside)
+  x = 0.270422, y = 0.000000, width = 0.270422, height = 0.177907, wide (tier 1, full height)
+  x = 0.000000, y = 0.177907, width = 0.540843, height = 0.822093, tall (tier 0, full)
+  x = 0.540843, y = 0.000000, width = 0.459157, height = 0.697928, tall (tier 0, full width)
+  x = 0.540843, y = 0.697928, width = 0.459157, height = 0.302072, wide (tier 0, full)
+class 38: proportion 1.577350269190, root of 3*x^2 - 6*x + 2
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.211325, wide (tier 0, inside)
+  x = 0.333333, y = 0.000000, width = 0.333333, height = 0.211325, wide (tier 1, full height)
+  x = 0.666667, y = 0.000000, width = 0.333333, height = 0.211325, wide (tier 1, full)
+  x = 0.000000, y = 0.211325, width = 0.500000, height = 0.788675, tall (tier 0, full height)
+  x = 0.500000, y = 0.211325, width = 0.500000, height = 0.788675, tall (tier 0, full)
+class 39: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.374072, height = 0.234142, wide (tier 0, inside)
+  x = 0.000000, y = 0.234142, width = 0.268771, height = 0.168231, wide (tier 0, inside)
+  x = 0.268771, y = 0.234142, width = 0.105301, height = 0.168231, tall (tier 1, full)
+  x = 0.000000, y = 0.402373, width = 0.374072, height = 0.597627, tall (tier 0, full)
+  x = 0.374072, y = 0.000000, width = 0.625928, height = 1.000000, tall (tier 0, full)
+class 40: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.597627, height = 0.374072, wide (tier 0, inside)
+  x = 0.597627, y = 0.000000, width = 0.168231, height = 0.105301, wide (tier 1, inside)
+  x = 0.597627, y = 0.105301, width = 0.168231, height = 0.268771, tall (tier 1, full)
+  x = 0.765858, y = 0.000000, width = 0.234142, height = 0.374072, tall (tier 1, full)
+  x = 0.000000, y = 0.374072, width = 1.000000, height = 0.625928, wide (tier 0, full)
+class 41: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.268771, height = 0.168231, wide (tier 0, inside)
+  x = 0.268771, y = 0.000000, width = 0.105301, height = 0.168231, tall (tier 1, full height)
+  x = 0.000000, y = 0.168231, width = 0.374072, height = 0.234142, wide (tier 0, full width)
+  x = 0.000000, y = 0.402373, width = 0.374072, height = 0.597627, tall (tier 0, full)
+  x = 0.374072, y = 0.000000, width = 0.625928, height = 1.000000, tall (tier 0, full)
+class 42: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.597627, height = 0.374072, wide (tier 0, inside)
+  x = 0.597627, y = 0.000000, width = 0.234142, height = 0.374072, tall (tier 1, full height)
+  x = 0.831769, y = 0.000000, width = 0.168231, height = 0.105301, wide (tier 1, full width)
+  x = 0.831769, y = 0.105301, width = 0.168231, height = 0.268771, tall (tier 1, full)
+  x = 0.000000, y = 0.374072, width = 1.000000, height = 0.625928, wide (tier 0, full)
+class 43: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.268771, height = 0.168231, wide (tier 0, inside)
+  x = 0.268771, y = 0.000000, width = 0.105301, height = 0.168231, tall (tier 1, full height)
+  x = 0.000000, y = 0.168231, width = 0.374072, height = 0.597627, tall (tier 0, full width)
+  x = 0.000000, y = 0.765858, width = 0.374072, height = 0.234142, wide (tier 0, full)
+  x = 0.374072, y = 0.000000, width = 0.625928, height = 1.000000, tall (tier 0, full)
+class 44: proportion 1.597626686280, root of x^5 - 2*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.168231, height = 0.105301, wide (tier 0, inside)
+  x = 0.000000, y = 0.105301, width = 0.168231, height = 0.268771, tall (tier 0, full width)
+  x = 0.168231, y = 0.000000, width = 0.597627, height = 0.374072, wide (tier 1, full height)
+  x = 0.765858, y = 0.000000, width = 0.234142, height = 0.374072, tall (tier 1, full)
+  x = 0.000000, y = 0.374072, width = 1.000000, height = 0.625928, wide (tier 0, full)
+class 45: proportion 1.600000000000, root of 5*x - 8
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.400000, height = 0.250000, wide (tier 0, inside)
+  x = 0.000000, y = 0.250000, width = 0.200000, height = 0.125000, wide (tier 0, inside)
+  x = 0.200000, y = 0.250000, width = 0.200000, height = 0.125000, wide (tier 1, full)
+  x = 0.400000, y = 0.000000, width = 0.600000, height = 0.375000, wide (tier 1, full)
+  x = 0.000000, y = 0.375000, width = 1.000000, height = 0.625000, wide (tier 0, full)
+class 46: proportion 1.600000000000, root of 5*x - 8
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.600000, height = 0.375000, wide (tier 0, inside)
+  x = 0.600000, y = 0.000000, width = 0.200000, height = 0.125000, wide (tier 1, inside)
+  x = 0.800000, y = 0.000000, width = 0.200000, height = 0.125000, wide (tier 2, full)
+  x = 0.600000, y = 0.125000, width = 0.400000, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.375000, width = 1.000000, height = 0.625000, wide (tier 0, full)
+class 47: proportion 1.633344815576, root of 3*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.366655, height = 0.224481, wide (tier 0, inside)
+  x = 0.000000, y = 0.224481, width = 0.266690, height = 0.163278, wide (tier 0, inside)
+  x = 0.266690, y = 0.224481, width = 0.099966, height = 0.163278, tall (tier 1, full)
+  x = 0.366655, y = 0.000000, width = 0.633345, height = 0.387759, wide (tier 1, full)
+  x = 0.000000, y = 0.387759, width = 1.000000, height = 0.612241, wide (tier 0, full)
+class 48: proportion 1.633344815576, root of 3*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.633345, height = 0.387759, wide (tier 0, inside)
+  x = 0.633345, y = 0.000000, width = 0.266690, height = 0.163278, wide (tier 1, inside)
+  x = 0.900034, y = 0.000000, width = 0.099966, height = 0.163278, tall (tier 2, full)
+  x = 0.633345, y = 0.163278, width = 0.366655, height = 0.224481, wide (tier 1, full)
+  x = 0.000000, y = 0.387759, width = 1.000000, height = 0.612241, wide (tier 0, full)
+class 49: proportion 1.633344815576, root of 3*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.633345, height = 0.387759, wide (tier 0, inside)
+  x = 0.633345, y = 0.000000, width = 0.366655, height = 0.224481, wide (tier 1, full width)
+  x = 0.633345, y = 0.224481, width = 0.266690, height = 0.163278, wide (tier 1, full height)
+  x = 0.900034, y = 0.224481, width = 0.099966, height = 0.163278, tall (tier 1, full)
+  x = 0.000000, y = 0.387759, width = 1.000000, height = 0.612241, wide (tier 0, full)
+class 50: proportion 1.633344815576, root of 3*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.633345, height = 0.387759, wide (tier 0, inside)
+  x = 0.633345, y = 0.000000, width = 0.099966, height = 0.163278, tall (tier 1, inside)
+  x = 0.733310, y = 0.000000, width = 0.266690, height = 0.163278, wide (tier 2, full)
+  x = 0.633345, y = 0.163278, width = 0.366655, height = 0.224481, wide (tier 1, full)
+  x = 0.000000, y = 0.387759, width = 1.000000, height = 0.612241, wide (tier 0, full)
+class 51: proportion 1.642736675908, root of 2*x^3 - 4*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.391260, height = 0.238176, wide (tier 0, inside)
+  x = 0.000000, y = 0.238176, width = 0.195630, height = 0.119088, wide (tier 0, inside)
+  x = 0.195630, y = 0.238176, width = 0.195630, height = 0.119088, wide (tier 1, full)
+  x = 0.000000, y = 0.357263, width = 0.391260, height = 0.642737, tall (tier 0, full)
+  x = 0.391260, y = 0.000000, width = 0.608740, height = 1.000000, tall (tier 0, full)
+class 52: proportion 1.642736675908, root of 2*x^3 - 4*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.195630, height = 0.119088, wide (tier 0, inside)
+  x = 0.195630, y = 0.000000, width = 0.195630, height = 0.119088, wide (tier 1, full height)
+  x = 0.000000, y = 0.119088, width = 0.391260, height = 0.238176, wide (tier 0, full width)
+  x = 0.000000, y = 0.357263, width = 0.391260, height = 0.642737, tall (tier 0, full)
+  x = 0.391260, y = 0.000000, width = 0.608740, height = 1.000000, tall (tier 0, full)
+class 53: proportion 1.642736675908, root of 2*x^3 - 4*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.195630, height = 0.119088, wide (tier 0, inside)
+  x = 0.195630, y = 0.000000, width = 0.195630, height = 0.119088, wide (tier 1, full height)
+  x = 0.000000, y = 0.119088, width = 0.391260, height = 0.642737, tall (tier 0, full width)
+  x = 0.000000, y = 0.761824, width = 0.391260, height = 0.238176, wide (tier 0, full)
+  x = 0.391260, y = 0.000000, width = 0.608740, height = 1.000000, tall (tier 0, full)
+class 54: proportion 1.657298106138, root of 2*x^3 - 5*x^2 + 4*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.578649, height = 0.349152, wide (tier 0, inside)
+  x = 0.000000, y = 0.349152, width = 0.578649, height = 0.349152, wide (tier 0, full width)
+  x = 0.578649, y = 0.000000, width = 0.421351, height = 0.698304, tall (tier 1, full)
+  x = 0.000000, y = 0.698304, width = 0.500000, height = 0.301696, wide (tier 0, full height)
+  x = 0.500000, y = 0.698304, width = 0.500000, height = 0.301696, wide (tier 0, full)
+class 55: proportion 1.682327803828, root of x^3 - 3*x^2 + 4*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.560776, height = 0.333333, wide (tier 0, inside)
+  x = 0.000000, y = 0.333333, width = 0.560776, height = 0.333333, wide (tier 0, full width)
+  x = 0.000000, y = 0.666667, width = 0.560776, height = 0.333333, wide (tier 0, full)
+  x = 0.560776, y = 0.000000, width = 0.439224, height = 0.261081, wide (tier 0, full width)
+  x = 0.560776, y = 0.261081, width = 0.439224, height = 0.738919, tall (tier 0, full)
+class 56: proportion 1.711345739273, root of x^3 - 2*x^2 + 4*x - 6
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.246994, height = 0.144327, wide (tier 0, inside)
+  x = 0.000000, y = 0.144327, width = 0.246994, height = 0.144327, wide (tier 0, full width)
+  x = 0.246994, y = 0.000000, width = 0.168671, height = 0.288654, tall (tier 1, full height)
+  x = 0.000000, y = 0.288654, width = 0.415665, height = 0.711346, tall (tier 0, full)
+  x = 0.415665, y = 0.000000, width = 0.584335, height = 1.000000, tall (tier 0, full)
+class 57: proportion 1.711345739273, root of x^3 - 2*x^2 + 4*x - 6
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.711346, height = 0.415665, wide (tier 0, inside)
+  x = 0.711346, y = 0.000000, width = 0.288654, height = 0.168671, wide (tier 1, full width)
+  x = 0.711346, y = 0.168671, width = 0.144327, height = 0.246994, tall (tier 1, full height)
+  x = 0.855673, y = 0.168671, width = 0.144327, height = 0.246994, tall (tier 1, full)
+  x = 0.000000, y = 0.415665, width = 1.000000, height = 0.584335, wide (tier 0, full)
+class 58: proportion 1.750000000000, root of 4*x - 7
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.250000, height = 0.142857, wide (tier 0, inside)
+  x = 0.000000, y = 0.142857, width = 0.250000, height = 0.142857, wide (tier 0, full width)
+  x = 0.000000, y = 0.285714, width = 0.250000, height = 0.142857, wide (tier 0, full width)
+  x = 0.250000, y = 0.000000, width = 0.750000, height = 0.428571, wide (tier 1, full)
+  x = 0.000000, y = 0.428571, width = 1.000000, height = 0.571429, wide (tier 0, full)
+class 59: proportion 1.786920545342, root of 2*x^3 - 4*x^2 + 3*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.786921, height = 0.440378, wide (tier 0, inside)
+  x = 0.786921, y = 0.000000, width = 0.106540, height = 0.059622, wide (tier 1, inside)
+  x = 0.893460, y = 0.000000, width = 0.106540, height = 0.059622, wide (tier 2, full)
+  x = 0.786921, y = 0.059622, width = 0.213079, height = 0.380756, tall (tier 1, full)
+  x = 0.000000, y = 0.440378, width = 1.000000, height = 0.559622, wide (tier 0, full)
+class 60: proportion 1.786920545342, root of 2*x^3 - 4*x^2 + 3*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.380756, height = 0.213079, wide (tier 0, inside)
+  x = 0.380756, y = 0.000000, width = 0.059622, height = 0.106540, tall (tier 1, inside)
+  x = 0.380756, y = 0.106540, width = 0.059622, height = 0.106540, tall (tier 1, full)
+  x = 0.000000, y = 0.213079, width = 0.440378, height = 0.786921, tall (tier 0, full)
+  x = 0.440378, y = 0.000000, width = 0.559622, height = 1.000000, tall (tier 0, full)
+class 61: proportion 1.800195577359, root of x^5 - 2*x^4 + 3*x^3 - 5*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.359687, height = 0.199804, wide (tier 0, inside)
+  x = 0.359687, y = 0.000000, width = 0.084818, height = 0.047116, wide (tier 1, inside)
+  x = 0.359687, y = 0.047116, width = 0.084818, height = 0.152689, tall (tier 1, full)
+  x = 0.000000, y = 0.199804, width = 0.444505, height = 0.800196, tall (tier 0, full)
+  x = 0.444505, y = 0.000000, width = 0.555495, height = 1.000000, tall (tier 0, full)
+class 62: proportion 1.800195577359, root of x^5 - 2*x^4 + 3*x^3 - 5*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.800196, height = 0.444505, wide (tier 0, inside)
+  x = 0.800196, y = 0.000000, width = 0.152689, height = 0.084818, wide (tier 1, inside)
+  x = 0.952884, y = 0.000000, width = 0.047116, height = 0.084818, tall (tier 2, full)
+  x = 0.800196, y = 0.084818, width = 0.199804, height = 0.359687, tall (tier 1, full)
+  x = 0.000000, y = 0.444505, width = 1.000000, height = 0.555495, wide (tier 0, full)
+class 63: proportion 1.800195577359, root of x^5 - 2*x^4 + 3*x^3 - 5*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.359687, height = 0.199804, wide (tier 0, inside)
+  x = 0.359687, y = 0.000000, width = 0.084818, height = 0.152689, tall (tier 1, inside)
+  x = 0.359687, y = 0.152689, width = 0.084818, height = 0.047116, wide (tier 1, full)
+  x = 0.000000, y = 0.199804, width = 0.444505, height = 0.800196, tall (tier 0, full)
+  x = 0.444505, y = 0.000000, width = 0.555495, height = 1.000000, tall (tier 0, full)
+class 64: proportion 1.800195577359, root of x^5 - 2*x^4 + 3*x^3 - 5*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.800196, height = 0.444505, wide (tier 0, inside)
+  x = 0.800196, y = 0.000000, width = 0.047116, height = 0.084818, tall (tier 1, inside)
+  x = 0.847311, y = 0.000000, width = 0.152689, height = 0.084818, wide (tier 2, full)
+  x = 0.800196, y = 0.084818, width = 0.199804, height = 0.359687, tall (tier 1, full)
+  x = 0.000000, y = 0.444505, width = 1.000000, height = 0.555495, wide (tier 0, full)
+class 65: proportion 1.834686470520, root of 3*x^3 - 6*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.303298, height = 0.165314, wide (tier 0, inside)
+  x = 0.303298, y = 0.000000, width = 0.151649, height = 0.082657, wide (tier 1, inside)
+  x = 0.303298, y = 0.082657, width = 0.151649, height = 0.082657, wide (tier 1, full)
+  x = 0.000000, y = 0.165314, width = 0.454948, height = 0.834686, tall (tier 0, full)
+  x = 0.454948, y = 0.000000, width = 0.545052, height = 1.000000, tall (tier 0, full)
+class 66: proportion 1.834686470520, root of 3*x^3 - 6*x^2 + 2*x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.151649, height = 0.082657, wide (tier 0, inside)
+  x = 0.000000, y = 0.082657, width = 0.151649, height = 0.082657, wide (tier 0, full width)
+  x = 0.151649, y = 0.000000, width = 0.303298, height = 0.165314, wide (tier 1, full height)
+  x = 0.000000, y = 0.165314, width = 0.454948, height = 0.834686, tall (tier 0, full)
+  x = 0.454948, y = 0.000000, width = 0.545052, height = 1.000000, tall (tier 0, full)
+class 67: proportion 1.843734277898, root of x^3 - 2*x^2 + 3*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.156266, height = 0.084755, wide (tier 0, inside)
+  x = 0.000000, y = 0.084755, width = 0.156266, height = 0.084755, wide (tier 0, full width)
+  x = 0.000000, y = 0.169510, width = 0.156266, height = 0.288112, tall (tier 0, full width)
+  x = 0.156266, y = 0.000000, width = 0.843734, height = 0.457622, wide (tier 1, full)
+  x = 0.000000, y = 0.457622, width = 1.000000, height = 0.542378, wide (tier 0, full)
+class 68: proportion 1.843734277898, root of x^3 - 2*x^2 + 3*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.843734, height = 0.457622, wide (tier 0, inside)
+  x = 0.843734, y = 0.000000, width = 0.156266, height = 0.084755, wide (tier 1, full width)
+  x = 0.843734, y = 0.084755, width = 0.156266, height = 0.288112, tall (tier 1, full width)
+  x = 0.843734, y = 0.372867, width = 0.156266, height = 0.084755, wide (tier 1, full)
+  x = 0.000000, y = 0.457622, width = 1.000000, height = 0.542378, wide (tier 0, full)
+class 69: proportion 1.843734277898, root of x^3 - 2*x^2 + 3*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.288112, height = 0.156266, wide (tier 0, inside)
+  x = 0.288112, y = 0.000000, width = 0.084755, height = 0.156266, tall (tier 1, full height)
+  x = 0.372867, y = 0.000000, width = 0.084755, height = 0.156266, tall (tier 1, full height)
+  x = 0.000000, y = 0.156266, width = 0.457622, height = 0.843734, tall (tier 0, full)
+  x = 0.457622, y = 0.000000, width = 0.542378, height = 1.000000, tall (tier 0, full)
+class 70: proportion 1.890704755872, root of 2*x^3 - 4*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.206645, height = 0.109295, wide (tier 0, inside)
+  x = 0.206645, y = 0.000000, width = 0.206645, height = 0.109295, wide (tier 1, full height)
+  x = 0.413290, y = 0.000000, width = 0.057807, height = 0.109295, tall (tier 1, full height)
+  x = 0.000000, y = 0.109295, width = 0.471097, height = 0.890705, tall (tier 0, full)
+  x = 0.471097, y = 0.000000, width = 0.528903, height = 1.000000, tall (tier 0, full)
+class 71: proportion 1.890704755872, root of 2*x^3 - 4*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.890705, height = 0.471097, wide (tier 0, inside)
+  x = 0.890705, y = 0.000000, width = 0.109295, height = 0.057807, wide (tier 1, full width)
+  x = 0.890705, y = 0.057807, width = 0.109295, height = 0.206645, tall (tier 1, full width)
+  x = 0.890705, y = 0.264452, width = 0.109295, height = 0.206645, tall (tier 1, full)
+  x = 0.000000, y = 0.471097, width = 1.000000, height = 0.528903, wide (tier 0, full)
+class 72: proportion 1.890704755872, root of 2*x^3 - 4*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.206645, height = 0.109295, wide (tier 0, inside)
+  x = 0.206645, y = 0.000000, width = 0.057807, height = 0.109295, tall (tier 1, full height)
+  x = 0.264452, y = 0.000000, width = 0.206645, height = 0.109295, wide (tier 1, full height)
+  x = 0.000000, y = 0.109295, width = 0.471097, height = 0.890705, tall (tier 0, full)
+  x = 0.471097, y = 0.000000, width = 0.528903, height = 1.000000, tall (tier 0, full)
+class 73: proportion 1.916823578225, root of 3*x^3 - 6*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.159435, height = 0.083176, wide (tier 0, inside)
+  x = 0.159435, y = 0.000000, width = 0.159435, height = 0.083176, wide (tier 1, full height)
+  x = 0.318869, y = 0.000000, width = 0.159435, height = 0.083176, wide (tier 1, full height)
+  x = 0.000000, y = 0.083176, width = 0.478304, height = 0.916824, tall (tier 0, full)
+  x = 0.478304, y = 0.000000, width = 0.521696, height = 1.000000, tall (tier 0, full)
+class 74: proportion 2.000000000000, root of x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.000000, y = 0.250000, width = 0.500000, height = 0.250000, wide (tier 0, full width)
+  x = 0.000000, y = 0.500000, width = 0.500000, height = 0.250000, wide (tier 0, full width)
+  x = 0.000000, y = 0.750000, width = 0.500000, height = 0.250000, wide (tier 0, full)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 1.000000, tall (tier 0, full)
+class 75: proportion 2.000000000000, root of x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.000000, y = 0.250000, width = 0.500000, height = 0.250000, wide (tier 0, full width)
+  x = 0.000000, y = 0.500000, width = 0.250000, height = 0.500000, tall (tier 0, full height)
+  x = 0.250000, y = 0.500000, width = 0.250000, height = 0.500000, tall (tier 0, full)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 1.000000, tall (tier 0, full)
+class 76: proportion 2.000000000000, root of x - 2
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 1
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.250000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.500000, y = 0.250000, width = 0.500000, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.500000, width = 1.000000, height = 0.500000, wide (tier 0, full)
+class 77: proportion 2.000000000000, root of x - 2
+  tilings in the class = 2, fixed by: identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.250000, width = 1.000000, height = 0.500000, wide (tier 0, full width)
+  x = 0.000000, y = 0.750000, width = 0.500000, height = 0.250000, wide (tier 0, full height)
+  x = 0.500000, y = 0.750000, width = 0.500000, height = 0.250000, wide (tier 0, full)
+class 78: proportion 2.000000000000, root of x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.250000, wide (tier 0, inside)
+  x = 0.000000, y = 0.250000, width = 0.250000, height = 0.500000, tall (tier 0, inside)
+  x = 0.250000, y = 0.250000, width = 0.250000, height = 0.500000, tall (tier 1, full)
+  x = 0.000000, y = 0.750000, width = 0.500000, height = 0.250000, wide (tier 0, full)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 1.000000, tall (tier 0, full)
+class 79: proportion 2.126323552676, root of 2*x^3 - 5*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.750882, height = 0.353136, wide (tier 0, inside)
+  x = 0.000000, y = 0.353136, width = 0.375441, height = 0.176568, wide (tier 0, inside)
+  x = 0.375441, y = 0.353136, width = 0.375441, height = 0.176568, wide (tier 1, full)
+  x = 0.750882, y = 0.000000, width = 0.249118, height = 0.529705, tall (tier 1, full)
+  x = 0.000000, y = 0.529705, width = 1.000000, height = 0.470295, wide (tier 0, full)
+class 80: proportion 2.126323552676, root of 2*x^3 - 5*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.375441, height = 0.176568, wide (tier 0, inside)
+  x = 0.375441, y = 0.000000, width = 0.375441, height = 0.176568, wide (tier 1, full height)
+  x = 0.000000, y = 0.176568, width = 0.750882, height = 0.353136, wide (tier 0, full width)
+  x = 0.750882, y = 0.000000, width = 0.249118, height = 0.529705, tall (tier 1, full)
+  x = 0.000000, y = 0.529705, width = 1.000000, height = 0.470295, wide (tier 0, full)
+class 81: proportion 2.285634646848, root of x^4 - 3*x^3 + 3*x^2 - 4*x + 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.723150, height = 0.316389, wide (tier 0, inside)
+  x = 0.000000, y = 0.316389, width = 0.723150, height = 0.316389, wide (tier 0, full width)
+  x = 0.723150, y = 0.000000, width = 0.276850, height = 0.632778, tall (tier 1, full)
+  x = 0.000000, y = 0.632778, width = 0.839335, height = 0.367222, wide (tier 0, full height)
+  x = 0.839335, y = 0.632778, width = 0.160665, height = 0.367222, tall (tier 0, full)
+class 82: proportion 2.285634646848, root of x^4 - 3*x^3 + 3*x^2 - 4*x + 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.723150, height = 0.316389, wide (tier 0, inside)
+  x = 0.000000, y = 0.316389, width = 0.723150, height = 0.316389, wide (tier 0, full width)
+  x = 0.723150, y = 0.000000, width = 0.276850, height = 0.632778, tall (tier 1, full)
+  x = 0.000000, y = 0.632778, width = 0.160665, height = 0.367222, tall (tier 0, full height)
+  x = 0.160665, y = 0.632778, width = 0.839335, height = 0.367222, wide (tier 0, full)
+class 83: proportion 2.333333333333, root of 3*x - 7
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.142857, wide (tier 0, inside)
+  x = 0.333333, y = 0.000000, width = 0.333333, height = 0.142857, wide (tier 1, full height)
+  x = 0.666667, y = 0.000000, width = 0.333333, height = 0.142857, wide (tier 1, full)
+  x = 0.000000, y = 0.142857, width = 1.000000, height = 0.428571, wide (tier 0, full width)
+  x = 0.000000, y = 0.571429, width = 1.000000, height = 0.428571, wide (tier 0, full)
+class 84: proportion 2.333333333333, root of 3*x - 7
+  tilings in the class = 2, fixed by: identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.428571, wide (tier 0, full width)
+  x = 0.000000, y = 0.428571, width = 0.333333, height = 0.142857, wide (tier 0, inside)
+  x = 0.333333, y = 0.428571, width = 0.333333, height = 0.142857, wide (tier 1, full height)
+  x = 0.666667, y = 0.428571, width = 0.333333, height = 0.142857, wide (tier 1, full)
+  x = 0.000000, y = 0.571429, width = 1.000000, height = 0.428571, wide (tier 0, full)
+class 85: proportion 2.346271905939, root of 2*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.213104, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.213104, wide (tier 1, full)
+  x = 0.000000, y = 0.213104, width = 0.846272, height = 0.360688, wide (tier 0, inside)
+  x = 0.846272, y = 0.213104, width = 0.153728, height = 0.360688, tall (tier 1, full)
+  x = 0.000000, y = 0.573792, width = 1.000000, height = 0.426208, wide (tier 0, full)
+class 86: proportion 2.346271905939, root of 2*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.213104, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.213104, wide (tier 1, full)
+  x = 0.000000, y = 0.213104, width = 1.000000, height = 0.426208, wide (tier 0, full width)
+  x = 0.000000, y = 0.639312, width = 0.846272, height = 0.360688, wide (tier 0, full height)
+  x = 0.846272, y = 0.639312, width = 0.153728, height = 0.360688, tall (tier 0, full)
+class 87: proportion 2.346271905939, root of 2*x^3 - 5*x^2 + 2*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.360688, height = 0.153728, wide (tier 0, inside)
+  x = 0.000000, y = 0.153728, width = 0.360688, height = 0.846272, tall (tier 0, full)
+  x = 0.360688, y = 0.000000, width = 0.213104, height = 0.500000, tall (tier 0, inside)
+  x = 0.360688, y = 0.500000, width = 0.213104, height = 0.500000, tall (tier 0, full)
+  x = 0.573792, y = 0.000000, width = 0.426208, height = 1.000000, tall (tier 0, full)
+class 88: proportion 2.366025403784, root of 2*x^2 - 6*x + 3
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.788675, height = 0.333333, wide (tier 0, inside)
+  x = 0.000000, y = 0.333333, width = 0.788675, height = 0.333333, wide (tier 0, full width)
+  x = 0.000000, y = 0.666667, width = 0.788675, height = 0.333333, wide (tier 0, full)
+  x = 0.788675, y = 0.000000, width = 0.211325, height = 0.500000, tall (tier 0, full width)
+  x = 0.788675, y = 0.500000, width = 0.211325, height = 0.500000, tall (tier 0, full)
+class 89: proportion 2.402208833865, root of x^5 - 3*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.583716, height = 0.242992, wide (tier 0, inside)
+  x = 0.000000, y = 0.242992, width = 0.268586, height = 0.111808, wide (tier 0, inside)
+  x = 0.000000, y = 0.354800, width = 0.268586, height = 0.645200, tall (tier 0, full)
+  x = 0.268586, y = 0.242992, width = 0.315130, height = 0.757008, tall (tier 0, full)
+  x = 0.583716, y = 0.000000, width = 0.416284, height = 1.000000, tall (tier 0, full)
+class 90: proportion 2.402208833865, root of x^5 - 3*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.757008, height = 0.315130, wide (tier 0, inside)
+  x = 0.000000, y = 0.315130, width = 0.645200, height = 0.268586, wide (tier 0, inside)
+  x = 0.645200, y = 0.315130, width = 0.111808, height = 0.268586, tall (tier 1, full)
+  x = 0.757008, y = 0.000000, width = 0.242992, height = 0.583716, tall (tier 1, full)
+  x = 0.000000, y = 0.583716, width = 1.000000, height = 0.416284, wide (tier 0, full)
+class 91: proportion 2.402208833865, root of x^5 - 3*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.583716, height = 0.242992, wide (tier 0, inside)
+  x = 0.000000, y = 0.242992, width = 0.268586, height = 0.645200, tall (tier 0, inside)
+  x = 0.000000, y = 0.888192, width = 0.268586, height = 0.111808, wide (tier 0, full)
+  x = 0.268586, y = 0.242992, width = 0.315130, height = 0.757008, tall (tier 0, full)
+  x = 0.583716, y = 0.000000, width = 0.416284, height = 1.000000, tall (tier 0, full)
+class 92: proportion 2.402208833865, root of x^5 - 3*x^4 + 3*x^3 - 4*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.757008, height = 0.315130, wide (tier 0, inside)
+  x = 0.000000, y = 0.315130, width = 0.111808, height = 0.268586, tall (tier 0, inside)
+  x = 0.111808, y = 0.315130, width = 0.645200, height = 0.268586, wide (tier 1, full)
+  x = 0.757008, y = 0.000000, width = 0.242992, height = 0.583716, tall (tier 1, full)
+  x = 0.000000, y = 0.583716, width = 1.000000, height = 0.416284, wide (tier 0, full)
+class 93: proportion 2.461895646916, root of 2*x^3 - 5*x^2 + x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.461896, height = 0.187618, wide (tier 0, inside)
+  x = 0.461896, y = 0.000000, width = 0.461896, height = 0.187618, wide (tier 1, full height)
+  x = 0.923791, y = 0.000000, width = 0.076209, height = 0.187618, tall (tier 1, full)
+  x = 0.000000, y = 0.187618, width = 1.000000, height = 0.406191, wide (tier 0, full width)
+  x = 0.000000, y = 0.593809, width = 1.000000, height = 0.406191, wide (tier 0, full)
+class 94: proportion 2.461895646916, root of 2*x^3 - 5*x^2 + x - 2
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.461896, height = 0.187618, wide (tier 0, inside)
+  x = 0.461896, y = 0.000000, width = 0.076209, height = 0.187618, tall (tier 1, full height)
+  x = 0.538104, y = 0.000000, width = 0.461896, height = 0.187618, wide (tier 1, full)
+  x = 0.000000, y = 0.187618, width = 1.000000, height = 0.406191, wide (tier 0, full width)
+  x = 0.000000, y = 0.593809, width = 1.000000, height = 0.406191, wide (tier 0, full)
+class 95: proportion 2.461895646916, root of 2*x^3 - 5*x^2 + x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.406191, wide (tier 0, full width)
+  x = 0.000000, y = 0.406191, width = 0.461896, height = 0.187618, wide (tier 0, inside)
+  x = 0.461896, y = 0.406191, width = 0.461896, height = 0.187618, wide (tier 1, full height)
+  x = 0.923791, y = 0.406191, width = 0.076209, height = 0.187618, tall (tier 1, full)
+  x = 0.000000, y = 0.593809, width = 1.000000, height = 0.406191, wide (tier 0, full)
+class 96: proportion 2.461895646916, root of 2*x^3 - 5*x^2 + x - 2
+  tilings in the class = 2, fixed by: identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.406191, wide (tier 0, full width)
+  x = 0.000000, y = 0.406191, width = 0.461896, height = 0.187618, wide (tier 0, inside)
+  x = 0.461896, y = 0.406191, width = 0.076209, height = 0.187618, tall (tier 1, full height)
+  x = 0.538104, y = 0.406191, width = 0.461896, height = 0.187618, wide (tier 1, full)
+  x = 0.000000, y = 0.593809, width = 1.000000, height = 0.406191, wide (tier 0, full)
+class 97: proportion 2.587401051968, root of x^3 - 3*x^2 + 3*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.793701, height = 0.306756, wide (tier 0, inside)
+  x = 0.000000, y = 0.306756, width = 0.793701, height = 0.306756, wide (tier 0, full width)
+  x = 0.793701, y = 0.000000, width = 0.206299, height = 0.079732, wide (tier 1, full width)
+  x = 0.793701, y = 0.079732, width = 0.206299, height = 0.533779, tall (tier 1, full)
+  x = 0.000000, y = 0.613512, width = 1.000000, height = 0.386488, wide (tier 0, full)
+class 98: proportion 2.587401051968, root of x^3 - 3*x^2 + 3*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.793701, height = 0.306756, wide (tier 0, inside)
+  x = 0.000000, y = 0.306756, width = 0.793701, height = 0.306756, wide (tier 0, full width)
+  x = 0.793701, y = 0.000000, width = 0.206299, height = 0.533779, tall (tier 1, full width)
+  x = 0.793701, y = 0.533779, width = 0.206299, height = 0.079732, wide (tier 1, full)
+  x = 0.000000, y = 0.613512, width = 1.000000, height = 0.386488, wide (tier 0, full)
+class 99: proportion 2.666666666667, root of 3*x - 8
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.333333, height = 0.125000, wide (tier 0, inside)
+  x = 0.000000, y = 0.125000, width = 0.333333, height = 0.125000, wide (tier 0, full width)
+  x = 0.333333, y = 0.000000, width = 0.666667, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.250000, width = 1.000000, height = 0.375000, wide (tier 0, full width)
+  x = 0.000000, y = 0.625000, width = 1.000000, height = 0.375000, wide (tier 0, full)
+class 100: proportion 2.666666666667, root of 3*x - 8
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.375000, wide (tier 0, full width)
+  x = 0.000000, y = 0.375000, width = 0.333333, height = 0.125000, wide (tier 0, inside)
+  x = 0.000000, y = 0.500000, width = 0.333333, height = 0.125000, wide (tier 0, full width)
+  x = 0.333333, y = 0.375000, width = 0.666667, height = 0.250000, wide (tier 1, full)
+  x = 0.000000, y = 0.625000, width = 1.000000, height = 0.375000, wide (tier 0, full)
+class 101: proportion 2.769292354239, root of x^3 - 3*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 1
+  x = 0.000000, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 0, inside)
+  x = 0.319448, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 1, full height)
+  x = 0.000000, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full height)
+  x = 0.319448, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full)
+  x = 0.638897, y = 0.000000, width = 0.361103, height = 1.000000, tall (tier 0, full)
+class 102: proportion 2.769292354239, root of x^3 - 3*x^2 + x - 1
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 0, inside)
+  x = 0.000000, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full)
+  x = 0.319448, y = 0.000000, width = 0.319448, height = 0.884646, tall (tier 0, inside)
+  x = 0.319448, y = 0.884646, width = 0.319448, height = 0.115354, wide (tier 0, full)
+  x = 0.638897, y = 0.000000, width = 0.361103, height = 1.000000, tall (tier 0, full)
+class 103: proportion 2.769292354239, root of x^3 - 3*x^2 + x - 1
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 0, inside)
+  x = 0.000000, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full)
+  x = 0.319448, y = 0.000000, width = 0.361103, height = 1.000000, tall (tier 0, full height)
+  x = 0.680552, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 0, full width)
+  x = 0.680552, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full)
+class 104: proportion 2.769292354239, root of x^3 - 3*x^2 + x - 1
+  tilings in the class = 4, fixed by: identity; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.319448, height = 0.115354, wide (tier 0, inside)
+  x = 0.000000, y = 0.115354, width = 0.319448, height = 0.884646, tall (tier 0, full)
+  x = 0.319448, y = 0.000000, width = 0.361103, height = 1.000000, tall (tier 0, full height)
+  x = 0.680552, y = 0.000000, width = 0.319448, height = 0.884646, tall (tier 0, full width)
+  x = 0.680552, y = 0.884646, width = 0.319448, height = 0.115354, wide (tier 0, full)
+class 105: proportion 2.796321903259, root of x^3 - 3*x^2 + 2*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.284775, height = 0.101839, wide (tier 0, inside)
+  x = 0.000000, y = 0.101839, width = 0.284775, height = 0.101839, wide (tier 0, full width)
+  x = 0.000000, y = 0.203678, width = 0.284775, height = 0.796322, tall (tier 0, full)
+  x = 0.284775, y = 0.000000, width = 0.357613, height = 1.000000, tall (tier 0, full height)
+  x = 0.642387, y = 0.000000, width = 0.357613, height = 1.000000, tall (tier 0, full)
+class 106: proportion 2.796321903259, root of x^3 - 3*x^2 + 2*x - 4
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.284775, height = 0.101839, wide (tier 0, inside)
+  x = 0.000000, y = 0.101839, width = 0.284775, height = 0.796322, tall (tier 0, full width)
+  x = 0.000000, y = 0.898161, width = 0.284775, height = 0.101839, wide (tier 0, full)
+  x = 0.284775, y = 0.000000, width = 0.357613, height = 1.000000, tall (tier 0, full height)
+  x = 0.642387, y = 0.000000, width = 0.357613, height = 1.000000, tall (tier 0, full)
+class 107: proportion 2.796321903259, root of x^3 - 3*x^2 + 2*x - 4
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.357613, wide (tier 0, full width)
+  x = 0.000000, y = 0.357613, width = 0.796322, height = 0.284775, wide (tier 0, inside)
+  x = 0.796322, y = 0.357613, width = 0.101839, height = 0.284775, tall (tier 1, full height)
+  x = 0.898161, y = 0.357613, width = 0.101839, height = 0.284775, tall (tier 1, full)
+  x = 0.000000, y = 0.642387, width = 1.000000, height = 0.357613, wide (tier 0, full)
+class 108: proportion 2.796321903259, root of x^3 - 3*x^2 + 2*x - 4
+  tilings in the class = 2, fixed by: identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.357613, wide (tier 0, full width)
+  x = 0.000000, y = 0.357613, width = 0.101839, height = 0.284775, tall (tier 0, inside)
+  x = 0.101839, y = 0.357613, width = 0.796322, height = 0.284775, wide (tier 1, full height)
+  x = 0.898161, y = 0.357613, width = 0.101839, height = 0.284775, tall (tier 1, full)
+  x = 0.000000, y = 0.642387, width = 1.000000, height = 0.357613, wide (tier 0, full)
+class 109: proportion 2.904160859135, root of x^3 - 3*x^2 + 2*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.904161, height = 0.311333, wide (tier 0, inside)
+  x = 0.904161, y = 0.000000, width = 0.095839, height = 0.033001, wide (tier 1, full width)
+  x = 0.904161, y = 0.033001, width = 0.095839, height = 0.278332, tall (tier 1, full)
+  x = 0.000000, y = 0.311333, width = 1.000000, height = 0.344334, wide (tier 0, full width)
+  x = 0.000000, y = 0.655666, width = 1.000000, height = 0.344334, wide (tier 0, full)
+class 110: proportion 2.904160859135, root of x^3 - 3*x^2 + 2*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.278332, height = 0.095839, wide (tier 0, inside)
+  x = 0.278332, y = 0.000000, width = 0.033001, height = 0.095839, tall (tier 1, full height)
+  x = 0.000000, y = 0.095839, width = 0.311333, height = 0.904161, tall (tier 0, full)
+  x = 0.311333, y = 0.000000, width = 0.344334, height = 1.000000, tall (tier 0, full height)
+  x = 0.655666, y = 0.000000, width = 0.344334, height = 1.000000, tall (tier 0, full)
+class 111: proportion 2.904160859135, root of x^3 - 3*x^2 + 2*x - 5
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.344334, wide (tier 0, full width)
+  x = 0.000000, y = 0.344334, width = 0.904161, height = 0.311333, wide (tier 0, inside)
+  x = 0.904161, y = 0.344334, width = 0.095839, height = 0.033001, wide (tier 1, full width)
+  x = 0.904161, y = 0.377334, width = 0.095839, height = 0.278332, tall (tier 1, full)
+  x = 0.000000, y = 0.655666, width = 1.000000, height = 0.344334, wide (tier 0, full)
+class 112: proportion 2.945510206542, root of 2*x^3 - 6*x^2 + x - 2
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.160500, height = 0.054490, wide (tier 0, inside)
+  x = 0.160500, y = 0.000000, width = 0.160500, height = 0.054490, wide (tier 1, full height)
+  x = 0.000000, y = 0.054490, width = 0.321000, height = 0.945510, tall (tier 0, full)
+  x = 0.321000, y = 0.000000, width = 0.339500, height = 1.000000, tall (tier 0, full height)
+  x = 0.660500, y = 0.000000, width = 0.339500, height = 1.000000, tall (tier 0, full)
+class 113: proportion 2.945510206542, root of 2*x^3 - 6*x^2 + x - 2
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.339500, wide (tier 0, full width)
+  x = 0.000000, y = 0.339500, width = 0.945510, height = 0.321000, wide (tier 0, inside)
+  x = 0.945510, y = 0.339500, width = 0.054490, height = 0.160500, tall (tier 1, full width)
+  x = 0.945510, y = 0.500000, width = 0.054490, height = 0.160500, tall (tier 1, full)
+  x = 0.000000, y = 0.660500, width = 1.000000, height = 0.339500, wide (tier 0, full)
+class 114: proportion 3.374423763209, root of x^3 - 4*x^2 + 3*x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.791475, height = 0.234551, wide (tier 0, inside)
+  x = 0.000000, y = 0.234551, width = 0.791475, height = 0.234551, wide (tier 0, full width)
+  x = 0.000000, y = 0.469102, width = 0.791475, height = 0.234551, wide (tier 0, full width)
+  x = 0.791475, y = 0.000000, width = 0.208525, height = 0.703653, tall (tier 1, full)
+  x = 0.000000, y = 0.703653, width = 1.000000, height = 0.296347, wide (tier 0, full)
+class 115: proportion 3.500000000000, root of 2*x - 7
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.500000, height = 0.142857, wide (tier 0, inside)
+  x = 0.500000, y = 0.000000, width = 0.500000, height = 0.142857, wide (tier 1, full)
+  x = 0.000000, y = 0.142857, width = 1.000000, height = 0.285714, wide (tier 0, full width)
+  x = 0.000000, y = 0.428571, width = 1.000000, height = 0.285714, wide (tier 0, full width)
+  x = 0.000000, y = 0.714286, width = 1.000000, height = 0.285714, wide (tier 0, full)
+class 116: proportion 3.500000000000, root of 2*x - 7
+  tilings in the class = 4, fixed by: identity; reflection x -> 1 - x
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.285714, wide (tier 0, full width)
+  x = 0.000000, y = 0.285714, width = 0.500000, height = 0.142857, wide (tier 0, inside)
+  x = 0.500000, y = 0.285714, width = 0.500000, height = 0.142857, wide (tier 1, full)
+  x = 0.000000, y = 0.428571, width = 1.000000, height = 0.285714, wide (tier 0, full width)
+  x = 0.000000, y = 0.714286, width = 1.000000, height = 0.285714, wide (tier 0, full)
+class 117: proportion 3.751100702376, root of x^3 - 4*x^2 + 2*x - 4
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.875550, height = 0.233412, wide (tier 0, inside)
+  x = 0.000000, y = 0.233412, width = 0.875550, height = 0.233412, wide (tier 0, full width)
+  x = 0.875550, y = 0.000000, width = 0.124450, height = 0.466823, tall (tier 1, full)
+  x = 0.000000, y = 0.466823, width = 1.000000, height = 0.266588, wide (tier 0, full width)
+  x = 0.000000, y = 0.733412, width = 1.000000, height = 0.266588, wide (tier 0, full)
+class 118: proportion 3.751100702376, root of x^3 - 4*x^2 + 2*x - 4
+  tilings in the class = 4, fixed by: identity; reflection y -> 1 - y
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.266588, wide (tier 0, full width)
+  x = 0.000000, y = 0.266588, width = 0.875550, height = 0.233412, wide (tier 0, inside)
+  x = 0.000000, y = 0.500000, width = 0.875550, height = 0.233412, wide (tier 0, full width)
+  x = 0.875550, y = 0.266588, width = 0.124450, height = 0.466823, tall (tier 1, full)
+  x = 0.000000, y = 0.733412, width = 1.000000, height = 0.266588, wide (tier 0, full)
+class 119: proportion 3.939465058587, root of x^3 - 4*x^2 + x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 0.238475, height = 0.060535, wide (tier 0, inside)
+  x = 0.000000, y = 0.060535, width = 0.238475, height = 0.939465, tall (tier 0, full)
+  x = 0.238475, y = 0.000000, width = 0.253842, height = 1.000000, tall (tier 0, full height)
+  x = 0.492317, y = 0.000000, width = 0.253842, height = 1.000000, tall (tier 0, full height)
+  x = 0.746158, y = 0.000000, width = 0.253842, height = 1.000000, tall (tier 0, full)
+class 120: proportion 3.939465058587, root of x^3 - 4*x^2 + x - 3
+  tilings in the class = 8, fixed by: identity
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.253842, wide (tier 0, full width)
+  x = 0.000000, y = 0.253842, width = 0.939465, height = 0.238475, wide (tier 0, inside)
+  x = 0.939465, y = 0.253842, width = 0.060535, height = 0.238475, tall (tier 1, full)
+  x = 0.000000, y = 0.492317, width = 1.000000, height = 0.253842, wide (tier 0, full width)
+  x = 0.000000, y = 0.746158, width = 1.000000, height = 0.253842, wide (tier 0, full)
+class 121: proportion 5.000000000000, root of x - 5
+  tilings in the class = 2, fixed by: identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees
+  points where four tiles meet = 0
+  x = 0.000000, y = 0.000000, width = 1.000000, height = 0.200000, wide (tier 0, full width)
+  x = 0.000000, y = 0.200000, width = 1.000000, height = 0.200000, wide (tier 0, full width)
+  x = 0.000000, y = 0.400000, width = 1.000000, height = 0.200000, wide (tier 0, full width)
+  x = 0.000000, y = 0.600000, width = 1.000000, height = 0.200000, wide (tier 0, full width)
+  x = 0.000000, y = 0.800000, width = 1.000000, height = 0.200000, wide (tier 0, full)
+tiles = 5, main rectangle = 1:1
+degrees = [11, 2, 32, 2, 4]
+proportions = 51
+Stats { leaves: 1472, candidates: 453, tilings: 421, exact: 0, singular: 0, constant: 0, overflows: 0 }, polynomials = 63
+tilings = 830
+classes under symmetry = 121
+classes by fixed points = 121
+  fixed by identity = 830
+  fixed by reflection x -> 1 - x = 62
+  fixed by reflection y -> 1 - y = 62
+  fixed by rotation by 180 degrees = 14
+tilings with a symmetry = 118
+  fixed exactly by {identity} = 712
+  fixed exactly by {identity; reflection x -> 1 - x} = 52
+  fixed exactly by {identity; reflection y -> 1 - y} = 52
+  fixed exactly by {identity; rotation by 180 degrees} = 4
+  fixed exactly by {identity; reflection x -> 1 - x; reflection y -> 1 - y; rotation by 180 degrees} = 10
+tilings by squares = 0, classes = 0
+tilings by number of points where four tiles meet = [818, 12]
+sequences by such points = [409, 12], of squares [0]
+tilings examined by such points = [409, 6], of squares [0]
+sequences repeating tilings by squares = 0
+multiplicities hold = true
+compared exactly = 15, inconsistent = 0, asymmetric = 0
+elapsed = 0.009s
