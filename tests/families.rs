@@ -50,6 +50,14 @@ fn wide_rectangles_count_aspect_ratio_functions() {
 }
 
 #[test]
+fn counts_dip_where_two_aspect_ratio_functions_share_a_root() {
+    let count = |n: usize, w: u32| Search::new(n, w, 1).run().count();
+    assert_eq!([count(5, 7), count(5, 8)], [162, 164]);
+    assert_eq!([count(6, 10), count(6, 11)], [786, 787]);
+    assert_eq!([count(7, 13), count(7, 14)], [4256, 4258]);
+}
+
+#[test]
 fn single_orientation_counts_dissections_into_squares() {
     let counts: Vec<usize> = (1..=8).map(|n| Search::square(n).with_minority(0).run().count()).collect();
     assert_eq!(counts, [1, 1, 2, 5, 11, 28, 74, 211]);
@@ -99,4 +107,28 @@ fn minority_sets_are_nested() {
         assert!(current.len() > previous.len());
         previous = current;
     }
+}
+
+#[test]
+fn proportions_persist_with_three_or_more_extra_tiles() {
+    let sets: Vec<Vec<String>> = (1..=9).map(|n| names(&Search::square(n).run())).collect();
+    for n in 2..=6 {
+        for m in n + 3..=9 {
+            assert!(sets[n - 1].iter().all(|p| sets[m - 1].contains(p)), "n = {n}, m = {m}");
+        }
+    }
+    assert!(!sets[4].contains(&sets[0][0]));
+}
+
+#[test]
+fn rational_proportions_needing_both_orientations_with_ten_tiles() {
+    let rational = |k: usize| -> Vec<String> {
+        let outcome = Search::square(10).with_minority(k).run();
+        outcome.proportions().iter().filter(|f| f.proportion.degree() == 1).map(|f| f.proportion.min_poly().to_string()).collect()
+    };
+    let single = rational(0);
+    let mixed = rational(2);
+    let extra: Vec<&String> = mixed.iter().filter(|p| !single.contains(p)).collect();
+    assert_eq!(single.len(), 1901);
+    assert_eq!(extra, ["3*x - 11", "2*x - 9", "x - 6"]);
 }

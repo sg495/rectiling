@@ -21,10 +21,13 @@ The command-line tool takes the number of tiles and, optionally, the integer wid
 $ ./target/release/rectiling 8
 $ ./target/release/rectiling --list 5
 $ ./target/release/rectiling 7 3 2
+$ ./target/release/rectiling --guillotine 9
+$ ./target/release/rectiling --minority 1 9
 ```
 
 It prints the number of distinct proportions, their distribution by algebraic degree and counters describing the search; with `--list` it also prints each proportion with its degree, the number of tilings that realise it and its minimal polynomial.
-The same search is available from Rust as `rectiling::Search`.
+With `--guillotine` only guillotine tilings are considered, and with `--minority K` only tilings with at most K tiles in the less frequent orientation.
+The same searches are available from Rust as `rectiling::Search`.
 
 The library reproduces the known values of a(n) for n ≤ 10 and extends the sequence with a(11) = 3446981, a(12) = 28799493 and a(13) = 250056983; see [knowledge/results.md](knowledge/results.md).
 
