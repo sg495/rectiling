@@ -7,7 +7,14 @@
 #show: template.with(
   title: [Enumerating the Dissections of a Square into Similar Rectangles],
   authors: ((name: "Stefano Gogioso", affil: "Hashberg"),),
-  abstract: [#todo[abstract, to be written once the headline results are settled.]],
+  abstract: [
+    We describe an exact procedure which, for a given $n$ and a main rectangle of rational aspect ratio, finds every proportion $x >= 1$ such that the main rectangle can be cut into $n$ rectangles of proportion $x$, each proportion being identified as a real algebraic number by its minimal polynomial.
+    The procedure places tiles one at a time on a staircase, and solves exactly, for each sequence of placements, a linear system whose coefficients are polynomials in the proportion.
+    We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
+    For the square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
+    For $n <= 12$ we also count the tilings themselves, their classes under the symmetries of the square, and the multisets of tiles that occur.
+    We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, that $a(n)$ grows at most like $(27 slash 2)^n$, and that for main rectangles wider than a bound depending on $n$ the number of proportions is the number of impedance functions of the corresponding electrical networks; we state conjectures on the rational proportions and on the growth of the sequences.
+  ],
   keywords: [tilings, similar rectangles, rectangulations, Baxter numbers, exact enumeration, real algebraic numbers],
 )
 
