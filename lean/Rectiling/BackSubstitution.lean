@@ -56,6 +56,18 @@ theorem Elims.length_eq {els : List (Elim R)} {ts : List (Vec R)} {π : R} (h : 
   | nil => rfl
   | snoc _ _ _ ih => simp [ih]
 
+/-- No previous pivot vanishes. -/
+theorem Elims.prev_ne_zero {els : List (Elim R)} {ts : List (Vec R)} {π : R}
+    (h : Elims ψ els ts π) : ∀ e ∈ els, ψ e.2.2 ≠ 0 := by
+  induction h with
+  | nil => intro e he; simp at he
+  | @snoc els ts π E e m _ hπ hE ih =>
+    intro e0 he0
+    rcases List.mem_append.mp he0 with he0 | he0
+    · exact ih e0 he0
+    · obtain rfl : e0 = (E, m, π) := by simpa using he0
+      exact hπ
+
 /-- On a solution of the equations seen so far, a carried form takes the value of the original form multiplied by the current pivot. -/
 theorem Elims.dot_carry {els : List (Elim R)} {ts : List (Vec R)} {π : R} (h : Elims ψ els ts π)
     {N : ℕ} {v : ℕ → L} (hv : ∀ t ∈ ts, dot N (mapVec ψ t) v = 0) :

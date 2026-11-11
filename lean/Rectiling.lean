@@ -13,5 +13,6 @@ import Rectiling.Main
 import Rectiling.Elimination
 import Rectiling.BackSubstitution
 import Rectiling.Determinant
+import Rectiling.Reduced
 import Rectiling.Audit
 import Rectiling.Check
