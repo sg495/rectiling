@@ -467,4 +467,121 @@ theorem allowed_map (hf : A.IsHom B f) (fresh : ℕ → L) (s : List (Tier L)) (
 
 end Map
 
+/-! ### Free sides -/
+
+section Sides
+
+variable {L : Type}
+
+theorem tileSize_side (A : Algebra L) {fit : Fit} (tall : Bool) (floor wall a b : L)
+    (h : fit ≠ .inside) : tileSize A fit tall floor wall a = tileSize A fit tall floor wall b := by
+  cases fit <;> cases tall <;> simp_all [tileSize]
+
+/-- The free side is used by inside placements only. -/
+theorem place_side (A : Algebra L) (s : List (Tier L)) (mv : Placement) (a b : L)
+    (h : mv.fit ≠ .inside) : place A s mv a = place A s mv b := by
+  unfold place
+  cases s[mv.tier]? with
+  | none => rfl
+  | some t => simp only [tileSize_side A mv.tall t.floor t.wall a b h]
+
+theorem positiveAt_side (s : List (Tier L)) (mv : Placement) (a b : L) (h : mv.fit ≠ .inside) :
+    positiveAt s mv a = positiveAt s mv b := by
+  unfold positiveAt
+  cases hfit : mv.fit <;> simp_all [positiveOf]
+
+theorem le_nextIndex (k : ℕ) (mv : Placement) : k ≤ nextIndex k mv := by
+  unfold nextIndex
+  split <;> omega
+
+/-- The number of inside placements after a sequence of placements, given their number before it. -/
+def finalIndex (k : ℕ) : List Placement → ℕ
+  | [] => k
+  | mv :: rest => finalIndex (nextIndex k mv) rest
+
+theorem le_finalIndex (k : ℕ) (path : List Placement) : k ≤ finalIndex k path := by
+  induction path generalizing k with
+  | nil => exact le_refl k
+  | cons mv rest ih => exact (le_nextIndex k mv).trans (ih _)
+
+/-- A sequence of placements depends only on the free sides of its inside placements. -/
+theorem run_congr (A : Algebra L) {f g : ℕ → L} (path : List Placement) :
+    ∀ (s : List (Tier L)) (k : ℕ), (∀ j, k ≤ j → j < finalIndex k path → f j = g j) →
+      (Allowed A f s k path ↔ Allowed A g s k path) ∧
+        positives A f s k path = positives A g s k path ∧
+        equations A f s k path = equations A g s k path := by
+  induction path with
+  | nil => intro s k _; exact ⟨Iff.rfl, rfl, rfl⟩
+  | cons mv rest ih =>
+    intro s k hfg
+    have hside : place A s mv (f k) = place A s mv (g k) ∧
+        positiveAt s mv (f k) = positiveAt s mv (g k) := by
+      by_cases hfit : mv.fit = .inside
+      · have hk : f k = g k := by
+          refine hfg k (le_refl k) ?_
+          have := le_finalIndex (nextIndex k mv) rest
+          simp only [nextIndex, hfit, ite_true] at this
+          simp only [finalIndex, nextIndex, hfit, ite_true]
+          exact this
+        rw [hk]
+        exact ⟨rfl, rfl⟩
+      · exact ⟨place_side A s mv _ _ hfit, positiveAt_side s mv _ _ hfit⟩
+    obtain ⟨i1, i2, i3⟩ := ih (place A s mv (g k)) (nextIndex k mv)
+      fun j hj hj' => hfg j ((le_nextIndex k mv).trans hj) hj'
+    simp only [Allowed, positives, equations, hside.1, hside.2, i1, i2, i3, and_self]
+
+set_option linter.unusedSimpArgs false in
+/-- A sequence that obeys the rules and empties the staircase emits as many equations as it has inside placements and the staircase has tiers. -/
+theorem length_equations (A : Algebra L) (fresh : ℕ → L) (path : List Placement) :
+    ∀ (s : List (Tier L)) (k : ℕ), Allowed A fresh s k path →
+      s.length + finalIndex k path = (equations A fresh s k path).length + k := by
+  induction path with
+  | nil =>
+    intro s k h
+    simp only [Allowed] at h
+    subst h
+    simp [finalIndex, equations]
+  | cons mv rest ih =>
+    intro s k h
+    obtain ⟨hallow, hrest⟩ := h
+    obtain ⟨⟨t, ht, -⟩, -⟩ := id hallow
+    have hlen := length_place A (fresh k) ht
+    have hih := ih _ _ hrest
+    obtain ⟨pre, post, rfl, hi⟩ := exists_split ht
+    rw [hlen] at hih
+    simp only [equations, finalIndex, List.length_append, equationAt_append A pre post t mv hi,
+      List.length_cons] at hih ⊢
+    cases hfit : mv.fit <;> cases htall : mv.tall <;>
+      simp only [hfit, htall, equationOf, tiersAfter, nextIndex, Option.toList_none,
+        Option.toList_some, List.length_nil, List.length_cons, List.length_append, ite_true,
+        reduceCtorEq, ite_false] at hih ⊢ <;> omega
+
+end Sides
+
+/-! ### Real lengths -/
+
+/-- The constraints emitted by a sequence of placements hold, for the given proportion and free sides. -/
+def Satisfies (x : ℝ) (fresh : ℕ → ℝ) (s : List (Tier ℝ)) (k : ℕ) (path : List Placement) : Prop :=
+  (∀ c ∈ positives (realAlgebra x) fresh s k path, 0 < c) ∧
+    ∀ e ∈ equations (realAlgebra x) fresh s k path, e = 0
+
+theorem Satisfies.head {x : ℝ} {fresh : ℕ → ℝ} {s : List (Tier ℝ)} {k : ℕ} {mv : Placement}
+    {rest : List Placement} (h : Satisfies x fresh s k (mv :: rest)) :
+    (∀ c ∈ positiveAt s mv (fresh k), 0 < c) ∧
+      ∀ e ∈ equationAt (realAlgebra x) s mv, e = 0 := by
+  refine ⟨fun c hc => h.1 c ?_, fun e he => h.2 e ?_⟩
+  · simp only [positives, List.mem_append, Option.mem_toList]
+    exact Or.inl hc
+  · simp only [equations, List.mem_append, Option.mem_toList]
+    exact Or.inl he
+
+theorem Satisfies.tail {x : ℝ} {fresh : ℕ → ℝ} {s : List (Tier ℝ)} {k : ℕ} {mv : Placement}
+    {rest : List Placement} (h : Satisfies x fresh s k (mv :: rest)) :
+    Satisfies x fresh (place (realAlgebra x) s mv (fresh k)) (nextIndex k mv) rest := by
+  refine ⟨fun c hc => h.1 c ?_, fun e he => h.2 e ?_⟩
+  · simp only [positives, List.mem_append]
+    exact Or.inr hc
+  · simp only [equations, List.mem_append]
+    exact Or.inr he
+
 end Rectiling

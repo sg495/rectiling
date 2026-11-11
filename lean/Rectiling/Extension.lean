@@ -2,11 +2,9 @@
 import Rectiling.Soundness
 
 /-!
-# Completeness of the staircase
+# One step of the construction of a placement sequence from a tiling
 
-Every tiling of the main rectangle by rectangles of proportion `x` is produced by a complete admissible placement sequence, with free sides that satisfy the emitted constraints.
-
-The sequence is built one tile at a time.
+A placement sequence that produces a given tiling is built one tile at a time.
 Say that the floor of a tier *extends* when, in the tiling, the tile lying below and to the right of the right end of the floor has its top side at the level of the floor.
 The next tile is placed at the first tier whose floor does not extend.
 A stale tier always has a floor that extends, and a started floor never extends, which makes every such placement admissible.

@@ -100,37 +100,6 @@ theorem tileSize_of_tile {x : ℝ} (hx : 0 < x) {fit : Fit} {tall : Bool} {floor
   · exact ⟨hn.symm, hl.symm⟩
   · exact ⟨hn.symm, hl.symm⟩
 
-/-! ### Independence of unused free sides -/
-
-theorem tileSize_side {L : Type} (A : Algebra L) {fit : Fit} (tall : Bool) (floor wall a b : L)
-    (h : fit ≠ .inside) : tileSize A fit tall floor wall a = tileSize A fit tall floor wall b := by
-  cases fit <;> cases tall <;> simp_all [tileSize]
-
-theorem place_side {L : Type} (A : Algebra L) (s : List (Tier L)) (mv : Placement) (a b : L)
-    (h : mv.fit ≠ .inside) : place A s mv a = place A s mv b := by
-  unfold place
-  cases s[mv.tier]? with
-  | none => rfl
-  | some t => simp only [tileSize_side A mv.tall t.floor t.wall a b h]
-
-theorem le_nextIndex (k : ℕ) (mv : Placement) : k ≤ nextIndex k mv := by
-  unfold nextIndex
-  split <;> omega
-
-theorem run_congr {L : Type} (A : Algebra L) {f g : ℕ → L} (path : List Placement) :
-    ∀ (s : List (Tier L)) (k : ℕ), (∀ j, k ≤ j → f j = g j) →
-      (Allowed A f s k path ↔ Allowed A g s k path) ∧
-        positives A f s k path = positives A g s k path ∧
-        equations A f s k path = equations A g s k path := by
-  induction path with
-  | nil => intro s k _; exact ⟨Iff.rfl, rfl, rfl⟩
-  | cons mv rest ih =>
-    intro s k hfg
-    have hk := hfg k (le_refl k)
-    obtain ⟨i1, i2, i3⟩ := ih (place A s mv (g k)) (nextIndex k mv)
-      fun j hj => hfg j ((le_nextIndex k mv).trans hj)
-    simp only [Allowed, positives, equations, hk, i1, i2, i3, and_self]
-
 theorem tiles_congr {x : ℝ} {f g : ℕ → ℝ} (path : List Placement) :
     ∀ (s : List (Tier ℝ)) (k : ℕ), (∀ j, k ≤ j → f j = g j) →
       tiles x W H f s k path = tiles x W H g s k path := by
@@ -333,7 +302,7 @@ theorem complete_from {x : ℝ} (hx : 0 < x) (htl : IsTiling (Rect.main W H) tl)
       intro fresh hside hplace hagree
       obtain ⟨b1, b2, b3, b4, -⟩ := hstep (fresh k) hside
       obtain ⟨c1, c2, c3⟩ := run_congr (realAlgebra x) path' (place (realAlgebra x) s mv side)
-        (nextIndex k mv) hagree
+        (nextIndex k mv) fun j hj _ => hagree j hj
       have c4 := tiles_congr (x := x) (W := W) (H := H) path' (place (realAlgebra x) s mv side)
         (nextIndex k mv) hagree
       refine ⟨mv :: path', fresh, ⟨b1, ?_⟩, ⟨?_, ?_⟩, ?_, ?_⟩

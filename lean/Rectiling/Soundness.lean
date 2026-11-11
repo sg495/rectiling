@@ -12,30 +12,6 @@ These inequalities follow from the rules on stale tiers and started floors: a ti
 
 namespace Rectiling
 
-/-- The constraints emitted by a sequence of placements hold. -/
-def Satisfies (x : ℝ) (fresh : ℕ → ℝ) (s : List (Tier ℝ)) (k : ℕ) (path : List Placement) : Prop :=
-  (∀ c ∈ positives (realAlgebra x) fresh s k path, 0 < c) ∧
-    ∀ e ∈ equations (realAlgebra x) fresh s k path, e = 0
-
-theorem Satisfies.head {x : ℝ} {fresh : ℕ → ℝ} {s : List (Tier ℝ)} {k : ℕ} {mv : Placement}
-    {rest : List Placement} (h : Satisfies x fresh s k (mv :: rest)) :
-    (∀ c ∈ positiveAt s mv (fresh k), 0 < c) ∧
-      ∀ e ∈ equationAt (realAlgebra x) s mv, e = 0 := by
-  refine ⟨fun c hc => h.1 c ?_, fun e he => h.2 e ?_⟩
-  · simp only [positives, List.mem_append, Option.mem_toList]
-    exact Or.inl hc
-  · simp only [equations, List.mem_append, Option.mem_toList]
-    exact Or.inl he
-
-theorem Satisfies.tail {x : ℝ} {fresh : ℕ → ℝ} {s : List (Tier ℝ)} {k : ℕ} {mv : Placement}
-    {rest : List Placement} (h : Satisfies x fresh s k (mv :: rest)) :
-    Satisfies x fresh (place (realAlgebra x) s mv (fresh k)) (nextIndex k mv) rest := by
-  refine ⟨fun c hc => h.1 c ?_, fun e he => h.2 e ?_⟩
-  · simp only [positives, List.mem_append]
-    exact Or.inr hc
-  · simp only [equations, List.mem_append]
-    exact Or.inr he
-
 /-- The tile of a placement whose constraints hold has positive sides and the given proportion. -/
 theorem size_facts {x : ℝ} (hx : 0 < x) (fit : Fit) (tall : Bool) (floor wall side : ℝ)
     (hp : 0 < positiveOf fit floor wall side)
