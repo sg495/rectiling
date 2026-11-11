@@ -254,6 +254,52 @@ def staircase_figure(path):
     plt.close(fig)
 
 
+def sporadic_figure(path):
+    """Draws the two sporadic tilings of proportions 5/3 with six tiles and 16/5 with nine."""
+    six = [(0, 0, 75, 45), (75, 0, 30, 50), (72, 50, 33, 55), (0, 45, 36, 60), (36, 45, 36, 60), (72, 45, 3, 5)]
+    nine = [(0, 0, 2560, 800), (2560, 0, 480, 1536), (2100, 1536, 470, 1504), (2570, 1536, 470, 1504)]
+    nine += [(700 * k, 800, 700, 2240) for k in range(3)] + [(2100, 800, 230, 736), (2330, 800, 230, 736)]
+    fig, axes = plt.subplots(1, 2, figsize=(3.6, 1.95))
+    for ax, tiles, side, label in zip(axes, (six, nine), (105, 3040), ("$5/3$", "$16/5$")):
+        assert sum(w * h for _, _, w, h in tiles) == side * side
+        draw(ax, [tuple(c / side for c in tile) for tile in tiles])
+        ax.set_title(label, fontsize=7, pad=2)
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+
+
+def network_figure(path):
+    """Draws a tiling with the horizontal components of its sides, and the network of the tiling with the edge joining its poles."""
+    tiles = [(0, 0, 0.6, 0.35), (0.6, 0, 0.4, 0.65), (0.4, 0.65, 0.6, 0.35), (0, 0.35, 0.4, 0.65), (0.4, 0.35, 0.2, 0.3)]
+    components = {"t": (0, 1, 0), "u": (0, 0.6, 0.35), "v": (0.4, 1, 0.65), "s": (0, 1, 1)}
+    nodes = {"t": (0.5, 0), "u": (0.25, 0.35), "v": (0.75, 0.65), "s": (0.5, 1)}
+    fig, (left, right) = plt.subplots(1, 2, figsize=(3.9, 1.95))
+    draw(left, tiles)
+    for x, y, w, h in tiles:
+        left.plot([x + w / 2, x + w / 2], [y, y + h], color="k", lw=0.5)
+    for name, (x0, x1, y) in components.items():
+        left.plot([x0, x1], [y, y], color="k", lw=1.6, solid_capstyle="butt")
+        left.text(x1 + 0.03 if x1 == 1 else x0 - 0.03, y, f"${name}$", fontsize=7, va="center", ha="left" if x1 == 1 else "right")
+    left.set_xlim(-0.12, 1.12)
+    for k, (x, y, w, h) in enumerate(tiles):
+        top = next(n for n, (x0, x1, c) in components.items() if abs(c - y - h) < 1e-9 and x0 - 1e-9 <= x and x + w <= x1 + 1e-9)
+        bottom = next(n for n, (x0, x1, c) in components.items() if abs(c - y) < 1e-9 and x0 - 1e-9 <= x and x + w <= x1 + 1e-9)
+        right.annotate("", xy=nodes[bottom], xytext=nodes[top], arrowprops=dict(arrowstyle="-|>", color=COLOURS[k], lw=1.2, shrinkA=3, shrinkB=3, mutation_scale=7))
+    right.annotate("", xy=nodes["s"], xytext=nodes["t"], arrowprops=dict(arrowstyle="-|>", color="k", lw=0.6, ls="--", shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle="arc3,rad=1.1"))
+    right.text(1.13, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
+    for name, (x, y) in nodes.items():
+        right.plot([x], [y], marker="o", mfc="w", mec="k", ms=4, zorder=3)
+        right.text(x - 0.06, y, f"${name}$", fontsize=7, va="center", ha="right")
+    right.set_xlim(-0.12, 1.3)
+    right.set_ylim(-0.05, 1.05)
+    right.set_aspect("equal")
+    right.axis("off")
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def main():
     """Generates all figures."""
     three = tilings(3)
@@ -268,6 +314,8 @@ def main():
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
     catalogue(6, 14, OUT / "six-tiles.svg", 0.47)
     print("proportions of full degree:", full_degree(OUT / "full-degree.svg"))
+    sporadic_figure(OUT / "sporadic.svg")
+    network_figure(OUT / "network.svg")
     print("three tiles:", [(round(v, 6), m) for v, _, m in three])
     print("tilings with four tiles:", len(four), "sharing the cubic:", len(cubic))
 
