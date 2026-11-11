@@ -3,6 +3,7 @@
 //! Exact enumeration of tilings of a rectangle by similar rectangles.
 
 pub mod algebraic;
+mod bags;
 mod cache;
 mod exact;
 pub mod factor;
@@ -10,6 +11,7 @@ mod fast;
 mod form;
 pub mod guillotine;
 pub mod int;
+mod modular;
 pub mod interval;
 mod pack;
 pub mod poly;

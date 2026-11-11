@@ -3,6 +3,7 @@
 //! Exhaustive search for tilings of a rectangle by similar rectangles.
 
 use crate::algebraic::{Algebraic, Registry};
+use crate::bags::Bags;
 use crate::cache::{PolyCache, WordMap};
 use crate::exact;
 use crate::fast::Engine;
@@ -56,6 +57,8 @@ pub struct Found {
     pub distinct: u64,
     /// Number of classes of such tilings under the symmetries of the main rectangle, if tilings were counted.
     pub classes: u64,
+    /// Number of distinct bags of tiles of such tilings, if bags were counted.
+    pub bags: u64,
 }
 
 /// Representative of a class of tilings under the symmetries of the main rectangle.
@@ -116,7 +119,7 @@ pub(crate) fn encode_witness(moves: impl Iterator<Item = Placement>) -> Witness 
     w
 }
 
-fn decode_witness(w: &Witness) -> Vec<Placement> {
+pub(crate) fn decode_witness(w: &Witness) -> Vec<Placement> {
     w.iter()
         .take_while(|&&b| b != NO_PLACEMENT)
         .map(|&b| Placement {
@@ -135,6 +138,7 @@ pub struct Outcome {
     stats: Stats,
     polynomials: usize,
     extras: Vec<[u64; 2]>,
+    bags: Vec<u64>,
     census: Option<Census>,
 }
 
@@ -201,6 +205,7 @@ impl Outcome {
                     witness: decode_witness(&self.witnesses[id as usize]),
                     distinct: examined * (1 + doubled as u64),
                     classes,
+                    bags: self.bags.get(id as usize).copied().unwrap_or(0),
                 }
             })
             .collect()
@@ -289,6 +294,7 @@ pub struct Search {
     minority: usize,
     counting: bool,
     listing: bool,
+    bags: bool,
 }
 
 /// Whether a partial tiling with the given numbers of tall and of placed tiles has at most the given number of tiles in its less frequent orientation.
@@ -308,6 +314,16 @@ impl Search {
             minority: tiles,
             counting: false,
             listing: false,
+            bags: false,
+        }
+    }
+
+    /// The same search, which also counts the tilings and the distinct bags of tiles: the proportion with the multiset of the short sides of the tiles.
+    pub fn counting_bags(self) -> Self {
+        Search {
+            counting: true,
+            bags: true,
+            ..self
         }
     }
 
@@ -332,8 +348,8 @@ impl Search {
         }
     }
 
-    pub(crate) fn analyst<'a>(&self, registry: &'a Registry) -> Option<Analyst<'a>> {
-        self.counting.then(|| Analyst::new(self.width, self.height, registry, self.listing))
+    pub(crate) fn analyst<'a>(&self, registry: &'a Registry, bags: Option<&'a Bags>) -> Option<Analyst<'a>> {
+        self.counting.then(|| Analyst::new(self.width, self.height, registry, self.listing, bags))
     }
 
     /// The same search restricted to tilings with at most the given number of tiles in the less frequent orientation.
@@ -400,10 +416,12 @@ impl Search {
         out
     }
 
-    fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache) -> Outcome {
+    fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache, bags: Option<Bags>) -> Outcome {
+        let bags = bags.map(|b| b.counts()).unwrap_or_default();
         let (counts, witnesses, extras) = shared.table.into_inner().expect("results lock");
         let mut census = shared.census.into_inner().expect("results lock");
         census.square = self.is_square();
+        census.bags = self.bags.then(|| bags.iter().sum());
         Outcome {
             registry,
             counts,
@@ -411,6 +429,7 @@ impl Search {
             stats: shared.stats.into_inner().expect("results lock"),
             polynomials: cache.len(),
             extras,
+            bags,
             census: self.counting.then_some(census),
         }
     }
@@ -420,11 +439,12 @@ impl Search {
         let registry = Registry::new();
         let cache = PolyCache::new();
         let shared = self.shared();
+        let bags = self.bags.then(Bags::new);
         self.sequences(4).par_iter().for_each_init(
-            || Engine::new(self, &registry, &cache, &shared),
+            || Engine::new(self, &registry, &cache, &shared, bags.as_ref()),
             |engine, prefix| engine.run(prefix),
         );
-        self.outcome(shared, registry, cache)
+        self.outcome(shared, registry, cache, bags)
     }
 
     /// Finds the proportions of all guillotine tilings by series and parallel composition of aspect ratios, counting for each the aspect ratio functions that realise it.
@@ -439,6 +459,7 @@ impl Search {
             stats,
             polynomials: cache.len(),
             extras: Vec::new(),
+            bags: Vec::new(),
             census: None,
         }
     }
@@ -448,9 +469,10 @@ impl Search {
         let registry = Registry::new();
         let cache = PolyCache::new();
         let shared = self.shared();
+        let bags = self.bags.then(Bags::new);
         self.sequences(self.tiles).par_chunks(1024).for_each(|paths| {
             let mut tally = Tally::default();
-            let mut analyst = self.analyst(&registry);
+            let mut analyst = self.analyst(&registry, bags.as_ref());
             for path in paths {
                 let solved = exact::solve(self.width, self.height, &registry, &cache, path);
                 tally.stats.leaves += 1;
@@ -469,6 +491,6 @@ impl Search {
             }
             tally.flush(&shared, true);
         });
-        self.outcome(shared, registry, cache)
+        self.outcome(shared, registry, cache, bags)
     }
 }

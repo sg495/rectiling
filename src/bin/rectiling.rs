@@ -12,6 +12,7 @@ fn main() {
     let mut guillotine = false;
     let mut tilings = false;
     let mut classes = false;
+    let mut bags = false;
     let mut exact = false;
     let mut minority: Option<usize> = None;
     let mut args = args.iter();
@@ -21,6 +22,7 @@ fn main() {
             "--guillotine" => guillotine = true,
             "--tilings" => tilings = true,
             "--classes" => classes = true,
+            "--bags" => bags = true,
             "--exact" => exact = true,
             "--minority" => match args.next().and_then(|v| v.parse().ok()) {
                 Some(v) => minority = Some(v),
@@ -42,6 +44,9 @@ fn main() {
     if let Some(limit) = minority {
         search = search.with_minority(limit);
     }
+    if bags {
+        search = search.counting_bags();
+    }
     if classes {
         search = search.listing_tilings();
     } else if tilings {
@@ -59,12 +64,13 @@ fn main() {
         for found in outcome.proportions() {
             if outcome.census().is_some() {
                 println!(
-                    "{:.15}\t{}\t{}\t{}\t{}\t{}",
+                    "{:.15}\t{}\t{}\t{}\t{}\t{}\t{}",
                     found.proportion.approx(),
                     found.proportion.degree(),
                     found.tilings,
                     found.distinct,
                     found.classes,
+                    found.bags,
                     found.proportion.min_poly()
                 );
             } else {
@@ -138,6 +144,10 @@ fn print_census(census: &Census) {
     println!("sequences repeating tilings by squares = {}", census.reoriented());
     println!("multiplicities hold = {}", census.multiplicities_hold());
     println!("compared exactly = {}, inconsistent = {}, asymmetric = {}", census.exact(), census.inconsistent(), census.asymmetric());
+    if let Some(bags) = census.bags() {
+        println!("bags = {bags}");
+        println!("collisions = {}, unresolved = {}", census.collisions(), census.unresolved());
+    }
 }
 
 fn trimmed(counts: &[u64]) -> &[u64] {
@@ -146,6 +156,6 @@ fn trimmed(counts: &[u64]) -> &[u64] {
 }
 
 fn usage() -> ! {
-    eprintln!("usage: rectiling [--list] [--tilings] [--classes] [--exact] [--guillotine] [--minority LIMIT] TILES [WIDTH HEIGHT]");
+    eprintln!("usage: rectiling [--list] [--tilings] [--classes] [--bags] [--exact] [--guillotine] [--minority LIMIT] TILES [WIDTH HEIGHT]");
     std::process::exit(2)
 }

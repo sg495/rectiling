@@ -206,6 +206,8 @@ pub(crate) fn solve(width: i64, height: i64, registry: &Registry, cache: &PolyCa
 struct Solution<C: Int> {
     /// The coordinates of the vertical and of the horizontal lines of the layout.
     lines: [Vec<Poly<C>>; 2],
+    /// The short sides of the tiles.
+    shorts: Vec<Poly<C>>,
     /// The common denominator.
     den: Poly<C>,
     /// The sign of the common denominator at the proportion.
@@ -225,9 +227,10 @@ fn solution_in<C: Int>(registry: &Registry, root: &RootRef, path: &[Placement], 
     let shift = alg.positives.iter().map(|f| f.den()).max().unwrap_or(0) as i32 + 1;
     let sizes: Vec<Poly<C>> = alg.positives.iter().map(|f| numerator(f, &det, &sol)).collect();
     let scaled = |q: usize, e: i32| sizes[q].shift((shift - alg.positives[q].den() as i32 + e) as usize);
+    let mut shorts = Vec::with_capacity(path.len());
     let mut lines = [vec![Poly::zero(), sol[k].shift(shift as usize)], vec![Poly::zero(), det.shift(shift as usize)]];
     for (q, &mv) in path.iter().enumerate() {
-        let (ex, ey, _) = exponents(mv);
+        let (ex, ey, es) = exponents(mv);
         let [left, right, bottom, top] = layout.sides[q].map(|v| v as usize);
         if right == lines[0].len() {
             let v = lines[0][left].add(&scaled(q, ex));
@@ -237,9 +240,11 @@ fn solution_in<C: Int>(registry: &Registry, root: &RootRef, path: &[Placement], 
             let v = lines[1][bottom].add(&scaled(q, ey));
             lines[1].push(v);
         }
+        shorts.push(scaled(q, es));
     }
     Some(Solution {
         lines,
+        shorts,
         den: det.shift(shift as usize),
         sign,
     })
@@ -324,4 +329,24 @@ pub(crate) fn coordinates(registry: &Registry, root: &RootRef, path: &[Placement
             })
             .collect(),
     )
+}
+
+/// The short sides of the tiles of a tiling, as numerators over a common denominator with machine-integer coefficients.
+pub(crate) struct Measures {
+    pub(crate) shorts: Vec<Vec<i64>>,
+    pub(crate) den: Vec<i64>,
+}
+
+/// The short sides of the tiles of the tiling realised by a placement sequence at a proportion, unless they exceed machine integers.
+pub(crate) fn measures(registry: &Registry, root: &RootRef, path: &[Placement]) -> Option<Measures> {
+    take_overflow();
+    let solution: Option<Solution<i64>> = solution_in(registry, root, path, &Layout::new(path));
+    if take_overflow() {
+        return None;
+    }
+    let solution = solution?;
+    Some(Measures {
+        shorts: solution.shorts.iter().map(|s| s.coeffs().to_vec()).collect(),
+        den: solution.den.coeffs().to_vec(),
+    })
 }

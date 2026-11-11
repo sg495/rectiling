@@ -132,6 +132,38 @@ fn proportions_carry_their_numbers_of_tilings() {
 }
 
 #[test]
+fn bags_of_the_square() {
+    for (n, expected) in [1, 1, 3, 11, 51, 250, 1419, 8877].into_iter().enumerate() {
+        let outcome = Search::square(n + 1).counting_bags().run();
+        let census = certified(&outcome);
+        assert_eq!(census.bags(), Some(expected), "n = {}", n + 1);
+        assert_eq!(census.unresolved(), 0);
+        let found = outcome.proportions();
+        assert_eq!(found.iter().map(|f| f.bags).sum::<u64>(), expected);
+        assert!(found.iter().all(|f| 1 <= f.bags && f.bags <= f.classes && f.classes <= f.distinct));
+    }
+}
+
+#[test]
+fn bags_agree_between_methods_and_between_transposed_rectangles() {
+    for (n, w, h) in [(6, 1, 1), (7, 1, 1), (6, 2, 1), (6, 5, 3)] {
+        let fast = Search::new(n, w, h).counting_bags().run();
+        let exact = Search::new(n, w, h).counting_bags().run_exact();
+        let transposed = Search::new(n, h, w).counting_bags().run();
+        assert_eq!(certified(&fast).bags(), certified(&exact).bags(), "n = {n}, w = {w}/{h}");
+        assert_eq!(certified(&fast).bags(), certified(&transposed).bags(), "n = {n}, w = {w}/{h}");
+    }
+}
+
+#[test]
+fn proportions_with_several_bags_for_six_tiles() {
+    let outcome = Search::square(6).counting_bags().run();
+    let several: Vec<(String, u64)> = outcome.proportions().iter().filter(|f| f.bags > 1).map(|f| (f.proportion.min_poly().to_string(), f.bags)).collect();
+    let expected = [("2*x^3 - 3*x^2 + 2*x - 2", 2), ("2*x - 3", 2), ("x^3 - 2*x^2 + x - 1", 3), ("x - 2", 2)];
+    assert_eq!(several, expected.map(|(p, b)| (p.to_string(), b)));
+}
+
+#[test]
 #[ignore = "takes a quarter of a minute in release mode"]
 fn tilings_with_nine_and_ten_tiles() {
     for (n, tilings, classes) in [(9, 7280599, 914261), (10, 77188146, 9666313)] {

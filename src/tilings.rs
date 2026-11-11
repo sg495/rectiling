@@ -3,6 +3,7 @@
 //! Identification of the tilings found by a search as sets of rectangles, and of their symmetries.
 
 use crate::algebraic::{Registry, RootRef};
+use crate::bags::{Bags, Entered};
 use crate::exact;
 use crate::interval::Iv;
 use crate::search::{Witness, encode_witness};
@@ -335,6 +336,10 @@ pub struct Census {
     pub(crate) exact: u64,
     pub(crate) inconsistent: u64,
     pub(crate) asymmetric: u64,
+    pub(crate) bags: Option<u64>,
+    pub(crate) entered: u64,
+    pub(crate) collisions: u64,
+    pub(crate) unresolved: u64,
     pub(crate) classes: Vec<Class>,
 }
 
@@ -355,6 +360,9 @@ impl Census {
         self.exact += o.exact;
         self.inconsistent += o.inconsistent;
         self.asymmetric += o.asymmetric;
+        self.entered += o.entered;
+        self.collisions += o.collisions;
+        self.unresolved += o.unresolved;
         self.classes.append(&mut o.classes);
         *o = Census {
             square: o.square,
@@ -440,6 +448,21 @@ impl Census {
         self.inconsistent
     }
 
+    /// The number of distinct bags of tiles, a bag being the proportion with the multiset of the short sides of the tiles, if the search was asked for it.
+    pub fn bags(&self) -> Option<u64> {
+        self.bags
+    }
+
+    /// The number of pairs of distinct bags that the modular filter did not separate.
+    pub fn collisions(&self) -> u64 {
+        self.collisions
+    }
+
+    /// The number of tilings whose bag could not be identified; the count of bags is certified only if it is zero.
+    pub fn unresolved(&self) -> u64 {
+        self.unresolved
+    }
+
     /// The number of tilings whose combinatorial symmetry was not confirmed by exact arithmetic; the counts are certified only if it is zero.
     pub fn asymmetric(&self) -> u64 {
         self.asymmetric
@@ -452,6 +475,7 @@ pub(crate) struct Analyst<'a> {
     height: i64,
     registry: &'a Registry,
     listing: bool,
+    bags: Option<&'a Bags>,
     grid: Grid,
     scratch: Grid,
 }
@@ -466,12 +490,13 @@ pub(crate) struct Verdict {
 }
 
 impl<'a> Analyst<'a> {
-    pub(crate) fn new(width: i64, height: i64, registry: &'a Registry, listing: bool) -> Self {
+    pub(crate) fn new(width: i64, height: i64, registry: &'a Registry, listing: bool, bags: Option<&'a Bags>) -> Self {
         Analyst {
             width,
             height,
             registry,
             listing,
+            bags,
             grid: Grid::new(),
             scratch: Grid::new(),
         }
@@ -564,6 +589,16 @@ impl<'a> Analyst<'a> {
             }
             if verdict.minimal {
                 census.minimal[class] += 1;
+                if let Some(bags) = self.bags {
+                    match bags.enter(self.registry, root, moves, own) {
+                        Entered::New(collision) => {
+                            census.entered += 1;
+                            census.collisions += collision as u64;
+                        }
+                        Entered::Known => {}
+                        Entered::Unresolved => census.unresolved += 1,
+                    }
+                }
                 if self.listing {
                     census.classes.push(Class {
                         id: root.id,

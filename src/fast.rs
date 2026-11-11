@@ -3,6 +3,7 @@
 //! Depth-first search with eager fraction-free elimination and certified numerical checks.
 
 use crate::algebraic::{Registry, RootRef};
+use crate::bags::Bags;
 use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
@@ -379,14 +380,14 @@ impl Drop for Engine<'_> {
 }
 
 impl<'a> Engine<'a> {
-    pub(crate) fn new(search: &Search, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
+    pub(crate) fn new(search: &Search, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared, bags: Option<&'a Bags>) -> Self {
         let (width, height) = search.sides();
         Engine {
             width,
             height,
             tiles: search.tiles(),
             minority: search.minority(),
-            analyst: search.analyst(registry),
+            analyst: search.analyst(registry, bags),
             sizes: SmallVec::new(),
             registry,
             cache,
