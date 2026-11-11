@@ -8,6 +8,7 @@ mod exact;
 pub mod factor;
 mod fast;
 mod form;
+pub mod guillotine;
 pub mod int;
 pub mod interval;
 mod pack;
@@ -17,6 +18,7 @@ pub mod search;
 pub mod staircase;
 
 pub use algebraic::Algebraic;
+pub use guillotine::count_guillotine_ratios;
 pub use poly::Poly;
 pub use search::{Found, Outcome, Search, Stats};
 pub use staircase::{Fit, Placement, count_layouts};

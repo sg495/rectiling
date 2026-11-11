@@ -6,6 +6,7 @@ use crate::algebraic::{Algebraic, Registry};
 use crate::cache::{PolyCache, WordMap};
 use crate::exact;
 use crate::fast::Engine;
+use crate::guillotine;
 use crate::staircase::{FITS, Placement, Staircase, Unit};
 use rayon::prelude::*;
 use std::sync::Mutex;
@@ -183,6 +184,12 @@ pub struct Search {
     tiles: usize,
     width: i64,
     height: i64,
+    minority: usize,
+}
+
+/// Whether a partial tiling with the given numbers of tall and of placed tiles has at most the given number of tiles in its less frequent orientation.
+pub(crate) fn within(minority: usize, tall: usize, placed: usize) -> bool {
+    tall.min(placed - tall) <= minority
 }
 
 impl Search {
@@ -194,7 +201,18 @@ impl Search {
             tiles,
             width: width as i64,
             height: height as i64,
+            minority: tiles,
         }
+    }
+
+    /// The same search restricted to tilings with at most the given number of tiles in the less frequent orientation.
+    pub fn with_minority(self, minority: usize) -> Self {
+        Search { minority, ..self }
+    }
+
+    /// The largest number of tiles allowed in the less frequent orientation.
+    pub fn minority(&self) -> usize {
+        self.minority
     }
 
     /// A search for tilings of a square by the given number of tiles.
@@ -229,6 +247,10 @@ impl Search {
                         if stairs.admits(mv, remaining).is_none() || (tall && path.is_empty() && search.is_square()) {
                             continue;
                         }
+                        let talls = path.iter().filter(|p| p.tall).count() + tall as usize;
+                        if !within(search.minority, talls, path.len() + 1) {
+                            continue;
+                        }
                         let mut next = stairs.clone();
                         next.place(&mut Unit, mv);
                         path.push(mv);
@@ -260,10 +282,24 @@ impl Search {
         let cache = PolyCache::new();
         let shared = Shared::default();
         self.sequences(4).par_iter().for_each_init(
-            || Engine::new(self.tiles, self.width, self.height, &registry, &cache, &shared),
+            || Engine::new(self.tiles, self.width, self.height, self.minority, &registry, &cache, &shared),
             |engine, prefix| engine.run(prefix),
         );
         self.outcome(shared, registry, cache)
+    }
+
+    /// Finds the proportions of all guillotine tilings by series and parallel composition of aspect ratios, counting for each the aspect ratio functions that realise it.
+    pub fn run_guillotine(&self) -> Outcome {
+        let registry = Registry::new();
+        let cache = PolyCache::new();
+        let (counts, stats) = guillotine::solve(self.tiles, self.width, self.height, &registry, &cache);
+        Outcome {
+            witnesses: vec![[NO_PLACEMENT; 14]; counts.len()],
+            registry,
+            counts,
+            stats,
+            polynomials: cache.len(),
+        }
     }
 
     /// Runs the search with every tiling solved by exact symbolic elimination, as a reference for the default method.
