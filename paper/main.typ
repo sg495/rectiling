@@ -850,7 +850,7 @@ The pass along a record keeps, besides the staircase, the coefficient by which t
   + If $j < ell$ and $p_j$ has an equation $E$ on $S$, there is an index $m$ with $1 <= m <= k^+$ and $E_m != 0$ such that the elimination $epsilon = (E, m, pi)$ divides exactly every floor and wall of $S^+$, and $Sigma_j = (epsilon(S^+), E_m, k^+)$, where $epsilon(S^+)$ is obtained by applying $epsilon$ to every floor and wall of $S^+$; the elimination $epsilon$ is _recorded_ with $p_j$.
 ] <def:elimination>
 
-A tile placed inside thus receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
+A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
 A stage therefore represents lengths up to the factor of its pivot.
 The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
 The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
@@ -1140,7 +1140,6 @@ When the stored polynomial is the minimal polynomial of the root, the certificat
   caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall: the exact solution of the system of its record, with the width of the main rectangle left free, for three values of the proportion. The central tile has height $(x^2 - 1) slash (5 x^2 + 3)$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
 ) <fig:pinwheel>
 
-
 #proposition(name: [degenerate tiles])[
   Let $f in ZZ[x]$ be primitive and irreducible over $QQ$, and let $r$ be a real number with $f(r) = 0$.
   Then, for every $q in ZZ[x]$, the polynomial $f$ divides $q$ in $ZZ[x]$ if and only if $q(r) = 0$.
@@ -1299,7 +1298,8 @@ This is what the two counts of the reference method establish in a run of the de
 ]
 
 The first statement needs no proviso: whatever the default search reports is the proportion of a tiling.
-The two searches can differ only at a record that the default method settles itself and that is not regular for the reference method, because a singular situation is counted or the record is flagged as constant; there the default method reports every solution and the reference method may report nothing. No such record is known.
+The two searches can differ only at a record that the default method settles itself and that is not regular for the reference method, because a singular situation is counted or the record is flagged as constant; there the default method reports every solution and the reference method may report nothing.
+No such record is known.
 Completeness of the default search needs less than that of the reference search, namely the regularity of the records passed to the reference method only.
 
 = Results <sec:results>
