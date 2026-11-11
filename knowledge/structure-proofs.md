@@ -21,7 +21,7 @@ The first claim is also proved formally, in the Lean development of [`lean/`](..
 - **$g(n) \le n \cdot A338781(n)$.** Proved in full (Proposition 6.4); the growth constant $6.159$ is numerical.
 - **Log-convexity of $a(n)$, the bound of the wide counts by $E(n)$, and $g(n)/a(n) \to 0$.** Open (Section 7).
 
-Two statements of the analysis needed correcting; see Section 8.
+Several statements of the analysis needed correcting; see Section 8.
 
 ## 0. Conventions
 
