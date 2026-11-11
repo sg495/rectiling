@@ -12,8 +12,8 @@ The first claim is also proved formally, in the Lean development of [`lean/`](..
 - **Parity law.** Proved in full (Corollary 2.8).
 - **Wide rectangles count the functions.** Proved, after a correction to the definition of $E(n)$, using standard facts of planar duality (Theorem 3.6).
 - **The three rational proportions lie in $S(n)$.** Proved in full (Proposition 4.1).
-- **They need both orientations.** Proved in full for $n - 4$ and $n - 11/2$; for $n - 19/3$ reduced to one finite fact, which is established by computation only (Theorem 4.5).
-- **There are no other such proportions for $n \ge 10$.** Open (Conjecture 4.7).
+- **They need both orientations.** Proved in full, by hand (Theorem 4.6).
+- **There are no other such proportions for $n \ge 10$.** Open (Conjecture 4.8).
 - **Explicit width.** $W(n) = n(1 + 4^n/2)$ is proved, assuming Kirchhoff's tree formulas (Proposition 5.1).
 - **Threshold $\lfloor n^2/4 \rfloor + 2$.** Open; only a lower bound on the threshold is proved (Proposition 5.2).
 - **$a(n) \le n\,2^{n-1} M(n)$.** Proved, assuming Tutte's enumeration of non-separable planar maps (Theorem 6.2).
@@ -456,19 +456,82 @@ Hence $1 \ge \sum_j \sigma_j \min(\delta(\sigma_j), 5/2) + \tfrac52 (3 - \sigma_
 With $v = 2 - \sigma$, $\psi(\sigma) - \tfrac52\sigma = 2/v + \tfrac92 v - 9 \ge -3$, with equality at $v = 2/3$; so $\sigma \min(\delta(\sigma), 5/2) \ge \tfrac52 \sigma - 3$ in all cases.
 The right-hand side is therefore at least $\tfrac{15}{2} - 6 = \tfrac32$, a contradiction. $\square$
 
-**Fact F (computational).** A rectangle of sides $5$ and $3$ cannot be dissected into eight squares.
+**Lemma 4.5.** A rectangle of sides $5$ and $3$ cannot be dissected into eight squares of side less than $3$.
 
-This is the output of the exhaustive search: `rectiling --list --minority 0 8 5 3` reports no proportion equal to $1$, with no singular or constant case.
-It is also the entry $5/3$ in the row $n = 8$ of the table of rational proportions in [analysis.md](analysis.md).
-No proof by hand is given here; the method of Lemma 4.4 shows that at most one of the eight squares touches neither the top nor the bottom side, and leaves a finite but long case analysis.
+*Proof.*
+Take $L = 5$ and $H = 3$, and suppose that such a dissection exists.
+Call a square *lower* if it touches the bottom side, *upper* if it touches the top side, and *middle* otherwise; no square is both lower and upper.
+A vertical line that avoids the corners crosses one lower square, of side $\sigma$, one upper square, of side $\tau$, and possibly middle squares, of sides $c_i$; and $1/\sigma + 1/\tau \ge 4/(\sigma + \tau) \ge 4/3$.
+By (4.1), $8 \ge 5 \cdot \tfrac43 + \int \sum_i 1/c_i$, and the integral is the number of middle squares, so there is at most one.
+A *cut* is a vertical line, other than the two sides, that crosses the interior of no square; the cuts divide the rectangle into *blocks*, each dissected by the squares it contains.
 
-**Theorem 4.5.**
+*Blocks without a middle square.*
+Every line crosses a lower and an upper square with $\sigma + \tau = 3$.
+Where the lower square changes, inside the block, the upper square does not, as the line is not a cut; so consecutive lower squares have the same side, and likewise the upper ones.
+The block thus consists of $a$ lower squares of side $\sigma$ and $b$ upper squares of side $3 - \sigma$ with $a\sigma = b(3 - \sigma)$, and $a$ and $b$ are coprime, as otherwise there would be a cut inside.
+It has $a + b$ squares and width $3ab/(a+b)$: the widths are $3/2$ for two squares, $2$ for three, $9/4$ for four, $12/5$ or $18/5$ for five, $5/2$ for six, $18/7$, $30/7$ or $36/7$ for seven, and $21/8$ or $45/8$ for eight.
+
+*No middle square.*
+The numbers of squares of the blocks form a partition of $8$ into parts at least $2$, and the widths add up to $5$.
+The partitions $8$; $6 + 2$; $5 + 3$; $4 + 4$; $4 + 2 + 2$; $3 + 3 + 2$; $2 + 2 + 2 + 2$ give the total widths $21/8$ or $45/8$; $4$; $22/5$ or $28/5$; $9/2$; $21/4$; $11/2$; $6$, none of which is $5$.
+
+*One middle square* $M$, of side $c$.
+The lines through $M$ cross three squares, so $h \ge 3$ on a length $c$, and (4.1) gives $8 \ge \tfrac{20}{3} + \tfrac53 c$, that is $c \le 4/5$.
+On these lines the lower squares have their top at the bottom of $M$ and the upper squares their bottom at its top; so the lower squares below $M$ have a common side $\sigma$, the upper squares above $M$ a common side $\tau^*$, and $\sigma + c + \tau^* = 3$.
+Let the block that contains $M$ have width $\omega$ and $k$ squares, and let it be $[0,\omega] \times [0,3]$, with $M$ above $[x_M, x_M + c]$.
+The other blocks have no middle square, so their numbers of squares form a partition of $8 - k$ into parts at least $2$.
+Below it is shown that $k \ge 4$; hence $(k, \omega)$ is one of $(8, 5)$, $(6, 7/2)$, $(5, 3)$, $(4, 11/4)$ and $(4, 2)$.
+
+Suppose $x_M > 0$.
+To the left of $M$ the lines cross two squares, and as before all lower squares there have one side $\sigma_L$ and all upper squares the side $3 - \sigma_L$.
+The line at $x_M$ is not a cut, so it crosses the interior of a lower or an upper square.
+If of a lower one, then $\sigma_L = \sigma$; if of an upper one, then $3 - \sigma_L = \tau^*$; these exclude each other because $c > 0$.
+So exactly one of the two kinds of square straddles the line at $x_M$, and the squares of the other kind end there.
+The same holds at $x_M + c$ if $x_M + c < \omega$.
+Up to the reflections of the rectangle in its two axes, four cases remain.
+
+*(i) $x_M = 0$ and $x_M + c = \omega$.*
+Then $c = a\sigma = b\tau^*$ with integers $a, b \ge 1$, so $3 = c(1 + 1/a + 1/b) \le 3c$, contrary to $c \le 4/5$.
+
+*(ii) $x_M = 0$, and a lower square straddles the line at $c$.*
+All $p$ lower squares have side $\sigma = \omega/p$; $a \ge 1$ upper squares lie above $M$; and $b \ge 1$ upper squares of side $3 - \sigma$ fill the rest, so $c = \omega - b(3 - \sigma) = \omega(1 + b/p) - 3b$, with $k = p + a + b + 1$ and $p + b \le k - 2$.
+For $k = 4$: $c = 2\omega - 3 \ge 1$.
+For $(k,\omega) = (5,3)$: $c = 3 - 3b(p-1)/p \ge 3/2$, as $p + b \le 3$.
+For $(6, 7/2)$: $c = \tfrac72 + b(\tfrac{7}{2p} - 3)$, which for $p + b \le 4$ is at least $1$.
+For $(8, 5)$: $c = 5 - b(3 - 5/p)$, which for $p + b \le 6$ is at least $1$.
+All contradict $c \le 4/5$.
+
+*(iii) $0 < x_M$, $x_M + c < \omega$, and lower squares straddle both lines.*
+All $p$ lower squares have side $\sigma = \omega/p$; $a \ge 1$ upper squares lie above $M$, and $t \ge 2$ upper squares of side $3 - \sigma$ lie to its left and right, so $c = \omega(1 + t/p) - 3t$, with $k = p + a + t + 1$ and $p + t \le k - 2$.
+For $(5,3)$: $c = 3$.
+For $(6, 7/2)$: $c \ge 1$.
+For $(8,5)$: $c = 5 + t(5/p - 3)$, which for $p + t \le 6$ is at least $1$.
+All contradict $c \le 4/5$.
+
+*(iv) $0 < x_M$, $x_M + c < \omega$, a lower square straddles the line at $x_M$ and an upper square the line at $x_M + c$.*
+From the left, there are $a$ lower squares of side $\sigma$, ending at $x_M + c$, then $b$ lower squares of side $3 - \tau^* = \sigma + c$; and $a'$ upper squares of side $3 - \sigma$, ending at $x_M$, then $b'$ upper squares of side $\tau^* = 3 - \sigma - c$.
+So $k = a + b + a' + b' + 1$ and
+$$(a + b)\sigma + bc = \omega, \qquad (a' + b')(3 - \sigma) - b'c = \omega, \qquad a\sigma - c = a'(3 - \sigma).$$
+The rotation of the rectangle by a half-turn exchanges $(a, b, a', b')$ with $(b', a', b, a)$.
+For $(5, 3)$, all four numbers are $1$, and the first and third equations give $c = 0$.
+For $(6, 7/2)$, up to the half-turn $(a,b,a',b')$ is $(2,1,1,1)$ or $(1,2,1,1)$: the first and third equations give $(\sigma, c) = (13/12, 1/4)$, which violates the second, and $(19/14, -2/7)$.
+For $(8, 5)$, $a + b + a' + b' = 7$; up to the half-turn $a + b \le 3$.
+If $a + b = 2$, the first equation gives $\sigma \ge (5 - 4/5)/2 > 2$ and the second $5(3 - \sigma) > 5$, a contradiction.
+If $a + b = 3$, the first and third equations give, for $(a, b; a', b')$ equal to $(1,2;1,3)$, $(1,2;2,2)$, $(1,2;3,1)$, $(2,1;1,3)$, $(2,1;2,2)$ and $(2,1;3,1)$, the values $(\sigma, c) = (11/7, 1/7)$, $(17/9, -1/3)$, $(23/11, -7/11)$, $(4/3, 1)$, $(11/7, 2/7)$ and $(7/4, -1/4)$.
+Three have $c < 0$; for the others the left-hand side of the second equation is $37/7$, $11/3$ and $36/7$, not $5$.
+
+In the cases (ii) to (iv) the block has at least four squares, as was used above. $\square$
+
+The arithmetic of this proof was repeated by a script over all values of the parameters, with the same outcome.
+Independently, the exhaustive search finds that the rectangle $5 \times 3$ cannot be dissected into eight squares at all: `rectiling --list --minority 0 8 5 3` reports no proportion equal to $1$, with no singular or constant case.
+
+**Theorem 4.6.**
 
 1. For $n \ge 5$, a rectangle of sides $n - 4$ and $1$ cannot be dissected into $n$ squares.
 2. For $n \ge 6$, a rectangle of sides $n - 11/2$ and $1$ cannot be dissected into $n$ squares.
-3. For $n \ge 7$, a rectangle of sides $n - 19/3$ and $1$ cannot be dissected into $n$ squares, if Fact F holds.
+3. For $n \ge 7$, a rectangle of sides $n - 19/3$ and $1$ cannot be dissected into $n$ squares.
 
-*Status.* (1) and (2) are proved in full; (3) is proved assuming Fact F, which is established by computation only.
+*Status.* Proved in full, by hand; the finite facts on which it rests, Lemmas 4.2, 4.4 and 4.5, agree with the exhaustive search.
 
 *Proof.*
 Suppose that the rectangle $L \times 1$ is dissected into $n$ squares, and apply Lemma 4.3: there is a dissection of $\ell \times 1$ into $k$ squares of side less than $1$, where $\ell = L - f$ and $k = n - f$, so that $k - \ell = n - L$, and $k \ge 4\ell$.
@@ -483,11 +546,11 @@ If $\ell = 3/2$ then $k = 7$, and the rectangle $3 \times 2$ would be dissected 
 
 (3) Here $k = \ell + 19/3$, so $\ell \le 19/9$ and $\ell - 2/3$ is an integer: $\ell = 2/3$ or $\ell = 5/3$.
 If $\ell = 2/3$ then $k = 7$, and the rectangle $3 \times 2$ would be dissected into seven squares, contrary to (2) for $n = 7$.
-If $\ell = 5/3$ then $k = 8$, and the rectangle $5 \times 3$ would be dissected into eight squares, contrary to Fact F. $\square$
+If $\ell = 5/3$ then $k = 8$, and the rectangle $5 \times 3$ would be dissected into eight squares of side less than $3$, contrary to Lemma 4.5. $\square$
 
-So, for $n \ge 8$, the proportions $n - 4$ and $n - 11/2$, and given Fact F also $n - 19/3$, belong to $S(n)$ and are realised only by tilings with both orientations.
+So, for $n \ge 8$, the proportions $n - 4$, $n - 11/2$ and $n - 19/3$ belong to $S(n)$ and are realised only by tilings with both orientations.
 
-**Remark 4.6.** The same argument shows that $m$, $m - 3/2$ and $m - 7/3$ are the three largest $L$ for which $L \times 1$ can be dissected into $m$ squares, for $m \ge 4$.
+**Remark 4.7.** The same argument shows that $m$, $m - 3/2$ and $m - 7/3$ are the three largest $L$ for which $L \times 1$ can be dissected into $m$ squares, for $m \ge 4$.
 Indeed, if $0 < m - L < 7/3$ then $\ell < 7/9$ and $k = \ell + (m - L) < 28/9$, so $k \le 3$.
 Two squares of side less than $1$ tile $\ell \times 1$ only for $\ell = 1/2$, which gives $m - L = 3/2$.
 Three such squares do so only for $\ell = 1/3$ and $\ell = 2/3$: one of them contains a left and a right corner, so it has side $\ell$, and the other two tile a rectangle of sides $\ell$ and $1 - \ell$, one of which is then twice the other.
@@ -495,13 +558,13 @@ These give $m - L = 8/3$ and $7/3$.
 
 ### 4.3 Exhaustiveness, and the exceptions for small $n$
 
-**Conjecture 4.7.** For $n \ge 10$, every rational element of $S(n)$ other than $n - 4$, $n - 11/2$ and $n - 19/3$ is realised with one orientation.
+**Conjecture 4.8.** For $n \ge 10$, every rational element of $S(n)$ other than $n - 4$, $n - 11/2$ and $n - 19/3$ is realised with one orientation.
 
 *Status.* Open.
 It holds for $10 \le n \le 13$ by computation.
 No argument is known that would bound the rational proportions of tilings with both orientations, and no general construction is known that adds four squares to a dissection into squares, which is what would be needed to realise with $n$ squares the remaining rational elements of $S(n-4)$.
 
-For $6 \le n \le 9$, Proposition 4.1 and Theorem 4.5 account for all entries of the table of the analysis except two, since $n - 11/2 > 1$ requires $n \ge 7$ and $n - 19/3 > 1$ requires $n \ge 8$.
+For $6 \le n \le 9$, Proposition 4.1 and Theorem 4.6 account for all entries of the table of the analysis except two, since $n - 11/2 > 1$ requires $n \ge 7$ and $n - 19/3 > 1$ requires $n \ge 8$.
 The two others are sporadic: they come from pinwheels whose central rectangle is not a square.
 
 - $5/3 \in S(6)$. In a square of side $105$: a wide tile $75 \times 45$ at the bottom-left, a tall tile $30 \times 50$ at the bottom-right, a tall tile $33 \times 55$ at the top-right, two tall tiles $36 \times 60$ side by side at the top-left, and a tall tile $3 \times 5$ in the centre.
@@ -654,7 +717,7 @@ The lower bound $2^{n-2} \le g(n)$ of the analysis was not examined.
 - *Definition of $E(n)$.* The count of functions must leave out the pairs of an arrangement and an orientation vector in which some tile vanishes identically. Such pairs exist from $n = 5$ on, and their functions need not be realised by any tiling with $n$ tiles. With all pairs included, the statement on wide rectangles would be false. Step 4 of the sketch also overlooked that a tile that does not vanish may be negative for large $x$; this is harmless only because the tiling then belongs to another arrangement with the same network, which is the content of Theorem 3.2.
 - *Reversing all orientations.* It replaces $R(x)$ by $R(1/x)$, not by $1/R(x)$; the inverse $1/R$ belongs to the transposed tiling. The conclusion drawn from it, that a function of the first kind or its reversal has a solution at least $1$, is unaffected.
 - *Indexing of the maps.* $M(n)$ counts the rooted non-separable planar maps with $n + 1$ edges, the additional edge joining the poles.
-- *Rational proportions.* That the three rectangles cannot be cut into $n$ squares is no longer conjectural, up to Fact F for the third; exhaustiveness remains so.
+- *Rational proportions.* That the three rectangles cannot be cut into $n$ squares is no longer conjectural; exhaustiveness remains so.
 
 ## References
 

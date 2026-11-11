@@ -120,7 +120,7 @@ These six terms were computed here only.
 
 - It was stated from n = 10 and 11 and then confirmed for n = 12 and 13.
 - *Proved:* the three proportions are the three largest for which n − 4 tiles of one orientation suffice, and they lie in S(n) by the pinwheel.
-- *Proved:* the rectangles of sides n − 4 and n − 11/2 by 1 cannot be cut into n squares; for n − 19/3 the same is proved from the fact, known by computation only, that the 5 × 3 rectangle cannot be cut into eight squares.
+- *Proved:* the rectangles of sides n − 4, n − 11/2 and n − 19/3 by 1 cannot be cut into n squares.
 - What remains conjectural is that there is no other exception.
 - The exceptions 5/3 for n = 6 and 16/5 for n = 9 come from pinwheels whose central rectangle is not a square.
 
@@ -202,7 +202,7 @@ The count is not monotone in w: it dips at the widths w = ab + 1.
 The proofs obtained since are in [structure-proofs.md](structure-proofs.md); what remains is the following.
 
 - A width W(n) of polynomial size, and the exact threshold ⌊n²/4⌋ + 2.
-- For the rational proportions, a proof by hand that the 5 × 3 rectangle cannot be cut into eight squares, and exhaustiveness, which looks harder.
+- For the rational proportions, exhaustiveness, which looks hard.
 - For the growth of T(n), the two combinatorial facts named above; a lower bound needs a family of tilings in which no tile vanishes at the root.
 - The growth constant of a(n) and the convergence of T(n)/(2ⁿ⁻¹·M(n)) look out of reach.
 
