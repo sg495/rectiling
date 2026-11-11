@@ -42,7 +42,7 @@ The same question for a main rectangle of rational aspect ratio w gives a two-pa
 
 ## Open questions
 
-- Independent confirmation of a(9) and a(10), and further terms.
+- Independent confirmation of the terms beyond a(10), and further terms; this library confirms a(9) and a(10) and adds three terms, see [results.md](results.md).
 - A formula, recurrence or asymptotic estimate for a(n).
 - The number of tilings up to symmetry, as opposed to the number of proportions.
 - The distribution of the algebraic degrees of the proportions; degree n is attained for n = 3, 5 and 7 but not for n = 4.
