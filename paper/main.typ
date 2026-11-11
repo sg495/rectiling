@@ -1225,7 +1225,9 @@ Completeness of the default search needs less than that of the reference search,
 = Results <sec:results>
 
 All computations were carried out with the Rust implementation of the search, on a machine with sixteen cores and 128 GB of memory.
-In every run, every record was regular in the sense of @def:regular, and no arithmetic overflow was encountered.
+All runs used the default search, except where stated.
+In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the reference method were all zero.
+In the default search these counters concern the records passed to the reference method, so that every run was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions.
 
 == The square <sec:square>
 
