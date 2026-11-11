@@ -233,27 +233,6 @@ def full_degree(path, columns=10, size=0.66):
     return len(items)
 
 
-def staircase_figure(path):
-    """Draws a partial tiling with the tiers of its staircase, their anchors and the regions available to the next tile."""
-    moves = [(0, "inside", False), (0, "inside", True), (2, "inside", True)]
-    values = {X: 1.6, sp.Symbol("s0"): 0.3, sp.Symbol("s1"): 0.22, sp.Symbol("s2"): 0.14}
-    tiers, tiles, _, _ = replay(moves)
-    concrete = [tuple(float(sp.sympify(c).subs(values)) for c in tile) for tile in tiles]
-    fig, ax = plt.subplots(figsize=(2.6, 2.6))
-    for t in tiers:
-        ax_, ay, floor, wall = (float(sp.sympify(c).subs(values)) for c in (t.ax, t.ay, t.floor, t.wall))
-        ax.add_patch(Rectangle((ax_, ay), floor, wall, fc="none", hatch="//", lw=0, ec="lightgray"))
-    draw(ax, concrete)
-    for k, t in enumerate(tiers):
-        ax_, ay, floor, wall = (float(sp.sympify(c).subs(values)) for c in (t.ax, t.ay, t.floor, t.wall))
-        ax.add_patch(Rectangle((ax_, ay), 1 - ax_, wall, fc="none", ec="k", lw=0.4))
-        ax.plot([ax_], [ay], marker="o", mfc="none", mec="k", ms=5)
-        ax.text(ax_ + 0.02, ay + 0.02, f"$T_{k}$", fontsize=7, va="bottom", ha="left")
-    fig.tight_layout(pad=0.2)
-    fig.savefig(path)
-    plt.close(fig)
-
-
 def main():
     """Generates all figures."""
     three = tilings(3)
@@ -264,7 +243,6 @@ def main():
     grid([t for _, t, _ in picks], 6, OUT / "four-tiles.svg", [f"{v:.4f}" for v, _, _ in picks])
     cubic = [(v, t, m) for v, t, m in four if abs(v - 1.5436890127) < 1e-6]
     grid([t for _, t, _ in cubic], len(cubic), OUT / "shared-cubic.svg")
-    staircase_figure(OUT / "staircase.svg")
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
     catalogue(6, 14, OUT / "six-tiles.svg", 0.47)
     print("proportions of full degree:", full_degree(OUT / "full-degree.svg"))

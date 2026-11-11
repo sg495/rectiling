@@ -512,7 +512,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/construction.svg", width: 100%),
-  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, the floors that extend in the tiling are drawn dashed in red and the others in black; the tile placed next is the one at the anchor of the first tier whose floor does not extend, marked in black.],
+  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, the floors that extend in the tiling are drawn dashed in red and the others in black; the tile placed next is the one at the anchor of the first tier whose floor does not extend, marked in black, and the anchor of a stale tier is grey.],
 ) <fig:construction>
 
 #proof[
@@ -1312,15 +1312,16 @@ The computations restricted to guillotine tilings or to tilings with few tiles i
 
 == The square <sec:square>
 
-@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, the number of pairs of a record and a proportion that it realises, and the number of distinct polynomials with a root in $[1, infinity)$.
+@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search met.
+The last number depends on the method of search and is not an invariant of the problem.
 
 #figure(
   kind: table,
   datatable(csv("data/counts.csv")),
-  caption: [Proportions for the square. A record is an admissible sequence with orientations, the first tile being wide; a tiling is a record with a proportion that it realises.],
+  caption: [Proportions for the square. A record is an admissible sequence with orientations, the first tile being wide; a realisation is a record with a proportion that it realises. The last column is the time of the run, in seconds.],
 ) <tab:counts>
 
-The values for $n <= 8$ agree with those of Henderson and Gerbet, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
+The values for $n <= 7$ agree with those of Henderson and Gerbet, the value for $n = 8$ agrees with Henderson's, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
 The values for $n = 11$, $12$ and $13$ are new.
 Those for $n = 11$ and $n = 12$ were each computed twice, with the reference treatment of degenerate tiles and with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
 
@@ -1365,7 +1366,7 @@ Every proportion with $n$ tiles has degree at most $n$ @taams2023.
 ) <tab:degrees-high>
 
 Odd degrees are more frequent than the neighbouring even ones.
-Degree $n$ is attained for every $n$ in the table other than $2$ and $4$; the proportions of degree $n$ for $n <= 7$ are shown in @app:full.
+Degree $n$ is attained for every $n$ in the table other than $4$; the proportions of degree $n$ for $n <= 7$ are shown in @app:full.
 
 The proportions of degree one are explained in part by dissections into squares.
 If all tiles of a similar tiling of the square have the same orientation, stretching one axis by the proportion gives a dissection of a rectangle into $n$ squares, whose aspect ratio is the proportion.
@@ -1426,7 +1427,7 @@ Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutt
   caption: [A tiling of the square by three tiles of proportion $1.7548...$, and the tiling by seven tiles of the same proportion obtained by placing a reduced copy of it at the centre of a pinwheel of four tiles; the second is drawn from its record.],
 ) <fig:persistence>
 
-@prop:persistence has been formalised in Lean, except for the fact, not needed for the inclusion, that a square cannot be cut into two, three or five squares.
+@prop:persistence has been formalised in Lean.
 The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
 Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
@@ -1524,7 +1525,7 @@ Finally, the search gives some information on growth.
   The network of a tiling, with an added edge joining its poles, is such a map; by @prop:transposition half of the $2^n$ orientation vectors need be considered, and each function yields at most $n$ proportions, by the bound on the degree in @prop:function.
 ]
 
-The same bound for the number of tilings in the sense of @tab:counts is proved only under two combinatorial hypotheses, which are stated in @sec:upper.
+The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:upper.
 The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$, and the number of proportions achievable by guillotine tilings is a decreasing share of the total: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
 The guillotine count is at most $n slash 2$ times the number of series–parallel networks with $n$ edges of two kinds (@prop:guillotine), whose growth constant is numerically about $6.16$.
 
@@ -1555,6 +1556,8 @@ We now count the tilings themselves, in three ways.
 ] <def:tbc>
 
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
+The number $t(n)$ is finite.
+Indeed the proportions are finitely many, by @prop:upper-full, as are the records, and a record has at most one solution at a given proportion: the constraints being linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
 A tiling determines its bag, and symmetric tilings have the same bag, so that
 $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
 The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
@@ -1574,18 +1577,25 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
 The search of @sec:search counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
 A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
 A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
-Tilings are compared through the exact coordinates of their tiles, which are elements of the number field of the proportion: floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
+A tiling is identified by its proportion, its orientations and the record described in @prop:representative, the solution of a reported record at a proportion being unique.
+The order of the coordinates of the sides of its tiles, which determines that record, the crossings and the symmetries, is computed exactly: the coordinates are elements of the number field of the proportion, floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
+This, and the count of bags, assume that the polynomial stored for a proportion is its minimal polynomial, which the search for proportions does not need.
 
 #proposition(name: [representative record])[
   Let $cal(T)$ be a similar tiling, with a choice of orientation for each tile.
-  A complete admissible record that yields $cal(T)$, as in @prop:complete, places at every stage the tile at the anchor of the first tier whose floor does not extend in $cal(T)$, provided that at every crossing of $cal(T)$ the tile to the lower right of the crossing is placed before the tile to its upper left.
-  In particular a tiling without crossings is yielded by exactly one complete admissible record for each choice of orientations.
+  A complete admissible record _yields_ $cal(T)$ if, for some free sides, the constraints of the record hold at the proportion of $cal(T)$, its tiles are those of $cal(T)$, and each of its placements has the orientation chosen for its tile.
+  A complete admissible record that yields $cal(T)$ places at every stage the tile at the anchor of the first tier whose floor does not extend in $cal(T)$, provided that at every crossing of $cal(T)$ the tile to the lower right of the crossing is placed before the tile to its upper left.
+  In particular a tiling without crossings is yielded by at most one complete admissible record for each choice of orientations.
 ] <prop:representative>
 
 #proof[
   Consider a placement of the record at a tier $T_i$ of the current staircase.
-  Every tier $T_j$ with $j < i$ has a floor that extends: otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile of full height at the next tier, whose top side then continues the floor to the right, so that the floor does extend; and a stale tier is never removed, so that the record could not be complete.
-  Suppose that the floor of $T_i$ extends, let $Q$ be its right end, and let $U$ be the tile of $cal(T)$ whose top left corner is $Q$.
+  Every tier $T_j$ with $j < i$ has a floor that extends.
+  This is so if $j = i - 1$ and the tile placed is as high as the wall of $T_i$, since the top side of that tile continues the floor to the right.
+  Otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile as high as the wall at the next tier, whose top side then continues the floor to the right, so that the floor does extend; and a stale tier is never removed, so that the record could not be complete.
+  Suppose that the floor of $T_i$ extends, and let $Q$ be its right end.
+  The tile that makes it extend is still to be placed, since points of its interior lie in the strip of the next tier; so its interior lies in the region of the staircase, which contains no point to the left of $Q$ and below the floor, by the remark made in the proof of @prop:anchor.
+  Its left side is therefore at the abscissa of $Q$; let $U$ be this tile, whose top left corner is $Q$.
   If the tile placed at $T_i$ is narrower than the floor, the remainder of the floor is started, and it remains so until a tile $V$ is placed whose bottom side ends at $Q$; if it is as wide as the floor, it is itself such a tile $V$.
   As long as the floor is started, $U$ cannot be placed, since it would lengthen the floor.
   Hence $V$ is placed before $U$, and $Q$ is a crossing with $V$ to its upper left and $U$ to its lower right, against the hypothesis.
@@ -1593,10 +1603,47 @@ Tilings are compared through the exact coordinates of their tiles, which are ele
   The record is thus determined by $cal(T)$ and the orientations.
 ]
 
-@prop:representative has not been formalised.
-It shows that, among tilings without crossings, the records correspond to the tilings with a choice of orientations, which explains the agreement of the number of placement sequences with the Baxter numbers observed in @sec:mosaic.
-For tilings with crossings the computation finds, for $n <= 12$, exactly $2^k$ records for each orientation vector of a tiling with $k$ crossings, one for each choice, at each crossing, of which of the two tiles is placed first; we have verified this count but not written out a proof.
-The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the sequence from the exact coordinates.
+The record constructed in the proof of @prop:complete is of this kind, and the same construction gives one record for each choice, at each crossing, of which of the two tiles is placed first.
+
+#proposition(name: [records of a tiling])[
+  Let $cal(T)$ be a similar tiling with $k$ crossings, with a choice of orientation for each tile, a tile that is not a square having the orientation of its shape.
+  For every set $X$ of crossings of $cal(T)$ there is exactly one complete admissible record that yields $cal(T)$ and in which the tile to the upper left of a crossing is placed before the tile to its lower right exactly at the crossings of $X$.
+  Hence exactly $2^k$ complete admissible records yield $cal(T)$.
+] <prop:multiplicity>
+
+#proof[
+  Say that a floor _$X$-extends_ if it extends in $cal(T)$ and its right end is not a crossing in $X$.
+  We show that a record as in the statement places, at every stage, the tile at the anchor of the first tier whose floor does not $X$-extend, which determines it.
+  Consider a placement at a tier $T_i$.
+  By the proof of @prop:representative, the floor of every tier $T_j$ with $j < i$ extends, and from this placement on $T_j$ is stale, or the tile placed is as high as the wall and $j = i - 1$; in either case no tile is placed at $T_j$ before the tile $U_j$ whose top left corner is the end $Q_j$ of the floor.
+  If $Q_j$ is a crossing, the tile to its upper left has points of its interior in the strip of $T_j$ and of no other tier, so that it is placed at $T_j$ or at a tier that replaces it, after $U_j$, and $Q_j$ is not in $X$; hence the floor of $T_j$ $X$-extends.
+  If the floor of $T_i$ extends, the proof of @prop:representative shows that its end is a crossing at which the tile to the upper left is placed first, hence a crossing in $X$; so the floor of $T_i$ does not $X$-extend.
+
+  For the existence, we repeat the construction of @prop:complete with the first tier whose floor does not $X$-extend, and with the fourth condition of @def:state replaced by the condition that the floor of every stale tier $X$-extends and the floor of no started tier does.
+  The proof of @prop:extension applies with the following changes.
+  If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, against the choice of $T_i$.
+  The proof that $h <= M$ uses only that the floor of $T_(i - 1)$ extends.
+  The placement is allowed, since the floor of a stale tier $X$-extends, and the floor of $T_(i - 1)$ $X$-extends while that of a started tier does not.
+  The orientation is the one chosen for $Q$; when $Q$ is a square, the sizes and the equations of the two orientations coincide.
+  After the placement, the started tier, if any, has a floor that ends where the floor of $T_i$ did, and so does not $X$-extend.
+  This gives a complete admissible record $rho_X$ that yields $cal(T)$.
+
+  Let $Q$ be a crossing, $V$ the tile to its upper left and $U$ the tile to its lower right.
+  Suppose that $U$ is placed before $V$ in $rho_X$, at a tier $T_i$.
+  The interior of $V$ lies in the region of the staircase, which, by the remark in the proof of @prop:anchor, contains no point to the left of the anchor of $T_i$ and below the top of its wall; so $U$ is as high as the wall. Then $i > 0$, since $Q$ is not on the boundary of the square, the floor of $T_(i - 1)$ ends at $Q$, and it extends.
+  As $T_(i - 1)$ comes before the tier chosen, its floor $X$-extends, and $Q$ is not in $X$.
+  Suppose that $V$ is placed before $U$, at a tier $T_i$.
+  The interior of $U$ lies in the region of the staircase, which contains no point below the floor of $T_i$ and to the left of its end; so $V$ is as wide as the floor, which ends at $Q$ and extends.
+  By the choice of the tier the floor does not $X$-extend, and $Q$ is in $X$.
+  So $rho_X$ is as in the statement.
+  The records $rho_X$ are distinct, since the order in which a record that yields $cal(T)$ places the tiles is determined by the record and $cal(T)$, each tile being the one at the anchor of its placement.
+]
+
+Neither proposition has been formalised.
+For $X$ empty the record of @prop:multiplicity is that of @prop:complete, so that a tiling without crossings has exactly one record for each choice of orientations, and for a tiling by squares the choice of orientations is free.
+This is one half of what the agreement of the number of placement sequences with the Baxter numbers, observed in @sec:mosaic, would require; the other half, that every complete admissible sequence is that of a tiling by rectangles without crossings, and that two such tilings have the same sequence exactly when they are mosaic equivalent, is not proved.
+The computation agrees with @prop:multiplicity: for $n <= 12$ and each $k$, the records of the tilings with $k$ crossings are $2^k$ times as many as these tilings.
+The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the sequence from the exact order of the coordinates.
 
 The values of @tab:tbc were checked as follows.
 For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
@@ -1613,14 +1660,15 @@ Some features of the table can be proved.
 ] <prop:symmetric>
 
 #proof[
-  For the first statement, transposition is an involution on the similar tilings of proportion $x > 1$, and it has no fixed point among them, since it exchanges wide and tall tiles.
-  For the second, the reflection fixes two corners of the square, hence the tile that contains one of them, and a rectangle fixed by the reflection in a diagonal through one of its corners is a square.
-  For the third, the centre of the square cannot lie in the interior of a tile, since the tile would be mapped to itself by the quarter turn, which a rectangle of proportion $x > 1$ is not; nor can it lie in the interior of a side of a tile without being a corner of another, since the quarter turn would map that side to a perpendicular segment through the centre, which meets the interior of a tile and is not contained in the sides of the tiles.
+  We prove the second statement first.
+  The reflection fixes two corners of the square, hence the tile that contains one of them, and a rectangle fixed by the reflection in a diagonal through one of its corners is a square.
+  For the first statement, transposition is an involution on the finite set of the similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point among them, by the second statement.
+  For the third, the centre of the square cannot lie in the interior of a tile, since the tile would be mapped to itself by the quarter turn, which a rectangle of proportion $x > 1$ is not; nor can it lie in the relative interior of a side of a tile, since the quarter turn would map that side to a perpendicular segment through the centre, which meets the interior of a tile and is not contained in the sides of the tiles.
   So the centre is a corner of every tile that contains it; there are four such tiles, and the centre is a crossing.
   No tile is then fixed by the half turn, so the quarter turn permutes the tiles in orbits of four.
 ]
 
-Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$.
+Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.
 Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388789$ tilings with twelve tiles, and $8 b(12) slash t(12) = 1.0003$.
 
 #proposition(name: [bags])[
@@ -1642,7 +1690,7 @@ The proportion $2$ has the most bags, and the most classes, for every $n$ from $
   The sequence $t(n + 1) slash t(n)$ is increasing for $n >= 5$, the quotient $8 b(n) slash t(n)$ tends to $1$, and $t(n)^(1 slash n)$ tends to $27 slash 2$.
 ] <conj:growth>
 
-The first two statements hold for $n <= 12$.
+The first statement holds for $5 <= n <= 11$, and $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$.
 For the third, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
 
 
@@ -1653,7 +1701,7 @@ For the third, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upp
 = Catalogue of tilings <app:catalogue>
 
 @fig:five and @fig:six show one tiling for each proportion achievable with five and with six tiles, labelled by proportion; the cases of three and four tiles are in @fig:three and @fig:four.
-The tiling shown for a proportion is the first that the search found, and is in general one of several.
+The tiling shown for a proportion is the first that one run of the search found, and is in general one of several.
 
 #figure(
   image("figures/five-tiles.svg", width: 100%),
@@ -1679,7 +1727,7 @@ There is one such proportion for three tiles, none for four, four for five, two 
 #figure(
   kind: table,
   datatable(csv("data/full-degree.csv"), size: 0.85em),
-  caption: [The proportions of degree $n$ achievable with $n <= 7$ tiles.],
+  caption: [The proportions of degree $n$ achievable with $n <= 7$ tiles, with the number of records, the first tile being wide, that realise each.],
 ) <tab:full>
 
 = Formalisation <app:formal>
@@ -1830,7 +1878,7 @@ The formal development is about a model of the method, and the following lies ou
 This appendix proves the propositions of @sec:structure other than @prop:persistence, which is proved there.
 The proofs are complete, except that the following classical results are used without proof, each being named where it is used.
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
-Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold only, for the explicit threshold.
+Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
 Tutte's enumeration of rooted non-separable planar maps is used in @prop:upper-full only, for the upper bound.
 A few remarks rest on computations made with the search of @sec:search; they are marked as such, and no proof depends on them.
 Nothing in this appendix has been formalised.
@@ -2568,7 +2616,7 @@ For @conj:exceptional we know of no argument that would bound the rational propo
 
 The network of a tiling, with the edge that joins its poles, is a planar map of a kind that has been enumerated, and each such map with orientations contributes at most $n$ proportions.
 
-A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere that preserve its orientation.
+A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere.
 It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
 A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
 The following result of Tutte @tutte1963 is used without proof: the number of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
@@ -2607,13 +2655,15 @@ In particular $G^+$ has no bridge, for a bridge of a connected graph without loo
 
 By Stirling's formula $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$, so that $limsup a(n)^(1 slash n) <= 27 slash 2$.
 
-The same bound for the number of tilings in the sense of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
+The same bound for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
 The proof of @prop:upper-full bounds the number of triples of a rooted map, an orientation vector and a proportion.
-The map that sends a record with orientations and a proportion to such a triple is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, and, secondly, a mosaic class is determined by its plane network together with the directions of its edges.
+The network of the tiling will not serve here, since by @prop:multiplicity a tiling with crossings has several records and one network.
+Associate instead with a record the network whose vertices are the horizontal segments created by its placements, two segments of equal height that meet at a crossing being kept distinct and joined in the order given by the record; the tiling still gives a flow on it, in which no current vanishes.
+The map that sends a record with orientations and a proportion to the triple of this network with the edge joining its poles, the orientations and the proportion is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, secondly, a mosaic class is determined by its plane network together with the directions of its edges, and, thirdly, the network of a record with the added edge is a non-separable planar map.
 Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
-The first condition is the statement of @sec:mosaic that we have not proved.
+The first condition is the statement of @sec:mosaic that we have not proved, and the third would follow from it if every sequence were that of a tiling by rectangles without crossings.
 The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
-So the number of tilings with $n$ tiles in the sense of @tab:counts is at most $n 2^(n - 1) M(n)$ if both conditions hold, and we do not claim the bound otherwise.
+So the number of realisations with $n$ tiles is at most $n 2^(n - 1) M(n)$ if the three conditions hold, and we do not claim the bound otherwise.
 The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
 
 For guillotine tilings the functions can be described directly, and are those of the series–parallel circuits.

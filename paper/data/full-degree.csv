@@ -1,5 +1,5 @@
 n,n,n,l
-$n$,proportion,tilings,minimal polynomial
+$n$,proportion,records,minimal polynomial
 3,1.754878,4,$x^3 - 2 x^2 + x - 1$
 5,1.419022,16,$x^5 - 2 x^4 + 3 x^3 - 4 x^2 + 2 x - 1$
 5,1.597627,24,$x^5 - 2 x^4 + 3 x^3 - 4 x^2 + x - 1$
