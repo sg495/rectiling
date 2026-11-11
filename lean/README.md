@@ -1,6 +1,7 @@
 # Lean formalisation of the two methods
 
 A Lean 4 development, on top of Mathlib, proving that the staircase enumeration of `rectiling` is sound and complete for tilings of a rectangle by similar rectangles, that the reference ("exact") method reports exactly the proportions of such tilings, and that the default ("fast") method does too, given specifications of the arithmetic primitives of each.
+It also proves the persistence of proportions: a proportion that serves for n ≥ 2 tiles in a square serves for n + k tiles, for every k ≥ 3.
 
 ## Building
 
@@ -16,12 +17,13 @@ The development contains no `sorry`, no `admit` and no `axiom`.
 
 ## Modules
 
-The modules fall into four groups.
+The modules fall into five groups.
 
 Geometry:
 
 - `Rectiling/Geometry.lean` — rectangles `Rect`, tilings `IsTiling`, tilings by rectangles of proportion `x ≥ 1` `IsSimilarTiling`, transposition.
 - `Rectiling/Scaling.lean` — homotheties of tilings.
+- `Rectiling/Refinement.lean` — translations of tilings, the replacement of a tile by a tiling of that tile (`IsTiling.refine`), and tilings placed side by side or one above the other (`IsTiling.hcat`, `IsTiling.vcat`).
 
 Staircase:
 
@@ -51,6 +53,9 @@ Default method (namespace `Rectiling.Fast`):
 - `Rectiling/Search.lean` — the model of `Engine::explore`, `Engine::delegate` and the splitting by prefixes of `Search::run` (`explore`, `exploreForced`, `Searched`), and the theorem `searched_iff`.
 - `Rectiling/Exact.lean` — exactness of the divisions: `Elims.pivot_eq_det`, `Elims.divisible` and `division_exact`.
 - `Rectiling/Target.lean` — the relation between the proportion polynomials of the two methods (`Run.final_eq_target`).
+Structure of the sequence:
+
+- `Rectiling/Persistence.lean` — the predicates `TilesWith` and `Achievable`, the cuts of a rectangle into four, six and eight rectangles similar to it, the pinwheel, and the theorem `persistence`.
 
 ## Main theorems
 
@@ -82,8 +87,16 @@ Default method:
 - `fast_sound`. Every proportion reported by the default method is the proportion of a tiling of the a × b rectangle by n rectangles; no proviso is needed.
 - `fast_complete`, `fast_iff`. If no sequence that the default method passes to the reference method is singular or has a constant aspect ratio, the proportions reported by the default method are exactly the proportions of the tilings of the a × b rectangle by n rectangles.
 - `fast_iff_reported`. If the search by the reference method is certified, the two methods report the same proportions; `reported_imp_fast` needs no proviso.
+- `TilesWith.add_three`, `TilesWith.add_five`. A rectangle with positive sides that can be cut into n rectangles of proportion x can be cut into n + 3 and into n + 5.
+- `Achievable.add_four`. For x > 1, if the unit square can be cut into n rectangles of proportion x, it can be cut into n + 4.
+- `achievable_one`. The unit square can be cut into n squares for every n ≥ 6.
+- `persistence`. If the unit square can be cut into n ≥ 2 rectangles of proportion x, it can be cut into n + k, for every k ≥ 3; `persistence_of_one_lt` drops the hypothesis on n when x > 1.
 
 ## How the proofs go
+
+Persistence rests on `IsTiling.refine`, which replaces the first tile of a tiling by a tiling of that tile.
+The cuts into four, six and eight are assembled from single rectangles with `IsTiling.hcat` and `IsTiling.vcat`; the pinwheel of four tiles around a central square is not of that kind and is verified directly (`Rect.isTiling_pinwheel`), after which the central square is refined by a scaled and translated copy of the given tiling.
+For squares the pinwheel degenerates, and the step of four is replaced by the fact that every number of squares from six onwards occurs.
 
 Soundness does not follow from the emitted constraints alone, since these never state that a tile placed inside its tier is narrower than the floor or lower than the wall.
 The missing inequalities come from the admissibility rules.
@@ -172,3 +185,4 @@ Default method:
 - That the renaming of slots relates the Rust code to the model of the default method, and that the floating-point code meets the specifications of `Numerics`.
 - That the exact divisions made when the size of a tile is carried through the later eliminations (`carryExact`) succeed; the model treats a failure there as an unsettled root.
 - Anything about the counts of sequences per proportion or the statistics of a search.
+- That the hypotheses of `persistence` cannot be weakened: that a square cannot be cut into two, three or five squares, and that steps of one and of two fail.

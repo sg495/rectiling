@@ -36,7 +36,8 @@ The library reproduces the known values of a(n) for n ≤ 10 and extends the seq
 - `src/` — the `rectiling` crate.
 - `tests/` — integration tests, exercising the crate through its public interface.
 - `benches/` — timings of the search, run with `cargo bench`.
-- `knowledge/` — curated notes on the problem, the theory and the algorithms used.
+- `knowledge/` — curated notes on the problem, the theory, the algorithms used, the results and their analysis.
+- `lean/` — a Lean 4 development proving that both search methods are sound and complete, and that proportions persist when tiles are added; see [lean/README.md](lean/README.md).
 
 ## Licence
 

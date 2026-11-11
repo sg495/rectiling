@@ -3,6 +3,7 @@ import Rectiling.Main
 import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
+import Rectiling.Persistence
 
 /-!
 # Axioms of the main theorems
@@ -47,3 +48,11 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.Fast.fast_iff
 #print axioms Rectiling.Fast.reported_imp_fast
 #print axioms Rectiling.Fast.fast_iff_reported
+#print axioms Rectiling.IsTiling.refine
+#print axioms Rectiling.Rect.isTiling_pinwheel
+#print axioms Rectiling.TilesWith.add_three
+#print axioms Rectiling.TilesWith.add_five
+#print axioms Rectiling.Achievable.add_four
+#print axioms Rectiling.achievable_one
+#print axioms Rectiling.persistence
+#print axioms Rectiling.persistence_of_one_lt
