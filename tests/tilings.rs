@@ -150,6 +150,21 @@ fn tilings_by_their_symmetries() {
 }
 
 #[test]
+fn tilings_with_all_tiles_in_one_orientation() {
+    let mut tilings = Vec::new();
+    let mut squared = Vec::new();
+    for n in 1..=10 {
+        let outcome = Search::square(n).with_minority(0).counting_tilings().run();
+        let census = certified(&outcome);
+        assert_eq!(census.classes_by_fixed_points(), Some(census.classes()), "n = {n}");
+        tilings.push(census.tilings());
+        squared.push((census.squared(), census.squared_classes()));
+    }
+    assert_eq!(tilings, [1, 2, 6, 21, 86, 374, 1758, 8626, 43827, 229160]);
+    assert_eq!(squared, [(1, 1), (0, 0), (0, 0), (1, 1), (0, 0), (4, 1), (8, 2), (36, 6), (105, 16), (384, 56)]);
+}
+
+#[test]
 fn bags_of_the_square() {
     for (n, expected) in [1, 1, 3, 11, 51, 250, 1419, 8877].into_iter().enumerate() {
         let outcome = Search::square(n + 1).counting_bags().run();

@@ -379,8 +379,8 @@ impl Census {
                 self.fixed[c][g] += o.fixed[c][g];
             }
             self.minimal[c] += o.minimal[c];
-            for (mine, theirs) in self.stabilisers[c].iter_mut().zip(o.stabilisers[c].iter_mut()) {
-                *mine += std::mem::take(theirs);
+            for (mine, theirs) in self.stabilisers[c].iter_mut().zip(o.stabilisers[c].iter()) {
+                *mine += theirs;
             }
         }
         self.reoriented += o.reoriented;
@@ -391,10 +391,8 @@ impl Census {
         self.collisions += o.collisions;
         self.unresolved += o.unresolved;
         self.classes.append(&mut o.classes);
-        let stabilisers = o.stabilisers;
         *o = Census {
             square: o.square,
-            stabilisers,
             ..Census::default()
         };
     }
