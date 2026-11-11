@@ -149,10 +149,10 @@ The staircase is therefore defined first as a combinatorial object carrying leng
   A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations; the _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
 ] <def:staircase>
 
-Three arithmetics of lengths occur.
+Several arithmetics of lengths occur.
 The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
 The second has a single element, so that a staircase over it, a _bare staircase_, carries only the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
-The others consist of linear forms in unknown lengths, and are introduced in @sec:solving and @sec:eager.
+The others consist of linear forms in unknown lengths, introduced in @sec:solving and @sec:eager, and of intervals, used in @sec:numeric.
 
 A real staircase is read geometrically inside a main rectangle $[0, W] times [0, H]$, the floors being laid end to end from the right side leftwards and the walls from the top side downwards.
 
@@ -217,7 +217,7 @@ In particular, the number of tiers and the flags of the staircases obtained by s
 
 == Placement rules <sec:rules>
 
-A tiling generally admits several orderings in which its tiles can be placed, and tilings that differ only in how the corners of their tiles alternate along a segment will turn out to impose the same conditions on the sizes of the tiles.
+A tiling generally admits several orderings in which its tiles can be placed, and tilings that differ only in how the corners of their tiles alternate along a segment impose the same conditions on the sizes of the tiles, as is explained informally in @sec:mosaic.
 The search therefore restricts the sequences of placements by two rules, which are expressed by the two flags, and abandons a sequence when fewer tiles remain to be placed than there are tiers.
 
 #definition(name: [admissible record])[
@@ -241,7 +241,7 @@ At $T_3$ all four fits are allowed, as far as the two rules are concerned.
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
-The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened or a tile is placed at it.
+The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened.
 The second concerns a horizontal segment that carries the tops of some tiles and the bottoms of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
 The bound on the number of tiers, by which the search abandons partial records, excludes nothing.
 
@@ -606,7 +606,8 @@ For a square main rectangle, transposition allows the first tile to be taken wid
 
 == Mosaic classes <sec:mosaic>
 
-The constraints of a record depend only on which tiles border each maximal segment of the tiling, and not on the order in which the corners of tiles on the two sides of a segment alternate.
+The equations that a tiling imposes on the sizes of its tiles depend only on which tiles border each maximal segment, and not on the order in which the corners of tiles on the two sides of a segment alternate.
+This section records that point of view, which motivates the placement rules; nothing in it is used in the proofs of correctness, and none of it is part of the formal development.
 
 #definition(name: [mosaic class])[
   A _segment_ of a tiling is a maximal line segment contained in the union of the boundaries of the tiles and not contained in the boundary of the main rectangle, or one of the four sides of the main rectangle.
@@ -628,7 +629,7 @@ We have not proved that each mosaic class has exactly one such record, nor that 
 
 In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
-The equations of a record are Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these determine the currents.
+The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @bsst1940.
 One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
 We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
 
@@ -806,7 +807,7 @@ The smallest case in which the search has anything to decide is that of two tile
 
 = Optimisations <sec:optimisations>
 
-The reference search treats $2^(n - 1) B(n)$ records independently when the main rectangle is a square, each at the cost of a symbolic elimination.
+The reference search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, by the count reported in @sec:mosaic.
 The search actually used, the _default search_, shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
 Its cost is about $0.6$ microseconds of processor time per record.
 A record that it cannot settle is passed to the reference method, so that its correctness rests on that of the reference method only for such records.
@@ -861,7 +862,7 @@ The pass along a record keeps, besides the staircase, the coefficient by which t
 
 A tile placed inside thus receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
 A stage therefore represents lengths up to the factor of its pivot.
-The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the fewest terms.
+The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
 The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
 Nothing is assumed about the first two causes, nor is anything proved about how often the pass fails: the statements below concern successful passes, and a record on which the pass fails is passed to the reference method.
 The third cause never occurs, by @prop:exact.
@@ -1024,7 +1025,7 @@ For the elimination of Bareiss, $lambda = plus.minus 1$, and the two polynomials
 The correctness of the default search does not depend on this comparison, which is recorded for its own sake.
 
 The cost of an elimination is proportional to the square of the number of tiers, and most nodes of the search tree are close to the leaves, where staircases have one or two tiers.
-In the implementation, when a single tier remains whose floor and wall are multiples $c_L t$ and $c_M t$ of the scale, the final equations $c_L - x c_M$ and $c_M - x c_L$ of the two orientations of the last tile are formed directly, without a separate placement.
+In the implementation, when one tile remains to be placed, on a single tier that is not stale and whose floor and wall are non-zero multiples $c_L t$ and $c_M t$ of the scale, and no forced placement is pending, the final equations $c_L - x c_M$ and $c_M - x c_L$ of the two orientations of the last tile are formed directly, without a separate placement.
 
 Away from the zeros of the pivots, the recorded eliminations determine the solution of the system.
 
@@ -1247,7 +1248,7 @@ The completions are the records of @def:admissible, and the prefixes cut them at
   + If the pass fails at $p$, the search reports $"Ref"_(a, b) (delta p rho')$ for every $rho' in cal(C)(r - 1, "false", S')$, where $S'$ is the bare staircase after $p$.
   + If $p$ has an equation $E$ and empties the staircase, the search treats the record $delta p$ by the second, third and fourth steps of @def:fastsolve, with $E$ as the final equation, and reports accordingly.
   + Otherwise it continues below the next stage of the pass, reached along $delta p$, with $r - 1$ tiles remaining.
-  The search with a _forced_ record $rho_1 = (f_1, dots, f_d)$, from the initial stage with $n$ tiles remaining, treats $f_1, dots, f_d$ in turn in the same three ways, each only if it belongs to the set of moves at the stage reached, and reports nothing otherwise; in the third case it passes to the next forced placement, and after the last one it continues with the search below the stage reached.
+  The search with a _forced_ record $rho_1 = (f_1, dots, f_d)$, from the initial stage with $n$ tiles remaining, treats $f_1, dots, f_d$ in turn in the same three ways, each only if it belongs to the set of moves at the stage reached, and reports nothing otherwise; in the first case, at a forced placement $f_j$, it reports only for those completions $rho'$ that begin with the remaining forced placements $f_(j + 1), dots, f_d$, or that are complete before these are exhausted and form a beginning of them; in the third case it passes to the next forced placement, and after the last one it continues with the search below the stage reached.
   For integers $d, n >= 0$, the _default search_ for $n$ tiles, split at depth $d$, reports the numbers found with $rho_1$ forced, for every $rho_1 in cal(P)_d (n, "true", S_0)$.
 ] <def:explore>
 
@@ -1276,14 +1277,15 @@ The search reports what the default method reports for the records taken one at 
   Otherwise the next stage $Sigma'$ has a staircase that is not empty, $B(Sigma, delta, p rho'') = B(Sigma', delta p, rho'')$, and the induction hypothesis applies to $Sigma'$.
 
   The same case distinction, applied to the forced placements in turn, shows two things for the search with $rho_1$ forced: every number that it reports belongs to $B(Sigma_0, nothing, rho')$ for some $rho' in cal(C)(n, "true", S_0)$, with $Sigma_0$ the initial stage; and it reports every number of $B(Sigma_0, nothing, rho_1 rho_2)$ whenever $rho_1 rho_2 in cal(C)(n, "true", S_0)$.
-  In the first case of the definition, indeed, the search reports for all the completions below the forced placement at which the pass fails, and these include those that continue with the remaining forced placements.
+  In the first case of the definition, indeed, the search reports for the completions below the forced placement at which the pass fails that continue with the remaining forced placements, and $rho_2$ preceded by these is one of them.
   By the first statement of @prop:enumeration, the records of $cal(C)(n, "true", S_0)$ are those over which the union is taken, so every number reported belongs to $"Fast"_n (a, b)$.
   Conversely, by the second statement of @prop:enumeration, every such record is of the form $rho_1 rho_2$ with $rho_1 in cal(P)_d (n, "true", S_0)$, so every number of $"Fast"_n (a, b)$ is reported.
 ]
 
-In the search as defined, a failure of the pass at a forced placement makes every task whose forced record passes through that placement report for the same records.
-The implementation avoids the repetition: in the first case, at a forced placement, it reports only for the completions that continue with the remaining forced placements.
-The two facts used in the last part of the proof hold for this variant as well, so that it reports the same set of numbers; the formal development models the search as in @def:explore, and proves nothing about the number of records counted for each proportion.
+Restricting the first case, at a forced placement, to the completions that continue with the remaining forced placements ensures that no record is treated under two prefixes: the records examined under the prefixes of the split, taken in order, are exactly the complete admissible records, each once, whether or not the pass fails and wherever it does.
+This is proved in the formal development (`examined_split`, `examined_once`).
+An earlier version of the implementation reported, in that case, for all the completions below the failing placement, under every prefix through it; the formalisation exposed this, which left the set of numbers reported unchanged but would have repeated records in the counts, and the implementation was corrected.
+No such failure had been observed.
 
 #definition(name: [certified default search])[
   Let $a$ and $b$ be integers and $n >= 0$.
@@ -1307,7 +1309,7 @@ This is what the two counts of the reference method establish in a run of the de
 ]
 
 The first statement needs no proviso: whatever the default search reports is the proportion of a tiling.
-The two searches can differ only at a record that the default method settles itself and at which the reference method counts a singular situation, where the default method reports every solution and the reference method reports nothing; no such record is known.
+The two searches can differ only at a record that the default method settles itself and that is not regular for the reference method, because a singular situation is counted or the record is flagged as constant; there the default method reports every solution and the reference method may report nothing. No such record is known.
 Completeness of the default search needs less than that of the reference search, namely the regularity of the records passed to the reference method only.
 
 = Results <sec:results>
@@ -1315,11 +1317,12 @@ Completeness of the default search needs less than that of the reference search,
 All computations were carried out with the Rust implementation of the search, on a machine with sixteen cores and 128 GB of memory.
 All runs used the default search, except where stated.
 In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the reference method were all zero.
-In the default search these counters concern the records passed to the reference method, so that every run was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions.
+In the default search these counters concern the records passed to the reference method, so that every unrestricted run of the default search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the reference search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
+The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @sec:structure, are made by variants of the search that @sec:search and @sec:optimisations do not cover.
 
 == The square <sec:square>
 
-@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$, the number of pairs of a record and a proportion that it realises, and the number of distinct polynomials with a root in $[1, infinity)$.
+@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, the number of pairs of a record and a proportion that it realises, and the number of distinct polynomials with a root in $[1, infinity)$.
 
 #figure(
   kind: table,
@@ -1329,7 +1332,7 @@ In the default search these counters concern the records passed to the reference
 
 The values for $n <= 8$ agree with those of Henderson and Gerbet, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
 The values for $n = 11$, $12$ and $13$ are new.
-Those for $n = 11$ and $n = 12$ were each computed twice, with the reference treatment of degenerate tiles and with that of @prop:degenerate, with identical results; the value for $n = 13$ was computed once and took three hours.
+Those for $n = 11$ and $n = 12$ were each computed twice, with the reference treatment of degenerate tiles and with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
 
 The search was checked in several further ways.
 For $n <= 9$ the search of @sec:optimisations and the reference search of @sec:solving agree on every proportion and on the number of records realising it.
@@ -1676,7 +1679,8 @@ The statements of the paper and those of the development differ in the following
 - *Exactness.* @prop:exact is formalised for the stages reached by the model of the method, which are amongst those of its statement; the lemmas from which it follows hold for all of them.
 - *The search.* The sets of @def:enumeration are lists, in the order in which the search tries the placements.
   The numbers found by the search of @def:explore form a predicate, defined by recursion, and the parallel execution is not modelled.
-  The development models the search in which a failure of the pass at a forced placement hands the whole subtree below that placement to the reference method; the implementation now restricts that subtree to the completions that continue with the remaining forced placements, and the remark after @prop:searched on this variant is not formalised.
+  The development models the search as in @def:explore, including the restriction to the remaining forced placements when the pass fails at a forced placement (`forcedCompletions`), and proves in addition that every complete admissible record is examined under exactly one prefix (`examined_once`).
+  The optional restriction of the search to tilings with few tiles in one orientation, which the default search does not impose, is not modelled.
 
 == What is not formalised <sec:unformalised>
 
