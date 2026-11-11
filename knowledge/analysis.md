@@ -152,7 +152,7 @@ That number grows as 6.1589ⁿ·n^(−3/2), where the constant is numerical and 
 The network of a tiling, with an additional edge joining its poles, is such a map with n + 1 edges.
 
 *Argued:* 2ⁿ⁻² ≤ g(n) ≤ a(n) ≤ T(n) ≤ n·2ⁿ⁻¹·M(n).
-The last inequality needs in addition that a mosaic class is determined by its map and the directions of its edges, and that each class has one placement sequence; neither is proved here.
+The last inequality needs in addition that a mosaic class is determined by its map and the directions of its edges, that each class has one placement sequence, and that the network of a record, in which the segments meeting at a point where four tiles meet are kept distinct, is a non-separable map; none of these is proved here.
 
 *Conjecture:* T(n)/(2ⁿ⁻¹·M(n)) converges to a constant near 0.30: the values are 0.3001, 0.2996, 0.3003, 0.3004, 0.3011, 0.3016 and 0.3022 for n = 7 to 13.
 The ratio creeps upward, so the safer statement is that T(n)^(1/n) → 27/2.

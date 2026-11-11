@@ -266,13 +266,18 @@ In a record of a tiling, let a step place a tile at tier i.
 
 Hence a record in which the lower right tile comes first at every crossing places every tile at the first tier whose floor does not extend: it is the representative record.
 Conversely the representative sequence places the tiles standing on a horizontal segment after all the tiles hanging below it, so the lower right tile comes first at every crossing.
-In particular a tiling without crossings has exactly one record for each orientation vector, which is the statement that each mosaic class has one admissible sequence, and explains the Baxter numbers of [enumeration.md](enumeration.md).
+In particular a tiling without crossings has exactly one record for each orientation vector.
+This is one half of what the Baxter numbers of [enumeration.md](enumeration.md) would require; the other half, that every complete admissible sequence is that of a tiling by rectangles without crossings and that two such tilings have the same sequence exactly when they are mosaic equivalent, is not proved.
 
-**Multiplicity of records** (*Argued*; verified for n ≤ 12).
-A tiling with k crossings has exactly 2^k records for each orientation vector.
-For a set X of crossings, the argument above, with "extends" replaced by "extends, and the end of the floor is not a crossing in X", shows that there is at most one record in which the upper left tile comes first exactly at the crossings in X.
-That there is one follows by displacing the segments slightly: at a crossing in X the vertical segment is kept and the right half of the horizontal one is raised, and at the other crossings the horizontal segment is kept and the upper half of the vertical one is moved right; the result is a tiling by rectangles without crossings, whose representative sequence has the same tiers and fits as the required record.
-The displacement was not written out in detail.
+**Multiplicity of records** (*Proved*; checked by enumeration on all dissections of the 4×4 grid and on samples of larger grids, and by the search for n ≤ 12).
+A tiling with k crossings has exactly 2^k records for each orientation vector: for every set X of crossings there is exactly one record in which the upper left tile comes first exactly at the crossings in X.
+Say that a floor X-extends if it extends and its end is not a crossing in X.
+
+1. *Uniqueness.* Such a record places every tile at the first tier whose floor does not X-extend. A tier j before the tier of the placement has an extending floor, by the argument above, and no tile is placed at it before the tile U whose top left corner is the end of that floor; the tile standing on the floor at its end is placed at tier j or at a tier that replaces it, hence after U, so the end is not in X. If the floor of the tier of the placement extends, its end is a crossing where the upper left tile comes first, hence in X.
+2. *Existence.* The construction of the representative sequence, with "extends" replaced by "X-extends", obeys the rules. The tile at the anchor is not wider than the floor: otherwise the floor extends and ends inside the bottom side of that tile, which is not a crossing. Stale floors X-extend and started floors do not, the started remainder ending where the floor did.
+3. *The record has the set X.* If the lower right tile U of a crossing Q is placed first, it is as high as its wall, the floor of the previous tier ends at Q and X-extends, so Q is not in X. If the upper left tile is placed first, it is as wide as its floor, which ends at Q and extends; as it does not X-extend, Q is in X.
+
+The search itself checks only that, for each k, the records of the tilings with k crossings are 2^k times as many as these tilings.
 Consequently T(n) = Σ 2^k over the tilings with first tile wide and x > 1, plus 2ⁿ⁻¹ · Σ 2^k over the tilings by squares.
 
 **Parity** (*Proved*). t(n) ≡ s(n) modulo 2, since transposition is an involution without fixed points on the tilings with x > 1.
@@ -283,7 +288,7 @@ The reflection fixes two corners of the square, hence the tile at such a corner,
 So the column of the diagonal reflections in the table of fixed tilings counts tilings by squares only.
 
 **Quarter turns** (*Proved*). A tiling with x > 1 fixed by a quarter turn has a crossing at the centre of the square and a number of tiles divisible by four; a tiling by squares fixed by a quarter turn has n ≡ 0 or 1 modulo 4.
-The centre cannot lie inside a tile or inside an edge when x > 1, since the tile, or the edge, would be mapped to itself; no tile is then fixed by the half turn, so the tiles fall into orbits of four.
+The centre cannot lie inside a tile when x > 1, since the tile would be mapped to itself, nor inside an edge of a tile, since the edge would be mapped to a perpendicular segment through the centre, which enters the interior of a tile; no tile is then fixed by the half turn, so the tiles fall into orbits of four.
 For squares the only other possibility is a tile centred at the centre.
 The table agrees: the quarter turns fix a tiling only for n = 1, 4, 8, 9 and 12.
 
@@ -292,7 +297,8 @@ The table agrees: the quarter turns fix a tiling only for n = 1, 4, 8, 9 and 12.
 **Crossings are not rare** (*Proved*, the second part given an exponential bound on t(n)).
 Let K(n) be the total number of crossings over all tilings with n tiles.
 Cutting a tile into four by its mid-lines maps a tiling with n tiles and one of its tiles to a tiling with n + 3 tiles and one of its crossings, injectively, so n·t(n) ≤ K(n + 3).
-If the mean number of crossings K(n)/t(n) were bounded by B, then t(n + 3) ≥ n·t(n)/B and t would grow faster than any exponential, which contradicts t(n) ≤ 2·T(n) ≤ n·2ⁿ·M(n) ([analysis.md](analysis.md), where the bound is argued).
+If the mean number of crossings K(n)/t(n) were bounded by B, then t(n + 3) ≥ n·t(n)/B and t would grow faster than any exponential, which would contradict t(n) ≤ n·2ⁿ·M(n).
+That bound is not proved: it needs that a tiling is determined by its plane network, its orientations and its proportion, and the bound on T(n) argued in [analysis.md](analysis.md) does not give it, since a tiling with crossings has several records and one network.
 So the mean number of crossings per tiling is unbounded.
 In the range computed it is still small, near 0.025, against a lower bound near 0.007.
 

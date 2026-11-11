@@ -88,13 +88,6 @@ For example, a 2 × 1 rectangle cannot be cut into exactly six squares, but a sq
 The middle column reproduces the published sequence, which is a further check on the search.
 A proportion listed for one n may well be realised with a single orientation for another n: 2 is, for two tiles.
 
-For n = 13 the counts by degree, from 1 to 13, are 52230, 13531, 3226298, 912764, 27008697, 8173821, 77488650, 19961337, 76665843, 13546609, 20575413, 1782742 and 649048.
-
-The first column counts the rational proportions.
-A rational proportion arises whenever all tiles have the same orientation, the main square then being cut into smaller squares after a change of scale along one axis.
-The number of rectangles that can be dissected into n squares ([OEIS A210517](https://oeis.org/A210517): 1, 1, 2, 5, 11, 28, 74, 211) agrees with the column up to n = 5 and is exceeded by it from n = 6 onwards (30, 76 and 214 against 28, 74 and 211).
-This suggests that some rational proportions are obtained with n tiles only by using both orientations; the comparison has not been examined case by case.
-
 ## Other main rectangles
 
 The number of proportions for a main rectangle of aspect ratio w.
