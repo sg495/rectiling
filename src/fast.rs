@@ -7,7 +7,7 @@ use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
 use crate::search::{Shared, Tally};
-use crate::staircase::{Algebra, FITS, Placement, Staircase, Unit};
+use crate::staircase::{Algebra, FITS, Fit, Placement, Staircase, Unit};
 use smallvec::SmallVec;
 
 const SLOTS: usize = 8;
@@ -242,6 +242,7 @@ struct Symbols {
     pivot: u32,
     pending: Option<Form>,
     fresh_slot: u8,
+    fresh_form: Form,
 }
 
 impl Algebra for Symbols {
@@ -257,6 +258,7 @@ impl Algebra for Symbols {
         self.used |= 1 << slot;
         self.fresh_slot = slot as u8;
         f[slot] = self.pivot;
+        self.fresh_form = f;
         f
     }
     fn add(&mut self, a: &Form, b: &Form) -> Form {
@@ -281,8 +283,9 @@ struct Numeric<'s> {
     x: Iv,
     sides: &'s [Iv],
     next: usize,
+    tile: u8,
     violated: bool,
-    unsure: bool,
+    unsure: SmallVec<[u8; 4]>,
 }
 
 impl Algebra for Numeric<'_> {
@@ -308,8 +311,9 @@ impl Algebra for Numeric<'_> {
         if a.hi <= 0.0 {
             self.violated = true;
         } else if !(a.lo > 0.0) {
-            self.unsure = true;
+            self.unsure.push(self.tile);
         }
+        self.tile += 1;
     }
     fn vanishes(&mut self, _: Iv) {}
 }
@@ -318,7 +322,10 @@ impl Algebra for Numeric<'_> {
 struct Step {
     mv: Placement,
     slot: u8,
-    eliminated: Option<(Form, u8)>,
+    /// The side of the tile on which positivity is tested, at the stage of elimination current when it was placed.
+    size: Form,
+    /// The equation, the eliminated slot and the previous pivot of the elimination that followed the placement.
+    eliminated: Option<(Form, u8, u32)>,
 }
 
 enum Verdict {
@@ -338,6 +345,7 @@ pub(crate) struct Engine<'a> {
     symbols: Symbols,
     path: Vec<Step>,
     local: WordMap<Box<[i64]>, Roots>,
+    min_polys: WordMap<u32, Box<[i64]>>,
     key: Vec<i64>,
     tally: Tally,
 }
@@ -363,9 +371,11 @@ impl<'a> Engine<'a> {
                 pivot: 0,
                 pending: None,
                 fresh_slot: NO_SLOT,
+                fresh_form: [0; SLOTS],
             },
             path: Vec::new(),
             local: WordMap::default(),
+            min_polys: WordMap::default(),
             key: Vec::new(),
             tally: Tally::default(),
         }
@@ -422,9 +432,15 @@ impl<'a> Engine<'a> {
         self.symbols.fresh_slot = NO_SLOT;
         let mut next = stairs.clone();
         next.place(&mut self.symbols, mv);
+        let tier = &stairs.tiers[mv.tier as usize];
         let mut step = Step {
             mv,
             slot: self.symbols.fresh_slot,
+            size: match mv.fit {
+                Fit::Inside => self.symbols.fresh_form,
+                Fit::FullHeight => tier.wall,
+                Fit::FullWidth | Fit::Full => tier.floor,
+            },
             eliminated: None,
         };
         let mut used = self.symbols.used;
@@ -459,8 +475,8 @@ impl<'a> Engine<'a> {
                             }
                         }
                         used &= !(1 << m);
+                        step.eliminated = Some((eq, m as u8, pivot));
                         pivot = lead;
-                        step.eliminated = Some((eq, m as u8));
                         ok = !arena.failed;
                     }
                 }
@@ -589,14 +605,63 @@ impl<'a> Engine<'a> {
         }
     }
 
-    fn check(&self, root: &RootRef) -> Verdict {
+    fn min_poly(&mut self, id: u32) -> Option<&[i64]> {
+        if !self.min_polys.contains_key(&id) {
+            if self.min_polys.len() >= LOCAL_CACHE_LIMIT {
+                self.min_polys.clear();
+            }
+            let words = self.registry.min_poly_words(id)?;
+            self.min_polys.insert(id, words);
+        }
+        self.min_polys.get(&id).map(|b| &**b)
+    }
+
+    /// Whether one of the given tiles is certified to have size exactly zero at the given root.
+    fn degenerate(&mut self, root: &RootRef, tiles: &[u8]) -> bool {
+        let mark = self.symbols.arena.mark();
+        let mut found = false;
+        for &q in tiles {
+            let mut form = self.path[q as usize].size;
+            for step in &self.path[q as usize..] {
+                if let Some((eq, m, prev)) = step.eliminated {
+                    let m = m as usize;
+                    let fm = form[m];
+                    for j in 0..SLOTS {
+                        if j != m {
+                            form[j] = self.symbols.arena.fused(eq[m], form[j], fm, eq[j], prev);
+                        }
+                    }
+                    form[m] = 0;
+                }
+            }
+            if self.symbols.arena.failed || form[1..].iter().any(|&e| e != 0) {
+                break;
+            }
+            if form[0] == 0 {
+                found = true;
+                break;
+            }
+            let numerator: SmallVec<[i128; 32]> = self.symbols.arena.slice(form[0]).0.iter().map(|&c| c as i128).collect();
+            let Some(divisor) = self.min_poly(root.id) else {
+                break;
+            };
+            if divides(divisor, numerator) {
+                found = true;
+                break;
+            }
+        }
+        self.symbols.arena.reset(mark);
+        found
+    }
+
+    fn check(&mut self, root: &RootRef) -> Verdict {
         let x = Iv { lo: root.lo, hi: root.hi };
         let arena = &self.symbols.arena;
         let mut val = [Iv::point(0.0); SLOTS];
         val[0] = Iv::point(1.0);
         let mut sides: SmallVec<[Iv; 8]> = SmallVec::new();
         for step in self.path.iter().rev() {
-            if let Some((eq, m)) = step.eliminated {
+            if let Some((eq, m, _)) = step.eliminated {
                 let m = m as usize;
                 let mut sum = Iv::point(0.0);
                 for j in 0..SLOTS {
@@ -624,8 +689,9 @@ impl<'a> Engine<'a> {
             x,
             sides: &sides,
             next: 0,
+            tile: 0,
             violated: false,
-            unsure: false,
+            unsure: SmallVec::new(),
         };
         let mut stairs = Staircase::new(Iv::point(self.width as f64), Iv::point(self.height as f64));
         for step in &self.path {
@@ -634,6 +700,29 @@ impl<'a> Engine<'a> {
                 return Verdict::Reject;
             }
         }
-        if numeric.unsure { Verdict::Unsure } else { Verdict::Accept }
+        if numeric.unsure.is_empty() {
+            return Verdict::Accept;
+        }
+        let tiles = numeric.unsure;
+        if self.degenerate(root, &tiles) { Verdict::Reject } else { Verdict::Unsure }
     }
+}
+
+/// Whether a primitive polynomial divides another, both given by coefficients from the constant term upwards.
+fn divides(divisor: &[i64], mut numerator: SmallVec<[i128; 32]>) -> bool {
+    let dn = divisor.len();
+    let lead = divisor[dn - 1] as i128;
+    while numerator.len() >= dn {
+        let top = numerator[numerator.len() - 1];
+        let q = top / lead;
+        if q * lead != top || q.abs() >= LIMIT {
+            return false;
+        }
+        let base = numerator.len() - dn;
+        for (j, &c) in divisor.iter().enumerate() {
+            numerator[base + j] -= q * c as i128;
+        }
+        numerator.pop();
+    }
+    numerator.iter().all(|&v| v == 0)
 }

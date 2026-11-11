@@ -14,6 +14,7 @@ keywords = ["tiling", "rectangles", "combinatorics", "algebraic-numbers"]
 categories = ["mathematics", "science"]
 
 [dependencies]
+hashbrown = "0.17.1"
 num-bigint = "0.4"
 num-integer = "0.1.47"
 num-traits = "0.2.19"

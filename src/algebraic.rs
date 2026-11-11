@@ -189,6 +189,14 @@ impl Registry {
         root.sign_of(q)
     }
 
+    /// The coefficients of the minimal polynomial of a registered number, if they are machine integers.
+    pub(crate) fn min_poly_words(&self, id: u32) -> Option<Box<[i64]>> {
+        match &*self.inner.lock().expect("registry lock").entries[id as usize].coeffs {
+            Coeffs::Words(w) => Some(w.clone()),
+            Coeffs::Big(_) => None,
+        }
+    }
+
     /// The registered number with the given identifier.
     pub fn get(&self, id: u32) -> Algebraic {
         self.inner.lock().expect("registry lock").entries[id as usize].clone()
