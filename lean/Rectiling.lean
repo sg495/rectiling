@@ -16,5 +16,7 @@ import Rectiling.Determinant
 import Rectiling.Reduced
 import Rectiling.Certified
 import Rectiling.Fast
+import Rectiling.Enumeration
+import Rectiling.Search
 import Rectiling.Audit
 import Rectiling.Check

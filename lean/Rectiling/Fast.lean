@@ -24,37 +24,140 @@ structure Limits where
   /-- The unknown chosen for elimination after the last placement of the given sequence, for the given equation, if any. -/
   pick : List Placement → Vec Coeff → Option ℕ
 
+/-- Outcome of the treatment of one placement by the symbolic pass. -/
+inductive Advance
+  /-- The pass fails. -/
+  | fail
+  /-- The placement empties the staircase; its record and the final equation. -/
+  | final (step : Step Coeff) (E : Vec Coeff)
+  /-- The pass continues from a stage; the record of the placement. -/
+  | next (st : Stage Coeff) (step : Step Coeff)
+
 open Classical in
+/-- The treatment of one placement at a stage, after the placements already made, as in `Engine::step`. -/
+noncomputable def advance (M : Limits) (st : Stage Coeff) (done : List Placement)
+    (mv : Placement) : Advance :=
+  if M.overflow (done ++ [mv]) then .fail
+  else
+    match positiveAt st.stairs mv st.side with
+    | none => .fail
+    | some size =>
+      match equationAt (vecAlgebra propX) st.stairs mv with
+      | none =>
+        if (place (vecAlgebra propX) st.stairs mv st.side).isEmpty then .fail
+        else .next ⟨place (vecAlgebra propX) st.stairs mv st.side, st.pivot,
+          nextIndex st.count mv⟩ ⟨mv, size, none⟩
+      | some E =>
+        if (place (vecAlgebra propX) st.stairs mv st.side).isEmpty then
+          .final ⟨mv, size, none⟩ E
+        else
+          match M.pick (done ++ [mv]) E with
+          | none => .fail
+          | some m =>
+            if 1 ≤ m ∧ m ≤ nextIndex st.count mv ∧ E m ≠ 0 ∧
+                ∀ t ∈ place (vecAlgebra propX) st.stairs mv st.side,
+                  Divisible (E, m, st.pivot) t.floor ∧ Divisible (E, m, st.pivot) t.wall then
+              .next ⟨(place (vecAlgebra propX) st.stairs mv st.side).map
+                (Tier.map (elimForm (E, m, st.pivot))), E m, nextIndex st.count mv⟩
+                ⟨mv, size, some (E, m, st.pivot)⟩
+            else .fail
+
 /-- The symbolic pass along a path from a stage, after the placements already made: the records of the placements and the final equation, or a failure. -/
 noncomputable def run (M : Limits) :
     Stage Coeff → List Placement → List Placement → Option (List (Step Coeff) × Vec Coeff)
   | _, _, [] => none
   | st, done, mv :: rest =>
-    if M.overflow (done ++ [mv]) then none
-    else
-      match positiveAt st.stairs mv st.side with
-      | none => none
-      | some size =>
-        match equationAt (vecAlgebra propX) st.stairs mv with
-        | none =>
-          (run M ⟨place (vecAlgebra propX) st.stairs mv st.side, st.pivot,
-            nextIndex st.count mv⟩ (done ++ [mv]) rest).map
-              fun r => (⟨mv, size, none⟩ :: r.1, r.2)
-        | some E =>
-          if (place (vecAlgebra propX) st.stairs mv st.side).isEmpty then
-            if rest.isEmpty then some ([⟨mv, size, none⟩], E) else none
-          else
-            match M.pick (done ++ [mv]) E with
-            | none => none
-            | some m =>
-              if 1 ≤ m ∧ m ≤ nextIndex st.count mv ∧ E m ≠ 0 ∧
-                  ∀ t ∈ place (vecAlgebra propX) st.stairs mv st.side,
-                    Divisible (E, m, st.pivot) t.floor ∧ Divisible (E, m, st.pivot) t.wall then
-                (run M ⟨(place (vecAlgebra propX) st.stairs mv st.side).map
-                  (Tier.map (elimForm (E, m, st.pivot))), E m, nextIndex st.count mv⟩
-                  (done ++ [mv]) rest).map
-                    fun r => (⟨mv, size, some (E, m, st.pivot)⟩ :: r.1, r.2)
-              else none
+    match advance M st done mv with
+    | .fail => none
+    | .final step E => if rest.isEmpty then some ([step], E) else none
+    | .next st' step => (run M st' (done ++ [mv]) rest).map fun r => (step :: r.1, r.2)
+
+/-- A placement that ends the pass is a full placement that empties the staircase. -/
+theorem advance_final {M : Limits} {st : Stage Coeff} {done : List Placement} {mv : Placement}
+    {step : Step Coeff} {E : Vec Coeff} (h : advance M st done mv = .final step E) :
+    ∃ size, step = ⟨mv, size, none⟩ ∧ positiveAt st.stairs mv st.side = some size ∧
+      equationAt (vecAlgebra propX) st.stairs mv = some E ∧
+      place (vecAlgebra propX) st.stairs mv st.side = [] := by
+  unfold advance at h
+  by_cases hov : M.overflow (done ++ [mv]) = true
+  · simp [hov] at h
+  simp only [hov, Bool.false_eq_true, ↓reduceIte] at h
+  cases hsize : positiveAt st.stairs mv st.side with
+  | none => simp [hsize] at h
+  | some size =>
+    rw [hsize] at h
+    simp only at h
+    cases heq : equationAt (vecAlgebra propX) st.stairs mv with
+    | none =>
+      rw [heq] at h
+      simp only at h
+      split_ifs at h
+    | some Eq =>
+      rw [heq] at h
+      simp only at h
+      by_cases hempty : (place (vecAlgebra propX) st.stairs mv st.side).isEmpty = true
+      · simp only [hempty, ↓reduceIte, Advance.final.injEq] at h
+        obtain ⟨rfl, rfl⟩ := h
+        exact ⟨size, rfl, rfl, rfl, List.isEmpty_iff.mp hempty⟩
+      · simp only [hempty, Bool.false_eq_true, ↓reduceIte] at h
+        cases hpick : M.pick (done ++ [mv]) Eq with
+        | none => simp [hpick] at h
+        | some m =>
+          rw [hpick] at h
+          simp only at h
+          split_ifs at h
+
+/-- A placement after which the pass continues leaves a staircase that is not empty, and is followed by no elimination or by an exact one. -/
+theorem advance_next {M : Limits} {st : Stage Coeff} {done : List Placement} {mv : Placement}
+    {step : Step Coeff} {st' : Stage Coeff} (h : advance M st done mv = .next st' step) :
+    place (vecAlgebra propX) st.stairs mv st.side ≠ [] ∧
+      ((∃ size, positiveAt st.stairs mv st.side = some size ∧
+          equationAt (vecAlgebra propX) st.stairs mv = none ∧ step = ⟨mv, size, none⟩ ∧
+          st' = ⟨place (vecAlgebra propX) st.stairs mv st.side, st.pivot,
+            nextIndex st.count mv⟩) ∨
+        ∃ size E m, positiveAt st.stairs mv st.side = some size ∧
+          equationAt (vecAlgebra propX) st.stairs mv = some E ∧ 1 ≤ m ∧
+          m ≤ nextIndex st.count mv ∧ E m ≠ 0 ∧
+          (∀ t ∈ place (vecAlgebra propX) st.stairs mv st.side,
+            Divisible (E, m, st.pivot) t.floor ∧ Divisible (E, m, st.pivot) t.wall) ∧
+          step = ⟨mv, size, some (E, m, st.pivot)⟩ ∧
+          st' = ⟨(place (vecAlgebra propX) st.stairs mv st.side).map
+            (Tier.map (elimForm (E, m, st.pivot))), E m, nextIndex st.count mv⟩) := by
+  unfold advance at h
+  by_cases hov : M.overflow (done ++ [mv]) = true
+  · simp [hov] at h
+  simp only [hov, Bool.false_eq_true, ↓reduceIte] at h
+  cases hsize : positiveAt st.stairs mv st.side with
+  | none => simp [hsize] at h
+  | some size =>
+    rw [hsize] at h
+    simp only at h
+    cases heq : equationAt (vecAlgebra propX) st.stairs mv with
+    | none =>
+      rw [heq] at h
+      simp only at h
+      by_cases hempty : (place (vecAlgebra propX) st.stairs mv st.side).isEmpty = true
+      · simp [hempty] at h
+      · simp only [hempty, Bool.false_eq_true, ↓reduceIte, Advance.next.injEq] at h
+        obtain ⟨rfl, rfl⟩ := h
+        exact ⟨fun h0 => hempty (List.isEmpty_iff.mpr h0), Or.inl ⟨size, rfl, rfl, rfl, rfl⟩⟩
+    | some Eq =>
+      rw [heq] at h
+      simp only at h
+      by_cases hempty : (place (vecAlgebra propX) st.stairs mv st.side).isEmpty = true
+      · simp [hempty] at h
+      · simp only [hempty, Bool.false_eq_true, ↓reduceIte] at h
+        cases hpick : M.pick (done ++ [mv]) Eq with
+        | none => simp [hpick] at h
+        | some m =>
+          rw [hpick] at h
+          simp only at h
+          split_ifs at h with hcond
+          simp only [Advance.next.injEq] at h
+          obtain ⟨rfl, rfl⟩ := h
+          obtain ⟨hm1, hm, hEm, hdiv⟩ := hcond
+          exact ⟨fun h0 => hempty (List.isEmpty_iff.mpr h0),
+            Or.inr ⟨size, Eq, m, rfl, rfl, hm1, hm, hEm, hdiv, rfl, rfl⟩⟩
 
 /-- A symbolic pass that does not fail is a successful pass in the sense of `Run`. -/
 theorem run_spec (M : Limits) :
@@ -67,45 +170,28 @@ theorem run_spec (M : Limits) :
   | cons mv rest ih =>
     intro st done steps E h
     rw [run] at h
-    by_cases hov : M.overflow (done ++ [mv]) = true
-    · simp [hov] at h
-    simp only [hov, Bool.false_eq_true, ↓reduceIte] at h
-    cases hsize : positiveAt st.stairs mv st.side with
-    | none => simp [hsize] at h
-    | some size =>
-      rw [hsize] at h
+    cases hadv : advance M st done mv with
+    | fail => simp [hadv] at h
+    | final step Eq =>
+      rw [hadv] at h
       simp only at h
-      cases heq : equationAt (vecAlgebra propX) st.stairs mv with
-      | none =>
-        rw [heq] at h
-        simp only at h
-        obtain ⟨⟨steps', E'⟩, hr, hpair⟩ := Option.map_eq_some_iff.mp h
-        simp only [Prod.mk.injEq] at hpair
-        obtain ⟨rfl, rfl⟩ := hpair
-        exact Run.plain hsize heq (ih _ _ _ _ hr)
-      | some Eq =>
-        rw [heq] at h
-        simp only at h
-        by_cases hempty : (place (vecAlgebra propX) st.stairs mv st.side).isEmpty = true
-        · simp only [hempty, ↓reduceIte] at h
-          by_cases hrest : rest.isEmpty = true
-          · simp only [hrest, ↓reduceIte, Option.some.injEq, Prod.mk.injEq] at h
-            obtain ⟨rfl, rfl⟩ := h
-            obtain rfl : rest = [] := List.isEmpty_iff.mp hrest
-            exact Run.leaf hsize heq
-          · simp [hrest] at h
-        · simp only [hempty, Bool.false_eq_true, ↓reduceIte] at h
-          cases hpick : M.pick (done ++ [mv]) Eq with
-          | none => simp [hpick] at h
-          | some m =>
-            rw [hpick] at h
-            simp only at h
-            split_ifs at h with hcond
-            obtain ⟨hm1, hm, hEm, hdiv⟩ := hcond
-            obtain ⟨⟨steps', E'⟩, hr, hpair⟩ := Option.map_eq_some_iff.mp h
-            simp only [Prod.mk.injEq] at hpair
-            obtain ⟨rfl, rfl⟩ := hpair
-            exact Run.elim hsize heq hm1 hm hEm hdiv (ih _ _ _ _ hr)
+      obtain ⟨size, rfl, hsize, heq, -⟩ := advance_final hadv
+      by_cases hrest : rest.isEmpty = true
+      · simp only [hrest, ↓reduceIte, Option.some.injEq, Prod.mk.injEq] at h
+        obtain ⟨rfl, rfl⟩ := h
+        obtain rfl : rest = [] := List.isEmpty_iff.mp hrest
+        exact Run.leaf hsize heq
+      · simp [hrest] at h
+    | next st' step =>
+      rw [hadv] at h
+      simp only at h
+      obtain ⟨⟨steps', E'⟩, hr, hpair⟩ := Option.map_eq_some_iff.mp h
+      simp only [Prod.mk.injEq] at hpair
+      obtain ⟨rfl, rfl⟩ := hpair
+      rcases (advance_next hadv).2 with ⟨size, hsize, heq, rfl, rfl⟩ |
+        ⟨size, Eq, m, hsize, heq, hm1, hm, hEm, hdiv, rfl, rfl⟩
+      · exact Run.plain hsize heq (ih _ _ _ _ hr)
+      · exact Run.elim hsize heq hm1 hm hEm hdiv (ih _ _ _ _ hr)
 
 /-! ### The leaves -/
 
