@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+name = "rectiling"
+version = "0.1.0"
+defaultTargets = ["Rectiling"]
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.35.0"
+
+[[lean_lib]]
+name = "Rectiling"
