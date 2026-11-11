@@ -321,7 +321,7 @@ pub(crate) struct Class {
 }
 
 /// Counts of the tilings found by a search, regarded as sets of rectangles.
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug)]
 pub struct Census {
     pub(crate) square: bool,
     /// Sequences with orientations and proportion, by squareness of the tiles and number of points at which four tiles meet.
@@ -332,6 +332,8 @@ pub struct Census {
     pub(crate) fixed: [[u64; 8]; 2],
     /// Tilings examined that come first in their class, by squareness of the tiles.
     pub(crate) minimal: [u64; 2],
+    /// Tilings examined by the set of symmetries that fix them, by squareness of the tiles.
+    pub(crate) stabilisers: [[u64; 256]; 2],
     pub(crate) reoriented: u64,
     pub(crate) exact: u64,
     pub(crate) inconsistent: u64,
@@ -341,6 +343,28 @@ pub struct Census {
     pub(crate) collisions: u64,
     pub(crate) unresolved: u64,
     pub(crate) classes: Vec<Class>,
+}
+
+impl Default for Census {
+    fn default() -> Self {
+        Census {
+            square: false,
+            records: [[0; MAX_POINTS]; 2],
+            canonical: [[0; MAX_POINTS]; 2],
+            fixed: [[0; 8]; 2],
+            minimal: [0; 2],
+            stabilisers: [[0; 256]; 2],
+            reoriented: 0,
+            exact: 0,
+            inconsistent: 0,
+            asymmetric: 0,
+            bags: None,
+            entered: 0,
+            collisions: 0,
+            unresolved: 0,
+            classes: Vec::new(),
+        }
+    }
 }
 
 impl Census {
@@ -355,6 +379,9 @@ impl Census {
                 self.fixed[c][g] += o.fixed[c][g];
             }
             self.minimal[c] += o.minimal[c];
+            for (mine, theirs) in self.stabilisers[c].iter_mut().zip(o.stabilisers[c].iter_mut()) {
+                *mine += std::mem::take(theirs);
+            }
         }
         self.reoriented += o.reoriented;
         self.exact += o.exact;
@@ -364,8 +391,10 @@ impl Census {
         self.collisions += o.collisions;
         self.unresolved += o.unresolved;
         self.classes.append(&mut o.classes);
+        let stabilisers = o.stabilisers;
         *o = Census {
             square: o.square,
+            stabilisers,
             ..Census::default()
         };
     }
@@ -405,6 +434,30 @@ impl Census {
             let other = if self.square { self.fixed[0][conjugate(g)] } else { 0 };
             self.fixed[0][g] + other + self.fixed[1][g]
         })
+    }
+
+    /// The number of tilings by the set of symmetries that fix them, each set given by the indices of its symmetries in the order of [`SYMMETRIES`].
+    pub fn stabilisers(&self) -> Vec<(Vec<usize>, u64)> {
+        let mut counts = [0u64; 256];
+        for mask in 0..256usize {
+            counts[mask] += self.stabilisers[0][mask] + self.stabilisers[1][mask];
+            if self.square {
+                let image = (0..8).filter(|g| mask >> g & 1 == 1).fold(0, |m, g| m | 1 << conjugate(g));
+                counts[image] += self.stabilisers[0][mask];
+            }
+        }
+        let members = |mask: usize| (0..8).filter(|g| mask >> g & 1 == 1).collect();
+        (0..256).filter(|&m| counts[m] > 0).map(|m| (members(m), counts[m])).collect()
+    }
+
+    /// The number of tilings fixed by some symmetry other than the identity.
+    pub fn symmetric(&self) -> u64 {
+        self.stabilisers().iter().filter(|(members, _)| members.len() > 1).map(|(_, count)| count).sum()
+    }
+
+    /// The number of classes of tilings whose tiles are squares.
+    pub fn squared_classes(&self) -> u64 {
+        self.minimal[1]
     }
 
     /// The number of classes of tilings under the symmetries of the main rectangle, counted by the tilings that come first in their class.
@@ -587,6 +640,7 @@ impl<'a> Analyst<'a> {
                     }
                 }
             }
+            census.stabilisers[class][stabiliser as usize] += 1;
             if verdict.minimal {
                 census.minimal[class] += 1;
                 if let Some(bags) = self.bags {

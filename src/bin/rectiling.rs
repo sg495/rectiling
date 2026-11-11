@@ -135,7 +135,12 @@ fn print_census(census: &Census) {
     for (name, count) in SYMMETRIES.iter().zip(fixed).take(census.order() as usize * 2).filter(|(_, c)| *c > 0) {
         println!("  fixed by {name} = {count}");
     }
-    println!("tilings by squares = {}", census.squared());
+    println!("tilings with a symmetry = {}", census.symmetric());
+    for (members, count) in census.stabilisers() {
+        let names: Vec<&str> = members.into_iter().map(|g| SYMMETRIES[g]).collect();
+        println!("  fixed exactly by {{{}}} = {count}", names.join("; "));
+    }
+    println!("tilings by squares = {}, classes = {}", census.squared(), census.squared_classes());
     println!("tilings by number of points where four tiles meet = {:?}", census.by_crossings());
     let [records, squares] = census.records();
     let [examined, examined_squares] = census.examined();

@@ -132,6 +132,24 @@ fn proportions_carry_their_numbers_of_tilings() {
 }
 
 #[test]
+fn tilings_by_their_symmetries() {
+    for n in 1..=8 {
+        let outcome = Search::square(n).counting_tilings().run();
+        let census = certified(&outcome);
+        let stabilisers = census.stabilisers();
+        assert_eq!(stabilisers.iter().map(|(_, count)| count).sum::<u64>(), census.tilings(), "n = {n}");
+        let fixed: [u64; 8] = std::array::from_fn(|g| stabilisers.iter().filter(|(members, _)| members.contains(&g)).map(|(_, count)| count).sum());
+        assert_eq!(fixed, census.fixed(), "n = {n}");
+        let classes: u64 = stabilisers.iter().map(|(members, count)| count * members.len() as u64).sum();
+        assert_eq!(classes, 8 * census.classes(), "n = {n}");
+    }
+    let eight = Search::square(8).counting_tilings().run();
+    assert_eq!(certified(&eight).symmetric(), 8006);
+    assert_eq!(certified(&eight).fixed()[3], 2);
+    assert_eq!((certified(&eight).squared(), certified(&eight).squared_classes()), (36, 6));
+}
+
+#[test]
 fn bags_of_the_square() {
     for (n, expected) in [1, 1, 3, 11, 51, 250, 1419, 8877].into_iter().enumerate() {
         let outcome = Search::square(n + 1).counting_bags().run();
