@@ -4,6 +4,9 @@ This note takes the statements of [analysis.md](analysis.md) that were labelled 
 Each section gives a precise statement, its status and a proof; where a proof depends on a result from the literature or on a computation, the dependence is named.
 The first claim is also proved formally, in the Lean development of [`lean/`](../lean/README.md).
 
+The proofs in this note, other than the formalised ones, were read line by line by an independent reviewer, who re-derived the computations, repeated the case analyses of Section 4 with a separate exhaustive enumeration of dissections into squares, and tested Theorem 2.6 exactly on four hundred random networks; the repairs requested have been made.
+The reviewer did not examine Remark 6.3 or the open conjectures, and did not read Tutte's paper in the original.
+
 ## Summary
 
 - **Persistence, $S(n) \subseteq S(n+k)$.** Proved in full and formalised in Lean (Theorem 1.1).
@@ -67,7 +70,7 @@ The step of four is proved for the square only: in a main rectangle with $W \ne 
 
 **Proposition 1.2.** $1 \in S(n)$ exactly for $n = 1$, $n = 4$ and $n \ge 6$.
 
-*Status.* Proved in full; the positive part is in Lean (`achievable_one`).
+*Status.* Proved in full; the case $n \ge 6$ of the positive part is in Lean (`achievable_one`), within whose proof the case $n = 4$ appears.
 
 *Proof.*
 If $n \ge 2$, no tile contains two corners of the square, since a square containing two corners of the unit square is the unit square.
@@ -115,7 +118,7 @@ This is positive, since $\varphi$ is not constant. $\square$
 *Proof.*
 Let $M$ be the set of vertices at which $\varphi$ is largest, and suppose $s \notin M$.
 At $v \in M$ the law of Kirchhoff reads $\sum_{e \ni v} y_e(\varphi(v) - \varphi(v_e)) = -I\,\delta_{vt} \le 0$, where $v_e$ is the other end of $e$; every term is non-negative, so every neighbour of $v$ lies in $M$.
-By connectedness $M = V$, a contradiction; so $s \in M$, and likewise $\varphi$ is smallest at $t$.
+By connectedness $M = V$, which contradicts the fact that $\varphi$ is not constant, as $I > 0$; so $s \in M$, and likewise $\varphi$ is smallest at $t$.
 The law of Kirchhoff at $s$ then gives $I = \sum_{e \ni s} y_e(\varphi(s) - \varphi(v_e)) \le (\varphi(s) - \varphi(t)) \sum_{e \ni s} y_e$. $\square$
 
 **Lemma 2.3.** The determinants $\det L_t$ and $\det L_{st}$ are polynomials in the $y_e$ with integer coefficients, homogeneous of degrees $|V| - 1$ and $|V| - 2$, and of degree at most one in each variable.
@@ -161,7 +164,7 @@ Give the edge $e$ the resistance $x^{\varepsilon_e}$: $x$ for a tall tile, $1/x$
 
 The denominator is a Laurent polynomial that does not vanish at $x = 1$, so the definition makes sense, and by Lemma 2.1 the value of $Z_{\mathfrak N,\varepsilon}$ at any $x > 0$ is the impedance of the network.
 By Proposition 2.4, a tiling $\tau$ of $[0,W] \times [0,H]$ by tiles of proportion $x$, with orientations $\varepsilon$, satisfies $H/W = Z_{\mathfrak N(\tau), \varepsilon}(x)$.
-The function $R$ of the analysis, the aspect ratio of the main rectangle for a fixed arrangement and fixed orientations, is this function or its inverse, according to the convention; Lemma 3.3 shows that the inverse is a function of the same kind.
+The function $R$ of the analysis, the aspect ratio of the main rectangle for a fixed arrangement and fixed orientations, is this function or its inverse, according to the convention; the inverse is a function of the same kind, being that of the transposed tiling (see also Lemma 3.3, which applies because the network of a tiling with the edge joining its poles has no bridge, by Lemma 6.1).
 
 A rational function $F \in \mathbb Q(x)$ is written *in lowest terms* as $F = N/D$ with $N, D \in \mathbb Z[x]$ coprime in $\mathbb Q[x]$, with no common integer factor other than $\pm 1$, and with the leading coefficient of $D$ positive.
 This determines $N$ and $D$.
@@ -205,8 +208,8 @@ So $m = 1$; the same argument applied to $1/F$, which also has positive real par
 The leading coefficient of $N$ is positive because $F > 0$ on $(0,\infty)$.
 By (1), $N$ and $D$ have opposite parities, so exactly one of them is odd; it is divisible by $x$, exactly once by (3), and the other is not divisible by $x$, by coprimality.
 
-(5) Let $k = \deg N - \deg D$, an odd number by (4).
-For large $|x|$, $F(\rho\,\mathrm e^{\mathrm i\theta}) = A \rho^k \mathrm e^{\mathrm i k\theta}(1 + O(1/\rho))$, and the argument of (3) gives $|k| \le 1$.
+(5) Let $\delta = \deg N - \deg D$, an odd number by (4).
+For large $|x|$, $F(\rho\,\mathrm e^{\mathrm i\theta}) = A \rho^\delta \mathrm e^{\mathrm i \delta\theta}(1 + O(1/\rho))$, and the argument of (3) gives $|\delta| \le 1$.
 Let $P(r) = \prod_e r_e \cdot \det L_{st}(1/r)$ and $Q(r) = \prod_e r_e \cdot \det L_t(1/r)$.
 By Lemma 2.3 these are polynomials in the resistances, of degree at most one in each, and homogeneous of degrees $c + 1$ and $c$, where $c = n - |V| + 1$.
 A monomial of $Q$ is a product of $c$ distinct resistances, $j$ of them equal to $x$ and $c - j$ equal to $1/x$, so it is $x^{2j - c}$; if $m$ edges have orientation $-1$ then $c - j \le m$ and $j \le n - m$, so $x^m$ times the monomial is a power of $x$ with exponent between $0$ and $n$.
@@ -221,7 +224,7 @@ By (1) the residue at $-\mathrm i\omega$ is the same, and $\kappa/(x - \mathrm i
 The difference between $F$ and the right-hand side of the formula is a rational function without poles that is bounded at infinity, hence a constant, and it is odd, hence zero.
 Finally $F(x)/x = c_\infty + c_0/x^2 + \sum_j 2\kappa_j/(x^2 + \omega_j^2)$ and $x F(x) = c_\infty x^2 + c_0 + \sum_j 2\kappa_j x^2/(x^2 + \omega_j^2)$. $\square$
 
-By (5), $F(x)$ tends to $0$ or to $\infty$ as $x \to \infty$, and likewise as $x \to 0^+$.
+By (5), $F(x)$ tends to $0$ or to $\infty$ as $x \to \infty$, and by (4) likewise as $x \to 0^+$.
 Reversing all orientations replaces $F(x)$ by $F(1/x)$, since it inverts every resistance as a function of $x$.
 
 The properties were also tested numerically on 300 random networks with up to nine edges.
@@ -275,6 +278,8 @@ form a tiling of $[\psi(f_L), \psi(f_R)] \times [\varphi(t), \varphi(s)]$ by $|E
 
 *Status.* Classical; this is the converse half of the correspondence of Brooks, Smith, Stone and Tutte (1940).
 The proof below is complete given three standard facts: Euler's formula, used in Lemma 3.1; the Jordan curve theorem; and the duality between bonds and cycles of a connected plane graph (Diestel, *Graph Theory*, Section 4.6: a set of edges is a minimal cut exactly when the dual edges form a cycle of the dual graph).
+Embeddings are taken to be piecewise linear, so that the two sides of a closed curve are well defined, and the dual of a plane graph is a multigraph, in which a minimal cut of two edges gives a cycle of length two.
+The proof uses the oriented form of the duality: if the edges of a minimal cut are all directed from one side of the cut to the other, they all cross the dual cycle in the same sense; this follows from the unoriented statement, since the dual cycle separates the two sides of the cut by the Jordan curve theorem.
 
 *Proof.*
 By the law of Ohm, $\varphi$ decreases strictly along every directed edge, so the directions are acyclic.
@@ -302,7 +307,7 @@ The union of the rectangles is closed and contains every point of the main recta
 **Lemma 3.3 (duality).** Let $\mathfrak N$ be a plane network in which $G^+$ has no bridge.
 Let $\mathfrak N^*$ be the network whose vertices are the faces of $G^+$, with an edge $e^*$ joining $\operatorname{left}(e)$ and $\operatorname{right}(e)$ for every edge $e$ of $G$, and with poles $f_R$ and $f_L$.
 Then $\mathfrak N^*$ is a plane network, and for every orientation vector $\varepsilon$, $Z_{\mathfrak N^*, -\varepsilon} = 1/Z_{\mathfrak N, \varepsilon}$.
-Moreover, for real positive resistances $r$ on $\mathfrak N$ and $1/r$ on $\mathfrak N^*$, the current in $e^*$ for a flow on $\mathfrak N^*$ vanishes exactly when the current in $e$ for a flow on $\mathfrak N$ does.
+Moreover, for real positive resistances $r$ on $\mathfrak N$ and $1/r$ on $\mathfrak N^*$, the current in $e^*$ for a flow on $\mathfrak N^*$ vanishes exactly when the current in $e$ for a flow on $\mathfrak N$ does: by the construction in the proof, the current in $e^*$ is a non-zero multiple of the potential difference across $e$, which is $r_e$ times the current in $e$.
 
 *Proof.*
 $\mathfrak N^*$ is the dual of $G^+$ with the edge dual to $e_0$ removed, that is the dual of the plane graph $G^+/e_0$; it is connected, it has no loop because $G^+$ has no bridge, and its poles lie on the face that corresponds to the vertex of $G^+/e_0$ made of $s$ and $t$.
@@ -340,6 +345,7 @@ Indeed, for a proper pair, (3) gives a tiling $\tau_x$ for all but finitely many
 It is essential that pairs with an identically vanishing current are left out.
 For the network of the pinwheel of five tiles with all orientations equal, the current in the central edge vanishes identically and the function is $x$ or $1/x$.
 This function does not belong to $\mathcal F_5$: by step (d) of Proposition 5.1 a proper pair would give a tiling of the rectangle $1009 \times 1$ by five tiles of proportion $1009$, and the search finds none (`rectiling --list 5 1009 1`).
+This exclusion therefore rests on a computation; it is confirmed by a direct enumeration of all networks with five edges.
 
 ### 3.3 The theorem
 
@@ -589,7 +595,8 @@ Multiply the three sums by $x^m \prod_e r_e$: this gives polynomials $\tilde P$,
 $\tilde Q(1)$ is the number of spanning trees, at most $\binom{n}{|V|-1}$; $\tilde P(1)$ is at most $\binom{n}{|V|-2}$; and the sum of the absolute values of the coefficients of $\nu_e$ is at most $\tilde Q(1)$.
 Each binomial coefficient is at most $\binom{n}{\lfloor n/2 \rfloor} \le 2^{n-1}$.
 Write $\tilde P = gN$ and $\tilde Q = gD$.
-Then $g \in \mathbb Z[x]$ by Gauss's lemma, and the roots of $g$ are roots of $\tilde Q$, which lie on the imaginary axis, as in Theorem 2.6 (3); so $g$ has coefficients of one sign and $|g(1)| \ge 1$.
+Then $g \in \mathbb Z[x]$: write $g = (a/b)\,g_0$ with $g_0 \in \mathbb Z[x]$ primitive and $a/b$ a fraction in lowest terms; by Gauss's lemma $b$ divides the content of $N$ and that of $D$, which have no common factor since $N/D$ is in lowest terms over $\mathbb Z$, so $b = 1$.
+The roots of $g$ are roots of $\tilde Q$, which lie on the imaginary axis, as in Theorem 2.6 (3); so $g$ has coefficients of one sign and $|g(1)| \ge 1$.
 Hence $N(1) \le 2^{n-1}$ and $D(1) \le 2^{n-1}$, and these bound every coefficient of $N$ and $D$.
 A root $z$ of a polynomial with integer coefficients $a_0, \dots, a_d$, $a_d \ne 0$, satisfies $|z| < 1 + \max_j |a_j|$ (Cauchy's bound).
 By Lemma 2.2, every $F \in \mathcal F_n$ satisfies $F(x) \le n x$ for $x \ge 1$, because $1/F \in \mathcal F_n$ is an impedance.
@@ -688,7 +695,7 @@ Let $g(n)$ be the number of proportions of guillotine tilings of the square by $
 2. $g(n) \le n \cdot |\mathcal G_n|/2 \le n\,\sigma_n/2$.
 
 *Status.* Proved in full.
-In particular the resistances come in pairs, exchanged by swapping the two kinds of resistor and exchanging series with parallel, which the OEIS entry, as consulted, presents as an observation.
+In particular the resistances come in pairs, exchanged by swapping the two kinds of resistor and exchanging series with parallel, which a comment in the OEIS entry presents as unproved; the entry also links a note by David Einstein, *Proof that the maximum number of resistances is even*, so the pairing is not new.
 
 *Proof.*
 (1) $1/(A + B)$ is the harmonic sum of $1/A$ and $1/B$, so $\mathcal G_n$ is closed under inversion by induction.
