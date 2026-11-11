@@ -3,11 +3,13 @@
 //! Exhaustive search for tilings of a rectangle by similar rectangles.
 
 use crate::algebraic::{Algebraic, Registry};
+use crate::bags::Bags;
 use crate::cache::{PolyCache, WordMap};
 use crate::exact;
 use crate::fast::Engine;
 use crate::guillotine;
 use crate::staircase::{FITS, Placement, Staircase, Unit};
+use crate::tilings::{Analyst, Census, Class, Verdict};
 use rayon::prelude::*;
 use std::sync::Mutex;
 
@@ -51,6 +53,55 @@ pub struct Found {
     pub tilings: u64,
     /// One placement sequence realising the proportion.
     pub witness: Vec<Placement>,
+    /// Number of tilings, as sets of rectangles, realising the proportion, if tilings were counted.
+    pub distinct: u64,
+    /// Number of classes of such tilings under the symmetries of the main rectangle, if tilings were counted.
+    pub classes: u64,
+    /// Number of distinct bags of tiles of such tilings, if bags were counted.
+    pub bags: u64,
+}
+
+/// Representative of a class of tilings under the symmetries of the main rectangle.
+#[derive(Clone, Debug)]
+pub struct Tiling {
+    proportion: Algebraic,
+    placements: Vec<Placement>,
+    tiles: Vec<[f64; 4]>,
+    stabiliser: u8,
+    crossings: usize,
+    order: u32,
+}
+
+impl Tiling {
+    /// The proportion of the tiles.
+    pub fn proportion(&self) -> &Algebraic {
+        &self.proportion
+    }
+
+    /// The placement sequence that represents the tiling.
+    pub fn placements(&self) -> &[Placement] {
+        &self.placements
+    }
+
+    /// Approximations of the left side, bottom side, width and height of each tile, in the order of placement and for a main rectangle of unit height.
+    pub fn tiles(&self) -> &[[f64; 4]] {
+        &self.tiles
+    }
+
+    /// The indices of the symmetries that fix the tiling, in the order of [`crate::SYMMETRIES`].
+    pub fn stabiliser(&self) -> Vec<usize> {
+        (0..8).filter(|g| self.stabiliser >> g & 1 == 1).collect()
+    }
+
+    /// The number of tilings in the class.
+    pub fn orbit(&self) -> usize {
+        self.order as usize / self.stabiliser.count_ones() as usize
+    }
+
+    /// The number of points at which four tiles meet.
+    pub fn crossings(&self) -> usize {
+        self.crossings
+    }
 }
 
 /// Placement sequence of at most fourteen tiles, one byte per placement.
@@ -68,7 +119,7 @@ pub(crate) fn encode_witness(moves: impl Iterator<Item = Placement>) -> Witness 
     w
 }
 
-fn decode_witness(w: &Witness) -> Vec<Placement> {
+pub(crate) fn decode_witness(w: &Witness) -> Vec<Placement> {
     w.iter()
         .take_while(|&&b| b != NO_PLACEMENT)
         .map(|&b| Placement {
@@ -86,9 +137,41 @@ pub struct Outcome {
     witnesses: Vec<Witness>,
     stats: Stats,
     polynomials: usize,
+    extras: Vec<[u64; 2]>,
+    bags: Vec<u64>,
+    census: Option<Census>,
 }
 
 impl Outcome {
+    /// The counts of tilings as sets of rectangles, if the search was asked for them.
+    pub fn census(&self) -> Option<&Census> {
+        self.census.as_ref()
+    }
+
+    /// One tiling from each class under the symmetries of the main rectangle, if the search was asked to list them, in increasing order of proportion.
+    pub fn classes(&self) -> Vec<Tiling> {
+        let Some(census) = &self.census else {
+            return Vec::new();
+        };
+        let mut classes: Vec<&Class> = census.classes.iter().collect();
+        classes.sort_by(|a, b| self.registry.approx(a.id).total_cmp(&self.registry.approx(b.id)).then(a.witness.cmp(&b.witness)));
+        classes
+            .into_iter()
+            .map(|class| {
+                let placements = decode_witness(&class.witness);
+                let root = self.registry.refs(&[class.id])[0];
+                Tiling {
+                    proportion: self.registry.get(class.id),
+                    tiles: exact::coordinates(&self.registry, &root, &placements).unwrap_or_default(),
+                    placements,
+                    stabiliser: class.stabiliser,
+                    crossings: class.crosses as usize,
+                    order: census.order() as u32,
+                }
+            })
+            .collect()
+    }
+
     /// The number of distinct proportions found.
     pub fn count(&self) -> usize {
         self.counts.iter().filter(|&&c| c > 0).count()
@@ -112,10 +195,18 @@ impl Outcome {
         let mut ids: Vec<u32> = (0..self.counts.len() as u32).filter(|&id| self.counts[id as usize] > 0).collect();
         ids.sort_by(|&a, &b| self.registry.approx(a).total_cmp(&self.registry.approx(b)));
         ids.into_iter()
-            .map(|id| Found {
-                proportion: self.registry.get(id),
-                tilings: self.counts[id as usize],
-                witness: decode_witness(&self.witnesses[id as usize]),
+            .map(|id| {
+                let [examined, classes] = self.extras.get(id as usize).copied().unwrap_or_default();
+                let unit = self.registry.approx(id) == 1.0;
+                let doubled = self.census.as_ref().is_some_and(|c| c.square) && !unit;
+                Found {
+                    proportion: self.registry.get(id),
+                    tilings: self.counts[id as usize],
+                    witness: decode_witness(&self.witnesses[id as usize]),
+                    distinct: examined * (1 + doubled as u64),
+                    classes,
+                    bags: self.bags.get(id as usize).copied().unwrap_or(0),
+                }
             })
             .collect()
     }
@@ -134,23 +225,29 @@ impl Outcome {
 /// Results accumulated by one thread, before they are merged into the shared table.
 #[derive(Default)]
 pub(crate) struct Tally {
-    pub(crate) found: WordMap<u32, (u64, Witness)>,
+    pub(crate) found: WordMap<u32, (u64, Witness, [u64; 2])>,
     pub(crate) stats: Stats,
+    pub(crate) census: Census,
 }
 
 /// Results shared by all threads of a search.
 #[derive(Default)]
 pub(crate) struct Shared {
-    table: Mutex<(Vec<u64>, Vec<Witness>)>,
+    table: Mutex<(Vec<u64>, Vec<Witness>, Vec<[u64; 2]>)>,
     stats: Mutex<Stats>,
+    census: Mutex<Census>,
+    counting: bool,
 }
 
 const FLUSH_LIMIT: usize = 1 << 18;
 
 impl Tally {
-    pub(crate) fn record(&mut self, id: u32, witness: impl FnOnce() -> Witness) {
+    pub(crate) fn record(&mut self, id: u32, verdict: Verdict, witness: impl FnOnce() -> Witness) {
         self.stats.tilings += 1;
-        self.found.entry(id).and_modify(|e| e.0 += 1).or_insert_with(|| (1, witness()));
+        let entry = self.found.entry(id).or_insert_with(|| (0, witness(), [0; 2]));
+        entry.0 += 1;
+        entry.2[0] += verdict.canonical as u64;
+        entry.2[1] += verdict.minimal as u64;
     }
 
     /// Merges the results into the shared table if they have grown large, or unconditionally.
@@ -160,12 +257,19 @@ impl Tally {
         }
         {
             let mut table = shared.table.lock().expect("results lock");
-            let (counts, witnesses) = &mut *table;
-            for (id, (count, witness)) in self.found.drain() {
+            let (counts, witnesses, extras) = &mut *table;
+            for (id, (count, witness, extra)) in self.found.drain() {
                 let id = id as usize;
                 if counts.len() <= id {
                     counts.resize(id + 1, 0);
                     witnesses.resize(id + 1, [NO_PLACEMENT; 14]);
+                }
+                if shared.counting {
+                    if extras.len() <= id {
+                        extras.resize(id + 1, [0; 2]);
+                    }
+                    extras[id][0] += extra[0];
+                    extras[id][1] += extra[1];
                 }
                 if counts[id] == 0 {
                     witnesses[id] = witness;
@@ -175,6 +279,9 @@ impl Tally {
         }
         shared.stats.lock().expect("results lock").merge(&self.stats);
         self.stats = Stats::default();
+        if shared.counting {
+            shared.census.lock().expect("results lock").merge(&mut self.census);
+        }
     }
 }
 
@@ -185,6 +292,9 @@ pub struct Search {
     width: i64,
     height: i64,
     minority: usize,
+    counting: bool,
+    listing: bool,
+    bags: bool,
 }
 
 /// Whether a partial tiling with the given numbers of tall and of placed tiles has at most the given number of tiles in its less frequent orientation.
@@ -202,7 +312,44 @@ impl Search {
             width: width as i64,
             height: height as i64,
             minority: tiles,
+            counting: false,
+            listing: false,
+            bags: false,
         }
+    }
+
+    /// The same search, which also counts the tilings and the distinct bags of tiles: the proportion with the multiset of the short sides of the tiles.
+    pub fn counting_bags(self) -> Self {
+        Search {
+            counting: true,
+            bags: true,
+            ..self
+        }
+    }
+
+    /// The same search, which also identifies the tilings as sets of rectangles and counts them, up to the symmetries of the main rectangle as well.
+    pub fn counting_tilings(self) -> Self {
+        Search { counting: true, ..self }
+    }
+
+    /// The same search, which also counts the tilings and keeps one from each class under the symmetries of the main rectangle.
+    pub fn listing_tilings(self) -> Self {
+        Search {
+            counting: true,
+            listing: true,
+            ..self
+        }
+    }
+
+    fn shared(&self) -> Shared {
+        Shared {
+            counting: self.counting,
+            ..Shared::default()
+        }
+    }
+
+    pub(crate) fn analyst<'a>(&self, registry: &'a Registry, bags: Option<&'a Bags>) -> Option<Analyst<'a>> {
+        self.counting.then(|| Analyst::new(self.width, self.height, registry, self.listing, bags))
     }
 
     /// The same search restricted to tilings with at most the given number of tiles in the less frequent orientation.
@@ -228,6 +375,10 @@ impl Search {
     /// Whether the main rectangle is a square.
     pub fn is_square(&self) -> bool {
         self.width == self.height
+    }
+
+    pub(crate) fn sides(&self) -> (i64, i64) {
+        (self.width, self.height)
     }
 
     fn sequences(&self, depth: usize) -> Vec<Vec<Placement>> {
@@ -265,14 +416,21 @@ impl Search {
         out
     }
 
-    fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache) -> Outcome {
-        let (counts, witnesses) = shared.table.into_inner().expect("results lock");
+    fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache, bags: Option<Bags>) -> Outcome {
+        let bags = bags.map(|b| b.counts()).unwrap_or_default();
+        let (counts, witnesses, extras) = shared.table.into_inner().expect("results lock");
+        let mut census = shared.census.into_inner().expect("results lock");
+        census.square = self.is_square();
+        census.bags = self.bags.then(|| bags.iter().sum());
         Outcome {
             registry,
             counts,
             witnesses,
             stats: shared.stats.into_inner().expect("results lock"),
             polynomials: cache.len(),
+            extras,
+            bags,
+            census: self.counting.then_some(census),
         }
     }
 
@@ -280,12 +438,13 @@ impl Search {
     pub fn run(&self) -> Outcome {
         let registry = Registry::new();
         let cache = PolyCache::new();
-        let shared = Shared::default();
+        let shared = self.shared();
+        let bags = self.bags.then(Bags::new);
         self.sequences(4).par_iter().for_each_init(
-            || Engine::new(self.tiles, self.width, self.height, self.minority, &registry, &cache, &shared),
+            || Engine::new(self, &registry, &cache, &shared, bags.as_ref()),
             |engine, prefix| engine.run(prefix),
         );
-        self.outcome(shared, registry, cache)
+        self.outcome(shared, registry, cache, bags)
     }
 
     /// Finds the proportions of all guillotine tilings by series and parallel composition of aspect ratios, counting for each the aspect ratio functions that realise it.
@@ -299,6 +458,9 @@ impl Search {
             counts,
             stats,
             polynomials: cache.len(),
+            extras: Vec::new(),
+            bags: Vec::new(),
+            census: None,
         }
     }
 
@@ -306,9 +468,11 @@ impl Search {
     pub fn run_exact(&self) -> Outcome {
         let registry = Registry::new();
         let cache = PolyCache::new();
-        let shared = Shared::default();
+        let shared = self.shared();
+        let bags = self.bags.then(Bags::new);
         self.sequences(self.tiles).par_chunks(1024).for_each(|paths| {
             let mut tally = Tally::default();
+            let mut analyst = self.analyst(&registry, bags.as_ref());
             for path in paths {
                 let solved = exact::solve(self.width, self.height, &registry, &cache, path);
                 tally.stats.leaves += 1;
@@ -318,11 +482,15 @@ impl Search {
                 tally.stats.constant += solved.constant as u64;
                 tally.stats.overflows += solved.overflow as u64;
                 for &id in &solved.feasible {
-                    tally.record(id, || encode_witness(path.iter().copied()));
+                    let verdict = match &mut analyst {
+                        Some(analyst) => analyst.examine(&mut tally.census, path, &registry.refs(&[id])[0], None),
+                        None => Verdict::default(),
+                    };
+                    tally.record(id, verdict, || encode_witness(path.iter().copied()));
                 }
             }
             tally.flush(&shared, true);
         });
-        self.outcome(shared, registry, cache)
+        self.outcome(shared, registry, cache, bags)
     }
 }
