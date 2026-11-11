@@ -613,7 +613,7 @@ This section records that point of view, which motivates the placement rules; no
 
 Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
 The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
-Accordingly, for every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
+For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
 This agreement is an observation, made by computation.
 That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
 
@@ -1428,7 +1428,7 @@ Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutt
 
 @prop:persistence has been formalised in Lean, except for the fact, not needed for the inclusion, that a square cannot be cut into two, three or five squares.
 The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
-Consequently almost every proportion is new at the number of tiles at which it first appears, as @tab:structure shows.
+Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
 The second phenomenon concerns the aspect ratio of the main rectangle as a function of the proportion.
 A tiling of a rectangle is an electrical network @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the difference of potential across it its height (@def:tiling-network).
@@ -1912,7 +1912,7 @@ In such a network the matrix $L_t$ is real and invertible, so that a flow of rea
   $ I = sum_(e in.rev s) y_e (phi(s) - phi(v_e)) <= (phi(s) - phi(t)) sum_(e in.rev s) y_e. $
 ]
 
-The dependence of the two determinants on the conductances is as simple as it can be.
+The two determinants are polynomials of low degree in the conductances.
 
 #proposition(name: [the determinants as polynomials])[
   The determinants $det L_t$ and $det L_(s t)$ are polynomials in the conductances $y_e$ with integer coefficients, homogeneous of degrees $abs(V) - 1$ and $abs(V) - 2$, and of degree at most one in each variable.
@@ -2203,7 +2203,7 @@ It may vanish identically, and the pair then has no tile for that edge at any pr
   We write $cal(F)_n$ for the set of the impedance functions $Z_(frak(N), epsilon)$ of the proper pairs with $n$ edges, and $cal(F)_n^infinity$ for the set of those $F in cal(F)_n$ that tend to $infinity$ at infinity.
 ] <def:proper>
 
-The set $cal(F)_n$ is what the tilings with $n$ tiles see of the impedance functions, in the following sense.
+The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ tiles realise, in the following sense.
 
 #proposition(name: [the set of functions])[
   Let $n >= 1$.
@@ -2229,8 +2229,8 @@ By the second and third statements, $cal(F)_n$ is also the set of the functions 
 Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tiling $tau_x$ for all but finitely many $x >= 1$; the networks $frak(N)(tau_x)$, with their edges labelled by those of $frak(N)$, take finitely many values up to isomorphism, so one of them occurs for infinitely many $x$, and by the second statement its function agrees with $Z_(frak(N), epsilon)$ at these $x$, hence everywhere.
 
 #example[
-  It is essential that the pairs with an identically vanishing current are left out.
-  Consider the network of a pinwheel of five tiles, four around a central one as in @fig:network, with all orientations equal.
+  The pairs with an identically vanishing current have to be left out.
+  Consider the network of a pinwheel of five tiles, four around a central one as in @fig:pinwheel, with all orientations equal.
   The current in the central edge vanishes identically, and the impedance function is $x$ or $1 slash x$.
   This function does not belong to $cal(F)_5$.
   Since $cal(F)_5$ is closed under inversion, it suffices to consider $1 slash x$.
