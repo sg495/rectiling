@@ -432,7 +432,7 @@ Every proportion with $n$ tiles has degree at most $n$ @taams2023.
 ) <tab:degrees-high>
 
 Odd degrees are markedly more frequent than the neighbouring even ones.
-Degree $n$ is attained for every $n$ in the table other than $2$ and $4$.
+Degree $n$ is attained for every $n$ in the table other than $2$ and $4$; the proportions of degree $n$ for $n <= 7$ are shown in @app:full.
 
 The proportions of degree one are explained in part by dissections into squares.
 If all tiles of a similar tiling of the square have the same orientation, stretching one axis by the proportion gives a dissection of a rectangle into $n$ squares, whose aspect ratio is the proportion.
@@ -480,3 +480,20 @@ The tiling shown for a proportion is the first that the search found, and is in 
   image("figures/six-tiles.svg", width: 100%),
   caption: [One tiling for each of the $245$ proportions achievable with six tiles.],
 ) <fig:six>
+
+= Proportions of full degree <app:full>
+
+A proportion achievable with $n$ tiles has algebraic degree at most $n$.
+@fig:full shows one tiling for each proportion of degree exactly $n$ with $n <= 7$ tiles, and @tab:full lists their minimal polynomials, with the number of records that realise each.
+There is one such proportion for three tiles, none for four, four for five, two for six and $44$ for seven.
+
+#figure(
+  image("figures/full-degree.svg", width: 100%),
+  caption: [One tiling for each proportion whose degree equals the number $n$ of tiles, for $n <= 7$.],
+) <fig:full>
+
+#figure(
+  kind: table,
+  datatable(csv("data/full-degree.csv"), size: 0.85em),
+  caption: [The proportions of degree $n$ achievable with $n <= 7$ tiles.],
+) <tab:full>
