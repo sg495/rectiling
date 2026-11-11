@@ -27,22 +27,14 @@ fn main() {
     let outcome = Search::new(tiles as usize, width, height).run();
     let elapsed = start.elapsed();
     if list {
-        for found in &outcome.proportions {
+        for found in outcome.proportions() {
             println!("{:.15}\t{}\t{}\t{}", found.proportion.approx(), found.proportion.degree(), found.tilings, found.proportion.min_poly());
         }
     }
-    let mut degrees: Vec<usize> = Vec::new();
-    for found in &outcome.proportions {
-        let d = found.proportion.degree();
-        if degrees.len() < d {
-            degrees.resize(d, 0);
-        }
-        degrees[d - 1] += 1;
-    }
     println!("tiles = {tiles}, main rectangle = {width}:{height}");
-    println!("degrees = {degrees:?}");
-    println!("proportions = {}", outcome.proportions.len());
-    println!("{:?}, polynomials = {}", outcome.stats, outcome.polynomials);
+    println!("degrees = {:?}", outcome.degrees());
+    println!("proportions = {}", outcome.count());
+    println!("{:?}, polynomials = {}", outcome.stats(), outcome.polynomials());
     println!("elapsed = {:.3}s", elapsed.as_secs_f64());
 }
 

@@ -52,37 +52,104 @@ pub struct Found {
     pub witness: Vec<Placement>,
 }
 
+/// Placement sequence of at most fourteen tiles, one byte per placement.
+pub(crate) type Witness = [u8; 14];
+
+const NO_PLACEMENT: u8 = u8::MAX;
+
+/// Encodes a placement sequence.
+pub(crate) fn encode_witness(moves: impl Iterator<Item = Placement>) -> Witness {
+    let mut w = [NO_PLACEMENT; 14];
+    for (slot, mv) in w.iter_mut().zip(moves) {
+        let fit = FITS.iter().position(|&f| f == mv.fit).unwrap_or(0) as u8;
+        *slot = mv.tier | fit << 3 | (mv.tall as u8) << 5;
+    }
+    w
+}
+
+fn decode_witness(w: &Witness) -> Vec<Placement> {
+    w.iter()
+        .take_while(|&&b| b != NO_PLACEMENT)
+        .map(|&b| Placement {
+            tier: b & 7,
+            fit: FITS[(b >> 3 & 3) as usize],
+            tall: b >> 5 & 1 == 1,
+        })
+        .collect()
+}
+
 /// Result of a search.
-#[derive(Clone, Debug)]
 pub struct Outcome {
+    registry: Registry,
+    counts: Vec<u64>,
+    witnesses: Vec<Witness>,
+    stats: Stats,
+    polynomials: usize,
+}
+
+impl Outcome {
+    /// The number of distinct proportions found.
+    pub fn count(&self) -> usize {
+        self.counts.iter().filter(|&&c| c > 0).count()
+    }
+
+    /// The number of proportions found of each algebraic degree, starting from degree one.
+    pub fn degrees(&self) -> Vec<usize> {
+        let mut histogram = Vec::new();
+        for (id, _) in self.counts.iter().enumerate().filter(|(_, c)| **c > 0) {
+            let d = self.registry.degree(id as u32);
+            if histogram.len() < d {
+                histogram.resize(d, 0);
+            }
+            histogram[d - 1] += 1;
+        }
+        histogram
+    }
+
     /// The proportions found, in increasing order.
-    pub proportions: Vec<Found>,
+    pub fn proportions(&self) -> Vec<Found> {
+        let mut ids: Vec<u32> = (0..self.counts.len() as u32).filter(|&id| self.counts[id as usize] > 0).collect();
+        ids.sort_by(|&a, &b| self.registry.approx(a).total_cmp(&self.registry.approx(b)));
+        ids.into_iter()
+            .map(|id| Found {
+                proportion: self.registry.get(id),
+                tilings: self.counts[id as usize],
+                witness: decode_witness(&self.witnesses[id as usize]),
+            })
+            .collect()
+    }
+
     /// Counters describing the work performed.
-    pub stats: Stats,
-    /// Number of distinct proportion equations solved.
-    pub polynomials: usize,
+    pub fn stats(&self) -> Stats {
+        self.stats
+    }
+
+    /// The number of distinct proportion equations solved.
+    pub fn polynomials(&self) -> usize {
+        self.polynomials
+    }
 }
 
 /// Results accumulated by one thread, before they are merged into the shared table.
 #[derive(Default)]
 pub(crate) struct Tally {
-    pub(crate) found: WordMap<u32, (u64, Option<Box<[Placement]>>)>,
+    pub(crate) found: WordMap<u32, (u64, Witness)>,
     pub(crate) stats: Stats,
 }
 
 /// Results shared by all threads of a search.
 #[derive(Default)]
 pub(crate) struct Shared {
-    table: Mutex<Vec<(u64, Option<Box<[Placement]>>)>>,
+    table: Mutex<(Vec<u64>, Vec<Witness>)>,
     stats: Mutex<Stats>,
 }
 
 const FLUSH_LIMIT: usize = 1 << 18;
 
 impl Tally {
-    pub(crate) fn record(&mut self, id: u32, witness: impl FnOnce() -> Box<[Placement]>) {
+    pub(crate) fn record(&mut self, id: u32, witness: impl FnOnce() -> Witness) {
         self.stats.tilings += 1;
-        self.found.entry(id).and_modify(|e| e.0 += 1).or_insert_with(|| (1, Some(witness())));
+        self.found.entry(id).and_modify(|e| e.0 += 1).or_insert_with(|| (1, witness()));
     }
 
     /// Merges the results into the shared table if they have grown large, or unconditionally.
@@ -92,15 +159,17 @@ impl Tally {
         }
         {
             let mut table = shared.table.lock().expect("results lock");
+            let (counts, witnesses) = &mut *table;
             for (id, (count, witness)) in self.found.drain() {
                 let id = id as usize;
-                if table.len() <= id {
-                    table.resize_with(id + 1, || (0, None));
+                if counts.len() <= id {
+                    counts.resize(id + 1, 0);
+                    witnesses.resize(id + 1, [NO_PLACEMENT; 14]);
                 }
-                table[id].0 += count;
-                if table[id].1.is_none() {
-                    table[id].1 = witness;
+                if counts[id] == 0 {
+                    witnesses[id] = witness;
                 }
+                counts[id] += count;
             }
         }
         shared.stats.lock().expect("results lock").merge(&self.stats);
@@ -174,21 +243,12 @@ impl Search {
         out
     }
 
-    fn outcome(&self, shared: Shared, registry: &Registry, cache: &PolyCache) -> Outcome {
-        let table = shared.table.into_inner().expect("results lock");
-        let mut proportions: Vec<Found> = table
-            .into_iter()
-            .enumerate()
-            .filter(|(_, (tilings, _))| *tilings > 0)
-            .map(|(id, (tilings, witness))| Found {
-                proportion: registry.get(id as u32),
-                tilings,
-                witness: witness.map(Vec::from).unwrap_or_default(),
-            })
-            .collect();
-        proportions.sort_by(|a, b| a.proportion.approx().total_cmp(&b.proportion.approx()));
+    fn outcome(&self, shared: Shared, registry: Registry, cache: PolyCache) -> Outcome {
+        let (counts, witnesses) = shared.table.into_inner().expect("results lock");
         Outcome {
-            proportions,
+            registry,
+            counts,
+            witnesses,
             stats: shared.stats.into_inner().expect("results lock"),
             polynomials: cache.len(),
         }
@@ -203,7 +263,7 @@ impl Search {
             || Engine::new(self.tiles, self.width, self.height, &registry, &cache, &shared),
             |engine, prefix| engine.run(prefix),
         );
-        self.outcome(shared, &registry, &cache)
+        self.outcome(shared, registry, cache)
     }
 
     /// Runs the search with every tiling solved by exact symbolic elimination, as a reference for the default method.
@@ -222,11 +282,11 @@ impl Search {
                 tally.stats.constant += solved.constant as u64;
                 tally.stats.overflows += solved.overflow as u64;
                 for &id in &solved.feasible {
-                    tally.record(id, || path.as_slice().into());
+                    tally.record(id, || encode_witness(path.iter().copied()));
                 }
             }
             tally.flush(&shared, true);
         });
-        self.outcome(shared, &registry, &cache)
+        self.outcome(shared, registry, cache)
     }
 }

@@ -16,11 +16,11 @@ fn main() {
         println!(
             "{:>5} {:>12} {:>14} {:>12} {:>10.3} {:>12.1}",
             tiles,
-            outcome.proportions.len(),
-            outcome.stats.leaves,
-            outcome.polynomials,
+            outcome.count(),
+            outcome.stats().leaves,
+            outcome.polynomials(),
             seconds,
-            seconds * threads * 1e9 / outcome.stats.leaves as f64
+            seconds * threads * 1e9 / outcome.stats().leaves as f64
         );
     }
 }

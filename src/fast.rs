@@ -6,14 +6,14 @@ use crate::algebraic::{Registry, RootRef};
 use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
-use crate::search::{Shared, Tally};
+use crate::search::{Shared, Tally, encode_witness};
 use crate::staircase::{Algebra, FITS, Fit, Placement, Staircase, Unit};
 use smallvec::SmallVec;
 
 const SLOTS: usize = 8;
 const NO_SLOT: u8 = u8::MAX;
 const LIMIT: i128 = 1 << 55;
-const LOCAL_CACHE_LIMIT: usize = 1 << 21;
+const LOCAL_CACHE_LIMIT: usize = 1 << 19;
 
 /// Linear form in the scale of the main rectangle and the free tile sides, as identifiers of coefficient polynomials.
 type Form = [u32; SLOTS];
@@ -347,6 +347,7 @@ pub(crate) struct Engine<'a> {
     local: WordMap<Box<[i64]>, Roots>,
     min_polys: WordMap<u32, Box<[i64]>>,
     key: Vec<i64>,
+    scratch: Vec<u8>,
     tally: Tally,
 }
 
@@ -377,6 +378,7 @@ impl<'a> Engine<'a> {
             local: WordMap::default(),
             min_polys: WordMap::default(),
             key: Vec::new(),
+            scratch: Vec::new(),
             tally: Tally::default(),
         }
     }
@@ -545,7 +547,7 @@ impl<'a> Engine<'a> {
         stats.overflows += solved.overflow as u64;
         stats.candidates += solved.candidate as u64;
         for &id in &solved.feasible {
-            self.tally.record(id, || moves.into());
+            self.tally.record(id, || encode_witness(moves.iter().copied()));
         }
     }
 
@@ -553,7 +555,7 @@ impl<'a> Engine<'a> {
         if let Some(r) = self.local.get(self.key.as_slice()) {
             return r.clone();
         }
-        let r = self.cache.roots(&self.key, self.registry);
+        let r = self.cache.roots(&self.key, &mut self.scratch, self.registry);
         if self.local.len() >= LOCAL_CACHE_LIMIT {
             self.local.clear();
         }
@@ -601,7 +603,7 @@ impl<'a> Engine<'a> {
         self.tally.stats.candidates += 1;
         for id in accepted {
             let path = &self.path;
-            self.tally.record(id, || path.iter().map(|s| s.mv).collect());
+            self.tally.record(id, || encode_witness(path.iter().map(|s| s.mv)));
         }
     }
 
