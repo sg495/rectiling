@@ -42,51 +42,76 @@ Soundness and completeness of the reference search have been formalised in Lean 
 
 = Tilings <sec:tilings>
 
-We work in the plane with axis-parallel rectangles.
-A rectangle is determined by its bottom-left corner and its two side lengths, and its proportion disregards which side is the longer.
+We work in the real plane with axis-parallel rectangles.
+A rectangle is given by its bottom-left corner and its two side lengths, and its proportion disregards which side is the longer.
 
 #definition(name: [rectangle])[
-  A _rectangle_ is a set $R = [a, a + w] times [b, b + h]$ with $w, h > 0$; its _width_ is $w$, its _height_ is $h$ and its _anchor_ is the point $(a, b)$.
-  The _aspect ratio_ of $R$ is $w slash h$ and its _proportion_ is $max(w slash h, h slash w) >= 1$.
-  The rectangle is _wide_ if $w >= h$ and _tall_ if $h >= w$.
+  A _rectangle_ is a quadruple $R = (a, b, w, h)$ of real numbers with $w, h > 0$, which stands for the set $[a, a + w] times [b, b + h]$; its _corner_ is the point $(a, b)$, its _width_ is $w$, its _height_ is $h$, and its _interior_ is $(a, a + w) times (b, b + h)$.
+  For a real number $x >= 1$, the rectangle $R$ has _proportion_ $x$ if $w = x h$ or $h = x w$; in the first case it is _wide_ for $x$, and in the second it is _tall_ for $x$.
 ] <def:rectangle>
 
+Since the sides are positive and $x >= 1$, a rectangle has proportion $x$ exactly when $x = max(w slash h, h slash w)$, and it is both wide and tall exactly when it is a square and $x = 1$.
 A tiling is a dissection in the usual sense: the tiles cover the main rectangle and overlap only along their boundaries.
 
 #definition(name: [tiling])[
-  A _tiling_ of a rectangle $M$ is a finite set of rectangles, its _tiles_, whose union is $M$ and whose interiors are pairwise disjoint.
-  A tiling is _similar of proportion $x$_ if every tile has proportion $x$.
+  A _tiling_ of a rectangle $M$ is a finite sequence $R_1, dots, R_n$ of rectangles, its _tiles_, whose union is $M$ and whose interiors are pairwise disjoint.
+  For $x >= 1$, a tiling is _similar of proportion $x$_ if every tile has proportion $x$.
 ] <def:tiling>
 
-Scaling the plane preserves proportions, so only the aspect ratio of the main rectangle matters, and we normalise its height to one.
+The order of the tiles plays no part: every rearrangement of a tiling is a tiling, and the tiles of a tiling are pairwise distinct, because a rectangle meets its own interior.
+Two rectangles with disjoint interiors are separated by a horizontal or a vertical line, so that the interior of each misses the other altogether; conversely, two tiles of a tiling whose interiors meet are equal.
+Both remarks are used repeatedly below.
 
 #definition(name: [achievable proportions])[
-  For a real number $w > 0$ and an integer $n >= 1$, let $P_n (w)$ be the set of those $x >= 1$ for which the rectangle $[0, w] times [0, 1]$ has a similar tiling of proportion $x$ with exactly $n$ tiles.
-  We write $a_w (n) := |P_n (w)|$ and $a(n) := a_1 (n)$.
+  For real numbers $W, H > 0$ and an integer $n >= 0$, let $P_n (W, H)$ be the set of those $x >= 1$ for which the rectangle $[0, W] times [0, H]$ has a similar tiling of proportion $x$ with exactly $n$ tiles.
+  We write $P_n (w) := P_n (w, 1)$, $a_w (n) := |P_n (w)|$ and $a(n) := a_1 (n)$.
 ] <def:counts>
 
 The sets $P_n (w)$ are finite in every case treated in this paper, as a by-product of the computation; see @sec:solving.
+Three elementary observations are used throughout.
+The first is that scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
 
-Two elementary observations are used throughout.
-The first is that exchanging the two axes turns a tiling of a rectangle of aspect ratio $w$ into one of aspect ratio $1 slash w$, turning wide tiles into tall ones.
+#proposition(name: [scaling])[
+  For all $W, H, c > 0$ and $n >= 0$, $P_n (c W, c H) = P_n (W, H)$.
+] <prop:scaling>
+
+#proof[
+  Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by $(c a, c b, c w, c h)$.
+  The new sides are positive, and $c w = x c h$ if $w = x h$, and likewise with the sides exchanged, so the new tiles have proportion $x$.
+  A point $p$ lies in a new tile, or in its interior, exactly when $p slash c$ lies in the old one, or in its interior; hence the new tiles cover $[0, c W] times [0, c H]$ exactly and have pairwise disjoint interiors.
+  This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
+]
+
+The second is that exchanging the two axes turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, turning wide tiles into tall ones.
 
 #proposition(name: [transposition])[
-  For all $w > 0$ and $n >= 1$, $P_n (w) = P_n (1 slash w)$.
+  For all $W, H > 0$ and $n >= 0$, $P_n (W, H) = P_n (H, W)$.
+  Consequently $P_n (w) = P_n (1 slash w)$ for all $w > 0$.
 ] <prop:transposition>
 
 #proof[
-  The map $(u, v) |-> (v slash w, u slash w)$ sends $[0, w] times [0, 1]$ onto $[0, 1 slash w] times [0, 1]$ and sends rectangles to rectangles of the same proportion.
+  Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by its _transpose_ $(b, a, h, w)$.
+  The transpose has positive sides and proportion $x$, the two conditions $w = x h$ and $h = x w$ being exchanged.
+  A point $(u, v)$ lies in the transpose of a tile, or in its interior, exactly when $(v, u)$ lies in the tile, or in its interior; hence the transposes cover $[0, H] times [0, W]$ exactly and have pairwise disjoint interiors.
+  This gives $P_n (W, H) subset.eq P_n (H, W)$, and the other inclusion is the same statement with $W$ and $H$ exchanged.
+  Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
 ]
 
-The second is that the sets of proportions grow with $n$ along steps of three.
+The third is that the sets of proportions grow with $n$ along steps of three.
 Whether they grow along steps of one is not known to us.
 
 #proposition(name: [subdivision])[
-  For all $w > 0$ and $n >= 1$, $P_n (w) subset.eq P_(n + 3) (w)$.
+  For all $W, H > 0$ and $n >= 0$, $P_n (W, H) subset.eq P_(n + 3) (W, H)$.
 ] <prop:subdivision>
 
 #proof[
-  Cutting one tile of a similar tiling into four congruent quarters, by the two lines through its centre, gives a similar tiling of the same proportion with three more tiles.
+  Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
+  The corner of $M$ lies in some tile, so $n >= 1$.
+  Let $R_1 = (a, b, w, h)$, and let $Q_1, dots, Q_4$ be the rectangles of width $w slash 2$ and height $h slash 2$ with corners $(a, b)$, $(a + w slash 2, b)$, $(a, b + h slash 2)$ and $(a + w slash 2, b + h slash 2)$.
+  They have proportion $x$, since $w slash 2 = x h slash 2$ if $w = x h$ and likewise with the sides exchanged.
+  They form a tiling of $R_1$: the two with the same ordinate of the corner are separated by the line of abscissa $a + w slash 2$ and cover a rectangle of width $w$ and height $h slash 2$, and the two rectangles so obtained are separated by the line of ordinate $b + h slash 2$ and cover $R_1$.
+  The sequence $Q_1, dots, Q_4, R_2, dots, R_n$ is then a tiling of $M$: its union is that of the original tiles, the interiors of the $Q_i$ are pairwise disjoint, and each of them lies in the interior of $R_1$, which is disjoint from the interiors of $R_2, dots, R_n$.
+  It has $n + 3$ tiles of proportion $x$.
 ]
 
 @fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the procedure of @sec:search; the remaining ones are their transposes.
@@ -103,15 +128,35 @@ Whether they grow along steps of one is not known to us.
 The search places tiles one at a time, starting at the bottom-left corner of the main rectangle, in such a way that the region already covered is always closed under moving left and down.
 The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile always sits in one of its concave corners.
 
+In the search the lengths of the steps of the staircase are not numbers but expressions in unknown quantities, and nothing guarantees beforehand that they take positive values.
+The staircase is therefore defined first as a combinatorial object carrying lengths of an arbitrary kind, and its geometric reading is defined afterwards.
+
 #definition(name: [staircase])[
-  Let $M = [0, W] times [0, H]$.
-  A _staircase_ in $M$ is a sequence of points $(a_0, b_0), dots, (a_(k - 1), b_(k - 1))$ of $M$, with $k >= 0$, such that $0 <= a_0 < dots < a_(k - 1) < W$ and $H > b_0 > dots > b_(k - 1) >= 0$, where moreover $a_0 = 0$ and $b_(k - 1) = 0$ if $k >= 1$.
-  Its $i$-th _tier_ is the rectangle $T_i = [a_i, W] times [b_i, b_(i - 1)]$, with $b_(-1) := H$; the point $(a_i, b_i)$ is the _anchor_ of the tier, $L_i := a_(i + 1) - a_i$ is its _floor_, with $a_k := W$, and $M_i := b_(i - 1) - b_i$ is its _wall_.
-  The _uncovered region_ of the staircase is the union of its tiers.
+  An _arithmetic of lengths_ is a set $cal(L)$ with two binary operations, written $ell + ell'$ and $ell - ell'$, and two unary operations, written $x ell$ and $ell slash x$.
+  A _tier_ over $cal(L)$ consists of a _floor_ $L in cal(L)$, a _wall_ $M in cal(L)$ and two flags, _stale_ and _started_, each of which is set or clear.
+  A _staircase_ over $cal(L)$ is a finite sequence $T_0, dots, T_(m - 1)$ of tiers over $cal(L)$, with $m >= 0$.
+  The _initial staircase_ of $W, H in cal(L)$ consists of a single tier with floor $W$, wall $H$ and both flags clear.
+  A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations; the _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
 ] <def:staircase>
 
-The staircase with the single anchor $(0, 0)$ has $M$ itself as its only tier, and the empty staircase has empty uncovered region.
-@fig:staircase shows a staircase with four tiers.
+Three arithmetics of lengths occur.
+The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
+The second has a single element, so that a staircase over it, a _bare staircase_, carries only the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
+The others consist of linear forms in unknown lengths, and are introduced in @sec:solving and @sec:eager.
+
+A real staircase is read geometrically inside a main rectangle $[0, W] times [0, H]$, the floors being laid end to end from the right side leftwards and the walls from the top side downwards.
+
+#definition(name: [anchors and region])[
+  Let $S = (T_0, dots, T_(m - 1))$ be a real staircase, with floors $L_i$ and walls $M_i$, and let $W$ and $H$ be real numbers.
+  The _anchor_ of the tier $T_i$ is the point $(a_i, b_i)$ with
+  $ a_i := W - sum_(j >= i) L_j, quad b_i := H - sum_(j <= i) M_j, $
+  its _strip_ is the set of points $(u, v)$ with $a_i <= u <= W$ and $b_i <= v <= b_i + M_i$, and the _region_ $U(S)$ of the staircase is the union of the strips of its tiers.
+  The staircase is _positive_ if all its floors and walls are positive.
+] <def:region>
+
+By definition $a_(i + 1) = a_i + L_i$ and $b_(i - 1) = b_i + M_i$, with the conventions $a_m := W$ and $b_(-1) := H$: the floor of a tier runs from its anchor to the next anchor, or to the right side of the main rectangle, and its wall runs from its anchor up to the level of the previous anchor, or to the top side.
+The region of the initial staircase of $W$ and $H$ is the main rectangle $[0, W] times [0, H]$, and the region of the empty staircase is empty.
+@fig:staircase shows a positive staircase with four tiers.
 
 #figure(
   image("figures/staircase.svg", width: 38%),
@@ -120,120 +165,396 @@ The staircase with the single anchor $(0, 0)$ has $M$ itself as its only tier, a
 
 A tile placed at the anchor of a tier may or may not be as wide as the floor, and may or may not be as high as the wall.
 This gives four kinds of placement, each of which turns a staircase into another.
+A tile that is as high as the wall has its height determined by the staircase, and its width by its orientation; a tile that is as wide as the floor is treated symmetrically; a tile that is neither has one side free.
 
 #definition(name: [placement])[
-  Let $T_i$ be a tier of a staircase, with floor $L$ and wall $M$.
-  A rectangle $R$ of width $w$ and height $h$ with the same anchor as $T_i$ _fits_ the tier if $w <= L$ and $h <= M$.
-  Its _fit_ is _inside_ if $w < L$ and $h < M$, _full height_ if $w < L$ and $h = M$, _full width_ if $w = L$ and $h < M$, and _full_ if $w = L$ and $h = M$.
-  _Placing_ $R$ replaces the staircase by the one whose uncovered region is the closure of the old uncovered region minus $R$.
+  A _placement_ is a triple $p = (i, phi, o)$ of the index $i >= 0$ of a tier, a _fit_ $phi$, which is _inside_, _full height_, _full width_ or _full_, and an _orientation_ $o$, which is _wide_ or _tall_.
+  A fit is _narrow_ if it is inside or full height, and _low_ if it is inside or full width.
+  Let $S = (T_0, dots, T_(m - 1))$ be a staircase over $cal(L)$ with $i < m$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $s in cal(L)$, the _free side_.
+  The _size_ $(w, h)$ of the tile of $p$ is
+  $ (w, h) := cases(
+    (x s, s) & "if" phi "is inside and" o "is wide,",
+    (s, x s) & "if" phi "is inside and" o "is tall,",
+    (x M, M) & "if" phi "is full height and" o "is wide,",
+    (M slash x, M) & "if" phi "is full height and" o "is tall,",
+    (L, L slash x) & "if" phi "is full width and" o "is wide,",
+    (L, x L) & "if" phi "is full width and" o "is tall,",
+    (L, M) & "if" phi "is full.",
+  ) $
+  The _positive quantity_ of $p$ is $s$ if $phi$ is inside, $M$ if $phi$ is full height, and $L$ if $phi$ is full width or full.
+  If $phi$ is full, the _equation_ of $p$ is the length $L - x M$ if $o$ is wide and $M - x L$ if $o$ is tall; other placements have no equation.
+  _Placing_ $p$ on $S$ with free side $s$ gives the staircase $S'$ obtained as follows.
+  + Every tier before $T_i$ becomes stale; if $phi$ is not low and $i > 0$, the floor $L_(i - 1)$ of $T_(i - 1)$ is then replaced by $L_(i - 1) + w$ and its stale flag is cleared.
+  + The tier $T_i$ is replaced by two tiers if $phi$ is inside, the first with floor $w$, wall $M - h$ and both flags clear, the second with floor $L - w$, wall $h$, stale flag clear and started flag set; by one tier with floor $L - w$, wall $M$, stale flag clear and started flag set if $phi$ is full height; by one tier with floor $L$, wall $M - h$ and both flags clear if $phi$ is full width; and by nothing if $phi$ is full.
+  + The tiers after $T_i$ are kept, except that, if $phi$ is not narrow and $i + 1 < m$, the wall $M_(i + 1)$ of $T_(i + 1)$ is replaced by $M_(i + 1) + h$.
+  If $S$ is a real staircase, read in the main rectangle $[0, W] times [0, H]$, the _tile_ of $p$ is the quadruple $(a_i, b_i, w, h)$, where $(a_i, b_i)$ is the anchor of $T_i$.
+  A placement with $i >= m$, at a tier that does not exist, leaves the staircase unchanged and has no positive quantity, no equation and no tile.
 ] <def:placement>
 
-Concretely, an inside placement replaces the anchor by two, one above the tile and one to its right; a full-height placement moves the anchor to the right and lengthens the floor of the previous tier by $w$; a full-width placement moves the anchor up and heightens the wall of the next tier by $h$; and a full placement removes the anchor, lengthening the floor of the previous tier by $L$ and heightening the wall of the next by $M$.
-The number of tiers thus increases by one, stays the same, or decreases by one.
-
-Every tiling can be built by placements.
-The proof singles out, at each stage, the first tier whose tile fits.
-
-#proposition(name: [staircase construction])[
-  Let $cal(T)$ be a tiling of $M$ and let $S$ be a staircase whose uncovered region is a union of tiles of $cal(T)$ and is not empty.
-  Then the tile of $cal(T)$ anchored at the anchor of some tier of $S$ fits that tier.
-  Consequently the tiles of $cal(T)$ can be ordered as $R_1, dots, R_n$ so that $R_j$ is placed, in the sense of @def:placement, on the staircase left by $R_1, dots, R_(j - 1)$, starting from the staircase of $M$ and ending with the empty one.
-] <prop:construction>
-
-#proof[
-  For each tier $T_i$, the point just above and to the right of its anchor is uncovered, and the tile $R^((i))$ of $cal(T)$ containing it must have that anchor, since the points to the left of the anchor and below it are covered or outside $M$.
-  The tile $R^((0))$ is no higher than the wall of $T_0$, which reaches the top of $M$.
-  If $R^((i))$ is no higher than the wall of $T_i$ but wider than its floor, then it covers points directly above the floor of $T_(i + 1)$ at the height of the anchor of $T_i$, so $R^((i + 1))$, which cannot overlap it, is no higher than the wall of $T_(i + 1)$.
-  The tile at the last tier cannot be wider than its floor, which reaches the right side of $M$.
-  Hence the least $i$ for which $R^((i))$ is no wider than the floor of $T_i$ exists, and for it $R^((i))$ fits.
-  Placing that tile gives a staircase whose uncovered region is again a union of tiles, and induction on the number of uncovered tiles gives the ordering.
-]
+Only an inside placement makes use of the free side.
+If $phi$ is not narrow then $w = L$, and if $phi$ is not low then $h = M$, by the definition of the size.
+In geometric terms, an inside placement replaces the anchor by two, one above the tile and one to its right; a full-height placement moves the anchor to the right and lengthens the floor of the previous tier by $w$; a full-width placement moves the anchor up and heightens the wall of the next tier by $h$; and a full placement removes the anchor, lengthening the floor of the previous tier by $L$ and heightening the wall of the next by $M$.
+The number of tiers thus increases by one with an inside placement, decreases by one with a full placement, and is unchanged otherwise.
+Placing commutes with homomorphisms: if $f$ is a homomorphism, the image under $f$ of the staircase obtained by placing $p$ on $S$ with free side $s$ is obtained by placing $p$ on the image of $S$ with free side $f(s)$, and the positive quantity and the equation of $p$ on the image of $S$ are the images of those on $S$.
+In particular, the number of tiers and the flags of the staircases obtained by successive placements do not depend on the arithmetic of lengths or on the free sides: they are those of the bare staircases obtained by the same placements.
 
 == Placement rules <sec:rules>
 
-A tiling generally admits several orderings as in @prop:construction, and tilings that differ only in how the corners of their tiles alternate along a segment will turn out to impose the same conditions on the sizes of the tiles.
-The search therefore restricts the sequences of placements by two rules.
-Each placement is recorded as a triple of the index of the tier, the fit, and the orientation of the tile, wide or tall; a _record_ is a sequence of such triples, and it is _complete_ if it leads from the staircase of the main rectangle to the empty staircase.
+A tiling generally admits several orderings in which its tiles can be placed, and tilings that differ only in how the corners of their tiles alternate along a segment will turn out to impose the same conditions on the sizes of the tiles.
+The search therefore restricts the sequences of placements by two rules, which are expressed by the two flags, and abandons a sequence when fewer tiles remain to be placed than there are tiers.
 
 #definition(name: [admissible record])[
-  Along a record, a tier becomes _stale_ when a tile is placed at a tier of larger index; it ceases to be stale when its floor is lengthened, and when a tile is placed at it.
-  The floor of a tier is _started_ if the tier was created to the right of a tile placed inside, or if its anchor was moved by a placement of full height; it ceases to be started when a tile of full width is placed at the tier.
-  A record is _admissible_ if no tile is placed at a stale tier, and no tile of full height and no full tile is placed at a tier whose previous tier has a started floor.
+  A placement $p = (i, phi, o)$ is _allowed_ at a staircase $S = (T_0, dots, T_(m - 1))$ if $i < m$, the tier $T_i$ is not stale and, in case $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
+  It is _admissible_ at $S$ with $r$ tiles remaining if it is allowed at $S$, $r >= 1$, and the number $m'$ of tiers after the placement satisfies $m' <= r - 1$, and $m' = 0$ only if $r = 1$.
+  A _record_ is a finite sequence $rho = (p_1, dots, p_ell)$ of placements.
+  Given a sequence $s_1, s_2, dots$ of free sides, _placing_ $rho$ on a staircase $S$ means placing $p_1, dots, p_ell$ in turn, the $j$-th inside placement of $rho$ being made with free side $s_j$.
+  The record $rho$ _obeys the rules_ from $S$ if each of its placements is allowed at the staircase on which it is placed and the staircase left by the last one is empty.
+  The record $rho$ is _complete admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible, with $n - j + 1$ tiles remaining, at the staircase on which it is placed, and the staircase left by the last one is empty.
+  The _first tile is wide_ in $rho$ if $rho$ is empty or $p_1$ is wide.
 ] <def:admissible>
 
-The first rule fixes the order in which tiles at different tiers are placed.
+Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
+The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened or a tile is placed at it.
 The second concerns a horizontal segment that carries the tops of some tiles and the bottoms of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
+The bound on the number of tiers, by which the search abandons partial records, excludes nothing.
+
+#proposition(name: [the bound on tiers])[
+  A record is complete admissible for $n$ tiles if and only if it consists of $n$ placements and obeys the rules from the bare initial staircase.
+] <prop:bound>
+
+#proof[
+  No placement is allowed at the empty staircase, so that in a record that obeys the rules no placement follows one that leaves the staircase empty.
+  Suppose that $rho = (p_1, dots, p_ell)$ obeys the rules from a bare staircase $S$ with $m$ tiers.
+  We show, by induction on $ell$, that $m <= ell$ and that each $p_j$ is admissible, with $ell - j + 1$ tiles remaining, at the staircase on which it is placed.
+  If $ell = 0$ then $S$ is empty and there is nothing to prove.
+  Otherwise let $S'$, with $m'$ tiers, be the staircase after $p_1$; then $m <= m' + 1$, the remaining placements obey the rules from $S'$, and by induction $m' <= ell - 1$ and the remaining placements are admissible as stated.
+  Hence $m <= ell$, and $p_1$ is admissible with $ell$ tiles remaining: it is allowed, $ell >= 1$, $m' <= ell - 1$, and if $m' = 0$ then no placement follows $p_1$, so that $ell = 1$.
+  Applied to the bare initial staircase, this shows that a record of $n$ placements that obeys the rules is complete admissible for $n$ tiles.
+  Conversely, an admissible placement is allowed, so a record that is complete admissible for $n$ tiles obeys the rules from the bare initial staircase, and it remains to see that it has $n$ placements.
+  More generally, if each placement $p_j$ of $rho$ is admissible, with $r - j + 1$ tiles remaining, on a staircase $S$ that is not empty, and the staircase left by the last one is empty, then $ell = r$, by induction on $ell$.
+  Indeed $ell >= 1$; if the staircase after $p_1$ is empty then $r = 1$ by admissibility and no placement follows, so that $ell = 1$; otherwise $ell - 1 = r - 1$ by induction.
+]
 
 == The linear system <sec:system>
 
-Fix a complete admissible record of $n$ placements.
-The sizes of the tiles are constrained by the record, and the constraints are linear once the proportion is fixed.
+A record constrains the sizes of the tiles, and the constraints are linear once the proportion is fixed.
+The short side of each tile placed inside its tier is a free unknown, and every other length is determined by the width and the height of the main rectangle and by these unknowns.
 
-Let the main rectangle have height $1$ and width $W$, and let $x >= 1$ be the proportion.
-A wide tile with short side $s$ has width $x s$ and height $s$; a tall one has width $s$ and height $x s$.
-The short side of a tile placed inside its tier is a free unknown.
-A full-height tile has the height of the wall, so its width is that height multiplied by $x$ if it is wide and divided by $x$ if it is tall; a full-width tile is treated symmetrically.
-A full tile has the width of the floor and the height of the wall, which must therefore be in the ratio prescribed by its orientation.
-
-#definition(name: [system of a record])[
-  Let $rho$ be a complete admissible record with $k$ inside placements.
-  Its _unknowns_ are $W$ and the short sides $s_1, dots, s_k$ of the tiles placed inside.
-  Every floor and wall arising along $rho$ is a linear form in $1, W, s_1, dots, s_k$ with coefficients in $ZZ[x, x^(-1)]$.
-  The _system_ of $rho$ consists of one equation for each full placement, $L = x M$ for a wide tile and $M = x L$ for a tall one, where $L$ and $M$ are the floor and wall of its tier, together with one strict inequality for each placement: the short side is positive for an inside tile, the wall is positive for a tile of full height, and the floor is positive for a tile of full width and for a full tile.
+#definition(name: [constraints of a record])[
+  Let $rho$ be a record, let $x > 0$, $W$ and $H$ be real numbers, and let $s = (s_1, s_2, dots)$ be a sequence of real numbers.
+  Place $rho$ on the real initial staircase of $W$ and $H$ with the free sides $s$.
+  The _positivity constraints_ of $rho$ are the positive quantities of its placements, one for each placement, and its _equations_ are the equations of its full placements, each taken on the staircase on which the placement is made.
+  The data $(W, H, s)$ _satisfy the constraints of $rho$ at $x$_ if every positivity constraint is a positive number and every equation is zero.
+  The _tiles of $rho$_ for $(x, W, H, s)$ are the tiles of its placements, in order, read in the main rectangle $[0, W] times [0, H]$.
 ] <def:system>
 
-The number of tiers increases by one with each inside placement and decreases by one with each full placement, from one to zero, so a complete record has $k + 1$ full placements and its system has $k + 1$ equations in $k + 1$ unknowns.
+The constraints depend only on those free sides that are used, namely $s_1, dots, s_k$ if $rho$ has $k$ inside placements.
+The unknowns are thus $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be given up to a common factor, and the following count shows that a complete record has as many equations as unknowns that remain.
+
+#proposition(name: [number of equations])[
+  A record with $k$ inside placements that obeys the rules from a staircase with $m$ tiers has $k + m$ full placements.
+  In particular a complete admissible record with $k$ inside placements has $k + 1$ equations.
+] <prop:count>
+
+#proof[
+  Each placement of the record is made at a tier that exists, so the number of tiers increases by one with each inside placement, decreases by one with each full placement, and is otherwise unchanged.
+  It passes from $m$ to zero, so the number of full placements exceeds the number of inside placements by $m$.
+  The second statement follows from @prop:bound, the initial staircase having one tier.
+]
 
 #example[
-  Consider the record that places a wide tile of full width, then a tall tile of full height, then a wide full tile, all at tier $0$.
+  Consider the record that places a wide tile of full width, then a tall tile of full height, then a wide full tile, all at tier $0$, with $H = 1$.
   The first tile has width $W$ and height $W slash x$, leaving a tier of floor $W$ and wall $1 - W slash x$.
-  The second has that wall as its height $h$ and width $h slash x$, and the third has width $W - h slash x$ and height $h$, so the system is the single equation $W - h slash x = x h$ with $h = 1 - W slash x$, that is,
+  The second has that wall as its height $h$ and width $h slash x$, and the third has width $W - h slash x$ and height $h$, so the only equation is $W - h slash x - x h = 0$ with $h = 1 - W slash x$, that is,
   $ W = (x^3 + x) / (2 x^2 + 1), $
-  with the inequalities $W > 0$ and $h > 0$.
+  and the positivity constraints are $W > 0$, $h > 0$ and $W - h slash x > 0$.
   For $W = 1$ the proportion is the root of $x^3 - 2 x^2 + x - 1$ in $[1, infinity)$, and the tiling is the sixth of @fig:three.
 ] <ex:plastic>
 
-== Soundness and completeness <sec:correct>
+== Soundness <sec:sound>
 
-The inequalities of the system say only that tiles have positive size.
+The positivity constraints say only that tiles have positive size.
 They do not say that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
-For admissible records this follows from the two rules, which are thus needed for every solution to be a tiling, and not only to avoid repetitions.
+For records that obey the rules this follows from the rules themselves, which are thus needed for every solution to be a tiling, and not only to avoid repetitions.
+The argument has two parts.
+The first is geometric: on a positive staircase, a tile that fits its tier as its fit says is cut out of the region.
+
+#proposition(name: [effect of a placement])[
+  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with floor $L$ and wall $M$, whose tile has size $(w, h)$ with $w, h > 0$.
+  Suppose that $w < L$ if $phi$ is narrow, and that $h < M$ if $phi$ is low.
+  Let $S'$ be the staircase after the placement and let $T$ be the tile of $p$.
+  Then $S'$ is positive, and
+  $ T subset.eq U(S), quad U(S') subset.eq U(S), quad U(S) subset.eq T union U(S'), $
+  and the interior of $T$ is disjoint from $U(S')$.
+] <prop:step>
+
+#proof[
+  Write $(a_j, b_j)$, $L_j$ and $M_j$ for the anchors, floors and walls of $S$, and $(a, b)$ for the anchor of $T_i$.
+  Since $S$ is positive, the relations $a_(j + 1) = a_j + L_j$ and $b_(j - 1) = b_j + M_j$ give $b_j >= b + M$ for $j < i$, and $a_j >= a + L$ and $b_j + M_j <= b$ for $j > i$, and also $a + L <= W$; moreover $a_(i + 1) = a + L$ and $b_(i + 1) + M_(i + 1) = b$ if $T_i$ is not the last tier, and $a + L = W$ if it is.
+  Recall that $w = L$ if $phi$ is not narrow and $h = M$ if $phi$ is not low, so that $w <= L$ and $h <= M$ in every case.
+
+  We first determine the anchors of $S'$.
+  The anchor of a tier depends only on the sum of the floors from that tier onwards and on the sum of the walls up to that tier.
+  For a tier before $T_i$ the walls up to it are unchanged, and so is the sum of the floors from it onwards: the tiers that replace $T_i$ have floors $w$ and $L - w$, or $L - w$ alone with $w$ added to the floor of $T_(i - 1)$, or $L$, or there are none and $L = w$ is added to the floor of $T_(i - 1)$.
+  For a tier after $T_i$ the floors from it onwards are unchanged, and so is the sum of the walls up to it: the tiers that replace $T_i$ have walls $M - h$ and $h$, or $M$, or $M - h$ alone with $h$ added to the wall of $T_(i + 1)$, or there are none and $M = h$ is added to the wall of $T_(i + 1)$.
+  Hence every tier of $S$ other than $T_i$ has the same anchor in $S'$, and the same computation gives the anchors of the tiers that replace $T_i$: they are $(a, b + h)$ and $(a + w, b)$ if $phi$ is inside, $(a + w, b)$ if $phi$ is full height, and $(a, b + h)$ if $phi$ is full width.
+  The strips of $S'$ are therefore the following.
+  The strips of the tiers before $T_i$ are those of $S$, their anchors and walls being unchanged.
+  The strip of $T_i$, which is $[a, W] times [b, b + M]$, is replaced by $[a, W] times [b + h, b + M]$ if $phi$ is low, together with $[a + w, W] times [b, b + h]$ if $phi$ is inside, and by $[a + w, W] times [b, b + M]$ if $phi$ is full height.
+  The strips of the tiers after $T_i$ are those of $S$, except that the strip $[a + L, W] times [b_(i + 1), b]$ of $T_(i + 1)$ becomes $[a + L, W] times [b_(i + 1), b + h]$ if $phi$ is not narrow.
+
+  The staircase $S'$ is positive: the floor of $T_(i - 1)$ and the wall of $T_(i + 1)$ can only grow, and the new tiers have floors $w$, $L - w$ with $phi$ narrow, or $L$, and walls $M - h$ with $phi$ low, $h$, or $M$.
+  The tile $T = [a, a + w] times [b, b + h]$ lies in the strip of $T_i$, because $w <= L$, $a + L <= W$ and $h <= M$.
+  Each strip of $S'$ lies in $U(S)$: this is clear for the unchanged ones and for those that replace the strip of $T_i$, which are parts of it, and a point of the enlarged strip of $T_(i + 1)$ lies in the old one if its ordinate is at most $b$, and in the strip of $T_i$ otherwise, since $a + L >= a$ and $h <= M$.
+  Let now $(u, v)$ be a point of $U(S)$.
+  If it lies in a strip of $S$ other than that of $T_i$, it lies in the corresponding strip of $S'$, which is the same or larger.
+  Suppose that it lies in the strip of $T_i$.
+  If $phi$ is low and $v >= b + h$, it lies in the strip $[a, W] times [b + h, b + M]$ of $S'$.
+  Otherwise $v <= b + h$; if $u <= a + w$ it lies in $T$; if $u > a + w$ and $phi$ is narrow, it lies in the strip of $S'$ with anchor $(a + w, b)$; and if $u > a + w$ and $phi$ is not narrow, then $u > a + L$, so that $T_i$ is not the last tier, and the point lies in the enlarged strip of $T_(i + 1)$.
+  This proves that $U(S) subset.eq T union U(S')$.
+  Finally let $(u, v)$ be a point of the interior of $T$, so that $a < u < a + w$ and $b < v < b + h$.
+  It is in no strip of a tier before $T_i$, since $v < b + M <= b_j$ for $j < i$; in none of the strips that replace that of $T_i$, which require $v >= b + h$ or $u >= a + w$; and in no strip of a tier after $T_i$, which requires $u >= a_j >= a + L >= a + w$.
+]
+
+The second part is combinatorial: a floor or a wall that has become non-positive in certain positions can never be removed from the staircase, so that such a staircase cannot be emptied.
+
+#definition(name: [doomed staircase])[
+  A real staircase is _floor-doomed_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
+  It is _wall-doomed_ if it has a tier whose wall is not positive and before which every tier is stale.
+] <def:doom>
+
+The empty staircase is neither.
+The next statement records what the constraints of a single placement give.
+
+#proposition(name: [tile of a placement])[
+  Let $x > 0$, and let $p$ be a placement at a tier of a real staircase, with free side $s$, whose positive quantity is positive and whose equation, if it has one, is zero.
+  Then the size $(w, h)$ of its tile satisfies $w > 0$ and $h > 0$, and $w = x h$ or $h = x w$.
+] <prop:size>
+
+#proof[
+  Let $L$ and $M$ be the floor and the wall of the tier.
+  For an inside placement $s > 0$ and the size is $(x s, s)$ or $(s, x s)$.
+  For a placement of full height $M > 0$ and the size is $(x M, M)$ or $(M slash x, M)$.
+  For a placement of full width $L > 0$ and the size is $(L, L slash x)$ or $(L, x L)$.
+  For a full placement the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
+]
+
+#proposition(name: [persistence of doom])[
+  Let $x > 0$, let $S$ be a real staircase, and let $p$ be a placement that is allowed at $S$, made with a free side for which its positive quantity is positive and its equation, if it has one, is zero.
+  Let $S'$ be the staircase after the placement.
+  If $S$ is floor-doomed then so is $S'$, and if $S$ is wall-doomed then so is $S'$.
+] <prop:doom>
+
+#proof[
+  Let $p = (i, phi, o)$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $(w, h)$ be the size of the tile, so that $w, h > 0$ by @prop:size.
+
+  Suppose that $S$ is wall-doomed, and let $T_j$ be a tier whose wall is not positive and before which every tier is stale.
+  Since $p$ is allowed, $T_i$ is not stale, so $j <= i$.
+  If $j < i$, the wall of $T_j$ is unchanged, and the tiers before $T_j$ remain stale: the placement makes every tier before $T_i$ stale, and clears the flag of $T_(i - 1)$ at most, which is not before $T_j$.
+  If $j = i$ then $M <= 0$.
+  The fit $phi$ is then low, for otherwise $h = M <= 0$.
+  Hence every tier before $T_i$ is stale in $S'$, and the first of the tiers that replace $T_i$ has wall $M - h < 0$.
+  In both cases $S'$ is wall-doomed.
+
+  Suppose that $S$ is floor-doomed, and let $T_j$ be a tier whose floor is not positive and which is started or last.
+  If $j < i$ then $T_j$ is not last, hence it is started.
+  Its floor and its started flag are unchanged by the placement, unless $j = i - 1$ and $phi$ is not low; but that case does not arise, since $p$ is allowed and $T_(i - 1)$ is then not started.
+  If $j = i$ then $L <= 0$.
+  The fit $phi$ is then narrow, for otherwise the positive quantity of $p$ is $L$.
+  Hence the last of the tiers that replace $T_i$ has floor $L - w < 0$ and is started.
+  If $j > i$, the floor and the started flag of $T_j$ are unchanged, and $T_j$ is the last tier of $S'$ if it is the last tier of $S$.
+  In every case $S'$ is floor-doomed.
+]
+
+It follows that doom cannot occur along a record that empties the staircase, and from this that every tile fits.
+
+#proposition(name: [strict fit])[
+  Let $x > 0$, let $rho$ be a record that obeys the rules from a real staircase $S$, placed with free sides $s$, and suppose that every positivity constraint of $rho$ on $S$ is positive and every equation is zero.
+  Then $S$ is neither floor-doomed nor wall-doomed.
+  If moreover $S$ is positive and $rho$ is not empty, then the first placement $p = (i, phi, o)$ of $rho$ has a tile of size $(w, h)$ with $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, where $L$ and $M$ are the floor and the wall of $T_i$, and the staircase after $p$ is positive.
+] <prop:fit>
+
+#proof[
+  The first statement is proved by induction on the length of $rho$.
+  If $rho$ is empty then $S$ is empty and is not doomed.
+  Otherwise let $S'$ be the staircase after the first placement; the rest of $rho$ obeys the rules from $S'$ and its constraints hold, so $S'$ is not doomed by induction, and neither is $S$ by @prop:doom.
+
+  For the second statement, let $S'$ be the staircase after $p$, which is not doomed by the first statement applied to the rest of $rho$, and recall that $w, h > 0$ by @prop:size.
+  If $phi$ is narrow and $w >= L$, then the last of the tiers that replace $T_i$ in $S'$ is started and has floor $L - w <= 0$, so that $S'$ is floor-doomed.
+  If $phi$ is low and $h >= M$, then every tier before $T_i$ is stale in $S'$ and the first of the tiers that replace $T_i$ has wall $M - h <= 0$, so that $S'$ is wall-doomed.
+  Hence $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, and $S'$ is positive by @prop:step.
+]
 
 #proposition(name: [soundness])[
-  Let $rho$ be a complete admissible record of $n$ placements, and let $x >= 1$ and $W, s_1, dots, s_k$ satisfy the system of $rho$.
-  Then the rectangles that $rho$ and the solution assign to the placements form a similar tiling of $[0, W] times [0, 1]$ of proportion $x$ with $n$ tiles.
+  Let $x >= 1$, let $rho$ be a complete admissible record for $n$ tiles, and let $W$, $H$ and $s = (s_1, s_2, dots)$ be real numbers that satisfy the constraints of $rho$ at $x$.
+  Then $W > 0$ and $H > 0$, and the tiles of $rho$ for $(x, W, H, s)$ form a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $n$ tiles.
 ] <prop:sound>
 
 #proof[
-  #todo[to be written out from the formal proof. Outline: it suffices that every floor and wall arising along $rho$ is positive, since the tiles then fit their tiers and each placement removes a rectangle from the uncovered region. If a floor becomes non-positive, it does so to the right of a tile placed with a narrow fit, so it is started, or it is the floor of the last tier; a floor that is non-positive and started or last remains so under every admissible placement with positive tiles, because it can be lengthened only from below, which the second rule forbids, and its tier can be removed only by a tile whose width is that floor. Similarly a wall that becomes non-positive lies behind tiers made stale by the placement that shortened it, and remains non-positive as long as they are stale. In either case the staircase cannot become empty.]
+  By @prop:bound the record $rho$ has $n$ placements and obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend on the flags only.
+  By @prop:fit the staircase $S_0$ is not doomed.
+  Its only tier is the last one and has no tier before it, so its floor $W$ and its wall $H$ are positive, and $S_0$ is positive.
+
+  We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that they are as many as the placements of $rho'$.
+  If $rho'$ is empty then $S$ is empty and so is $U(S)$.
+  Otherwise let $p$ be the first placement of $rho'$, let $T$ be its tile and $S'$ the staircase after it.
+  By @prop:size the tile $T$ is a rectangle of proportion $x$, and by @prop:fit it fits its tier strictly where its fit says so and $S'$ is positive, so that @prop:step applies.
+  By induction the tiles of the rest of $rho'$ are rectangles of proportion $x$ contained in $U(S')$, with pairwise disjoint interiors, which cover $U(S')$.
+  Hence all the tiles are contained in $U(S)$, because $T subset.eq U(S)$ and $U(S') subset.eq U(S)$; the interior of $T$ is disjoint from the later tiles, because it is disjoint from $U(S')$; and the tiles cover $U(S)$, because $U(S) subset.eq T union U(S')$.
+
+  Applied to $rho$ and $S_0$, whose region is $[0, W] times [0, H]$, this shows that the tiles of $rho$ lie in the main rectangle, cover it, and have pairwise disjoint interiors.
+  They are $n$ rectangles of proportion $x$, and $x >= 1$.
 ]
 
-For completeness, the tiles of a given tiling must be ordered so that both rules are obeyed.
-The order that places the tile at the first tier at which it fits, as in the proof of @prop:construction, does not always obey the second rule.
-The following one does.
+== Completeness <sec:complete>
+
+For completeness, the tiles of a given tiling must be placed in an order for which both rules are obeyed.
+The order that places, at each stage, the tile at the first tier at which it fits does not always obey the second rule.
+The following notion gives one that does.
 
 #definition(name: [extending floor])[
-  Let $cal(T)$ be a tiling and let $S$ be a staircase whose uncovered region is a union of tiles of $cal(T)$.
-  The floor of a tier of $S$, with right end at $(c, d)$, _extends_ in $cal(T)$ if some tile of $cal(T)$ has its top side at height $d$, over an interval $[u, v]$ with $u <= c < v$.
+  Let $R_1, dots, R_n$ be a tiling of $[0, W] times [0, H]$ and let $S$ be a real staircase, read in that rectangle.
+  The floor of a tier of $S$, with anchor $(a, b)$ and floor $L$, _extends_ in the tiling if some tile $(a', b', w', h')$ satisfies $b' + h' = b$ and $a' <= a + L < a' + w'$.
 ] <def:extends>
 
-The floor extends when the segment that carries it continues to the right beyond its end, so that a tile of full height placed at the next tier will lengthen it.
+The floor extends when the segment that carries it continues to the right beyond its end $(a + L, b)$, as the top side of a tile lying below it.
+A tile of full height placed at the next tier will then lengthen the floor.
+The construction relies on finding the tiles that lie next to a given point.
+
+#proposition(name: [tiles near a point])[
+  Let $R_1, dots, R_n$ be a tiling of $[0, W] times [0, H]$, and let $0 <= c < W$.
+  If $0 <= d < H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' <= d < b' + h'$.
+  If $0 < d <= H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' < d <= b' + h'$.
+] <prop:near>
+
+#proof[
+  Since the tiles are finitely many, there is $epsilon$ with $0 < epsilon < W - c$ such that no tile has the abscissa of its corner in $(c, c + epsilon]$, and there is $eta$ with $0 < eta < H - d$ such that no tile has the ordinate of its corner in $(d, d + eta]$.
+  The point $(c + epsilon, d + eta)$ lies in the main rectangle, hence in some tile $(a', b', w', h')$.
+  Then $a' <= c + epsilon$, so that $a' <= c$ by the choice of $epsilon$, and $c < c + epsilon <= a' + w'$; likewise $b' <= d < b' + h'$.
+  For the second statement, choose $epsilon$ as before and $eta$ with $0 < eta < d$ such that no tile has the ordinate $b' + h'$ of its top side in $[d - eta, d)$.
+  The point $(c + epsilon, d - eta)$ lies in some tile $(a', b', w', h')$, for which $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
+]
+
+The record is built one placement at a time, and the following conditions are maintained.
+
+#definition(name: [state of the construction])[
+  Let $R_1, dots, R_n$ be a tiling of $M = [0, W] times [0, H]$.
+  A _state_ consists of a positive real staircase $S$, read in $M$, and of a division of the tiles into _placed_ and _remaining_ ones, such that
+  + the interior of every placed tile is disjoint from $U(S)$;
+  + the interior of every remaining tile is contained in $U(S)$;
+  + $U(S)$ is contained in $M$;
+  + the floor of every stale tier of $S$ extends in the tiling, and the floor of no started tier of $S$ does.
+] <def:state>
+
+In a state, the tile at each anchor is still to be placed.
+
+#proposition(name: [tile at an anchor])[
+  In a state with staircase $S$, for every tier of $S$ there is a remaining tile whose corner is the anchor of the tier.
+] <prop:anchor>
+
+#proof[
+  Let $(a, b)$, $L$ and $M_i$ be the anchor, the floor and the wall of the tier $T_i$.
+  As in the proof of @prop:step, the strips of the earlier tiers lie in the half-plane of ordinates at least $b + M_i$, those of the later tiers in the half-plane of abscissas at least $a + L$, and $a + L <= W$.
+  Consequently a point $(u, v)$ with $v < b + M_i$ and $u < a + L$, and with $u < a$ or $v < b$, does not belong to $U(S)$.
+  The points $(a, b)$ and $(a, b + M_i)$ belong to the strip of $T_i$, hence to the main rectangle, so that $0 <= a < a + L <= W$ and $0 <= b < b + M_i <= H$.
+  By @prop:near some tile $T = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
+  Let $u_0$ be the mean of $a$ and $min(a' + w', a + L)$, and $v_0$ the mean of $b$ and $min(b' + h', b + M_i)$.
+  The point $(u_0, v_0)$ lies in the interior of $T$ and in the strip of $T_i$, so $T$ is not placed, and its interior is contained in $U(S)$.
+  If $a' < a$, the point with abscissa the mean of $a'$ and $a$ and with ordinate $v_0$ lies in the interior of $T$, but not in $U(S)$ by the remark above; hence $a' = a$.
+  If $b' < b$, the point with abscissa $u_0$ and with ordinate the mean of $b'$ and $b$ lies in the interior of $T$, but not in $U(S)$; hence $b' = b$.
+]
+
+The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
+
+#proposition(name: [step of the construction])[
+  Let $x >= 1$, let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and consider a state whose staircase $S$ is not empty.
+  Then some tier of $S$ has a floor that does not extend.
+  Let $T_i$ be the first such tier, with floor $L$ and wall $M$, and let $Q = (a, b, w, h)$ be the remaining tile at its anchor.
+  Then $w <= L$ and $h <= M$.
+  Let $p = (i, phi, o)$, where $phi$ is narrow exactly if $w < L$ and low exactly if $h < M$, and $o$ is wide if $w = x h$ and tall otherwise, and let the free side be $h$ if $o$ is wide and $w$ if $o$ is tall.
+  Then $p$ is allowed at $S$, its tile is $Q$, its positive quantity is positive, its equation, if it has one, is zero, and the staircase after $p$, with $Q$ counted as placed, is a state.
+] <prop:extension>
+
+#proof[
+  The floor of the last tier ends at abscissa $W$, and no tile $(a', b', w', h')$ has $a' <= W < a' + w'$, since the tiles lie in the main rectangle; hence the floor of the last tier does not extend, and $T_i$ exists.
+  Recall from the proof of @prop:anchor that $0 <= a < a + L <= W$ and $0 <= b < b + M <= H$.
+
+  Suppose that $w > L$.
+  Then $T_i$ is not the last tier, as otherwise $a + L = W$ while $a + w <= W$.
+  The anchor of $T_(i + 1)$ is $(a + L, b - M_(i + 1))$ and lies in the main rectangle, so that $b >= M_(i + 1) > 0$.
+  By @prop:near, applied to the point $(a + L, b)$, with $0 <= a + L < a + w <= W$ and $0 < b <= H$, some tile $T = (a', b', w', h')$ satisfies $a' <= a + L < a' + w'$ and $b' < b <= b' + h'$.
+  If $b < b' + h'$, the interiors of $T$ and $Q$ meet, since the open intervals $(a', a' + w')$ and $(a, a + w)$ both contain the points just to the right of $a + L$, and the open intervals $(b', b' + h')$ and $(b, b + h)$ both contain the points just above $b$; then $T = Q$, which contradicts $b' < b$.
+  Hence $b' + h' = b$, and the floor of $T_i$ extends, contrary to the choice of $T_i$.
+  This proves that $w <= L$.
+
+  Suppose that $h > M$.
+  If $i = 0$ then $b + M = H$, while $b + h <= H$.
+  If $i > 0$, the floor of $T_(i - 1)$ extends, by the choice of $T_i$; it ends at the point $(a, b + M)$, so some tile $T = (a', b', w', h')$ satisfies $b' + h' = b + M$ and $a' <= a < a' + w'$.
+  The interiors of $T$ and $Q$ meet, since the open intervals $(a', a' + w')$ and $(a, a + w)$ both contain the points just to the right of $a$, and the open intervals $(b', b + M)$ and $(b, b + h)$ both contain the points just below $b + M$; then $T = Q$, which contradicts $b + h > b + M$.
+  This proves that $h <= M$.
+
+  The placement $p$ is allowed.
+  The tier $T_i$ is not stale, since the floor of a stale tier extends.
+  If $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started, since its floor extends and the floor of a started tier does not.
+
+  The tile $Q$ has proportion $x$, so $h = x w$ if $o$ is tall.
+  The size of the tile of $p$ is then $(w, h)$, by inspection of the seven cases of @def:placement.
+  For an inside placement it is $(x h, h)$ or $(w, x w)$.
+  For a placement of full height $h = M$, and the size is $(x M, M) = (x h, h)$ or $(M slash x, M) = (h slash x, h)$.
+  For a placement of full width $w = L$, and the size is $(L, L slash x) = (w, w slash x)$ or $(L, x L) = (w, x w)$.
+  For a full placement it is $(L, M) = (w, h)$.
+  Hence the tile of $p$ is $Q$.
+  Its positive quantity is the free side, which is a side of $Q$, or it is $L$ or $M$, and $S$ is positive.
+  If $phi$ is full, the equation is $L - x M = w - x h = 0$ if $o$ is wide, and $M - x L = h - x w = 0$ if $o$ is tall.
+
+  Let $S'$ be the staircase after $p$.
+  By the choice of $phi$, @prop:step applies: $S'$ is positive, $U(S') subset.eq U(S)$, $U(S) subset.eq Q union U(S')$, and the interior of $Q$ is disjoint from $U(S')$.
+  The interiors of the tiles placed before, and that of $Q$, are therefore disjoint from $U(S')$, and $U(S')$ is contained in the main rectangle.
+  A remaining tile other than $Q$ has its interior in $U(S)$ and disjoint from that of $Q$, hence disjoint from $Q$ itself, so its interior is contained in $U(S')$.
+  It remains to examine the flags of $S'$; recall from the proof of @prop:step that the tiers of $S$ other than $T_i$ keep their anchors.
+  The tiers before $T_i$ have floors that extend in $S$.
+  Those that are stale in $S'$ have the same floor as in $S$, so their floors extend; none of them is started in $S$, hence none is started in $S'$, where the started flags of these tiers are the same.
+  The tiers that replace $T_i$ are not stale, and the only one that is started is the last one in the case of a narrow fit; its anchor is $(a + w, b)$ and its floor is $L - w$, so its floor ends at $(a + L, b)$, as that of $T_i$ does, and does not extend.
+  The tiers after $T_i$ have the same anchors, floors and flags as in $S$.
+]
 
 #proposition(name: [completeness])[
-  Let $x >= 1$, $W > 0$ and $H > 0$, and let $cal(T)$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $n$ tiles.
-  Then there are a complete admissible record $rho$ of $n$ placements, in which each placement has the orientation of the tile it places, and values of the free sides, such that the system of $rho$ is satisfied and the tiles assigned to the placements are those of $cal(T)$.
-  If $W = H$, then $cal(T)$ or its transpose arises from such a record whose first tile is wide.
+  Let $x >= 1$, let $W, H > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$.
+  Then there are a complete admissible record $rho$ for $n$ tiles and real numbers $s = (s_1, s_2, dots)$ such that $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are $R_1, dots, R_n$ in some order, and each placement of $rho$ is wide exactly if its tile $(a, b, w, h)$ satisfies $w = x h$.
 ] <prop:complete>
 
 #proof[
-  #todo[to be written out from the formal proof. Outline: at each stage, place the tile at the anchor of the first tier whose floor does not extend. Such a tier exists, since the floor of the last tier ends on the right side of the main rectangle; the tile at its anchor fits it, by the argument of @prop:construction applied to the tiers before it, whose floors extend. Two invariants hold along the construction: the floor of a stale tier extends, and a started floor does not. Hence the tier chosen is not stale, and a tile of full height is placed only when the floor of the previous tier extends, so that it is not started. The last statement follows from @prop:transposition, as transposition fixes the bottom-left tile.]
+  The initial staircase of $W$ and $H$, with every tile remaining, is a state: the staircase is positive, its region is the main rectangle, which contains every tile, and its only tier is neither stale nor started.
+  We show, by induction on the number $r$ of remaining tiles of a state with staircase $S$, that there are a record $rho'$ of $r$ placements and free sides such that $rho'$ obeys the rules from $S$, its constraints on $S$ hold, its tiles on $S$ are the remaining tiles in some order, and each of its placements is wide exactly if its tile satisfies $w = x h$.
+  If $r = 0$ then $S$ is empty, since otherwise there would be a remaining tile by @prop:anchor, and the empty record will do.
+  If $r > 0$ then $S$ is not empty, since the interior of a remaining tile is contained in $U(S)$.
+  Then @prop:extension gives a placement $p$, with a free side, whose tile is a remaining tile $Q$ and after which there is a state with $r - 1$ remaining tiles, namely those other than $Q$.
+  By induction that state has a record $rho''$ with free sides as stated, and $rho'$ is $p$ followed by $rho''$, the free side of $p$, if $p$ is inside, being put before those of $rho''$.
+  Applied to the initial state this gives a record $rho$ of $n$ placements that obeys the rules from the initial staircase, which is complete admissible for $n$ tiles by @prop:bound.
 ]
 
 A square tile is both wide and tall, so that a tiling with square tiles arises from several records; this multiplicity is harmless, since only proportions are counted.
+For a square main rectangle, transposition allows the first tile to be taken wide, which halves the number of orientations to be examined.
+
+#proposition(name: [completeness for a square])[
+  Let $x >= 1$, let $W > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, W]$ of proportion $x$.
+  Then there are a complete admissible record $rho$ for $n$ tiles in which the first tile is wide, and real numbers $s$, such that $(W, W, s)$ satisfy the constraints of $rho$ at $x$ and the tiles of $rho$ are, in some order, either $R_1, dots, R_n$ or their transposes.
+] <prop:square>
+
+#proof[
+  Let $rho$ and $s$ be given by @prop:complete.
+  If $rho$ is empty there is nothing to prove.
+  Otherwise its first placement is made at the only tier of the initial staircase, so its tile $T = (0, 0, w, h)$ has its corner at the origin.
+  If $w = x h$ the first placement is wide, and $rho$ will do.
+  Otherwise $h = x w$, since $T$ has proportion $x$.
+  The transposes of $R_1, dots, R_n$ form a similar tiling of the same square, of proportion $x$, as in the proof of @prop:transposition; let $rho'$ and $s'$ be given by @prop:complete for it.
+  The tile of the first placement of $rho'$ has its corner at the origin and is the transpose of some $R_j$, whose corner is then the origin; the interiors of $R_j$ and $T$ meet, so $R_j = T$.
+  That tile is thus $(0, 0, h, w)$, and $h = x w$ says that the first placement of $rho'$ is wide.
+]
 
 == Mosaic classes <sec:mosaic>
 
-The system of a record depends only on which tiles border each maximal segment of the tiling, and not on the order in which the corners of tiles on the two sides of a segment alternate.
+The constraints of a record depend only on which tiles border each maximal segment of the tiling, and not on the order in which the corners of tiles on the two sides of a segment alternate.
 
 #definition(name: [mosaic class])[
   A _segment_ of a tiling is a maximal line segment contained in the union of the boundaries of the tiles and not contained in the boundary of the main rectangle, or one of the four sides of the main rectangle.
@@ -242,52 +563,152 @@ The system of a record depends only on which tiles border each maximal segment o
 
 Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
 The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
-Accordingly, for every $n <= 13$ the number of complete admissible sequences of $n$ placements, disregarding orientations, is $B(n)$ @oeisA001181.
-We have not proved that each mosaic class has exactly one such sequence; the correctness of the search does not depend on it.
+Accordingly, for every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
+This agreement is an observation, made by computation.
+We have not proved that each mosaic class has exactly one such record, nor that a tiling without a point where four tiles meet arises from only one record; the correctness of the search does not depend on either statement, since a repeated record affects the amount of work and not the set of proportions found.
 
 In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
-The equations of the system are Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these determine the currents.
-One therefore expects the equations of every record to have exactly one solution for each $x > 0$.
-The search does not rely on this expectation, but verifies it for each record, in the following form.
-
-#definition(name: [regular record])[
-  Let $rho$ be a complete admissible record and let $p, q >= 1$ be integers.
-  Write the equations of the system of $rho$ as $A (s_1, dots, s_k, W)^top = c$, with $A$ a square matrix and $c$ a vector over $ZZ[x]$, after clearing powers of $x$.
-  The record is _regular_ for the aspect ratio $p slash q$ if $det A != 0$; if, for the solution $W = N slash D$ over $QQ(x)$ given by Cramer's rule with $D = det A$, the polynomial $F_rho := q N - p D$ is not zero; and if $D(alpha) != 0$ for every root $alpha >= 1$ of $F_rho$.
-] <def:regular>
+The equations of a record are Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these determine the currents.
+One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
+We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
 
 == Solving the system <sec:solving>
 
-For a regular record, the proportions realised with main aspect ratio $p slash q$ are the roots $alpha >= 1$ of $F_rho$ at which all the tile sizes, which are rational functions $Q_j slash D$ of the proportion, are positive.
+For a main rectangle of sides in the ratio $a slash b$, with $a$ and $b$ positive integers, the height is normalised to $H = 1$ and the width $W$ is kept as an unknown, to be compared with $a slash b$ at the end.
+Every floor and wall arising along a record is then a linear form in $1$, $W$ and the free sides, whose coefficients are polynomials in the proportion divided by a power of it.
+
+#definition(name: [linear forms])[
+  A _linear form_ is a pair $f = (d, c)$ of an integer $d >= 0$ and a sequence $c = (c_0, c_1, c_2, dots)$ of polynomials in $ZZ[x]$; it stands for the expression
+  $ (c_0 + c_1 W + c_2 s_1 + c_3 s_2 + dots.c) / x^d. $
+  The sum and the difference of $(d, c)$ and $(d', c')$ have exponent $D = max(d, d')$ and coefficients $c_j x^(D - d) plus.minus c'_j x^(D - d')$; the product of $(d, c)$ with $x$ is $(d - 1, c)$ if $d > 0$ and $(0, x c)$ if $d = 0$; and the quotient of $(d, c)$ by $x$ is $(d + 1, c)$.
+  With these operations the linear forms are an arithmetic of lengths.
+  For an integer $k >= 0$ and real numbers $x != 0$, $W$ and $s_1, dots, s_k$, the _numerator_ and the _value_ of $f$ are
+  $ nu_k (f) := c_0 (x) + c_1 (x) W + sum_(j = 1)^k c_(j + 1) (x) s_j, quad "val"_k (f) := nu_k (f) / x^d. $
+  The _symbolic system_ of a record $rho$ consists of the positivity constraints and of the equations obtained by placing $rho$ on the initial staircase whose floor is the form $W$ and whose wall is the form $1$, the free sides being the forms $s_1, s_2, dots$.
+] <def:forms>
+
+#proposition(name: [symbolic system])[
+  Let $rho$ be a record with $k$ inside placements, and let $x != 0$, $W$ and $s = (s_1, s_2, dots)$ be real numbers.
+  Then $(W, 1, s)$ satisfy the constraints of $rho$ at $x$ if and only if $"val"_k (f) > 0$ for every positivity constraint $f$ of the symbolic system of $rho$ and $"val"_k (g) = 0$ for every equation $g$ of it.
+] <prop:forms>
+
+#proof[
+  For $x != 0$ the map $"val"_k$ is a homomorphism from the linear forms to the real numbers: this is a direct verification for each of the four operations, in which numerators are brought to the common power of $x$.
+  It sends the form $W$ to $W$, the form $1$ to $1$, and the form $s_j$ to $s_j$ for $j <= k$.
+  Since placing commutes with homomorphisms, the positivity constraints and the equations of $rho$ on the real initial staircase of $W$ and $1$, with free sides the values of the forms $s_j$, are the values of those of the symbolic system.
+  Only the first $k$ free sides are used, and their values are $s_1, dots, s_k$.
+]
+
 The reference form of the search treats each record separately and uses exact arithmetic throughout.
+Its arithmetic is performed by three routines, which are not part of what is proved here: the statements below hold for any routines that meet the following specifications.
 
-+ The matrix of the equations is brought to triangular form by fraction-free elimination @bareiss1968, which yields $N$ and $D$.
-+ The record is discarded if $F_rho$ has no root in $[1, infinity)$.
-+ Otherwise $F_rho$ is factorised into irreducible factors over $ZZ$, and the real roots of each factor in $[1, infinity)$ are isolated by Descartes' rule of signs with bisection @collins1976.
-  Each root is thereby identified by its minimal polynomial and its position among the roots of that polynomial.
-+ Back-substitution gives each tile size as $Q_j (x) slash D(x)$ with $Q_j in ZZ[x]$.
-+ For each root $alpha$, the signs of $D(alpha)$ and of each $Q_j (alpha)$ are determined exactly: $Q_j (alpha) = 0$ if and only if the minimal polynomial of $alpha$ divides $Q_j$, and otherwise the sign is found by evaluating $Q_j$ on an isolating interval for $alpha$, refined until the value is separated from zero.
-  The root is accepted if all the signs are equal.
+#definition(name: [exact routines])[
+  The _exact routines_ are the following, with their assumed specifications.
+  + _Elimination._ Given a square matrix $A$ over $ZZ[x]$, of size $m$, and a vector $c in ZZ[x]^m$, the routine either fails or returns a polynomial $D$ and polynomials $N_1, dots, N_m$.
+    In the second case there is $lambda in ZZ[x]$ such that $D = lambda det A$ and $N_i = lambda det A_i$ for every $i$, where $A_i$ is the matrix $A$ with its $i$-th column replaced by $c$.
+  + _Roots._ Given a polynomial $q in ZZ[x]$, the routine returns a finite set $"roots"(q)$ of real numbers.
+    If $q != 0$, this is the set of the real numbers $r >= 1$ with $q(r) = 0$.
+  + _Signs._ Given a real number $r$ and a polynomial $q in ZZ[x]$, the routine returns a sign $"sign"(r, q)$, which is $-1$, $0$ or $1$.
+    If $r$ belongs to $"roots"(q')$ for some polynomial $q'$, this is the sign of the real number $q(r)$.
+] <def:primitives>
 
-Factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
+Nothing is assumed of the elimination when it fails.
+In the implementation, the elimination is the fraction-free elimination of Bareiss @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
+The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
+The sign of $q$ at a root $r$ is zero if and only if the minimal polynomial of $r$ divides $q$, and is otherwise found by evaluating $q$ on an isolating interval for $r$, refined until the value is separated from zero.
+
+#definition(name: [reference method])[
+  Let $a$ and $b$ be integers and let $rho$ be a complete admissible record, with $k$ inside placements.
+  Let $g_1, dots, g_(k + 1)$ be the equations of its symbolic system, as given by @prop:count, and write $g_r = (d_r, c^((r)))$.
+  Let $A$ be the square matrix of size $k + 1$ with entries $A_(r j) := c^((r))_(j + 1)$ for $j <= k$ and $A_(r, k + 1) := c^((r))_1$, and let $c$ be the vector with entries $c_r := -c^((r))_0$, so that the columns of $A$ correspond to the unknowns $s_1, dots, s_k, W$.
+  The _reference method_ treats $rho$ as follows.
+  + It applies the elimination to $A$ and $c$.
+    If the elimination fails, it reports no proportion and counts one _singular situation_.
+  + Otherwise, with $D$ and $N_1, dots, N_(k + 1)$ the polynomials returned, it forms $F_rho := b N_(k + 1) - a D$.
+    If $F_rho = 0$, it reports no proportion and flags the record as _constant_.
+  + Otherwise, if the coefficients of $F_rho (x + 1)$ are all non-negative or all non-positive and its constant coefficient is not zero, it reports no proportion.
+  + Otherwise, for each positivity constraint $f = (d, c')$ of the symbolic system it forms $Q_f := c'_0 D + c'_1 N_(k + 1) + sum_(j = 1)^k c'_(j + 1) N_j$.
+    It reports the numbers $r in "roots"(F_rho)$ for which $"sign"(r, D) != 0$ and $"sign"(r, Q_f) = "sign"(r, D)$ for every $f$, and it counts one singular situation for each $r in "roots"(F_rho)$ with $"sign"(r, D) = 0$.
+  We write $"Ref"_(a, b) (rho)$ for the finite set of numbers reported.
+] <def:reference>
+
+On the solutions of the equations, the unknowns are $N_j slash D$ by Cramer's rule, the width is $N_(k + 1) slash D$, and each positivity constraint has numerator $Q_f slash D$; the proportion must be a root of $F_rho$ for the width to be $a slash b$.
+The third step is justified by the following test.
+
+#proposition(name: [absence of roots])[
+  Let $q in ZZ[x]$ be such that the coefficients of $q(x + 1)$ are all non-negative or all non-positive, and its constant coefficient is not zero.
+  Then $q(r) != 0$ for every real number $r >= 1$.
+] <prop:noroot>
+
+#proof[
+  Let $q(x + 1) = sum_j q_j x^j$, so that $q(r) = q_0 + sum_(j >= 1) q_j (r - 1)^j$ with $r - 1 >= 0$.
+  If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then $q(r) < 0$ likewise.
+]
+
+#proposition(name: [reference method on a record])[
+  Let $a$ and $b != 0$ be integers, and let $rho$ be a complete admissible record.
+  + Every $r in "Ref"_(a, b) (rho)$ satisfies $r >= 1$, and there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
+  + If the reference method counts no singular situation for $rho$ and does not flag it as constant, then conversely every real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ belongs to $"Ref"_(a, b) (rho)$.
+] <prop:solve>
+
+#proof[
+  Let $k$ be the number of inside placements of $rho$, and keep the notation of @def:reference.
+  For a real number $r != 0$ and real numbers $W$ and $s_1, dots, s_k$, write $z := (s_1, dots, s_k, W)$.
+  By the definition of $A$ and $c$, the numerator of the equation $g_i$ is $nu_k (g_i) = (A(r) z)_i - c_i (r)$.
+  For $r > 0$ a value has the sign of its numerator, so that, by @prop:forms, $(W, 1, s)$ satisfy the constraints of $rho$ at $r$ if and only if $A(r) z = c(r)$ and $nu_k (f) > 0$ for every positivity constraint $f$ of the symbolic system.
+  Two facts on the matrix $A$ over the ring $ZZ[x]$ are used, both consequences of the identity between a matrix and its adjugate: $A dot.op (det A_1, dots, det A_(k + 1))^top = (det A) c$, and, for every real vector $z$ with $A(r) z = c(r)$, $(det A)(r) z_i = (det A_i)(r)$ for every $i$.
+
+  For the first statement, let $r in "Ref"_(a, b) (rho)$.
+  Then the elimination has succeeded, $F_rho != 0$, and $r in "roots"(F_rho)$, so that $r >= 1$ and $F_rho (r) = 0$, and the signs reported at $r$ are the true signs.
+  In particular $D(r) != 0$.
+  Let $z_i := N_i (r) slash D(r)$, and let $W := z_(k + 1)$ and $s_j := z_j$.
+  Since $D = lambda det A$ and $N_i = lambda det A_i$, the first fact gives $A(r) z = lambda(r) (det A)(r) c(r) slash D(r) = c(r)$.
+  From $F_rho (r) = 0$ and $b != 0$ it follows that $W = N_(k + 1) (r) slash D(r) = a slash b$.
+  For a positivity constraint $f$, the definition of $Q_f$ gives $Q_f (r) = D(r) nu_k (f)$; since $Q_f (r)$ and $D(r)$ have the same sign, which is not zero, $nu_k (f) > 0$.
+  Hence the constraints of $rho$ hold.
+
+  For the second statement, let $r >= 1$ and $s$ be such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$, and let $z := (s_1, dots, s_k, a slash b)$, so that $A(r) z = c(r)$, and $nu_k (f) > 0$ for every positivity constraint $f$.
+  The elimination has succeeded, since otherwise a singular situation is counted.
+  By the second fact, multiplied by $lambda(r)$, $D(r) z_i = N_i (r)$ for every $i$.
+  In particular $F_rho (r) = b N_(k + 1) (r) - a D(r) = D(r) (b dot.op a slash b - a) = 0$.
+  The record is not flagged as constant, so $F_rho != 0$; the test of the third step fails, by @prop:noroot; hence the fourth step is reached and $r in "roots"(F_rho)$.
+  No singular situation is counted, so $"sign"(r, D) != 0$.
+  Finally $Q_f (r) = D(r) nu_k (f)$ with $nu_k (f) > 0$, so $Q_f (r)$ has the sign of $D(r)$, and $r$ is reported.
+]
+
+The proviso of the second statement is what the search verifies.
+
+#definition(name: [regular record])[
+  Let $a$ and $b$ be integers.
+  A complete admissible record is _regular_ for $(a, b)$ if the reference method counts no singular situation for it and does not flag it as constant.
+  For an integer $n >= 0$, the reference search _reports_ the numbers of
+  $ "Ref"_n (a, b) := union.big_rho "Ref"_(a, b) (rho), $
+  where $rho$ ranges over the complete admissible records for $n$ tiles, in which moreover the first tile is wide if $a = b$.
+  The reference search for $n$ tiles is _certified_ if all these records are regular for $(a, b)$.
+] <def:regular>
+
+A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being void when the test of the third step succeeds.
 
 #proposition(name: [correctness of the reference search])[
-  Let $p, q >= 1$ and $n >= 1$ be integers, and consider the reference search over all complete admissible records of $n$ placements, with the first tile wide if $p = q$.
-  Every number that it accepts belongs to $P_n (p slash q)$.
-  If every such record is regular for $p slash q$, the numbers accepted are exactly the elements of $P_n (p slash q)$.
+  Let $a, b >= 1$ and $n >= 0$ be integers.
+  Then $"Ref"_n (a, b) subset.eq P_n (a, b)$.
+  If the reference search for $n$ tiles is certified, then $"Ref"_n (a, b) = P_n (a, b)$.
 ] <prop:reference>
 
 #proof[
-  If $alpha$ is accepted for a record, then $D(alpha) != 0$ and the values $Q_j (alpha) slash D(alpha)$ and $W = p slash q$ satisfy the system at $x = alpha$, so $alpha in P_n (p slash q)$ by @prop:sound.
-  Conversely, let $alpha in P_n (p slash q)$.
-  By @prop:complete some record, with first tile wide if $p = q$, has a system satisfied at $x = alpha$ with $W = p slash q$.
-  If the record is regular, the solution at $x = alpha$ is the one given by Cramer's rule, so $F_rho (alpha) = 0$ and the tile sizes are $Q_j (alpha) slash D(alpha) > 0$, and $alpha$ is accepted.
+  Let $r in "Ref"_(a, b) (rho)$ for a complete admissible record $rho$ for $n$ tiles.
+  By @prop:solve, $r >= 1$ and $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ for some $s$, so by @prop:sound there is a similar tiling of $[0, a slash b] times [0, 1]$ of proportion $r$ with $n$ tiles.
+  Hence $r in P_n (a slash b, 1) = P_n (a, b)$, by @prop:scaling.
+  Conversely, let $r in P_n (a, b) = P_n (a slash b, 1)$.
+  If $a != b$, @prop:complete gives a complete admissible record $rho$ for $n$ tiles and $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$; if $a = b$, @prop:square gives the same with the first tile wide in $rho$.
+  If the search is certified, $rho$ is regular, and $r in "Ref"_(a, b) (rho)$ by @prop:solve.
 ]
 
-The implementation counts the records for which the elimination finds no pivot, for which $D$ vanishes at a candidate root, or for which $F_rho$ is identically zero.
-All three counts were zero in every computation reported in @sec:results, so that every record examined was regular.
-In particular the sets $P_n (w)$ computed there are finite.
+By @prop:scaling the set $P_n (a, b)$ is $P_n (a slash b)$.
+The implementation counts the singular situations and the records flagged as constant, and both counts were zero in every computation reported in @sec:results; for the computations made with the search of @sec:optimisations, the counts concern the records that it passes to the reference method, which is what @prop:fast requires.
+We have not proved that the counts are always zero.
+When the search is certified, the set $P_n (a slash b)$ is finite, being the union of the finite sets reported for the finitely many records; this remark is not part of the formal development.
 
 = Optimisations <sec:optimisations>
 
