@@ -29,6 +29,11 @@ impl<C: Int> Form<C> {
         self.c.get(index).cloned().unwrap_or_else(Poly::zero)
     }
 
+    /// The power of the tile proportion by which the form is divided.
+    pub fn den(&self) -> u32 {
+        self.den
+    }
+
     /// The coefficients, by index of unknown.
     pub fn coeffs(&self) -> &[Poly<C>] {
         &self.c

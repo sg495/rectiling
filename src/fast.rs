@@ -6,8 +6,9 @@ use crate::algebraic::{Registry, RootRef};
 use crate::cache::{PolyCache, Roots, WordMap};
 use crate::exact;
 use crate::interval::Iv;
-use crate::search::{Shared, Tally, encode_witness, within};
+use crate::search::{Search, Shared, Tally, encode_witness, within};
 use crate::staircase::{Algebra, FITS, Fit, Placement, Staircase, Unit};
+use crate::tilings::{Analyst, MAX_TILES, Verdict as Examined};
 use smallvec::SmallVec;
 
 const SLOTS: usize = 8;
@@ -298,6 +299,8 @@ struct Numeric<'s> {
     tile: u8,
     violated: bool,
     unsure: SmallVec<[u8; 4]>,
+    keep: bool,
+    sizes: SmallVec<[Iv; MAX_TILES]>,
 }
 
 impl Algebra for Numeric<'_> {
@@ -324,6 +327,9 @@ impl Algebra for Numeric<'_> {
             self.violated = true;
         } else if !(a.lo > 0.0) {
             self.unsure.push(self.tile);
+        }
+        if self.keep {
+            self.sizes.push(a);
         }
         self.tile += 1;
     }
@@ -362,6 +368,8 @@ pub(crate) struct Engine<'a> {
     key: Vec<i64>,
     scratch: Vec<u8>,
     tally: Tally,
+    analyst: Option<Analyst<'a>>,
+    sizes: SmallVec<[Iv; MAX_TILES]>,
 }
 
 impl Drop for Engine<'_> {
@@ -371,12 +379,15 @@ impl Drop for Engine<'_> {
 }
 
 impl<'a> Engine<'a> {
-    pub(crate) fn new(tiles: usize, width: i64, height: i64, minority: usize, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
+    pub(crate) fn new(search: &Search, registry: &'a Registry, cache: &'a PolyCache, shared: &'a Shared) -> Self {
+        let (width, height) = search.sides();
         Engine {
             width,
             height,
-            tiles,
-            minority,
+            tiles: search.tiles(),
+            minority: search.minority(),
+            analyst: search.analyst(registry),
+            sizes: SmallVec::new(),
             registry,
             cache,
             shared,
@@ -620,7 +631,11 @@ impl<'a> Engine<'a> {
         stats.overflows += solved.overflow as u64;
         stats.candidates += solved.candidate as u64;
         for &id in &solved.feasible {
-            self.tally.record(id, || encode_witness(moves.iter().copied()));
+            let verdict = match &mut self.analyst {
+                Some(analyst) => analyst.examine(&mut self.tally.census, moves, &self.registry.refs(&[id])[0], None),
+                None => Examined::default(),
+            };
+            self.tally.record(id, verdict, || encode_witness(moves.iter().copied()));
         }
     }
 
@@ -680,10 +695,10 @@ impl<'a> Engine<'a> {
         if roots.is_empty() {
             return;
         }
-        let mut accepted: SmallVec<[u32; 2]> = SmallVec::new();
+        let mut accepted: SmallVec<[(RootRef, SmallVec<[Iv; MAX_TILES]>); 2]> = SmallVec::new();
         for root in roots.iter() {
             match self.check(root) {
-                Verdict::Accept => accepted.push(root.id),
+                Verdict::Accept => accepted.push((*root, std::mem::take(&mut self.sizes))),
                 Verdict::Reject => {}
                 Verdict::Unsure => {
                     let moves: Vec<Placement> = self.path.iter().map(|s| s.mv).collect();
@@ -693,9 +708,16 @@ impl<'a> Engine<'a> {
             }
         }
         self.tally.stats.candidates += 1;
-        for id in accepted {
+        for (root, sizes) in accepted {
             let path = &self.path;
-            self.tally.record(id, || encode_witness(path.iter().map(|s| s.mv)));
+            let verdict = match &mut self.analyst {
+                Some(analyst) => {
+                    let moves: SmallVec<[Placement; MAX_TILES]> = path.iter().map(|s| s.mv).collect();
+                    analyst.examine(&mut self.tally.census, &moves, &root, Some(&sizes))
+                }
+                None => Examined::default(),
+            };
+            self.tally.record(root.id, verdict, || encode_witness(path.iter().map(|s| s.mv)));
         }
     }
 
@@ -786,6 +808,8 @@ impl<'a> Engine<'a> {
             tile: 0,
             violated: false,
             unsure: SmallVec::new(),
+            keep: self.analyst.is_some(),
+            sizes: SmallVec::new(),
         };
         let mut stairs = Staircase::new(Iv::point(self.width as f64), Iv::point(self.height as f64));
         for step in &self.path {
@@ -795,6 +819,7 @@ impl<'a> Engine<'a> {
             }
         }
         if numeric.unsure.is_empty() {
+            self.sizes = numeric.sizes;
             return Verdict::Accept;
         }
         let tiles = numeric.unsure;

@@ -16,9 +16,11 @@ pub mod poly;
 pub mod roots;
 pub mod search;
 pub mod staircase;
+mod tilings;
 
 pub use algebraic::Algebraic;
 pub use guillotine::count_guillotine_ratios;
 pub use poly::Poly;
-pub use search::{Found, Outcome, Search, Stats};
+pub use search::{Found, Outcome, Search, Stats, Tiling};
 pub use staircase::{Fit, Placement, count_layouts};
+pub use tilings::{Census, SYMMETRIES};
