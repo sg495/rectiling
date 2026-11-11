@@ -18,6 +18,11 @@ const SHARD_BITS: u32 = 12;
 
 type Residues = SmallVec<[u64; 14]>;
 
+/// The tilings that represent the distinct bags with one key, each with the identifier of its proportion.
+type Holders = SmallVec<[(u32, Witness); 1]>;
+
+type Shards<K, V> = Box<[Mutex<WordMap<K, V>>]>;
+
 /// What entering the bag of a tiling into the table established.
 pub(crate) enum Entered {
     /// The bag is new; the flag tells whether a different bag has the same residues.
@@ -30,8 +35,8 @@ pub(crate) enum Entered {
 
 /// Concurrent table of the distinct bags of the tilings of a search, each represented by one tiling.
 pub(crate) struct Bags {
-    shards: Box<[Mutex<WordMap<u64, SmallVec<[(u32, Witness); 1]>>>]>,
-    points: Box<[Mutex<WordMap<u32, (u64, u64)>>]>,
+    shards: Shards<u64, Holders>,
+    points: Shards<u32, (u64, u64)>,
 }
 
 /// Coefficients of a product of two polynomials, unless one exceeds the range of the integers used.
@@ -137,7 +142,7 @@ impl Bags {
         let shard = &self.shards[(key >> (64 - SHARD_BITS)) as usize];
         let mut seen = 0;
         loop {
-            let others: SmallVec<[(u32, Witness); 1]> = {
+            let others: Holders = {
                 let mut guard = shard.lock().expect("bags lock");
                 let entry = guard.entry(key).or_default();
                 if entry.len() == seen {
