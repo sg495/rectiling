@@ -1364,7 +1364,7 @@ Every proportion with $n$ tiles has degree at most $n$ @taams2023.
   caption: [Number of proportions for the square, by algebraic degree from $8$ to $13$.],
 ) <tab:degrees-high>
 
-Odd degrees are markedly more frequent than the neighbouring even ones.
+Odd degrees are more frequent than the neighbouring even ones.
 Degree $n$ is attained for every $n$ in the table other than $2$ and $4$; the proportions of degree $n$ for $n <= 7$ are shown in @app:full.
 
 The proportions of degree one are explained in part by dissections into squares.
@@ -1395,7 +1395,7 @@ For instance, a rectangle of sides $2$ and $1$ cannot be dissected into six squa
 
 We found no closed form, recurrence or generating function for $a(n)$.
 The sequence satisfies no linear recurrence with constant coefficients of order at most five, and none with polynomial coefficients of the orders and degrees that thirteen terms allow one to test, a test which does recover the recurrence of the Baxter numbers; the usual transforms of the sequence match no entry of the OEIS, and its residues modulo small integers show no pattern.
-The search does, however, reveal a good deal of structure, which we now describe.
+The results of the search nevertheless show some structure.
 @tab:structure collects the counts involved.
 
 #figure(
@@ -1525,7 +1525,7 @@ Finally, the search gives some information on growth.
 ]
 
 The same bound for the number of tilings in the sense of @tab:counts is proved only under two combinatorial hypotheses, which are stated in @sec:upper.
-The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$, and the number of proportions achievable by guillotine tilings is a rapidly vanishing share of the total: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
+The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$, and the number of proportions achievable by guillotine tilings is a decreasing share of the total: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
 The guillotine count is at most $n slash 2$ times the number of series–parallel networks with $n$ edges of two kinds (@prop:guillotine), whose growth constant is numerically about $6.16$.
 
 #conjecture[
