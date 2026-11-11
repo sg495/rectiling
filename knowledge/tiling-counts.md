@@ -17,20 +17,20 @@ Statements are labelled as in [analysis.md](analysis.md): *Proved* (the proof is
 
 ## Values
 
-| n  | a(n)     | c(n)    | b(n)       | t(n)       |
-| -- | -------- | ------- | ---------- | ---------- |
-| 1  | 1        | 1       | 1          | 1          |
-| 2  | 1        | 1       | 1          | 2          |
-| 3  | 3        | 3       | 3          | 14         |
-| 4  | 11       | 11      | 16         | 89         |
-| 5  | 51       | 51      | 121        | 830        |
-| 6  | 245      | 250     | 976        | 7278       |
-| 7  | 1372     | 1419    | 9051       | 70410      |
-| 8  | 8522     | 8877    | 88982      | 703606     |
-| 9  | 58347    | 61147   | 914261     | 7280599    |
-| 10 | 433926   | 456652  | 9666313    | 77188146   |
-| 11 | 3446981  | 3636350 | 104584332  | 836069812  |
-| 12 | 28799493 |         | 1152003122 | 9213388789 |
+| n  | a(n)     | c(n)     | b(n)       | t(n)       |
+| -- | -------- | -------- | ---------- | ---------- |
+| 1  | 1        | 1        | 1          | 1          |
+| 2  | 1        | 1        | 1          | 2          |
+| 3  | 3        | 3        | 3          | 14         |
+| 4  | 11       | 11       | 16         | 89         |
+| 5  | 51       | 51       | 121        | 830        |
+| 6  | 245      | 250      | 976        | 7278       |
+| 7  | 1372     | 1419     | 9051       | 70410      |
+| 8  | 8522     | 8877     | 88982      | 703606     |
+| 9  | 58347    | 61147    | 914261     | 7280599    |
+| 10 | 433926   | 456652   | 9666313    | 77188146   |
+| 11 | 3446981  | 3636350  | 104584332  | 836069812  |
+| 12 | 28799493 | 30408726 | 1152003122 | 9213388789 |
 
 The values of a(n) are those of [results.md](results.md).
 All the other values were computed here on 11 November 2026, on the machine described there, and none of them was on record before, apart from b(1), b(2) and b(3).
@@ -211,7 +211,7 @@ Ratios, and the mean number of crossings per tiling with its lower bound.
 | 9  | 10.348      | 0.2882          | 1.00460     | 0.00452         | 0.02362                     | 0.00600     | 1.0480    |
 | 10 | 10.602      | 0.2898          | 1.00184     | 0.00183         | 0.02483                     | 0.00639     | 1.0524    |
 | 11 | 10.832      | 0.2911          | 1.00072     | 0.00072         | 0.02563                     | 0.00673     | 1.0549    |
-| 12 | 11.020      | 0.2920          | 1.00029     | 0.00029         | 0.02676                     | 0.00711     |           |
+| 12 | 11.020      | 0.2920          | 1.00029     | 0.00029         | 0.02676                     | 0.00711     | 1.0559    |
 
 Here M(n) = 2·(3n)!/((2n+1)!·(n+1)!) as in [analysis.md](analysis.md), and the lower bound is that of the statement on crossings below.
 
@@ -227,7 +227,7 @@ Here M(n) = 2·(3n)!/((2n+1)!·(n+1)!) as in [analysis.md](analysis.md), and the
 - **Criteria.** On every record, the comparison with the representative sequence and the criterion on crossings agreed, and so did the two tests of symmetry (`inconsistent` = 0); every combinatorial symmetry was confirmed on the coordinates (`asymmetric` = 0).
 - **Transposed rectangles.** A w × h and an h × w rectangle have the same numbers of tilings, classes and bags, with the reflections exchanged, for the three rectangles above.
 
-The values for n = 11 and n = 12 come from the Rust search alone, with its default method; t(11), b(11), t(12) and b(12) were each obtained in two runs with identical results, the second with a later version of the program, and c(11) was computed once.
+The values for n = 11 and n = 12 come from the Rust search alone, with its default method; t(11), b(11), t(12) and b(12) were each obtained in two runs with identical results, the second with a later version of the program, and c(11) and c(12) were each computed once.
 
 ## The sixteen classes for four tiles
 
@@ -324,7 +324,7 @@ A tiling symmetric in an axis is determined by one half, but the tiles that stra
 
 *Heuristic:* the share of tilings with a crossing rises slowly, from 2.0% at n = 7 to 2.6% at n = 12; by the statement above it cannot stay bounded away from one for ever unless the mean is carried by few tilings.
 
-*Heuristic:* c(n)/a(n) = 1.020, 1.034, 1.042, 1.048, 1.052 and 1.055 for n = 6 to 11: nearly every proportion has a single bag.
+*Heuristic:* c(n)/a(n) = 1.020, 1.034, 1.042, 1.048, 1.052, 1.055 and 1.056 for n = 6 to 12: nearly every proportion has a single bag.
 For n ≤ 5 every proportion has one bag, so c(n) = a(n).
 For n = 6 the four proportions with more than one bag (3/2, 2, and the roots of 2x³ − 3x² + 2x − 2 and x³ − 2x² + x − 1) all occur with fewer tiles, and the extra bags come from applying the constructions of the persistence statement of [analysis.md](analysis.md) to different tiles.
 From n = 7 onwards proportions that are new at n can also have several bags (16, 148, 1368, 12410 and 108156 of them for n = 7 to 11), so no law in terms of the complexity of the proportion holds.
@@ -341,7 +341,7 @@ The mean number of classes per proportion is 6.6, 10.4, 15.7, 22.3 and 30.3 for 
 - No law relating the number of bags of a proportion to the least number of tiles with which it occurs; see above.
 - No recurrence was sought for t(n) or b(n): with twelve terms the tests of [analysis.md](analysis.md) could detect only very small recurrences, and the Baxter-like growth of T(n) already failed them.
 - **Limits.** Counting t(n) and b(n) costs about twice the plain search: 12 seconds for n = 10, 128 seconds and 1.8 GB for n = 11, and 29 minutes and 7.2 GB for n = 12 (6.6 hours of processor time), so n = 13 would take some six hours and was not attempted. What limits it is the search itself, and beyond it the exact comparison of coordinates, which about 7% of the records need.
-- Counting bags is limited by the exact comparison of each class representative with the stored tiling of the same key: two eliminations and n tests of divisibility, about 50 microseconds of processor time, for nearly every class, since c(n) is so much smaller than b(n). The run for n = 11 took 16 minutes and 3.5 GB while other jobs were running (two hours of processor time), and n = 12 would take about an hour and a half; it was not attempted. A cheaper exact comparison, reusing the eliminations of the default method in place of fresh ones, would be needed to go further.
+- Counting bags is limited by the exact comparison of each class representative with the stored tiling of the same key: two eliminations and n tests of divisibility, about 50 microseconds of processor time, for nearly every class, since c(n) is so much smaller than b(n). The run for n = 11 took 16 minutes and 3.5 GB while other jobs were running (two hours of processor time), and the run for n = 12 took two hours and 12 GB (25 hours of processor time). A cheaper exact comparison, reusing the eliminations of the default method in place of fresh ones, would be needed to go further.
 - The reference program is limited by memory, since it keeps every tiling as a set of exact rectangles: eight tiles take eight minutes and 5.4 GB, and nine would need some ten times as much.
 
 ## Reproducing
