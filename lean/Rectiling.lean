@@ -15,5 +15,6 @@ import Rectiling.BackSubstitution
 import Rectiling.Determinant
 import Rectiling.Reduced
 import Rectiling.Certified
+import Rectiling.Fast
 import Rectiling.Audit
 import Rectiling.Check
