@@ -1434,59 +1434,77 @@ The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, 
 Consequently almost every proportion is new at the number of tiles at which it first appears, as @tab:structure shows.
 
 The second phenomenon concerns the aspect ratio of the main rectangle as a function of the proportion.
-For a tiling with given arrangement and orientations, this is the effective resistance of a planar network whose resistances are $x$ and $1 slash x$ @bsst1940, and it has the following properties.
+A tiling of a rectangle is an electrical network @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the difference of potential across it its height (@def:tiling-network).
+For a network $frak(N)$ in the sense of @def:network and an orientation vector $epsilon$, which labels each edge as tall or wide, let $Z_(frak(N), epsilon) in QQ(x)$ be the impedance of the network between its poles when every tall edge has resistance $x$ and every wide edge resistance $1 slash x$ (@def:impedance).
+A similar tiling of $[0, W] times [0, H]$ of proportion $x$, with network $frak(N)$ and orientations $epsilon$, satisfies $H slash W = Z_(frak(N), epsilon) (x)$, so that this function gives the height of the main rectangle over its width; the aspect ratio $W slash H$ is given by $1 slash Z_(frak(N), epsilon)$, which is the impedance function of the dual network with the orientations reversed (@sec:function).
+These functions have the following properties.
 
 #proposition(name: [aspect-ratio function])[
-  Let $R$ be the aspect-ratio function of an arrangement of $n$ tiles with orientations, in which no tile vanishes identically, and write $R = N slash D$ in lowest terms.
-  Then $R$ is odd; $N$ and $D$ have non-negative integer coefficients; one of them is an even polynomial with non-zero constant term and the other is an odd polynomial; their degrees differ by one and are at most $n$, and at most $2 k + 1$ if $k$ tiles have the less frequent orientation; and $R(x) slash x$ is non-increasing and $x R(x)$ non-decreasing on $(0, infinity)$.
+  Let $frak(N)$ be a network with $n$ edges and $epsilon$ an orientation vector for its edges, and write $F = Z_(frak(N), epsilon) = N slash D$ in lowest terms.
+  Then $F$ is odd; $N$ and $D$ have non-negative integer coefficients; one of them is an even polynomial with non-zero constant term and the other is an odd polynomial; their degrees differ by one and are at most $n$, and at most $2 k + 1$ if at most $k$ edges are tall or at most $k$ edges are wide; and $F(x) slash x$ is non-increasing and $x F(x)$ non-decreasing on $(0, infinity)$.
 ] <prop:function>
 
 #proof[
-  #todo[the proof, by an energy argument for the network with complex resistances, which locates the roots of $N$ and $D$ on the imaginary axis, is written out in the project notes and is to be brought into an appendix after independent review.]
+  This is part of @prop:reactance, which is proved in @sec:function.
+  The idea is to let $x$ be a complex number with positive real part: every resistance then has positive real part, and the power dissipated in the network shows that so has $F(x)$, which, with the oddness of $F$, confines the roots of $N$ and of $D$ to the imaginary axis and makes them simple.
 ]
 
-Two consequences follow at once.
-The polynomial $N - D$, whose roots in $[1, infinity)$ are the candidate proportions for the square, determines the pair ${R, 1 slash R}$, since $N$ and $D$ are its even and odd parts up to sign.
-And its degree has a parity that can be read from the behaviour of $R$.
+Two consequences follow.
+The polynomial $N - D$, whose roots in $[1, infinity)$ are the candidate proportions for the square, determines the pair ${F, 1 slash F}$, since $N$ and $D$ are its even and odd parts up to sign (@prop:difference).
+And its degree has a parity that can be read from the behaviour of $F$.
 
 #proposition(name: [parity of the degree])[
   In the situation of @prop:function, let $d := deg(N - D)$.
-  If $R$ tends to $0$ at one end of $(0, infinity)$ and to $infinity$ at the other, then $d$ is odd and $R(x) = 1$ has an odd number of positive solutions, counted with multiplicity.
-  Otherwise $d$ and the number of solutions are even.
+  If $F$ tends to $0$ at one end of $(0, infinity)$ and to $infinity$ at the other, then $d$ is odd and $F(x) = 1$ has an odd number of positive solutions, counted with multiplicity.
+  Otherwise $d$ and the number of positive solutions, counted with multiplicity, are even.
 ] <prop:parity>
 
 #proof[
-  By @prop:function, $d = max(deg N, deg D)$, the leading coefficient of $N - D$ is positive exactly when $R$ is unbounded at infinity, and $N(0) - D(0)$ is negative exactly when $R$ tends to $0$ at $0$.
-  The signs of $N - D$ at the two ends of $(0, infinity)$ therefore differ in the first case and agree in the second, which gives the parity of the number of roots, and the parity of $d$ is that of the odd polynomial among $N$ and $D$ if it has the larger degree, and of the even one otherwise.
+  This is @prop:parity-full.
+  The signs of $N - D$ at the two ends of $(0, infinity)$ are determined by the limits of $F$ there, which gives the parity of the number of roots, and the parity of $d$ is that of whichever of $N$ and $D$ has the larger degree.
 ]
 
-A function of the first kind always yields a solution, and one of the second kind usually yields none, which accounts for the predominance of odd degrees in @tab:degrees: the proportions of odd degree make up between $82$ and $90$ per cent of all proportions for $7 <= n <= 13$.
+A function of the first kind always yields a positive solution, and one of the second kind usually yields none.
+This suggests an explanation for the predominance of odd degrees in @tab:degrees, where the proportions of odd degree make up between $82$ and $90$ per cent of all proportions for $7 <= n <= 13$; the explanation is only heuristic, since $d$ is the degree of $N - D$ and not that of the minimal polynomial of a proportion.
 
 The third phenomenon is that the aspect-ratio functions themselves can be counted by the search.
-Let $E(n)$ be the number of aspect-ratio functions of arrangements of $n$ tiles with orientations in which no tile vanishes identically, counted up to $R |-> 1 slash R$.
+The count must leave out the networks with orientations in which the current in some edge vanishes for every $x$, as it does in the central tile of a pinwheel of five tiles of equal orientations, because their functions need not be those of any tiling (@ex:improper).
+A pair $(frak(N), epsilon)$ of a network with $n$ edges, embedded in the plane with both poles on the outer face, and of an orientation vector is _proper_ if no current of the flow of value $1$ vanishes identically as a function of $x$ (@def:proper).
+Let $cal(F)_n$ be the set of the impedance functions of the proper pairs with $n$ edges.
+It is finite, it is closed under $F |-> 1 slash F$, which has no fixed point in it, and it is the set of the impedance functions of the similar tilings with $n$ tiles (@prop:functions and the remark that follows it).
+Let $E(n) := abs(cal(F)_n) slash 2$, and let $cal(F)_n^infinity$ be the set of the functions of $cal(F)_n$ that tend to $infinity$ at infinity, of which there are $E(n)$.
 
 #proposition(name: [wide rectangles])[
-  For every $n$ there is $W(n)$ such that $a_w (n) = E(n)$ for every real $w > W(n)$.
-  One can take $W(n) = n (1 + 4^n slash 2)$, and one cannot take $W(n) < floor(n^2 slash 4) + 1$.
+  For every $n >= 1$ there is a real number $W(n)$ such that, for every real number $w > W(n)$, every $F in cal(F)_n^infinity$ has exactly one solution $x_F (w)$ of $F(x) = w$ in $[1, infinity)$, and $F |-> x_F (w)$ is a bijection from $cal(F)_n^infinity$ onto $P_n (w)$; in particular $a_w (n) = E(n)$ for every real number $w > W(n)$.
+  One can take $W(n) = n (1 + 4^n slash 2)$.
+  For $n >= 2$ the two properties do not both hold at $w = floor(n^2 slash 4) + 1$, so that every such $W(n)$ is at least $floor(n^2 slash 4) + 1$.
 ] <prop:wide>
 
 #proof[
-  #todo[the proof is written out in the project notes and is to be brought into an appendix after independent review. Outline: for large $w$ only the functions that are unbounded at infinity can take the value $w$ on $[1, infinity)$, each does so exactly once by the monotonicity in @prop:function, distinct functions do so at distinct points, and no tile vanishes there; a network with non-zero currents is realised by a tiling @bsst1940. The explicit bound uses Kirchhoff's formula for the currents in terms of spanning trees. For the lower bound, the functions $a x + b slash x$ and $a x + x slash b$ with $a + b = n$ take the value $a b + 1$ at the same point $x = b$.]
+  The three statements are @prop:wide-full, @prop:threshold and @prop:coincidence, which are proved in @sec:wide; the first rests on classical facts of planar duality and the second on Kirchhoff's formulas for the currents of a network in terms of its spanning trees, as stated there.
+  For large $w$ only the functions that are unbounded at infinity take the value $w$ on $[1, infinity)$, each does so exactly once, distinct functions do so at distinct points, and no current vanishes there, while a plane network with non-zero currents is the network of a tiling @bsst1940.
+  For the last statement, the functions $a x + b slash x$ and $a x + x slash b$ with $a + b = n$ take the value $a b + 1$ at the same point $x = b$.
 ]
 
+The last statement does not say that $a_w (n) != E(n)$ at that width, although this is what is observed.
 The column of functions in @tab:structure was computed with $w = 1009$, and confirmed with three larger values of $w$ for $n <= 9$ and one for $n = 10$.
-For $n <= 10$ it agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $E(11) = 9865302$ is new and was computed once.
+The largest of these, $w = 1000003$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$, so that for these $n$ the column is $E(n)$ by @prop:wide; for $9 <= n <= 11$ the widths used are below that threshold, and the identification of the column with $E(n)$ depends on the second part of @conj:threshold below.
+For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $9865302$ for $n = 11$ is new and was computed once.
 
 The fourth phenomenon concerns the rational proportions.
 By @tab:rational some of them are achievable with $n$ tiles only if both orientations are used, and from ten tiles onwards the search finds exactly three.
+A proportion $x$ is achievable with $n$ tiles of a single orientation exactly when a rectangle of sides $x$ and $1$ can be dissected into $n$ squares, that is, has a tiling with $n$ tiles that are squares.
 
 #proposition(name: [exceptional rational proportions])[
-  The proportion $n - 4$ belongs to $P_n (1)$ for $n >= 6$, the proportion $n - 11 slash 2$ for $n >= 7$, and the proportion $n - 19 slash 3$ for $n >= 8$.
-  None of the three is achievable with $n$ tiles of a single orientation: rectangles of sides $1$ and $n - 4$, $n - 11 slash 2$ or $n - 19 slash 3$ cannot be dissected into $n$ squares.
+  The proportion $n - 4$ belongs to $P_n (1)$ for every $n >= 6$, the proportion $n - 11 slash 2$ for every $n >= 7$, and the proportion $n - 19 slash 3$ for every $n >= 8$.
+  A rectangle of sides $n - 4$ and $1$ cannot be dissected into $n$ squares for any $n >= 5$, nor one of sides $n - 11 slash 2$ and $1$ for any $n >= 6$, nor one of sides $n - 19 slash 3$ and $1$ for any $n >= 7$.
+  Consequently, for $n >= 6$, $n >= 7$ and $n >= 8$ respectively, the three proportions are not achievable with $n$ tiles of a single orientation.
 ] <prop:exceptional>
 
 #proof[
-  #todo[the proof is written out in the project notes and is to be brought into an appendix after independent review. Outline: the three proportions are the largest rational elements of $P_(n - 4) (1)$ and persist by the pinwheel of @prop:persistence. For the impossibility, in a dissection of a rectangle of height $1$ into squares the number of squares is the integral, over vertical lines, of the sum of the reciprocals of the sides of the squares met; removing the squares of side $1$ reduces the three statements to three finite ones, that a square cannot be cut into five squares, nor a rectangle of sides $3$ and $2$ into seven squares of side less than $2$, nor one of sides $5$ and $3$ into eight squares of side less than $3$.]
+  The two statements are @prop:three-occur and @prop:no-squares, which are proved in @sec:rational.
+  The three proportions are achievable with $n - 4$ tiles of a single orientation and persist by the pinwheel of @prop:persistence.
+  For the impossibility, the number of squares in a dissection of a rectangle of height $1$ is the integral, over the vertical lines, of the sum of the reciprocals of the sides of the squares met; removing the squares of side $1$ then reduces the three statements to three finite ones, that a square cannot be dissected into five squares, nor a rectangle of sides $3$ and $2$ into seven squares of side less than $2$, nor one of sides $5$ and $3$ into eight squares of side less than $3$.
 ]
 
 #conjecture[
@@ -1494,22 +1512,24 @@ By @tab:rational some of them are achievable with $n$ tiles only if both orienta
 ] <conj:exceptional>
 
 The conjecture holds for $10 <= n <= 13$; it was formulated from the cases $n = 10$ and $n = 11$ and then confirmed for $12$ and $13$.
-For smaller $n$ there are further exceptions, which arise from pinwheels with a central rectangle that is not a square: $5 slash 3$ for six tiles and $16 slash 5$ for nine.
+For smaller $n$ there are further exceptions, which arise from pinwheels with a central rectangle that is not a square: $5 slash 3$ for six tiles and $16 slash 5$ for nine, shown in @ex:sporadic.
 The last column of @tab:structure extends the eight known terms of A210517 @oeisA210517 by five; a sixth, $155656$ for $n = 14$, was also computed.
 
 Finally, the search gives some information on growth.
 
 #proposition(name: [upper bound])[
-  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$, where $M(n) = 2 (3 n)! slash ((2 n + 1)! (n + 1)!)$ is the number of rooted non-separable planar maps with $n + 1$ edges.
+  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$, where $M(n) := 2 (3 n)! slash ((2 n + 1)! (n + 1)!)$.
   In particular $limsup a(n)^(1 slash n) <= 27 slash 2$.
 ] <prop:upper>
 
 #proof[
-  #todo[the proof is written out in the project notes and is to be brought into an appendix after independent review. Outline: the network of a tiling, with an added edge joining its poles, is a non-separable planar map with $n + 1$ edges; there are $2^n$ orientation vectors, of which half need be considered by @prop:transposition, and each function yields at most $n$ proportions, by the bound on the degree in @prop:function.]
+  This is @prop:upper-full, which is proved in @sec:upper on the basis of Tutte's theorem that $M(n)$ is the number of rooted non-separable planar maps with $n + 1$ edges @tutte1963.
+  The network of a tiling, with an added edge joining its poles, is such a map; by @prop:transposition half of the $2^n$ orientation vectors need be considered, and each function yields at most $n$ proportions, by the bound on the degree in @prop:function.
 ]
 
+The same bound for the number of tilings in the sense of @tab:counts is proved only under two combinatorial hypotheses, which are stated in @sec:upper.
 The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$, and the number of proportions achievable by guillotine tilings is a rapidly vanishing share of the total: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
-The growth of the guillotine count is bounded by that of the series–parallel networks with two kinds of edge, whose growth constant is about $6.16$.
+The guillotine count is at most $n slash 2$ times the number of series–parallel networks with $n$ edges of two kinds (@prop:guillotine), whose growth constant is numerically about $6.16$.
 
 #conjecture[
   The sequence $a(n + 1) slash a(n)$ is non-decreasing.
