@@ -3,3 +3,4 @@ import Rectiling.Geometry
 import Rectiling.Staircase
 import Rectiling.Layout
 import Rectiling.Region
+import Rectiling.Soundness
