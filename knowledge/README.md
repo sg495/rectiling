@@ -9,3 +9,4 @@ Curated notes on the problem that `rectiling` addresses and on the methods it us
 - [validation.md](validation.md) — external data against which the implementation is checked.
 - [results.md](results.md) — the values computed with the library, including new terms of the sequence.
 - [analysis.md](analysis.md) — structural laws, derived sequences and conjectures found in the search for a formula.
+- [structure-proofs.md](structure-proofs.md) — proofs of the structural laws of the analysis, with the status of each claim and of each conjecture.
