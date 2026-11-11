@@ -332,6 +332,30 @@ theorem positive_postAfter {fit : Fit} {h' : ℝ} (hh : 0 < h') (h : Positive po
         exact ⟨this.1, by linarith⟩
       · exact h u (by simp [hu])
 
+/-- Floors and walls stay positive when a tile of positive size is placed that fits its tier strictly where its fit says so. -/
+theorem positive_parts {fit : Fit} {w h' : ℝ} (hs : Positive (pre ++ t :: post)) (hw : 0 < w)
+    (hh : 0 < h') (hn : fit.narrow = true → w < t.floor) (hl : fit.low = true → h' < t.wall) :
+    Positive (preAfter (realAlgebra x) fit w pre ++ midAfter (realAlgebra x) fit t w h' ++
+      postAfter (realAlgebra x) fit h' post) := by
+  have hpre : Positive pre := fun u hu => hs u (by simp [hu])
+  have hpost : Positive post := fun u hu => hs u (by simp [hu])
+  have ht := hs t (by simp)
+  intro u hu
+  simp only [List.mem_append] at hu
+  rcases hu with (hu | hu) | hu
+  · exact positive_preAfter hw hpre u hu
+  · cases fit <;>
+      simp only [midAfter, realAlgebra, List.mem_cons, List.not_mem_nil, or_false, Fit.narrow,
+        Fit.low, forall_const] at hu hn hl
+    · rcases hu with rfl | rfl
+      · exact ⟨hw, by linarith⟩
+      · exact ⟨by linarith, hh⟩
+    · subst hu
+      exact ⟨by linarith, ht.2⟩
+    · subst hu
+      exact ⟨ht.1, by linarith⟩
+  · exact positive_postAfter hh hpost u hu
+
 /-- If no floor or wall is doomed after the placement, the tile fits its tier strictly where its fit says so, and floors and walls stay positive. -/
 theorem StepData.positive_place (d : StepData x pre t post mv side)
     (hs : Positive (pre ++ t :: post))
@@ -377,22 +401,7 @@ theorem StepData.positive_place (d : StepData x pre t post mv side)
       · simp only [midAfter, List.cons_append, DoomW, realAlgebra]
         exact Or.inl (by linarith)
       · simp [hfit, Fit.low] at hlow
-  refine ⟨hn, hl, ?_⟩
-  intro u hu
-  simp only [List.mem_append] at hu
-  rcases hu with (hu | hu) | hu
-  · exact positive_preAfter hw hpre u hu
-  · cases hfit : mv.fit <;> rw [hfit] at hu hn hl <;>
-      simp only [midAfter, realAlgebra, List.mem_cons, List.not_mem_nil, or_false, Fit.narrow,
-        Fit.low, forall_const] at hu hn hl
-    · rcases hu with rfl | rfl
-      · exact ⟨hw, by linarith⟩
-      · exact ⟨by linarith, hh⟩
-    · subst hu
-      exact ⟨by linarith, ht.2⟩
-    · subst hu
-      exact ⟨ht.1, by linarith⟩
-  · exact positive_postAfter hh hpost u hu
+  exact ⟨hn, hl, positive_parts hs hw hh hn hl⟩
 
 end StepLemmas
 

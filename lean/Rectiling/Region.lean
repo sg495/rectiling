@@ -13,7 +13,7 @@ namespace Rectiling
 structure StepHyp (W : ℝ) (Gpre : List GTier) (g : GTier) (Gpost : List GTier) (fit : Fit)
     (w h : ℝ) : Prop where
   pre_above : ∀ g' ∈ Gpre, g.ay + g.wall ≤ g'.ay
-  post_right : ∀ g' ∈ Gpost, g.ax + g.floor ≤ g'.ax ∧ g'.ay + g'.wall ≤ g.ay ∧ 0 ≤ g'.wall
+  post_right : ∀ g' ∈ Gpost, g.ax + g.floor ≤ g'.ax ∧ g'.ay + g'.wall ≤ g.ay ∧ 0 < g'.wall
   head : ∀ q ∈ Gpost.head?, q.ax = g.ax + g.floor ∧ q.ay + q.wall = g.ay
   last : Gpost = [] → g.ax + g.floor = W
   le_W : g.ax + g.floor ≤ W
@@ -41,7 +41,7 @@ theorem stepHyp_of_positive {W H : ℝ} {pre post : List (Tier ℝ)} {t : Tier �
   · intro g' hg'
     obtain ⟨b1, _, _, b4, _, b6⟩ := geom_bounds hpost g' hg'
     simp only
-    exact ⟨by linarith, b4, b6.le⟩
+    exact ⟨by linarith, b4, b6⟩
   · intro q hq
     cases post with
     | nil => simp [geom] at hq
