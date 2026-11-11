@@ -1,6 +1,8 @@
 -- SPDX-License-Identifier: LGPL-3.0-or-later
 import Rectiling.Geometry
 import Rectiling.Scaling
+import Rectiling.Refinement
+import Rectiling.Persistence
 import Rectiling.Staircase
 import Rectiling.Layout
 import Rectiling.Region
