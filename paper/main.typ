@@ -1649,7 +1649,7 @@ The values of @tab:tbc were checked as follows.
 For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
 For $n <= 10$ they agree with a run in which every record is solved by the reference method and every comparison of coordinates is exact.
 For $n <= 12$ the number of classes obtained from canonical representatives agrees with the number given by Burnside's lemma from the tilings fixed by each symmetry, and the number of records agrees with the count $sum 2^k$ described above.
-The values of $t$ and $b$ for $n = 11$ and $n = 12$, and of $c$ for $n = 11$, rest on the search alone.
+The values of all three sequences for $n = 11$ and $n = 12$ rest on the search alone.
 
 Some features of the table can be proved.
 
@@ -1683,7 +1683,7 @@ Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388
 ]
 
 For $n <= 5$ every proportion has a single bag.
-For larger $n$ nearly every proportion still has a single bag: the quotient $c(n) slash a(n)$ rises only from $1.020$ for six tiles to $1.055$ for eleven.
+For larger $n$ nearly every proportion still has a single bag: the quotient $c(n) slash a(n)$ rises only from $1.020$ for six tiles to $1.056$ for twelve.
 The proportion $2$ has the most bags, and the most classes, for every $n$ from $8$ to $11$.
 
 #conjecture[
