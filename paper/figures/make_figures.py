@@ -212,27 +212,6 @@ def catalogue(n, columns, path, size, labels=True):
     plt.close(fig)
 
 
-def full_degree(path, columns=10, size=0.66):
-    """Draws one tiling for each proportion whose algebraic degree equals the number of tiles, for up to seven tiles."""
-    items = []
-    for n in range(3, 8):
-        for line in (OUT.parent / "data" / f"tilings-{n}.tsv").read_text().splitlines():
-            value, degree, _, _, witness = line.split("\t")
-            if int(degree) == n:
-                items.append((n, value, witness))
-    count = -(-len(items) // columns)
-    fig, axes = plt.subplots(count, columns, figsize=(size * columns, size * 1.2 * count), squeeze=False)
-    for ax in axes.flat:
-        ax.axis("off")
-    for ax, (n, value, witness) in zip(axes.flat, items):
-        draw(ax, witness_tiles(value, witness))
-        ax.set_title(f"$n = {n}$: {float(value):.4f}", fontsize=4.6, pad=1.5)
-    fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
-    fig.savefig(path)
-    plt.close(fig)
-    return len(items)
-
-
 def main():
     """Generates all figures."""
     three = tilings(3)
@@ -245,7 +224,6 @@ def main():
     grid([t for _, t, _ in cubic], len(cubic), OUT / "shared-cubic.svg")
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
     catalogue(6, 14, OUT / "six-tiles.svg", 0.47)
-    print("proportions of full degree:", full_degree(OUT / "full-degree.svg"))
     print("three tiles:", [(round(v, 6), m) for v, _, m in three])
     print("tilings with four tiles:", len(four), "sharing the cubic:", len(cubic))
 

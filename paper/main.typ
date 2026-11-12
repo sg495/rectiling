@@ -42,7 +42,7 @@ $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 
 @sec:tilings fixes definitions.
 @sec:search presents the search procedure, with the propositions that make it sound and complete, and @sec:optimisations the optimisations that make thirteen tiles feasible, with the propositions that justify them.
-The results are in @sec:results.
+The results are in @sec:results, and further properties of the sets of proportions, with some conjectures, in @app:structure.
 The propositions of @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the reference search and of the optimised search.
 The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
 The implementation itself is not verified.
@@ -175,7 +175,7 @@ This and the other figures of this section are drawn from tilings found by the s
 
 #figure(
   image("figures/staircase.svg", width: 55%),
-  caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$; the tiles still to be placed are outlined. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
+  caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
 
 A tile placed at the anchor of a tier may or may not be as wide as the floor, and may or may not be as high as the wall.
@@ -603,35 +603,6 @@ For a square main rectangle, transposition allows the first tile to be taken wid
   That tile is thus $(0, 0, h, w)$, and $h = x w$ says that the first placement of $rho'$ is wide.
 ]
 
-== Mosaic classes <sec:mosaic>
-
-The equations that a tiling imposes on the sizes of its tiles depend only on which tiles border each maximal segment, and not on the order in which the corners of tiles on the two sides of a segment alternate.
-This section records that point of view, which motivates the placement rules; nothing in it is used in the proofs of correctness, and none of it is part of the formal development.
-
-#definition(name: [mosaic class])[
-  A _segment_ of a tiling is a maximal line segment contained in the union of the boundaries of the tiles and not contained in the boundary of the main rectangle, or one of the four sides of the main rectangle.
-  Two tilings with $n$ tiles are _mosaic equivalent_ if their tiles can be numbered so that, for each side of each tile, the tiles whose opposite side lies on the same segment are the same in both, and the segments carrying the four sides of the main rectangle correspond.
-] <def:mosaic>
-
-@fig:mosaic shows two tilings of the same mosaic class.
-
-#figure(
-  image("figures/mosaic.svg", width: 48%),
-  caption: [Two tilings of the square by five tiles, of proportions $6 slash 5$ and $1.6823...$, whose records have the same placements and differ in the orientation of the last tile. The same tiles lie on either side of each segment, but along the vertical segment the junction on the right lies between the two on the left in the first tiling, and below both in the second.],
-) <fig:mosaic>
-
-Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
-The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
-For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
-This agreement is an observation, made by computation.
-That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
-
-In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
-A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
-The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @bsst1940.
-One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
-We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
-
 == Solving the system <sec:solving>
 
 For a main rectangle of sides in the ratio $a slash b$, with $a$ and $b$ positive integers, the height is normalised to $H = 1$ and the width $W$ is kept as an unknown, to be compared with $a slash b$ at the end.
@@ -806,7 +777,7 @@ The smallest case in which the search has anything to decide is that of two tile
 
 = Optimisations <sec:optimisations>
 
-The reference search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, by the count reported in @sec:mosaic.
+The reference search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
 The search actually used, the _default search_, shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
 Its cost is about $0.6$ microseconds of processor time per record.
 A record that it cannot settle is passed to the reference method, so that its correctness rests on that of the reference method only for such records.
@@ -1319,7 +1290,7 @@ All computations were carried out with the Rust implementation of the search, on
 All runs used the default search, except where stated.
 In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the reference method were all zero.
 In the default search these counters concern the records passed to the reference method, so that every unrestricted run of the default search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the reference search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
-The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @sec:structure, are made by variants of the search that @sec:search and @sec:optimisations do not cover.
+The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @app:structure, are made by variants of the search that @sec:search and @sec:optimisations do not cover.
 
 == The square <sec:square>
 
@@ -1376,8 +1347,8 @@ Every proportion with $n$ tiles has degree at most $n$ @taams2023.
   caption: [Number of proportions for the square, by algebraic degree from $8$ to $13$.],
 ) <tab:degrees-high>
 
-Odd degrees are more frequent than the neighbouring even ones.
-Degree $n$ is attained for every $n$ in the table other than $4$; the proportions of degree $n$ for $n <= 7$ are shown in @app:full.
+Odd degrees are more frequent than the neighbouring even ones; a heuristic reason is given after @prop:parity-full.
+Degree $n$ is attained for every $n$ in the table other than $4$.
 
 The proportions of degree one are explained in part by dissections into squares.
 If all tiles of a similar tiling of the square have the same orientation, stretching one axis by the proportion gives a dissection of a rectangle into $n$ squares, whose aspect ratio is the proportion.
@@ -1403,157 +1374,50 @@ For instance, a rectangle of sides $2$ and $1$ cannot be dissected into six squa
   caption: [Number of proportions for main rectangles of aspect ratio $w$.],
 ) <tab:rectangles>
 
-== Structure of the sequence <sec:structure>
+== Growth <sec:growth>
 
 We found no closed form, recurrence or generating function for $a(n)$.
 The sequence satisfies no linear recurrence with constant coefficients of order at most five, and none with polynomial coefficients of the orders and degrees that thirteen terms allow one to test, a test which does recover the recurrence of the Baxter numbers; the usual transforms of the sequence match no entry of the OEIS, and its residues modulo small integers show no pattern.
-The results of the search nevertheless show some structure.
-@tab:structure collects the counts involved.
+The sets of proportions do have some structure: proportions persist when tiles are added, the aspect ratio of the main rectangle is a rational function of the proportion of a restricted kind, these functions are counted by the proportions for wide main rectangles, and all but three of the rational proportions for ten tiles or more are explained by dissections into squares.
+These properties, and the conjectures that the computations suggest, are the subject of @app:structure.
+Here we bound the growth of $a(n)$.
 
-#figure(
-  kind: table,
-  datatable(csv("data/structure.csv")),
-  caption: [For $n$ tiles in a square: the number of proportions; the number of those not achievable with fewer tiles; the number achievable by guillotine tilings; the number $E(n)$ of aspect-ratio functions up to inversion; and the number of rational proportions achievable with a single orientation.],
-) <tab:structure>
+The bound rests on the electrical network of a tiling @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles $s$ and $t$ are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the difference of potential across it its height (@def:tiling-network).
+The network $frak(N)(tau)$ of a tiling $tau$ is drawn in the plane with both poles on the outer face, and $G^+$ denotes its graph with an additional edge $e_0$ joining the poles (@def:plane-network).
+For an orientation vector $epsilon$, which labels each edge as tall or wide, the impedance $Z_(frak(N), epsilon)$ of a network $frak(N)$ between its poles, when every tall edge has resistance $x$ and every wide edge resistance $1 slash x$, is a rational function of $x$ (@def:impedance).
+A similar tiling $tau$ of $[0, W] times [0, H]$ of proportion $x$, with orientations $epsilon$, satisfies $H slash W = Z_(frak(N)(tau), epsilon) (x)$, by @prop:tiling-network.
 
-The first phenomenon is that proportions persist.
-Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutting it as a square is cut into six squares gives five more; and four more are obtained by surrounding the tiling with a pinwheel.
-
-#proposition(name: [persistence])[
-  For all $n >= 2$ and $k >= 3$, $P_n (1) subset.eq P_(n + k) (1)$.
-] <prop:persistence>
-
-#proof[
-  Every $k >= 3$ is a sum of threes, fours and fives, so it suffices to treat $k in {3, 4, 5}$.
-  Replacing a tile of a tiling by a tiling of that tile gives a tiling, and a rectangle of proportion $x$ can be tiled by four rectangles of proportion $x$, and by six: this gives $k = 3$ and $k = 5$.
-  For $k = 4$ and $x > 1$, let $p := x slash (x + 1)$.
-  Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling.
-  For $k = 4$ and $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $m$ squares for every $m >= 6$.
-]
-
-@fig:persistence shows the step of four for the tiling by three tiles whose proportion is the square of the plastic ratio.
-
-#figure(
-  image("figures/persistence.svg", width: 48%),
-  caption: [A tiling of the square by three tiles of proportion $1.7548...$, and the tiling by seven tiles of the same proportion obtained by placing a reduced copy of it at the centre of a pinwheel of four tiles; the second is drawn from its record.],
-) <fig:persistence>
-
-@prop:persistence has been formalised in Lean.
-The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
-Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
-
-The second phenomenon concerns the aspect ratio of the main rectangle as a function of the proportion.
-A tiling of a rectangle is an electrical network @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the difference of potential across it its height (@def:tiling-network).
-For a network $frak(N)$ in the sense of @def:network and an orientation vector $epsilon$, which labels each edge as tall or wide, let $Z_(frak(N), epsilon) in QQ(x)$ be the impedance of the network between its poles when every tall edge has resistance $x$ and every wide edge resistance $1 slash x$ (@def:impedance).
-A similar tiling of $[0, W] times [0, H]$ of proportion $x$, with network $frak(N)$ and orientations $epsilon$, satisfies $H slash W = Z_(frak(N), epsilon) (x)$, so that this function gives the height of the main rectangle over its width; the aspect ratio $W slash H$ is given by $1 slash Z_(frak(N), epsilon)$, which is the impedance function of the dual network with the orientations reversed (@sec:function).
-These functions have the following properties.
-
-#proposition(name: [aspect-ratio function])[
-  Let $frak(N)$ be a network with $n$ edges and $epsilon$ an orientation vector for its edges, and write $F = Z_(frak(N), epsilon) = N slash D$ in lowest terms.
-  Then $F$ is odd; $N$ and $D$ have non-negative integer coefficients; one of them is an even polynomial with non-zero constant term and the other is an odd polynomial; their degrees differ by one and are at most $n$, and at most $2 k + 1$ if at most $k$ edges are tall or at most $k$ edges are wide; and $F(x) slash x$ is non-increasing and $x F(x)$ non-decreasing on $(0, infinity)$.
-] <prop:function>
-
-#proof[
-  This is part of @prop:reactance, which is proved in @sec:function.
-  The idea is to let $x$ be a complex number with positive real part: every resistance then has positive real part, and the power dissipated in the network shows that so has $F(x)$, which, with the oddness of $F$, confines the roots of $N$ and of $D$ to the imaginary axis and makes them simple.
-]
-
-Two consequences follow.
-The polynomial $N - D$, whose roots in $[1, infinity)$ are the candidate proportions for the square, determines the pair ${F, 1 slash F}$, since $N$ and $D$ are its even and odd parts up to sign (@prop:difference).
-And its degree has a parity that can be read from the behaviour of $F$.
-
-#proposition(name: [parity of the degree])[
-  In the situation of @prop:function, let $d := deg(N - D)$.
-  If $F$ tends to $0$ at one end of $(0, infinity)$ and to $infinity$ at the other, then $d$ is odd and $F(x) = 1$ has an odd number of positive solutions, counted with multiplicity.
-  Otherwise $d$ and the number of positive solutions, counted with multiplicity, are even.
-] <prop:parity>
-
-#proof[
-  This is @prop:parity-full.
-  The signs of $N - D$ at the two ends of $(0, infinity)$ are determined by the limits of $F$ there, which gives the parity of the number of roots, and the parity of $d$ is that of whichever of $N$ and $D$ has the larger degree.
-]
-
-A function of the first kind always yields a positive solution, and one of the second kind usually yields none.
-This suggests an explanation for the predominance of odd degrees in @tab:degrees, where the proportions of odd degree make up between $82$ and $90$ per cent of all proportions for $7 <= n <= 13$; the explanation is only heuristic, since $d$ is the degree of $N - D$ and not that of the minimal polynomial of a proportion.
-
-The third phenomenon is that the aspect-ratio functions themselves can be counted by the search.
-The count must leave out the networks with orientations in which the current in some edge vanishes for every $x$, as it does in the central tile of a pinwheel of five tiles of equal orientations, because their functions need not be those of any tiling (@ex:improper).
-A pair $(frak(N), epsilon)$ of a network with $n$ edges, embedded in the plane with both poles on the outer face, and of an orientation vector is _proper_ if no current of the flow of value $1$ vanishes identically as a function of $x$ (@def:proper).
-Let $cal(F)_n$ be the set of the impedance functions of the proper pairs with $n$ edges.
-It is finite, it is closed under $F |-> 1 slash F$, which has no fixed point in it, and it is the set of the impedance functions of the similar tilings with $n$ tiles (@prop:functions and the remark that follows it).
-Let $E(n) := abs(cal(F)_n) slash 2$, and let $cal(F)_n^infinity$ be the set of the functions of $cal(F)_n$ that tend to $infinity$ at infinity, of which there are $E(n)$.
-
-#proposition(name: [wide rectangles])[
-  For every $n >= 1$ there is a real number $W(n)$ such that, for every real number $w > W(n)$, every $F in cal(F)_n^infinity$ has exactly one solution $x_F (w)$ of $F(x) = w$ in $[1, infinity)$, and $F |-> x_F (w)$ is a bijection from $cal(F)_n^infinity$ onto $P_n (w)$; in particular $a_w (n) = E(n)$ for every real number $w > W(n)$.
-  One can take $W(n) = n (1 + 4^n slash 2)$.
-  For $n >= 2$ the two properties do not both hold at $w = floor(n^2 slash 4) + 1$, so that every such $W(n)$ is at least $floor(n^2 slash 4) + 1$.
-] <prop:wide>
-
-#proof[
-  The three statements are @prop:wide-full, @prop:threshold and @prop:coincidence, which are proved in @sec:wide; the first rests on classical facts of planar duality and the second on Kirchhoff's formulas for the currents of a network in terms of its spanning trees, as stated there.
-  For large $w$ only the functions that are unbounded at infinity take the value $w$ on $[1, infinity)$, each does so exactly once, distinct functions do so at distinct points, and no current vanishes there, while a plane network with non-zero currents is the network of a tiling @bsst1940.
-  For the last statement, the functions $a x + b slash x$ and $a x + x slash b$ with $a + b = n$ take the value $a b + 1$ at the same point $x = b$.
-]
-
-The last statement does not say that $a_w (n) != E(n)$ at that width, although this is what is observed.
-The column of functions in @tab:structure was computed with $w = 1009$, and confirmed with three larger values of $w$ for $n <= 9$ and one for $n = 10$.
-The largest of these, $w = 1000003$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$, so that for these $n$ the column is $E(n)$ by @prop:wide; for $9 <= n <= 11$ the widths used are below that threshold, and the identification of the column with $E(n)$ depends on the second part of @conj:threshold below.
-For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $9865302$ for $n = 11$ is new and was computed once.
-
-The fourth phenomenon concerns the rational proportions.
-By @tab:rational some of them are achievable with $n$ tiles only if both orientations are used, and from ten tiles onwards the search finds exactly three.
-A proportion $x$ is achievable with $n$ tiles of a single orientation exactly when a rectangle of sides $x$ and $1$ can be dissected into $n$ squares, that is, has a tiling with $n$ tiles that are squares.
-
-#proposition(name: [exceptional rational proportions])[
-  The proportion $n - 4$ belongs to $P_n (1)$ for every $n >= 6$, the proportion $n - 11 slash 2$ for every $n >= 7$, and the proportion $n - 19 slash 3$ for every $n >= 8$.
-  A rectangle of sides $n - 4$ and $1$ cannot be dissected into $n$ squares for any $n >= 5$, nor one of sides $n - 11 slash 2$ and $1$ for any $n >= 6$, nor one of sides $n - 19 slash 3$ and $1$ for any $n >= 7$.
-  Consequently, for $n >= 6$, $n >= 7$ and $n >= 8$ respectively, the three proportions are not achievable with $n$ tiles of a single orientation.
-] <prop:exceptional>
-
-#proof[
-  The two statements are @prop:three-occur and @prop:no-squares, which are proved in @sec:rational.
-  The three proportions are achievable with $n - 4$ tiles of a single orientation and persist by the pinwheel of @prop:persistence.
-  For the impossibility, the number of squares in a dissection of a rectangle of height $1$ is the integral, over the vertical lines, of the sum of the reciprocals of the sides of the squares met; removing the squares of side $1$ then reduces the three statements to three finite ones, that a square cannot be dissected into five squares, nor a rectangle of sides $3$ and $2$ into seven squares of side less than $2$, nor one of sides $5$ and $3$ into eight squares of side less than $3$.
-]
-
-#conjecture[
-  For every $n >= 10$, the rational proportions in $P_n (1)$ that are not achievable with $n$ tiles of a single orientation are exactly $n - 4$, $n - 11 slash 2$ and $n - 19 slash 3$.
-] <conj:exceptional>
-
-The conjecture holds for $10 <= n <= 13$; it was formulated from the cases $n = 10$ and $n = 11$ and then confirmed for $12$ and $13$.
-For smaller $n$ there are further exceptions, which arise from pinwheels with a central rectangle that is not a square: $5 slash 3$ for six tiles and $16 slash 5$ for nine, shown in @ex:sporadic.
-The last column of @tab:structure extends the eight known terms of A210517 @oeisA210517 by five; a sixth, $155656$ for $n = 14$, was also computed.
-
-Finally, the search gives some information on growth.
+A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere.
+It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
+A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
+The following result of Tutte @tutte1963 is used without proof: the number of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
+For $m = n + 1$ this is
+$ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
 
 #proposition(name: [upper bound])[
-  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$, where $M(n) := 2 (3 n)! slash ((2 n + 1)! (n + 1)!)$.
+  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$.
   In particular $limsup a(n)^(1 slash n) <= 27 slash 2$.
 ] <prop:upper>
 
 #proof[
-  This is @prop:upper-full, which is proved in @sec:upper on the basis of Tutte's theorem that $M(n)$ is the number of rooted non-separable planar maps with $n + 1$ edges @tutte1963.
-  The network of a tiling, with an added edge joining its poles, is such a map; by @prop:transposition half of the $2^n$ orientation vectors need be considered, and each function yields at most $n$ proportions, by the bound on the degree in @prop:function.
+  Let $x in P_n (1)$, and let $tau$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
+  Transposing if necessary, by @prop:transposition, the tile at the bottom-left corner is wide; let $epsilon$ be an orientation vector of $tau$ for which that tile has orientation $-1$, all orientations being taken to be $-1$ if $x = 1$.
+  Root the map $G^+$ of $frak(N)(tau)$ at $e_0$; the edge of the bottom-left tile is then the first edge after $e_0$ in the rotation at $t$, on a side fixed once and for all.
+  By @prop:tiling-network, $Z_(frak(N)(tau), epsilon) (x) = 1$, so that $x$ is a root of $N - D$, where $N slash D$ is this function in lowest terms.
+  By @prop:reactance, $N - D$ is not zero and has degree at most $n$, and it depends only on the isomorphism class of the rooted map with its orientation vector.
+  By @prop:nonseparable and the result of Tutte there are at most $M(n)$ rooted maps, each with at most $2^(n - 1)$ orientation vectors in which the distinguished edge has orientation $-1$, and each pair contributes at most $n$ roots.
+  This gives the first statement, and the second follows by Stirling's formula, by which $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$.
 ]
 
-The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:upper.
-The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$, and the number of proportions achievable by guillotine tilings is a decreasing share of the total: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
-The guillotine count is at most $n slash 2$ times the number of series–parallel networks with $n$ edges of two kinds (@prop:guillotine), whose growth constant is numerically about $6.16$.
+
+The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:mosaic.
+The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$.
 
 #conjecture[
   The sequence $a(n + 1) slash a(n)$ is non-decreasing.
 ] <conj:logconvex>
 
-#conjecture[
-  The proportion of the elements of $P_n (1)$ that are achievable by a guillotine tiling with $n$ tiles tends to zero as $n$ tends to infinity.
-] <conj:guillotine>
-
-#conjecture[
-  For every $n$ and every rational $w > 0$, $a_w (n) <= E(n)$; and $a_w (n) = E(n)$ for every integer $w >= floor(n^2 slash 4) + 2$.
-] <conj:threshold>
-
-@conj:logconvex holds for $n <= 12$, and @conj:guillotine is supported by the values for $n <= 12$.
-The first part of @conj:threshold holds for $n <= 8$ on the thirty integers and sixteen fractions tried, and we have no argument for it; the second holds for $n <= 8$ and $w <= 30$, and was predicted and then confirmed for $n = 9$.
+@conj:logconvex holds for $n <= 12$.
 
 == Tilings, classes and bags <sec:tilings-counts>
 
@@ -1568,7 +1432,7 @@ We now count the tilings themselves, in three ways.
 
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
 The number $t(n)$ is finite.
-Indeed the proportions are finitely many, by @prop:upper-full, as are the records, and a record has at most one solution at a given proportion: the constraints being linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
+Indeed the proportions are finitely many, by @prop:upper, as are the records, and a record has at most one solution at a given proportion: the constraints being linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
 A tiling determines its bag, and symmetric tilings have the same bag, so that
 $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
 The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
@@ -1698,12 +1562,21 @@ For larger $n$ nearly every proportion still has a single bag: the quotient $c(n
 The proportion $2$ has the most bags, and the most classes, for every $n$ from $8$ to $11$.
 
 #conjecture[
-  The sequence $t(n + 1) slash t(n)$ is increasing for $n >= 5$, the quotient $8 b(n) slash t(n)$ tends to $1$, and $t(n)^(1 slash n)$ tends to $27 slash 2$.
-] <conj:growth>
+  The sequence $t(n + 1) slash t(n)$ is increasing for $n >= 5$.
+] <conj:growth-quotients>
 
-The first statement holds for $5 <= n <= 11$, and $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$.
-For the third, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
+#conjecture[
+  The quotient $8 b(n) slash t(n)$ tends to $1$ as $n$ tends to infinity.
+] <conj:growth-symmetry>
 
+#conjecture[
+  The sequence $t(n)^(1 slash n)$ tends to $27 slash 2$.
+] <conj:growth-rate>
+
+@conj:growth-quotients holds for $5 <= n <= 11$.
+For @conj:growth-symmetry, the quotient $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$, to $1.0003$.
+For @conj:growth-rate, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
+The three statements are independent of one another as far as we know.
 
 #bibliography("refs.bib", style: "ieee")
 
@@ -1723,23 +1596,6 @@ The tiling shown for a proportion is the first that one run of the search found,
   image("figures/six-tiles.svg", width: 100%),
   caption: [One tiling for each of the $245$ proportions achievable with six tiles.],
 ) <fig:six>
-
-= Proportions of full degree <app:full>
-
-A proportion achievable with $n$ tiles has algebraic degree at most $n$.
-@fig:full shows one tiling for each proportion of degree exactly $n$ with $n <= 7$ tiles, and @tab:full lists their minimal polynomials, with the number of records that realise each.
-There is one such proportion for three tiles, none for four, four for five, two for six and $44$ for seven.
-
-#figure(
-  image("figures/full-degree.svg", width: 100%),
-  caption: [One tiling for each proportion whose degree equals the number $n$ of tiles, for $n <= 7$.],
-) <fig:full>
-
-#figure(
-  kind: table,
-  datatable(csv("data/full-degree.csv"), size: 0.85em),
-  caption: [The proportions of degree $n$ achievable with $n <= 7$ tiles, with the number of records, the first tile being wide, that realise each.],
-) <tab:full>
 
 = Formalisation <app:formal>
 
@@ -1982,19 +1838,53 @@ The formal development is about a model of the method, and the following lies ou
 #let rct = math.op("rect")
 #let adj = math.op("adj")
 
-= Proofs for the structure of the sequence <app:structure>
+= Properties and conjectures <app:structure>
 
-This appendix proves the propositions of @sec:structure other than @prop:persistence, which is proved there.
+This appendix collects properties of the sets of proportions, with their proofs, and the conjectures that the computations of @sec:results suggest.
 The proofs are complete, except that the following classical results are used without proof, each being named where it is used.
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
 Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
-Tutte's enumeration of rooted non-separable planar maps is used in @prop:upper-full only, for the upper bound.
 A few remarks rest on computations made with the search of @sec:search; they are marked as such, and no proof depends on them.
-Nothing in this appendix has been formalised.
+Nothing in this appendix has been formalised, except @prop:persistence.
+@tab:structure collects the counts to which the appendix refers.
+
+#figure(
+  kind: table,
+  datatable(csv("data/structure.csv")),
+  caption: [For $n$ tiles in a square: the number of proportions; the number of those not achievable with fewer tiles; the number achievable by guillotine tilings; the number $E(n)$ of aspect-ratio functions up to inversion; and the number of rational proportions achievable with a single orientation.],
+) <tab:structure>
 
 Throughout, an _orientation vector_ for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
 An orientation vector $epsilon$ on the tiles of a similar tiling of proportion $x$ is _an orientation vector of the tiling_ if every tile $T$ is tall for $x$ when $epsilon_T = +1$ and wide for $x$ when $epsilon_T = -1$.
 For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector will do, the tiles being squares.
+
+== Persistence <sec:persistence>
+
+Proportions persist when tiles are added.
+Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutting it as a square is cut into six squares gives five more; and four more are obtained by surrounding the tiling with a pinwheel.
+
+#proposition(name: [persistence])[
+  For all $n >= 2$ and $k >= 3$, $P_n (1) subset.eq P_(n + k) (1)$.
+] <prop:persistence>
+
+#proof[
+  Every $k >= 3$ is a sum of threes, fours and fives, so it suffices to treat $k in {3, 4, 5}$.
+  Replacing a tile of a tiling by a tiling of that tile gives a tiling, and a rectangle of proportion $x$ can be tiled by four rectangles of proportion $x$, and by six: this gives $k = 3$ and $k = 5$.
+  For $k = 4$ and $x > 1$, let $p := x slash (x + 1)$.
+  Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling.
+  For $k = 4$ and $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $m$ squares for every $m >= 6$.
+]
+
+@fig:persistence shows the step of four for the tiling by three tiles whose proportion is the square of the plastic ratio.
+
+#figure(
+  image("figures/persistence.svg", width: 48%),
+  caption: [A tiling of the square by three tiles of proportion $1.7548...$, and the tiling by seven tiles of the same proportion obtained by placing a reduced copy of it at the centre of a pinwheel of four tiles; the second is drawn from its record.],
+) <fig:persistence>
+
+@prop:persistence has been formalised in Lean (@app:formal).
+The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
+Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
 == Networks <sec:networks>
 
@@ -2260,6 +2150,7 @@ The behaviour of $F$ at the two ends of $(0, infinity)$ fixes the signs of $N - 
 
 In the first case of the statement $F(x) = 1$ has a positive solution $x$, and either $x >= 1$, or $1 slash x >= 1$ is a solution for the reversed orientations.
 The number $d$ is the degree of $N - D$, and not that of the minimal polynomial of a proportion, which divides $N - D$; the relation between this law and the distribution of the degrees in @tab:degrees and @tab:degrees-high therefore remains heuristic.
+A function of the first kind always yields a positive solution, and one of the second kind usually yields none, which would explain why the proportions of odd degree make up between $82$ and $90$ per cent of all proportions for $7 <= n <= 13$.
 
 == From a network to a tiling <sec:converse>
 
@@ -2274,6 +2165,25 @@ The abscissas of the tiling are given by a potential on the faces of the network
 
 Embeddings are taken to be piecewise linear, so that the two sides of a closed curve are well defined, and the dual of a plane graph is a multigraph, in which a minimal cut of two edges gives a cycle of length two.
 By @prop:tiling-network the network of a tiling is a plane network, for the embedding constructed there, and it is always considered with that embedding.
+
+The graph $G^+$ of the network of a tiling is a non-separable planar map, in the sense of @sec:growth; this is used there for the upper bound on $a(n)$.
+
+#proposition(name: [the map of a tiling])[
+  Let $tau$ be a tiling of a rectangle with $n >= 1$ tiles.
+  Then the plane graph $G^+$ of the plane network $frak(N)(tau)$ is a non-separable planar map with $n + 1$ edges.
+] <prop:nonseparable>
+
+#proof[
+  Direct each edge from the top of its tile to the bottom.
+  The height decreases along the edges, every component other than $s$ carries the bottom side of a tile, and every component other than $t$ the top side of one, by the proof of @prop:tiling-network.
+  So from every vertex $v$ a directed path leads down to $t$, and one leads up from $v$ to $s$ against the directions; the first passes only through vertices lower than $v$ and the second only through higher ones.
+  Remove a vertex $u$.
+  If $u = s$, every other vertex still reaches $t$; similarly if $u = t$.
+  Otherwise each remaining vertex $v$ still has its path to $t$ or its path to $s$, since $u$ is not both lower and higher than $v$, and $s$ and $t$ are joined by $e_0$.
+  So $G^+$ has no vertex whose removal disconnects it; it has no loop, and it has $n + 1$ edges.
+]
+
+In particular $G^+$ has no bridge, for a bridge of a connected graph without loops that has at least two edges has an end whose removal disconnects the graph; this is what the application of @prop:dual to the network of a tiling requires.
 
 The first step is the potential on the faces, whose differences across the edges are the currents.
 It uses Euler's formula, by which a connected plane graph with $v$ vertices and $m$ edges has $m - v + 2$ faces.
@@ -2502,9 +2412,19 @@ The next statement shows that the two statements of @prop:wide-full cannot both 
 
 @prop:coincidence does not give $a_w (n) < E(n)$ at the width $w = a b + 1$, because a function may contribute several solutions when $w$ is small.
 It exhibits one coincidence for even $n$, where $a = b$, and two for odd $n$, where $(a, b)$ and $(b, a)$ give the same width; in the computations, which cover $2 <= n <= 9$, $a_w (n)$ at $w = floor(n^2 slash 4) + 1$ is accordingly $E(n) - 1$ for even $n$ and $E(n) - 2$ for odd $n$.
+#conjecture[
+  For every $n$ and every rational $w > 0$, $a_w (n) <= E(n)$; and $a_w (n) = E(n)$ for every integer $w >= floor(n^2 slash 4) + 2$.
+] <conj:threshold>
+
+The first part of @conj:threshold holds for $n <= 8$ on the thirty integers and sixteen fractions tried; the second holds for $n <= 8$ and $w <= 30$, and was predicted and then confirmed for $n = 9$.
 What is missing for the second part of @conj:threshold is a proof that beyond that width no two functions share a solution, every function of $cal(F)_n^infinity$ has one solution, the functions of the other kind have none, and no tile vanishes.
 The gap between the width proved sufficient, which is exponential in $n$, and the conjectured one, which is quadratic, comes from the use of Cauchy's bound on the roots of $N_F D_G - N_G D_F$.
 For the first part of @conj:threshold we have no argument: for small $w$ a function can have several solutions and the functions of the other kind contribute as well, and the trivial bound is $a_w (n) <= 2 n E(n)$.
+
+The column of functions in @tab:structure was computed with $w = 1009$, and confirmed with three larger values of $w$ for $n <= 9$ and one for $n = 10$.
+The largest of these, $w = 1000003$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$, so that for these $n$ the column is $E(n)$ by @prop:wide-full and @prop:threshold; for $9 <= n <= 11$ the widths used are below that threshold, and the identification of the column with $E(n)$ depends on the second part of @conj:threshold.
+For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $9865302$ for $n = 11$ is new and was computed once.
+
 
 == Rational proportions that need both orientations <sec:rational>
 
@@ -2512,7 +2432,8 @@ A _dissection of a rectangle into squares_ is a tiling of the rectangle all of w
 A similar tiling of the unit square of proportion $x$ whose tiles are all wide becomes, when the ordinates are multiplied by $x$, a dissection of the rectangle $[0, 1] times [0, x]$ into squares, and conversely; a tiling whose tiles are all tall is the transpose of one whose tiles are all wide.
 So a proportion $x in P_n (1)$ is achieved by $n$ tiles of a single orientation exactly when a rectangle of sides $x$ and $1$ can be dissected into $n$ squares.
 
-The three proportions of @prop:exceptional are obtained by surrounding with a pinwheel the three most elongated rectangles that can be dissected into $n - 4$ squares.
+By @tab:rational some rational proportions are achievable with $n$ tiles only if both orientations are used, and from ten tiles onwards the search finds exactly three: $n - 4$, $n - 11 slash 2$ and $n - 19 slash 3$.
+These are obtained by surrounding with a pinwheel the three most elongated rectangles that can be dissected into $n - 4$ squares.
 
 #proposition(name: [the three proportions occur])[
   The proportion $n - 4$ belongs to $P_n (1)$ for every $n >= 6$, the proportion $n - 11 slash 2$ for every $n >= 7$, and the proportion $n - 19 slash 3$ for every $n >= 8$.
@@ -2703,7 +2624,14 @@ Two squares of side less than $1$ dissect a rectangle of sides $ell$ and $1$ onl
 Three such squares do so only for $ell = 1 slash 3$ and $ell = 2 slash 3$: one of them contains a left and a right corner, so it has side $ell$, and the other two dissect a rectangle of sides $ell$ and $1 - ell$, one of which is then twice the other.
 These give $m - L = 8 slash 3$ and $7 slash 3$.
 
-It remains to account for the exceptions for small $n$.
+#conjecture[
+  For every $n >= 10$, the rational proportions in $P_n (1)$ that are not achievable with $n$ tiles of a single orientation are exactly $n - 4$, $n - 11 slash 2$ and $n - 19 slash 3$.
+] <conj:exceptional>
+
+The conjecture holds for $10 <= n <= 13$; it was formulated from the cases $n = 10$ and $n = 11$ and then confirmed for $12$ and $13$.
+The last column of @tab:structure extends the eight known terms of A210517 @oeisA210517 by five; a sixth, $155656$ for $n = 14$, was also computed.
+
+There are further exceptions for small $n$.
 For $6 <= n <= 9$, the rational proportions in $P_n (1)$ that are not achieved by $n$ tiles of a single orientation are, according to the search, $5 slash 3$ and $2$ for six tiles; $3 slash 2$ and $3$ for seven; $5 slash 3$, $5 slash 2$ and $4$ for eight; and $8 slash 3$, $16 slash 5$, $7 slash 2$ and $5$ for nine; the first three lists are those of @tab:rational.
 @prop:three-occur and @prop:no-squares account for all of them except two, since $n - 11 slash 2 > 1$ requires $n >= 7$ and $n - 19 slash 3 > 1$ requires $n >= 8$.
 The two others are sporadic, and come from pinwheels whose central rectangle is not a square.
@@ -2723,59 +2651,7 @@ That rectangles of sides $5$ and $3$, and of sides $16$ and $5$, cannot be disse
 Why no such sporadic proportion occurs for $10 <= n <= 13$ is not explained.
 For @conj:exceptional we know of no argument that would bound the rational proportions of tilings with both orientations, and of no general construction that adds four squares to a dissection into squares, which is what would be needed to achieve with $n$ squares the remaining rational elements of $P_(n - 4) (1)$.
 
-== Upper bounds <sec:upper>
-
-The network of a tiling, with the edge that joins its poles, is a planar map of a kind that has been enumerated, and each such map with orientations contributes at most $n$ proportions.
-
-A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere.
-It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
-A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
-The following result of Tutte @tutte1963 is used without proof: the number of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
-For $m = n + 1$ this is
-$ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
-
-#proposition(name: [the map of a tiling])[
-  Let $tau$ be a tiling of a rectangle with $n >= 1$ tiles.
-  Then the plane graph $G^+$ of the plane network $frak(N)(tau)$ is a non-separable planar map with $n + 1$ edges.
-] <prop:nonseparable>
-
-#proof[
-  Direct each edge from the top of its tile to the bottom.
-  The height decreases along the edges, every component other than $s$ carries the bottom side of a tile, and every component other than $t$ the top side of one, by the proof of @prop:tiling-network.
-  So from every vertex $v$ a directed path leads down to $t$, and one leads up from $v$ to $s$ against the directions; the first passes only through vertices lower than $v$ and the second only through higher ones.
-  Remove a vertex $u$.
-  If $u = s$, every other vertex still reaches $t$; similarly if $u = t$.
-  Otherwise each remaining vertex $v$ still has its path to $t$ or its path to $s$, since $u$ is not both lower and higher than $v$, and $s$ and $t$ are joined by $e_0$.
-  So $G^+$ has no vertex whose removal disconnects it; it has no loop, and it has $n + 1$ edges.
-]
-
-In particular $G^+$ has no bridge, for a bridge of a connected graph without loops that has at least two edges has an end whose removal disconnects the graph; this is what the application of @prop:dual to the network of a tiling requires.
-
-#proposition(name: [upper bound])[
-  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$.
-] <prop:upper-full>
-
-#proof[
-  Let $x in P_n (1)$, and let $tau$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
-  Transposing if necessary, by @prop:transposition, the tile at the bottom-left corner is wide; let $epsilon$ be an orientation vector of $tau$ for which that tile has orientation $-1$, all orientations being taken to be $-1$ if $x = 1$.
-  Root the map $G^+$ of $frak(N)(tau)$ at $e_0$; the edge of the bottom-left tile is then the first edge after $e_0$ in the rotation at $t$, on a side fixed once and for all.
-  By @prop:tiling-network, $Z_(frak(N)(tau), epsilon) (x) = 1$, so that $x$ is a root of $N - D$, where $N slash D$ is this function in lowest terms.
-  By @prop:reactance, $N - D$ is not zero and has degree at most $n$, and it depends only on the isomorphism class of the rooted map with its orientation vector.
-  By @prop:nonseparable and the result of Tutte there are at most $M(n)$ rooted maps, each with at most $2^(n - 1)$ orientation vectors in which the distinguished edge has orientation $-1$, and each pair contributes at most $n$ roots.
-]
-
-By Stirling's formula $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$, so that $limsup a(n)^(1 slash n) <= 27 slash 2$.
-
-The same bound for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
-The proof of @prop:upper-full bounds the number of triples of a rooted map, an orientation vector and a proportion.
-The network of the tiling will not serve here, since by @prop:multiplicity a tiling with crossings has several records and one network.
-Associate instead with a record the network whose vertices are the horizontal segments created by its placements, two segments of equal height that meet at a crossing being kept distinct and joined in the order given by the record; the tiling still gives a flow on it, in which no current vanishes.
-The map that sends a record with orientations and a proportion to the triple of this network with the edge joining its poles, the orientations and the proportion is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, secondly, a mosaic class is determined by its plane network together with the directions of its edges, and, thirdly, the network of a record with the added edge is a non-separable planar map.
-Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
-The first condition is the statement of @sec:mosaic that we have not proved, and the third would follow from it if every sequence were that of a tiling by rectangles without crossings.
-The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
-So the number of realisations with $n$ tiles is at most $n 2^(n - 1) M(n)$ if the three conditions hold, and we do not claim the bound otherwise.
-The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
+== Guillotine tilings <sec:guillotine>
 
 For guillotine tilings the functions can be described directly, and are those of the series–parallel circuits.
 
@@ -2822,3 +2698,51 @@ $
 The quotients $sigma_(n + 1) slash sigma_n$, corrected by the factor $(1 - 3 slash (2 n + 2))^(-1)$, are $6.15881$, $6.15887$ and $6.15889$ at $n = 100$, $200$ and $399$.
 So the growth constant of $g(n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
 That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is numerical.
+
+The number of proportions achievable by guillotine tilings is a decreasing share of the total in @tab:structure: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
+
+#conjecture[
+  The proportion of the elements of $P_n (1)$ that are achievable by a guillotine tiling with $n$ tiles tends to zero as $n$ tends to infinity.
+] <conj:guillotine>
+
+@conj:guillotine is supported by the values for $n <= 12$.
+
+== Mosaic classes <sec:mosaic>
+
+The equations that a tiling imposes on the sizes of its tiles depend only on which tiles border each maximal segment, and not on the order in which the corners of tiles on the two sides of a segment alternate.
+This section records that point of view, which motivates the placement rules; nothing in it is used in the proofs of correctness, and none of it is part of the formal development.
+
+#definition(name: [mosaic class])[
+  A _segment_ of a tiling is a maximal line segment contained in the union of the boundaries of the tiles and not contained in the boundary of the main rectangle, or one of the four sides of the main rectangle.
+  Two tilings with $n$ tiles are _mosaic equivalent_ if their tiles can be numbered so that, for each side of each tile, the tiles whose opposite side lies on the same segment are the same in both, and the segments carrying the four sides of the main rectangle correspond.
+] <def:mosaic>
+
+@fig:mosaic shows two tilings of the same mosaic class.
+
+#figure(
+  image("figures/mosaic.svg", width: 48%),
+  caption: [Two tilings of the square by five tiles, of proportions $6 slash 5$ and $1.6823...$, whose records have the same placements and differ in the orientation of the last tile. The same tiles lie on either side of each segment, but along the vertical segment the junction on the right lies between the two on the left in the first tiling, and below both in the second.],
+) <fig:mosaic>
+
+Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
+The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
+For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
+This agreement is an observation, made by computation.
+That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
+
+In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
+A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
+The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @bsst1940.
+One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
+We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
+
+The same bound for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
+The proof of @prop:upper bounds the number of triples of a rooted map, an orientation vector and a proportion.
+The network of the tiling will not serve here, since by @prop:multiplicity a tiling with crossings has several records and one network.
+Associate instead with a record the network whose vertices are the horizontal segments created by its placements, two segments of equal height that meet at a crossing being kept distinct and joined in the order given by the record; the tiling still gives a flow on it, in which no current vanishes.
+The map that sends a record with orientations and a proportion to the triple of this network with the edge joining its poles, the orientations and the proportion is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, secondly, a mosaic class is determined by its plane network together with the directions of its edges, and, thirdly, the network of a record with the added edge is a non-separable planar map.
+Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
+The first condition is the agreement with the Baxter numbers observed above, which we have not proved, and the third would follow from it if every sequence were that of a tiling by rectangles without crossings.
+The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
+So the number of realisations with $n$ tiles is at most $n 2^(n - 1) M(n)$ if the three conditions hold, and we do not claim the bound otherwise.
+The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
