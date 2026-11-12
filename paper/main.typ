@@ -828,6 +828,7 @@ The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from
 ] <conj:logconvex>
 
 @conj:logconvex holds for $n <= 12$.
+Conjectures on the rate of growth of $a(n)$ are stated in @sec:growth-rate.
 
 == Tilings, classes and bags <sec:tilings-counts>
 
@@ -856,7 +857,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
 
 #figure(
   image("figures/sequences.svg", width: 62%),
-  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves, in the colours of the tilings and of the classes, are $0.295 dot.op 2^n M(n)$ and one eighth of it, the forms that @conj:growth-rate and @conj:growth-symmetry suggest, the constant being an extrapolation of the quotients given below; the dotted curve, in the colour of the proportions, is the bound $n 2^(n - 1) M(n)$ of @prop:upper.],
+  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves, in the colours of the tilings and of the classes, are $0.295 dot.op 2^n M(n)$ and one eighth of it, the forms that @conj:growth-rate and @conj:growth-symmetry suggest, the constant being an extrapolation of the quotients given below; the dashed curve in the colour of the proportions is $0.676 dot.op (27 slash 2)^n n^(-11 slash 2)$, the form suggested by @conj:asymptotic.],
 ) <fig:sequences>
 
 #figure(
@@ -2776,6 +2777,26 @@ The number of proportions achievable by guillotine tilings is a decreasing share
 ] <conj:guillotine>
 
 @conj:guillotine is supported by the values for $n <= 12$.
+
+== The rate of growth <sec:growth-rate>
+
+By @prop:upper the numbers $a(n)$ grow at most like $(27 slash 2)^n$.
+The values computed suggest that this is their rate of growth, with a correction that is a power of $n$.
+
+#conjecture[
+  The sequence $a(n)^(1 slash n)$ tends to $27 slash 2$.
+] <conj:rate>
+
+#conjecture[
+  The sequence $a(n) thin n^(11 slash 2) thin (27 slash 2)^(-n)$ tends to a positive limit.
+] <conj:asymptotic>
+
+@conj:asymptotic implies @conj:rate.
+The evidence is numerical and comes from thirteen terms only.
+If $a(n)$ were a constant times $mu^n n^(-gamma)$, then $gamma$ would be $log(mu a(n) slash a(n + 1)) slash log((n + 1) slash n)$ for every $n$.
+For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and so appears to settle near $11 slash 2$; for $mu = 25 slash 2$ and $mu = 13$ it is still decreasing at $n = 12$, and for $mu = 14$, which @prop:upper excludes, it has begun to increase.
+With $gamma = 11 slash 2$, the sequence of @conj:asymptotic takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$.
+We have no argument for the exponent, nor for the rate; @fig:sequences shows the curve $0.676 dot.op (27 slash 2)^n n^(-11 slash 2)$ against the values of $a(n)$.
 
 == Mosaic classes <sec:mosaic>
 
