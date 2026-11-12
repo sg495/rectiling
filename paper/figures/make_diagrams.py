@@ -131,8 +131,8 @@ def fits_figure(path, value, witness):
     moves = moves_of(witness)
     fig, axes = plt.subplots(1, 4, figsize=(6.6, 2.0))
     chosen = []
-    for ax, fit in zip(axes, CODES.values()):
-        k = max((k for k, (_, f, _) in enumerate(moves) if f == fit), key=lambda k: min(tiles[k][2], tiles[k][3]))
+    picks = sorted((max((k for k, (_, f, _) in enumerate(moves) if f == fit), key=lambda k: min(tiles[k][2], tiles[k][3])), fit) for fit in CODES.values())
+    for ax, (k, fit) in zip(axes, picks):
         i = moves[k][0]
         t = sts[k][i]
         x, y, w, h = tiles[k]

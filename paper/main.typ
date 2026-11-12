@@ -26,12 +26,12 @@ For three pieces there are three: thirds, of proportion $3$; a half-height slab 
 
 The qualitative question was settled in the 1990s.
 Dehn had shown that a rectangle can be cut into squares only if its sides are commensurable @dehn1903, and Brooks, Smith, Stone and Tutte had recast dissections of rectangles as planar electrical networks @bsst1940.
-Freiling and Rinne @freiling1994, and independently Laczkovich and Szekeres @laczkovich1995, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; the case of a rectangle cut into rectangles was treated by Freiling, Laczkovich and Rinne @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
+Freiling and Rinne @freiling1994, and independently Laczkovich and Szekeres @laczkovich1995, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; the question of which rectangles can be tiled by rectangles similar to a given one was studied by Freiling, Laczkovich and Rinne @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
 
-The quantitative question dates from December 2022, when Baez asked how many proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
+The quantitative question dates from December 2022, when Baez asked on Mathstodon which proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
 The resulting sequence $a(n)$ is entry A359146 of the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
-The values for $n <= 7$ were obtained by exhaustive searches of Henderson @henderson2023 and of Gerbet, reported in @baez2023; Henderson also found $a(8) = 8522$.
-Taams proved that the proportion is algebraic of degree at most $n$ @taams2023.
+The values for $n <= 4$ were found by hand, and those for $5 <= n <= 7$ by exhaustive searches of Henderson @henderson2023 and of Gerbet, reported in @baez2023, Henderson's value for $n = 7$ being corrected after Gerbet's search; Henderson also reported, tentatively, $a(8) = 8522$.
+Taams gave an argument that the proportion is algebraic of degree at most $n$ @taams2023.
 Einstein, using the correspondence with electrical networks, reported $a(9) = 58347$ and $a(10) = 433926$ @einstein2023; these two values have not, to our knowledge, been published elsewhere or reproduced.
 No formula, recurrence or asymptotic estimate for $a(n)$ is known.
 
@@ -105,7 +105,7 @@ Exchanging the two axes turns a tiling of a rectangle into a tiling of the recta
   Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
 ]
 
-The sets of proportions grow with $n$ along steps of three.
+The sets of proportions grow with $n$ along steps of three, as Einstein observed @einstein2023.
 Whether they grow along steps of one is not known to us.
 
 #proposition(name: [subdivision])[
@@ -215,7 +215,7 @@ A tile that is as high as the wall has its height determined by the staircase, a
 
 #figure(
   image("figures/fits.svg", width: 100%),
-  caption: [Four of the seven placements of the record of the tiling of @fig:staircase, one of each fit. In each panel the tile just placed is outlined, the floor and the wall of its tier before the placement are drawn thick, the rectangle that they span is hatched, and the anchors of the staircase after the placement are circled. The inside tile is narrower than the floor and lower than the wall; the tile of full height is as high as the wall, and the one of full width as wide as the floor; the full tile, which is the last, is both.],
+  caption: [Four of the seven placements of the record of the tiling of @fig:staircase, one of each fit. In each panel the tile just placed is outlined, the floor and the wall of its tier before the placement are drawn thick, the rectangle that they span is hatched, and the anchors of the staircase after the placement are circled. The inside tile is narrower than the floor and lower than the wall; the tile of full width is as wide as the floor, and the one of full height as high as the wall; the full tile, which is the last, is both.],
 ) <fig:fits>
 
 Only an inside placement makes use of the free side.
@@ -1075,7 +1075,7 @@ Its arithmetic is performed by three routines, which are not part of what is pro
 
 Nothing is assumed of the elimination when it fails.
 In the implementation, the elimination is the fraction-free elimination of Bareiss @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
-The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
+The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound @mignotte1974 on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
 The sign of $q$ at a root $r$ is zero if and only if the minimal polynomial of $r$ divides $q$, and is otherwise found by evaluating $q$ on an isolating interval for $r$, refined until the value is separated from zero.
 
 #definition(name: [direct method])[
@@ -2008,7 +2008,7 @@ They are far from the growth observed in @tab:tbc.
 
 == Networks <sec:networks>
 
-Brooks, Smith, Stone and Tutte associate with a tiling of a rectangle an electrical network, in which the tiles are resistors @bsst1940.
+Brooks, Smith, Stone and Tutte associate with a tiling of a rectangle an electrical network, in which the tiles are resistors @bsst1940 @prasolov2011.
 For a similar tiling the resistances are $x$ and $1 slash x$, and the properties of the aspect ratio as a function of $x$ come from letting $x$ be a complex number.
 Networks are therefore defined with complex resistances.
 
@@ -2158,7 +2158,8 @@ The aspect ratio $W slash H$ of @def:counts is the value at $x$ of the inverse $
 The statements below are therefore made for impedance functions only.
 
 The next statement collects the properties of these functions.
-The second, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile playing the part of an inductor and a wide one that of a capacitor, and constitute Foster's reactance theorem @foster1924; they are proved here from @prop:flow, since the proof is short.
+The first, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile playing the part of an inductor and a wide one that of a capacitor, and constitute Foster's reactance theorem @foster1924; the second is the corresponding property of positive real functions @brune1931.
+For tilings by rectangles all of them are stated by Prasolov and Skopenkov @prasolov2011; they are proved here from @prop:flow, since the proof is short.
 
 #proposition(name: [properties of the impedance function])[
   Let $F = Z_(frak(N), epsilon)$ for a network with $n$ edges, and let $F = N slash D$ in lowest terms.
@@ -2274,7 +2275,7 @@ A function of the first kind always yields a positive solution, and one of the s
 
 == From a network to a tiling <sec:converse>
 
-The correspondence of Brooks, Smith, Stone and Tutte has a converse: a planar network with positive resistances in which every current is different from zero is the network of a tiling.
+The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is different from zero is the network of a tiling.
 The abscissas of the tiling are given by a potential on the faces of the network, which exists by planarity.
 
 #definition(name: [plane network])[
@@ -2896,7 +2897,7 @@ This section records that point of view, which motivates the placement rules; no
   caption: [Two tilings of the square by five tiles, of proportions $6 slash 5$ and $1.6823...$, whose records have the same placements and differ in the orientation of the last tile. The same tiles lie on either side of each segment, but along the vertical segment the junction on the right lies between the two on the left in the first tiling, and below both in the second.],
 ) <fig:mosaic>
 
-Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
+Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @yao2003 @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
 The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
 For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
 This agreement is an observation, made by computation.
@@ -2904,7 +2905,7 @@ That a tiling without a point where four tiles meet arises from only one record,
 
 In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
-The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @bsst1940.
+The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @kirchhoff1847 @bsst1940.
 One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
 We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
 
