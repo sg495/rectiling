@@ -2275,6 +2275,28 @@ In the first case of the statement $F(x) = 1$ has a positive solution $x$, and e
 The number $d$ is the degree of $N - D$, and not that of the minimal polynomial of a proportion, which divides $N - D$; the relation between this law and the distribution of the degrees in @tab:degrees and @tab:degrees-high therefore remains heuristic.
 A function of the first kind always yields a positive solution, and one of the second kind usually yields none, which would explain why the proportions of odd degree make up between $82$ and $90$ per cent of all proportions for $7 <= n <= 13$.
 
+The derivative of an impedance function has a geometric meaning.
+
+#proposition(name: [slope of the impedance function])[
+  Let $F = Z_(frak(N), epsilon)$, let $x > 0$, and let $i$ be the current of the flow of value $1$ for the resistances $r_e = x^(epsilon_e)$.
+  Then
+  $ F(x) = sum_e r_e i_e^2, quad x F'(x) = sum_e epsilon_e r_e i_e^2. $
+  In particular, for a similar tiling of proportion $x > 1$ with network $frak(N)$ and orientation vector $epsilon$, the number $x F'(x) slash F(x)$ is the area of the tall tiles minus the area of the wide tiles, divided by the area of the main rectangle.
+] <prop:slope>
+
+#proof[
+  Let $(phi, i)$ be the flow of value $1$ for real positive resistances $r$, and let $j$ be a real function on the edges that satisfies the law of Kirchhoff with value $c$.
+  Summing the law of Kirchhoff for $j$ against $phi$ gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
+  With $j = i$ this is $Z = sum_e r_e i_e^2$.
+  The currents are rational functions of the resistances, by Cramer's rule and @prop:flow; let a dot denote the derivative along a differentiable family of resistances.
+  Then $dot(i)$ satisfies the law of Kirchhoff with value $0$, so that $sum_e r_e i_e dot(i)_e = 0$, and $dot(Z) = sum_e dot(r)_e i_e^2 + 2 sum_e r_e i_e dot(i)_e = sum_e dot(r)_e i_e^2$.
+  For $r_e = x^(epsilon_e)$ the derivative with respect to $x$ is $dot(r)_e = epsilon_e r_e slash x$.
+  In the tiling the tile of $e$ has width $i_e W$ and height $r_e i_e W$, where $W$ is the width of the main rectangle, by @prop:tiling-network, so that its area is $r_e i_e^2 W^2$ and the area of the main rectangle is $F(x) W^2$.
+]
+
+Since $abs(x F'(x)) <= F(x)$, this proves again that $F(x) slash x$ is non-increasing and $x F(x)$ non-decreasing.
+At a solution of $F(x) = 1$ at which $F$ increases, the tall tiles of the corresponding tiling of the square cover more than half of it, and at one at which $F$ decreases, less than half.
+
 == From a network to a tiling <sec:converse>
 
 The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is different from zero gives a tiling with one tile for each edge, whose own network is obtained from the given one by identifying vertices of equal potential that lie on a common face.
@@ -2579,7 +2601,7 @@ The functions themselves grow at least threefold with each tile.
 
 Equality holds for $n = 1$, where $E(2) = 3$; the quotients $E(n + 1) slash E(n)$ of @tab:structure increase from $3$ to $7.84$.
 The proportions for the square are among the roots in $[1, infinity)$ of the polynomials $N - D$ of the functions of $cal(F)_n$, by the second statement of @prop:functions, a function and its inverse having the same roots, so that $a(n) <= n E(n)$ by the fifth statement of @prop:reactance.
-The argument of @prop:functions-growth does not extend to the square, where a function may have several roots in $[1, infinity)$ or none and different functions may share a root; we do not know whether $a(n + 1) > a(n)$ for every $n$.
+The argument of @prop:functions-growth does not extend to the square, where a function may have several roots in $[1, infinity)$ or none and different functions may share a root; we do not know whether $a(n + 1) > a(n)$ for every $n$, and @sec:full-side considers the same question for the tilings.
 
 == Rational proportions that need both orientations <sec:rational>
 
@@ -2861,6 +2883,114 @@ The number of proportions achievable by guillotine tilings is a decreasing share
 ] <conj:guillotine>
 
 @conj:guillotine is supported by the values for $n <= 12$.
+
+== Tilings with a tile along a side <sec:full-side>
+
+We do not know whether $t(n + 1) >= t(n)$ for every $n$, nor whether $a(n + 1) > a(n)$.
+This section gives a lower bound for $t(n + 1)$ by a number of networks with $n$ edges, which in the range computed exceeds $t(n)$.
+The tilings that it counts consist of a tiling of a rectangle with $n$ tiles and of one more tile along a whole side of the square.
+It first shows that a tiling can be recovered from its network, and conversely.
+
+#definition(name: [regular point])[
+  Two plane networks are _isomorphic_ if there are bijections between their vertices and between their edges that preserve the ends of the edges, the poles, and the cyclic order of the edges of $G^+$ around each vertex.
+  A _pair_ with $n$ edges is a plane network with $n$ edges with an orientation vector, and two pairs are isomorphic if there is an isomorphism of their plane networks that preserves the orientations.
+  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of positive value in which no current vanishes; direct the edges so that the currents are positive, and let $rct(e)$ be the rectangles of @prop:bsst.
+  For a vertex $v$, let $S_v$ be the union of the top sides of the rectangles $rct(e)$ with $e^- = v$ and of the bottom sides of the rectangles $rct(e)$ with $e^+ = v$.
+  The flow is _regular_ if the sets $S_v$ are pairwise disjoint.
+  For a pair $(frak(N), epsilon)$, a number $x > 0$ is a _regular point_ if no current of the flow of value $1$ for the resistances $x^(epsilon_e)$ vanishes and that flow is regular.
+] <def:regular-point>
+
+#proposition(name: [segments of the vertices])[
+  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of value $I > 0$ in which no current vanishes, the edges being directed so that the currents are positive.
+  + At every vertex other than the poles, the edges that leave it are consecutive in the cyclic order around it.
+  + For every vertex $v$, the set $S_v$ is a horizontal segment at height $phi(v)$, and it is the union of the top sides of the rectangles of the edges that leave $v$, as well as the union of the bottom sides of the rectangles of the edges that enter $v$, when $v$ has edges of the kind considered. In counter-clockwise order around $v$, the edges that leave $v$ come in the order of their rectangles from left to right, and are followed by the edges that enter $v$ in the order of their rectangles from right to left. The sets $S_s$ and $S_t$ are the top and the bottom side of the main rectangle.
+  + If $v != w$ and $S_v$ meets $S_w$, then they meet in a single point, which is a corner of four tiles.
+] <prop:segments>
+
+#proof[
+  By the proof of @prop:bsst, the potential decreases strictly along every edge, every vertex other than the poles has an edge that enters it and one that leaves it, from every vertex a directed path leads to $t$, and a path against the directions leads to $s$.
+
+  For the first statement, suppose that edges $a$, $b$, $c$, $d$ occur in this cyclic order around a vertex $v$ other than the poles, with $a$ and $c$ leaving $v$ and $b$ and $d$ entering it.
+  Take directed paths from $v$ to $t$ that begin with $a$ and with $c$, and let $z$ be the first vertex after $v$ on the first path that lies on the second.
+  The parts of the two paths from $v$ to $z$ form a closed curve $C$ all of whose vertices other than $v$ have potential smaller than $phi(v)$.
+  Since $a$ and $c$ separate $b$ from $d$ in the cyclic order around $v$, the edges $b$ and $d$ begin in different components of the complement of $C$, by the Jordan curve theorem.
+  The paths from $v$ against the directions that begin with $b$ and with $d$ lead to $s$ through vertices of potential larger than $phi(v)$, so they meet $C$ only at $v$; hence $s$, which is not on $C$, lies in both components, which is absurd.
+
+  For the second, let $v$ be a vertex other than the poles and let $e_1, dots, e_k$ be the edges that leave it, in counter-clockwise order, followed by the edges $e'_1, dots, e'_m$ that enter it.
+  The face that follows a leaving edge $e$ counter-clockwise around its tail is $lft(e)$, and the one that precedes it is $rgt(e)$; for an entering edge the face that follows it around its head is $rgt(e)$ and the one that precedes it is $lft(e)$.
+  Hence $lft(e_j) = rgt(e_(j + 1))$, so that the top sides $[psi(rgt(e_j)), psi(lft(e_j))] times {phi(v)}$ of the rectangles of the leaving edges follow one another from left to right and their union is $[psi(rgt(e_1)), psi(lft(e_k))] times {phi(v)}$.
+  Likewise $lft(e'_1) = lft(e_k)$, $rgt(e'_j) = lft(e'_(j + 1))$ and $rgt(e'_m) = rgt(e_1)$, so that the bottom sides of the rectangles of the entering edges follow one another from right to left and have the same union.
+  At $s$ the edge $e_0$ of $G^+$ is the only one that enters, with $lft(e_0) = f_R$ and $rgt(e_0) = f_L$, and the same computation shows that the top sides of the rectangles of the edges that leave $s$ cover $[psi(f_L), psi(f_R)] times {phi(s)}$; likewise at $t$.
+
+  For the third, $S_v$ and $S_w$ are at the same height, so neither $v$ nor $w$ is a pole, the potential of every other vertex lying strictly between those of the poles.
+  Suppose that the two segments have a common point $p$ that is not an end of both.
+  Then they have a common point whose abscissa is that of no corner of a tile; the points just above it lie in the interior of a single tile $rct(e)$, and the bottom side of that tile lies in $S_v$ and in $S_w$ by the second statement, so that $e^+ = v$ and $e^+ = w$, which is absurd.
+  So the segments have only an end $p$ in common, the right end of $S_v$ and the left end of $S_w$, say.
+  By the second statement, the last rectangle above $S_v$, the first above $S_w$, the last below $S_v$ and the first below $S_w$ are four tiles with a corner at $p$.
+]
+
+#proposition(name: [a tiling and its network])[
+  + Let $frak(N)$ be a plane network with real positive resistances and a regular flow, and let $tau$ be the tiling of @prop:bsst. Then $e |-> rct(e)$ induces an isomorphism of plane networks from $frak(N)$ to $frak(N)(tau)$, under which the resistance of $e$ is that of the tile $rct(e)$.
+  + Let $tau$ be a tiling of a rectangle. For the plane network $frak(N)(tau)$, with the resistances and the flow of @prop:tiling-network, the rectangles of @prop:bsst are the tiles of $tau$, up to a translation, and the flow is regular.
+] <prop:reconstruction>
+
+#proof[
+  For the first statement, every top side and every bottom side of a tile lies in one of the sets $S_v$, which are finitely many pairwise disjoint segments; so these sets are the connected components of the union of the top and bottom sides of the tiles, that is, the vertices of $frak(N)(tau)$.
+  The tile $rct(e)$ has its top side in $S_(e^-)$ and its bottom side in $S_(e^+)$, and $S_s$ and $S_t$ are the top and bottom sides of the main rectangle, by @prop:segments.
+  In the embedding of $frak(N)(tau)$ given in the proof of @prop:tiling-network, the edges around a component are, counter-clockwise, the tiles below it from left to right followed by the tiles above it from right to left, and the edge added between the poles lies to the same side; this is the order given by @prop:segments.
+
+  For the second, draw $frak(N)(tau)$ as in the proof of @prop:tiling-network, each tile being represented by the vertical segment through its centre and each component being contracted to a point; contracting the components does not change the faces, so we describe them before the contraction.
+  The centre segment cuts the interior of a tile into a left and a right half.
+  A point of the main rectangle that lies on no component and on no centre segment is in a half of a tile, or on a vertical side of a tile; two halves lie in the same face exactly if they are joined by a chain of halves in which consecutive ones share such a point of a vertical side, and then the right side of the tile of a left half, or the left side of the tile of a right half, is at the same abscissa along the chain.
+  Let $psi_0 (f)$ be this common abscissa for a face $f$ inside the main rectangle, and let $psi_0$ be the abscissa of the left side of the main rectangle on the face to its left and that of the right side on the face to its right; these are the two faces at $e_0$.
+  For the edge $e$ of a tile $T$, directed downwards, $lft(e)$ contains the right half of $T$ and $rgt(e)$ its left half, so that $psi_0 (lft(e)) - psi_0 (rgt(e))$ is the width of $T$, which is the current in $e$; and $psi_0 (f_R) - psi_0 (f_L)$ is the width of the main rectangle, which is the value of the flow.
+  By the uniqueness in @prop:face-potential, $psi_0$ differs from $psi$ by a constant, and the potential is the height by @prop:tiling-network; so $rct(e)$ is $T$, up to a translation.
+  The sets $S_v$ are then contained in distinct components, and so are disjoint.
+]
+
+Besides the three facts named before @prop:bsst, the proofs use that the contraction of the components does not change the faces of the drawing.
+By the third statement of @prop:segments, a flow is regular whenever no four tiles of its tiling meet at a point.
+
+#proposition(name: [tilings and regular points])[
+  Let $n >= 1$, and let $s(n)$ be the number of tilings of the unit square by $n$ squares.
+  + The similar tilings of the unit square with $n$ tiles and proportion $x > 1$ correspond bijectively to the triples of an isomorphism class of pairs $(frak(N), epsilon)$ with $n$ edges and of a regular point $x > 1$ of it with $Z_(frak(N), epsilon) (x) = 1$. Hence $t(n) - s(n)$ is the number of these triples.
+  + Every pair $(frak(N), epsilon)$ with impedance function $F$ has a _full-side root_: a number $x > 1$ with $F(x) = 1 - 1 slash x$, if $F$ tends to $0$ at infinity, or with $F(x) = x slash (x - 1)$, if $F$ tends to $infinity$.
+  + Let $g(n)$ be the number of isomorphism classes of pairs with $n$ edges that have a full-side root which is a regular point. Then $t(n + 1) >= g(n)$.
+] <prop:full-side>
+
+#proof[
+  For the first statement, a tiling $tau$ of proportion $x > 1$ has exactly one orientation vector $epsilon$, and $x$ is a regular point of $(frak(N)(tau), epsilon)$ at which the impedance function is $1$, by @prop:functions and the second statement of @prop:reconstruction, which also shows that $tau$ is determined by the pair and $x$.
+  Conversely, at a regular point $x > 1$ of a pair $(frak(N), epsilon)$ with value $1$, the tiling $tau$ of @prop:bsst for the flow of value $1$ is a similar tiling of the unit square of proportion $x$, with orientation vector $epsilon$, and the pair is isomorphic to $(frak(N)(tau), epsilon)$ by the first statement of @prop:reconstruction.
+
+  For the second, $F(1)$ is a positive real number, by @prop:reactance.
+  The function $1 - 1 slash x$ is $0$ at $1$ and tends to $1$ at infinity, so that $F(x) - 1 + 1 slash x$ is positive at $1$ and negative for large $x$ if $F$ tends to $0$; the function $x slash (x - 1)$ tends to $infinity$ at $1$ from the right and to $1$ at infinity, so that $F(x) - x slash (x - 1)$ is negative near $1$ and positive for large $x$ if $F$ tends to $infinity$.
+  By the fifth statement of @prop:reactance one of the two cases holds, and the intermediate value theorem gives the root.
+
+  For the third, let $x > 1$ be a regular full-side root of a pair $(frak(N), epsilon)$, and let $tau$ be the tiling of @prop:bsst for the flow of value $1$; it is a similar tiling of proportion $x$ of a rectangle of width $1$ and height $F(x)$.
+  If $F(x) = 1 - 1 slash x$, adding a tile of width $1$ and height $1 slash x$ above $tau$ gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the top side.
+  If $F(x) = x slash (x - 1)$, the tiling $tau$ scaled by $(x - 1) slash x$ has width $(x - 1) slash x$ and height $1$, and adding a tile of width $1 slash x$ and height $1$ to its left gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the left side.
+  A tiling of the unit square with at least two tiles does not have both a tile along the top side and a tile along the left side, since their interiors would meet.
+  So the tiling obtained determines which case holds; it determines $x$, which is its proportion, and $tau$, by removing the tile along the side; and $tau$ determines the pair up to isomorphism, as in the first statement.
+  Choosing one regular full-side root for each class thus gives $g(n)$ distinct tilings.
+]
+
+The first statement gives a way of counting the tilings that is independent of the search of @sec:solving: a plane network in which no current vanishes identically has a non-separable graph $G^+$, since a part of the network that hangs from the rest at a single vertex and contains no pole carries no current; so it suffices to go through the rooted non-separable planar maps with $n + 1$ edges, rooted at $e_0$, and for each of them and each orientation vector to find the regular points with value $1$ among the roots of a polynomial.
+We carried this out in floating-point arithmetic for $n <= 9$, and it reproduces the values of $t(n)$ in @tab:tbc.
+The same computation gives $g(n)$.
+
+#conjecture[
+  For every $n >= 1$, $g(n) >= t(n)$.
+] <conj:full-side>
+
+By the third statement of @prop:full-side, @conj:full-side implies that $t(n + 1) >= t(n)$ for every $n$.
+It holds for $n <= 9$: $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $2852$, $25380$, $240608$, $2382684$ and $24415502$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
+The quotient $t(n) slash g(n)$ increases slowly in this range, from $0.287$ for six tiles to $0.298$ for nine, and the values do not show whether it remains below $1$.
+
+The conjecture cannot be proved one network at a time.
+Let $frak(N)$ be ten blocks in series, each of nine edges in parallel, with $90$ edges in all.
+Its impedance function for an orientation vector with $a_j$ tall edges in the $j$-th block is $sum_j x slash (a_j + (9 - a_j) x^2)$, every point is regular, and the number of the pairs of an orientation vector and a solution $x > 1$ of $F(x) = 1$, counted in exact arithmetic by the changes of sign of $N - D$ at rational points, is at least $1.008 dot.op 2^(90)$.
+So this network has more tilings of the square of proportion larger than $1$ than orientation vectors.
+For $n <= 9$, on the other hand, no network has more such tilings than it has orientation vectors with a regular full-side root.
 
 == The rate of growth <sec:growth-rate>
 
