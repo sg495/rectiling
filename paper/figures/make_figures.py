@@ -2,6 +2,7 @@
 """Generates the figures of the paper from staircase placement sequences."""
 
 import csv
+from math import factorial
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
@@ -228,12 +229,12 @@ def sequences_plot(path):
         points = [(n, v) for n, v in enumerate(values, start=1) if v]
         ax.plot(*zip(*points), color=colour, marker=marker, ms=3.2, lw=0.9, mec="w", mew=0.4, label=name)
     ax.set_yscale("log")
-    limits = ax.get_ylim()
-    for k, name in enumerate(("$t(n)$", "$b(n)$", "$a(n)$")):
-        values = [v for v in series[name][0] if v]
-        last = len(values)
-        ax.plot([1, last], [values[-1] * 13.5 ** (1 - last), values[-1]], color="0.72", lw=0.6, ls=(0, (4, 2)), zorder=1, label="$(27/2)^n$" if k == 0 else None)
-    ax.set_ylim(limits)
+    maps = lambda n: 2 * factorial(3 * n) // (factorial(2 * n + 1) * factorial(n + 1))
+    shape = [(n, 2**n * maps(n)) for n in range(1, 13)]
+    grey = dict(color="0.6", lw=0.6, zorder=1)
+    ax.plot(*zip(*[(n, 0.295 * v) for n, v in shape]), ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n)$ and an eighth of it", **grey)
+    ax.plot(*zip(*[(n, 0.295 * v / 8) for n, v in shape]), ls=(0, (4, 2)), **grey)
+    ax.plot(*zip(*[(n, n * 2 ** (n - 1) * maps(n)) for n in range(1, 14)]), ls=(0, (1, 1.5)), label="$n 2^{n-1} M(n)$", **grey)
     ax.set_xticks(range(1, 14))
     ax.set_xlabel("$n$", fontsize=8)
     ax.tick_params(labelsize=7, width=0.4, length=2.5)
@@ -242,7 +243,7 @@ def sequences_plot(path):
         ax.spines[side].set_visible(False)
     for side in ("left", "bottom"):
         ax.spines[side].set_linewidth(0.4)
-    ax.legend(fontsize=7, frameon=False, loc="upper left")
+    ax.legend(fontsize=6.5, frameon=False, loc="upper left")
     fig.tight_layout(pad=0.3)
     fig.savefig(path)
     plt.close(fig)
