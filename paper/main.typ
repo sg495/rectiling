@@ -26,7 +26,7 @@ For three pieces there are three: thirds, of proportion $3$; a half-height slab 
 
 The qualitative question was settled in the 1990s.
 Dehn had shown that a rectangle can be cut into squares only if its sides are commensurable @dehn1903, and Brooks, Smith, Stone and Tutte had recast dissections of rectangles as planar electrical networks @bsst1940.
-Freiling and Rinne @freiling1994, and independently Laczkovich and Szekeres @laczkovich1995, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; the question of which rectangles can be tiled by rectangles similar to a given one was studied by Freiling, Laczkovich and Rinne @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
+Laczkovich and Szekeres @laczkovich1995, and independently Freiling and Rinne @freiling1994, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; Freiling, Laczkovich and Rinne characterised the rectangles that can be tiled by rectangles similar to a given one, in terms of odd rational functions that map the right half-plane into itself @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
 
 The quantitative question dates from December 2022, when Baez asked on Mathstodon which proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
 The resulting sequence $a(n)$ is entry A359146 of the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
@@ -2160,7 +2160,8 @@ The statements below are therefore made for impedance functions only.
 
 The next statement collects the properties of these functions.
 The first, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile playing the part of an inductor and a wide one that of a capacitor, and constitute Foster's reactance theorem @foster1924; the second is the corresponding property of positive real functions @brune1931.
-For tilings by rectangles all of them are stated by Prasolov and Skopenkov @prasolov2011; they are proved here from @prop:flow, since the proof is short.
+For tilings, that the aspect ratio of the main rectangle is a rational function of those of the tiles, with rational coefficients, is a theorem of Dehn @dehn1903; Freiling, Laczkovich and Rinne show that a rectangle of proportion $v$ can be tiled by rectangles of proportion $u$ exactly if $v = Q(u)$ for an odd rational function $Q$ with rational coefficients that maps the right half-plane into itself @flr1997, and Prasolov and Skopenkov state these properties in electrical terms @prasolov2011.
+They are proved here from @prop:flow, since the proof is short.
 
 #proposition(name: [properties of the impedance function])[
   Let $F = Z_(frak(N), epsilon)$ for a network with $n$ edges, and let $F = N slash D$ in lowest terms.
