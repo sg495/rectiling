@@ -2277,7 +2277,7 @@ A function of the first kind always yields a positive solution, and one of the s
 
 == From a network to a tiling <sec:converse>
 
-The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is different from zero is the network of a tiling.
+The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is different from zero gives a tiling with one tile for each edge, whose own network is obtained from the given one by identifying vertices of equal potential that lie on a common face.
 The abscissas of the tiling are given by a potential on the faces of the network, which exists by planarity.
 
 #definition(name: [plane network])[
