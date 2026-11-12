@@ -829,7 +829,8 @@ The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from
 ] <conj:logconvex>
 
 @conj:logconvex holds for $n <= 12$.
-Conjectures on the rate of growth of $a(n)$ are stated in @sec:growth-rate.
+The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and with it $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount that is far too small to be seen in the values computed.
+Whether $a(n)^(1 slash n)$ converges is not known (@sec:growth-rate).
 
 == Tilings, classes and bags <sec:tilings-counts>
 
@@ -858,7 +859,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
 
 #figure(
   image("figures/sequences.svg", width: 62%),
-  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves, in the colours of the tilings and of the classes, are $0.295 dot.op 2^n M(n)$ and one eighth of it, the forms that @conj:growth-rate and @conj:growth-symmetry suggest, the constant being an extrapolation of the quotients given below; the dashed curve in the colour of the proportions is $0.676 dot.op (27 slash 2)^n n^(-11 slash 2)$, the form suggested by @conj:asymptotic.],
+  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves are fits to the terms computed: $0.295 dot.op 2^n M(n)$ and one eighth of it, in the colours of the tilings and of the classes, and $0.676 dot.op (27 slash 2)^n n^(-11 slash 2)$, in the colour of the proportions. They are not asymptotic forms, since the rate of growth is smaller than $27 slash 2$ by @prop:deficit.],
 ) <fig:sequences>
 
 #figure(
@@ -988,12 +989,12 @@ The proportion $2$ has the most bags, and the most classes, for every $n$ from $
 ] <conj:growth-symmetry>
 
 #conjecture[
-  The sequence $t(n)^(1 slash n)$ tends to $27 slash 2$.
+  The sequence $t(n)^(1 slash n)$ converges.
 ] <conj:growth-rate>
 
 @conj:growth-quotients holds for $5 <= n <= 11$.
 For @conj:growth-symmetry, the quotient $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$, to $1.0003$.
-For @conj:growth-rate, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
+For @conj:growth-rate, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$, which suggests the rate $27 slash 2$ of $2^n M(n)$; but the limit, if it exists, is smaller than $27 slash 2$ by @prop:deficit, so that this quotient eventually tends to zero.
 The three statements are independent of one another as far as we know.
 
 #heading(numbering: none)[Use of AI Systems]
@@ -2991,8 +2992,9 @@ The same computation gives $g(n)$.
 ] <conj:full-side>
 
 By the third statement of @prop:full-side, @conj:full-side implies that $t(n + 1) >= t(n)$ for every $n$.
-It holds for $n <= 9$, according to this computation in floating-point arithmetic: $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $2852$, $25380$, $240608$, $2382684$ and $24415502$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
+It holds for $n <= 10$. For $n <= 9$, according to this computation in floating-point arithmetic, $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $2852$, $25380$, $240608$, $2382684$ and $24415502$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
 The quotient $t(n) slash g(n)$ is $0.257$, $0.291$, $0.287$, $0.293$, $0.295$ and $0.298$ for $n = 4, dots, 9$; it increases slowly from six tiles on, and the values do not show whether it remains below $1$.
+A second computation, in integer arithmetic, certifies regular full-side roots by an exact change of sign on a small interval on which the potentials of the vertices are shown to be pairwise distinct; it certifies $24202856$ pairs for nine tiles, and for ten tiles $77189138$ pairs among the first $80445440$ examined, which exceeds $t(10) = 77188146$.
 
 The conjecture cannot be proved one network at a time.
 Let $frak(N)$ be ten blocks in series, each of nine edges in parallel, with $90$ edges in all.
@@ -3002,23 +3004,103 @@ For $n <= 9$, on the other hand, no network has more such tilings than it has or
 
 == The rate of growth <sec:growth-rate>
 
-By @prop:upper the numbers $a(n)$ grow at most like $(27 slash 2)^n$.
-The values computed suggest that this is their rate of growth, with a correction that is a power of $n$.
+By @prop:upper the numbers $a(n)$ grow at most like $(27 slash 2)^n$, and the values computed are compatible with that rate.
+It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a certain local pattern has no regular point, hence carries no tiling by @prop:full-side, and the pairs that avoid a local pattern grow at a smaller rate than all pairs.
+
+#definition(name: [square block])[
+  A _square block_ of a pair $(frak(N), epsilon)$ is a face of $G^+$ whose boundary is a cycle of four edges $a$, $b$, $d$, $c$ of $G$, where $a$ joins a vertex $u$ to a vertex $v_1$, $b$ joins $v_1$ to a vertex $w$, $c$ joins $u$ to a vertex $v_2$ and $d$ joins $v_2$ to $w$, such that $v_1$ and $v_2$ have degree two in $G^+$ and the four edges have the same orientation.
+] <def:square-block>
+
+In a tiling, two tiles of the same orientation stacked between the same two segments are congruent, and two such stacks side by side form four congruent tiles that meet at a point; the two vertices of degree two would then be one.
+
+#proposition(name: [square blocks])[
+  A pair with a square block has no regular point.
+] <prop:square-block>
+
+#proof[
+  The vertex $v_1$ lies on $a$ and $b$ only, so it is not a pole, the poles being ends of $e_0$; likewise $v_2$.
+  Let $x > 0$ be such that no current of the flow of value $1$ vanishes, and let $r := x^(epsilon_a)$ be the common resistance of the four edges.
+  By the law of Kirchhoff at $v_1$ the same current $j_1$ flows through $a$ and $b$ from $u$ to $w$, and likewise a current $j_2$ through $c$ and $d$.
+  By the law of Ohm, $phi(u) - phi(w) = 2 r j_1 = 2 r j_2$, so that $j_1 = j_2 =: j$ and $phi(v_1) = phi(u) - r j = phi(v_2)$.
+  We may name the vertices so that $j > 0$; then $a$ and $c$ are directed from $u$, with heads $v_1$ and $v_2$.
+  The face lies on one side of its boundary, along which $a$ and $c$ are traversed in opposite senses, so that it is $lft(a) = rgt(c)$ or $rgt(a) = lft(c)$.
+  In either case its value under $psi$ is the abscissa of the right side of one of $rct(a)$, $rct(c)$ and of the left side of the other, and the bottom sides of the two rectangles are at the same height; so they have a common end, which lies in $S_(v_1)$ and in $S_(v_2)$, and the flow is not regular.
+]
+
+#proposition(name: [substitution])[
+  Let $(frak(N), epsilon)$ be a pair with $n$ edges, with $G^+$ non-separable and without square block, and let $S$ be a set of $k$ of its edges.
+  Replace every edge $e in S$, with ends $u$ and $w$, by six edges of the orientation of $e$: two edges joining $u$ and $w$ and, between them in the drawing, two paths of two edges from $u$ to $w$ through new vertices $v_1$ and $v_2$.
+  + The result is a pair with $n + 5 k$ edges, with $G^+$ non-separable.
+  + Its square blocks are the $k$ faces bounded by the two paths of a replaced edge.
+  + The isomorphism class of the result determines that of $(frak(N), epsilon)$ and, under the isomorphism, the set $S$.
+] <prop:substitution>
+
+#proof[
+  For the first statement, the edge $e_0$ and the poles are untouched, and there are no loops.
+  If a new vertex is removed, what remains contains a copy of $G^+$ in which each replaced edge is represented by one of the two edges that join its ends, and the other new vertices are attached to it.
+  If an old vertex $y$ is removed, $G^+ - y$ is connected, each replaced edge not at $y$ is again represented, and every new vertex remains joined to an end of its edge other than $y$.
+
+  For the second, the new faces at a replaced edge are two triangles, each bounded by one of the two edges that join $u$ and $w$ and by one of the paths, and the quadrilateral bounded by the two paths; every other face is a face of the original with some edges replaced by one of the edges that join their ends, and has the same number of sides.
+  The degree of an old vertex increases by three for every replaced edge at it, and the ends of a replaced edge have degree at least four.
+  Let a face be a square block of the result, with vertices $v'_1$ and $v'_2$ of degree two.
+  If $v'_1$ is new, the two faces at it are a triangle and the quadrilateral of its edge, so the face is that quadrilateral.
+  If both are old, no edge at them has been replaced; the four edges of the face are the edges at $v'_1$ and $v'_2$, so they are old, and the face is a face of the original with the same boundary, degrees and orientations, hence a square block of the original, against the hypothesis.
+  Conversely each of the $k$ quadrilaterals is a square block.
+
+  For the third, an isomorphism between two results carries square blocks to square blocks.
+  For each square block, the two edges that join its vertices $u$ and $w$ are determined as a pair: they are the third sides of the two triangles across its paths.
+  Deleting the two vertices of degree two and one of these two edges at every square block gives a pair that does not depend on the choice, up to the name of the edge kept, and that is the original pair with the kept edges forming $S$.
+  So the isomorphism induces one of the original pairs that carries $S$ to $S$; and a plane network has no isomorphism with itself other than the identity, since such an isomorphism fixes $e_0$ and its ends and then, by the cyclic orders, every edge in turn.
+]
+
+#proposition(name: [the rate of growth is smaller than $27 slash 2$])[
+  Let $A(n)$ be the number of isomorphism classes of pairs with $n$ edges with $G^+$ non-separable and without square block, and let
+  $ lambda := (27 slash 2) / (1 + (2 slash 27)^5) = 13.49996... $
+  There is a constant $C$ such that, for every $n >= 1$,
+  $ g(n) <= A(n) <= C lambda^n, quad t(n) <= (n + 1) A(n). $
+  Consequently
+  $ limsup_(n -> infinity) a(n)^(1 slash n) <= limsup_(n -> infinity) t(n)^(1 slash n) <= lambda < 27 / 2. $
+] <prop:deficit>
+
+#proof[
+  The isomorphism classes of pairs with $m$ edges and $G^+$ non-separable are at most $2^m M(m)$, as in the proof of @prop:upper: the plane network is a non-separable planar map rooted at $e_0$, and it has $2^m$ orientation vectors.
+  By @prop:substitution, a class counted by $A(n)$ and a set of $k$ of its edges give a class with $n + 5 k$ edges and exactly $k$ square blocks, and different data give different classes; hence
+  $ sum_(n + 5 k = m) binom(n, k) A(n) <= 2^m M(m) quad "for every" m. $
+  Let $rho := 2 slash 27$.
+  Multiplying by $rho^m$ and summing over $m$, all terms being non-negative,
+  $ sum_n A(n) (rho + rho^6)^n = sum_m rho^m sum_(n + 5 k = m) binom(n, k) A(n) <= sum_m M(m) (4 slash 27)^m =: C, $
+  which is finite because $M(m)$ is asymptotic to a constant times $(27 slash 4)^m m^(-5 slash 2)$.
+  Each term of the sum on the left is at most $C$, and $1 slash (rho + rho^6) = lambda$; so $A(n) <= C lambda^n$.
+
+  A pair with a regular point is isomorphic to the pair of a tiling, by the first statement of @prop:reconstruction, so that its graph $G^+$ is non-separable by @prop:nonseparable, and it has no square block by @prop:square-block.
+  Hence $g(n) <= A(n)$.
+  By the first statement of @prop:full-side, $t(n) - s(n)$ is the number of the triples of such a pair and of a regular point $x > 1$ at which its impedance function is $1$; a pair has at most $n$ such points, by the fifth statement of @prop:reactance, so that $t(n) - s(n) <= n A(n)$.
+  A tiling $sigma$ of the unit square by squares gives the pair of $frak(N)(sigma)$ with all edges wide, whose impedance function is $1 slash x$ and whose flows are those of unit resistances with the potential divided by $x$, so that every point is regular by the second statement of @prop:reconstruction; distinct tilings give pairs that are not isomorphic, so that $s(n) <= A(n)$.
+  Finally $a(n) <= t(n)$, every proportion being that of a tiling.
+]
+
+The constant $C$ is numerically $0.25$.
+The bound is of no use for the values of $n$ within reach: the factor $(1 + (2 slash 27)^5)^(-n)$ is $0.99997$ for $n = 13$, and $C (n + 1) lambda^n$ falls below the bound of @prop:upper only for $n$ of the order of $10^7$.
+Its interest is that the rate $27 slash 2$ of the planar maps is not that of the tilings.
+The pattern can be widened, to four edges with $epsilon_a + epsilon_d = epsilon_b + epsilon_c$, which lowers the bound slightly; and other patterns have the same effect.
+For nine tiles $0.6$ per cent of the pairs have a square block, while $3.3$ per cent have no regular full-side root.
+
+Whether the sequences have a rate of growth at all is not known.
 
 #conjecture[
-  The sequence $a(n)^(1 slash n)$ tends to $27 slash 2$.
+  The sequence $t(n)^(1 slash n)$ converges.
+] <conj:rate-tilings>
+
+#conjecture[
+  The sequence $a(n)^(1 slash n)$ converges.
 ] <conj:rate>
 
-#conjecture[
-  The sequence $a(n) thin n^(11 slash 2) thin (27 slash 2)^(-n)$ tends to a positive limit.
-] <conj:asymptotic>
-
-@conj:asymptotic implies @conj:rate.
-The evidence is numerical and comes from thirteen terms only.
+By @prop:deficit the limits, if they exist, are smaller than $27 slash 2$.
+The values computed do not show this.
 If $a(n)$ were a constant times $mu^n n^(-gamma)$, then $gamma$ would be $log(mu a(n) slash a(n + 1)) slash log((n + 1) slash n)$ for every $n$.
-For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and so appears to settle near $11 slash 2$; for $mu = 25 slash 2$ and $mu = 13$ it is still decreasing at $n = 12$, and for $mu = 14$, which @prop:upper excludes, it has begun to increase.
-With $gamma = 11 slash 2$, the sequence of @conj:asymptotic takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$.
-We have no argument for the exponent, nor for the rate; @fig:sequences shows the curve $0.676 dot.op (27 slash 2)^n n^(-11 slash 2)$ against the values of $a(n)$.
+For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and the quotient of $a(n)$ by $(27 slash 2)^n n^(-11 slash 2)$ takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$; likewise the quotient of $t(n)$ by $2^n M(n)$ increases slowly, to $0.2920$ for twelve tiles.
+These fits, which @fig:sequences shows, describe the terms computed and nothing more: by @prop:deficit both quotients tend to zero.
+A deficit of the size proved, or of the size that the proportion of pairs without regular points suggests, is invisible in thirteen terms.
 
 == Mosaic classes <sec:mosaic>
 
