@@ -228,6 +228,12 @@ def sequences_plot(path):
         points = [(n, v) for n, v in enumerate(values, start=1) if v]
         ax.plot(*zip(*points), color=colour, marker=marker, ms=3.2, lw=0.9, mec="w", mew=0.4, label=name)
     ax.set_yscale("log")
+    limits = ax.get_ylim()
+    for k, name in enumerate(("$t(n)$", "$b(n)$", "$a(n)$")):
+        values = [v for v in series[name][0] if v]
+        last = len(values)
+        ax.plot([1, last], [values[-1] * 13.5 ** (1 - last), values[-1]], color="0.72", lw=0.6, ls=(0, (4, 2)), zorder=1, label="$(27/2)^n$" if k == 0 else None)
+    ax.set_ylim(limits)
     ax.set_xticks(range(1, 14))
     ax.set_xlabel("$n$", fontsize=8)
     ax.tick_params(labelsize=7, width=0.4, length=2.5)

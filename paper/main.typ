@@ -856,7 +856,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
 
 #figure(
   image("figures/sequences.svg", width: 62%),
-  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide.],
+  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed lines have the slope of $(27 slash 2)^n$, the growth of the bound of @prop:upper, and pass through the last points of the tilings, of the classes and of the proportions.],
 ) <fig:sequences>
 
 #figure(
