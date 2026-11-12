@@ -856,7 +856,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
 
 #figure(
   image("figures/sequences.svg", width: 62%),
-  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves are $0.295 dot.op 2^n M(n)$ and one eighth of it, the forms that @conj:growth-rate and @conj:growth-symmetry suggest for the tilings and the classes, the constant being an extrapolation of the quotients given below; the dotted curve is the bound $n 2^(n - 1) M(n)$ of @prop:upper on the number of proportions.],
+  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags $c(n)$ and of proportions $a(n)$ differ by less than six per cent throughout, and their curves nearly coincide. The dashed curves, in the colours of the tilings and of the classes, are $0.295 dot.op 2^n M(n)$ and one eighth of it, the forms that @conj:growth-rate and @conj:growth-symmetry suggest, the constant being an extrapolation of the quotients given below; the dotted curve, in the colour of the proportions, is the bound $n 2^(n - 1) M(n)$ of @prop:upper.],
 ) <fig:sequences>
 
 #figure(

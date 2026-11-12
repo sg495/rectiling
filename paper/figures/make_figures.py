@@ -230,11 +230,13 @@ def sequences_plot(path):
         ax.plot(*zip(*points), color=colour, marker=marker, ms=3.2, lw=0.9, mec="w", mew=0.4, label=name)
     ax.set_yscale("log")
     maps = lambda n: 2 * factorial(3 * n) // (factorial(2 * n + 1) * factorial(n + 1))
-    shape = [(n, 2**n * maps(n)) for n in range(1, 13)]
-    grey = dict(color="0.6", lw=0.6, zorder=1)
-    ax.plot(*zip(*[(n, 0.295 * v) for n, v in shape]), ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n)$ and an eighth of it", **grey)
-    ax.plot(*zip(*[(n, 0.295 * v / 8) for n, v in shape]), ls=(0, (4, 2)), **grey)
-    ax.plot(*zip(*[(n, n * 2 ** (n - 1) * maps(n)) for n in range(1, 14)]), ls=(0, (1, 1.5)), label="$n 2^{n-1} M(n)$", **grey)
+    shape = [(n, 2**n * maps(n)) for n in range(1, 15)]
+    faint = dict(lw=0.8, alpha=0.45, zorder=1)
+    ax.plot(*zip(*[(n, 0.295 * v) for n, v in shape]), color=series["$t(n)$"][1], ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n)$", **faint)
+    ax.plot(*zip(*[(n, 0.295 * v / 8) for n, v in shape]), color=series["$b(n)$"][1], ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n) / 8$", **faint)
+    ax.plot(*zip(*[(n, n * v / 2) for n, v in shape]), color=series["$a(n)$"][1], ls=(0, (1, 1.5)), label="$n 2^{n-1} M(n)$", **faint)
+    ax.set_xlim(0.5, 13.6)
+    ax.set_ylim(0.3, 1.2e13)
     ax.set_xticks(range(1, 14))
     ax.set_xlabel("$n$", fontsize=8)
     ax.tick_params(labelsize=7, width=0.4, length=2.5)
