@@ -1960,7 +1960,7 @@ Most proportions achievable with $n$ tiles are not achievable with fewer, as @ta
 The steps of three, five and seven, and hence every step other than one, two and four, do not depend on the main rectangle being a square.
 
 #proposition(name: [persistence for every main rectangle])[
-  For all $W, H > 0$, every $n >= 0$ and every $k$ with $k = 3$ or $k >= 5$, $P_n (W, H) subset.eq P_(n + k) (W, H)$.
+  For every real number $w > 0$, every $n >= 0$ and every $k$ with $k = 3$ or $k >= 5$, $P_n (w) subset.eq P_(n + k) (w)$.
 ] <prop:persistence-rectangles>
 
 #proof[
