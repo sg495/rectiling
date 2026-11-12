@@ -1979,8 +1979,8 @@ They are far from the growth observed in @tab:tbc.
 #proposition(name: [steps of three, four and five])[
   Let $n >= 1$, and let $s(n)$ be the number of tilings of the unit square by $n$ squares.
   + $t(n + 3) >= t(n)$.
-  + $t(n + 5) >= 4 t(n)$.
   + $t(n + 4) >= 2 (t(n) - s(n))$.
+  + $t(n + 5) >= 4 t(n)$.
   + Every element of $P_n (1)$ is at most $n$, and $a(n + 3) >= a(n) + 1$.
 ] <prop:steps>
 
@@ -1990,17 +1990,17 @@ They are far from the growth observed in @tab:tbc.
   For the first, cut the tile at the bottom-left corner into four by its mid-lines.
   In the image the tile at the bottom-left corner, of width $a$ and height $b$, and the tiles with corners $(a, 0)$, $(0, b)$ and $(a, b)$ are the four pieces; their union is the tile that was cut, namely $[0, 2 a] times [0, 2 b]$, and the other tiles are unchanged.
 
-  For the second, there are four dissections of the unit square into one square of side $2 slash 3$ and five of side $1 slash 3$, according to the corner that the large square occupies.
+  For the second, let the tiling have proportion $x > 1$; there are $t(n) - s(n)$ such tilings.
+  The construction of @prop:persistence for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
+  The transpose of this tiling is a similar tiling of the same proportion in which the tile at the bottom-left corner is tall, so that the tilings obtained in the two ways are different.
+  In either case, removing the four tiles that contain the corners of the square, after transposing if the tile at the bottom-left corner is tall, leaves the scaled copy of the original tiling.
+
+  For the third, there are four dissections of the unit square into one square of side $2 slash 3$ and five of side $1 slash 3$, according to the corner that the large square occupies.
   Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map of the proof of @prop:persistence-rectangles; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
   Let the tile at the bottom-left corner of the image have width $a$ and height $b$.
   If it is the large piece, then $(A, B) = (3 a slash 2, 3 b slash 2)$, and $[a, 3 a slash 2] times [0, b slash 2]$ is a tile of the image.
   If it is a small piece, then $(A, B) = (3 a, 3 b)$, and the tile of the image that contains the points just to the right of $(a, 0)$ is a piece with corner $(a, 0)$ and of width $a$ or $2 a$, so that $[a, 3 a slash 2] times [0, b slash 2]$, which has the same corner, is not a tile.
   The image thus determines which case holds, hence $A$ and $B$; the pieces are the tiles of the image contained in $[0, A] times [0, B]$, which gives the position of the large piece, and the other tiles are unchanged.
-
-  For the third, let the tiling have proportion $x > 1$; there are $t(n) - s(n)$ such tilings.
-  The construction of @prop:persistence for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
-  The transpose of this tiling is a similar tiling of the same proportion in which the tile at the bottom-left corner is tall, so that the tilings obtained in the two ways are different.
-  In either case, removing the four tiles that contain the corners of the square, after transposing if the tile at the bottom-left corner is tall, leaves the scaled copy of the original tiling.
 
   For the fourth, the long side of a tile of proportion $x$ contained in the unit square is at most $1$, so that its area is at most $1 slash x$; the $n$ tiles have total area $1$, hence $n slash x >= 1$.
   By @prop:subdivision, $P_n (1) subset.eq P_(n + 3) (1)$, and $n + 3 in P_(n + 3) (1)$, by cutting the square into $n + 3$ horizontal strips, while $n + 3 in.not P_n (1)$.
