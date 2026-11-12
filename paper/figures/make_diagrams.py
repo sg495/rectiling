@@ -163,7 +163,9 @@ def rules_figure(path, value, witness):
         draw(ax, tiles[:k])
         outline_rest(ax, tiles[k:])
         for j, t in enumerate(sts[k]):
-            style = dict(color="tab:red", lw=1.2, ls=(0, (3, 1.5))) if t.started else dict(color="k", lw=1.1)
+            if t.started:
+                ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="w", lw=1.2, solid_capstyle="butt", zorder=4)
+            style = dict(color="#cc0000", lw=1.2, ls=(0, (3, 1.5))) if t.started else dict(color="k", lw=1.1)
             ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], solid_capstyle="butt", zorder=4, **style)
             ax.text(t.ax + 0.025, t.ay + 0.022, f"$T_{j}$", fontsize=7, ha="left", va="bottom", zorder=7)
         mark_anchors(ax, sts[k], size=4.6)
@@ -233,7 +235,9 @@ def construction_figure(path, value, witness):
         first = None
         for j, t in enumerate(sts[k]):
             ext = extends(tiles, t.ax + t.floor, t.ay)
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="tab:red" if ext else "k", lw=1.8, ls=(0, (2, 1.2)) if ext else "-", solid_capstyle="butt", zorder=4)
+            if ext:
+                ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="w", lw=1.2, solid_capstyle="butt", zorder=4)
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="#cc0000" if ext else "k", lw=1.2 if ext else 1.1, ls=(0, (3, 1.5)) if ext else "-", solid_capstyle="butt", zorder=4)
             if not ext and first is None:
                 first = j
         assert first == moves[k][0], (k, first, moves[k])

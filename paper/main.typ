@@ -13,7 +13,7 @@
     We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
     For the special case of a square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
     For $n <= 12$ we also count the tilings themselves, their classes under the symmetries of the square, and the multisets of tiles that occur.
-    We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, that $a(n)$ grows at most like $(27 slash 2)^n$, and that for main rectangles wider than a bound depending on $n$ the number of proportions is the number of impedance functions of the corresponding electrical networks; we state conjectures on the rational proportions and on the growth of the sequences.
+    We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, and that $a(n)$ grows at most like $(27 slash 2)^n$.
   ],
   keywords: [tilings, similar rectangles, rectangulations, Baxter numbers, exact enumeration, real algebraic numbers],
 )
@@ -41,9 +41,10 @@ We reproduce all the values above, by a method independent of both earlier ones,
 $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 
 @sec:tilings fixes definitions.
-@sec:search presents the search procedure, with the propositions that make it sound and complete, and @sec:optimisations the optimisations that make thirteen tiles feasible, with the propositions that justify them.
+@sec:staircases presents the staircases on which tilings are built and the rules that restrict the sequences of placements.
+@sec:systems associates a linear system with each sequence, proves that the construction is sound and complete, and describes the search; the technical part of solving the systems, with the optimisations that make thirteen tiles feasible, is in @app:solving.
 The results are in @sec:results, and further properties of the sets of proportions, with some conjectures, in @app:structure.
-The propositions of @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the reference search and of the optimised search.
+The propositions of @sec:staircases, @sec:systems and @app:solving have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the direct search and of the incremental search.
 The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
 The implementation itself is not verified.
 @app:formal relates the statements of this paper to those of the formal development, and lists what the latter does not cover.
@@ -128,14 +129,14 @@ Whether they grow along steps of one is not known to us.
   caption: [A similar tiling of the square by five tiles, its transpose, in which wide and tall tiles are exchanged, and the tiling by eight tiles obtained by cutting one tile into four.],
 ) <fig:symmetry>
 
-@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the procedure of @sec:search; the remaining ones are their transposes.
+@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search of @sec:solving; the remaining ones are their transposes.
 
 #figure(
   image("figures/three-tiles.svg", width: 100%),
   caption: [The similar tilings of a square with three tiles in which the bottom-left tile is wide, labelled by proportion. Tiles are coloured in the order in which the search places them.],
 ) <fig:three>
 
-= Search procedure <sec:search>
+= Staircases <sec:staircases>
 
 == Staircases <sec:staircase>
 
@@ -156,7 +157,7 @@ The staircase is therefore defined first as a combinatorial object carrying leng
 Several arithmetics of lengths occur.
 The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
 The second has a single element, so that a staircase over it, a _bare staircase_, carries only the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
-The others consist of linear forms in unknown lengths, introduced in @sec:solving and @sec:eager, and of intervals, used in @sec:numeric.
+The others consist of linear forms in unknown lengths, introduced in @sec:forms and @sec:eager, and of intervals, used in @sec:numeric.
 
 A real staircase is read geometrically inside a main rectangle $[0, W] times [0, H]$, the floors being laid end to end from the right side leftwards and the walls from the top side downwards.
 
@@ -177,6 +178,8 @@ This and the other figures of this section are drawn from tilings found by the s
   image("figures/staircase.svg", width: 55%),
   caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
+
+== Placements <sec:placements>
 
 A tile placed at the anchor of a tier may or may not be as wide as the floor, and may or may not be as high as the wall.
 This gives four kinds of placement, each of which turns a staircase into another.
@@ -222,7 +225,7 @@ The number of tiers increases by one with an inside placement, decreases by one 
 Placing commutes with homomorphisms: if $f$ is a homomorphism, the image under $f$ of the staircase obtained by placing $p$ on $S$ with free side $s$ is obtained by placing $p$ on the image of $S$ with free side $f(s)$, and the positive quantity and the equation of $p$ on the image of $S$ are the images of those on $S$.
 In particular, the number of tiers and the flags of the staircases obtained by successive placements do not depend on the arithmetic of lengths or on the free sides: they are those of the bare staircases obtained by the same placements.
 
-== Placement rules <sec:rules>
+== Placement rules and records <sec:rules>
 
 A tiling generally admits several orderings in which its tiles can be placed, and tilings that differ only in how the corners of their tiles alternate along a segment impose the same conditions on the sizes of the tiles, as is explained informally in @sec:mosaic.
 The search therefore restricts the sequences of placements by two rules, which are expressed by the two flags, and abandons a sequence when fewer tiles remain to be placed than there are tiers.
@@ -269,7 +272,12 @@ The bound on the number of tiers, by which the search abandons partial records, 
   Indeed $ell >= 1$; if the staircase after $p_1$ is empty then $r = 1$ by admissibility and no placement follows, so that $ell = 1$; otherwise $ell - 1 = r - 1$ by induction.
 ]
 
-== The linear system <sec:system>
+= Linear systems <sec:systems>
+
+A record of placements imposes a system of linear equations and inequalities on the sizes of the tiles, whose coefficients depend on the proportion.
+This section defines the system, proves that its solutions are exactly the similar tilings, and describes how the search uses it.
+
+== The constraints of a record <sec:system>
 
 A record constrains the sizes of the tiles, and the constraints are linear once the proportion is fixed.
 The short side of each tile placed inside its tier is a free unknown, and every other length is determined by the width and the height of the main rectangle and by these unknowns.
@@ -603,146 +611,55 @@ For a square main rectangle, transposition allows the first tile to be taken wid
   That tile is thus $(0, 0, h, w)$, and $h = x w$ says that the first placement of $rho'$ is wide.
 ]
 
-== Solving the system <sec:solving>
+== The search <sec:solving>
 
-For a main rectangle of sides in the ratio $a slash b$, with $a$ and $b$ positive integers, the height is normalised to $H = 1$ and the width $W$ is kept as an unknown, to be compared with $a slash b$ at the end.
-Every floor and wall arising along a record is then a linear form in $1$, $W$ and the free sides, whose coefficients are polynomials in the proportion divided by a power of it.
+By @prop:sound and @prop:complete, the proportions achievable with $n$ tiles in a main rectangle of sides $a slash b$ and $1$ are the numbers $x >= 1$ at which the constraints of some complete admissible record for $n$ tiles have a solution with $W = a slash b$ and $H = 1$; for a square, by @prop:square, only the records in which the first tile is wide need be considered.
+The search examines these records, of which there are finitely many, and finds the proportions of each exactly.
 
-#definition(name: [linear forms])[
-  A _linear form_ is a pair $f = (d, c)$ of an integer $d >= 0$ and a sequence $c = (c_0, c_1, c_2, dots)$ of polynomials in $ZZ[x]$; it stands for the expression
-  $ (c_0 + c_1 W + c_2 s_1 + c_3 s_2 + dots.c) / x^d. $
-  The sum and the difference of $(d, c)$ and $(d', c')$ have exponent $D = max(d, d')$ and coefficients $c_j x^(D - d) plus.minus c'_j x^(D - d')$; the product of $(d, c)$ with $x$ is $(d - 1, c)$ if $d > 0$ and $(0, x c)$ if $d = 0$; and the quotient of $(d, c)$ by $x$ is $(d + 1, c)$.
-  With these operations the linear forms are an arithmetic of lengths.
-  For an integer $k >= 0$ and real numbers $x != 0$, $W$ and $s_1, dots, s_k$, the _numerator_ and the _value_ of $f$ are
-  $ nu_k (f) := c_0 (x) + c_1 (x) W + sum_(j = 1)^k c_(j + 1) (x) s_j, quad "val"_k (f) := nu_k (f) / x^d. $
-  The _symbolic system_ of a record $rho$ consists of the positivity constraints and of the equations obtained by placing $rho$ on the initial staircase whose floor is the form $W$ and whose wall is the form $1$, the free sides being the forms $s_1, s_2, dots$.
-] <def:forms>
+Let $rho$ be a complete admissible record with $k$ inside placements, and take $H = 1$.
+Every floor and wall that arises along $rho$ is a linear form in $1$, $W$ and the free sides $s_1, dots, s_k$, whose coefficients are polynomials in $x$ divided by a power of $x$, and by @prop:count the record has $k + 1$ equations in the $k + 1$ unknowns $s_1, dots, s_k$ and $W$.
+Clearing the powers of $x$ gives a square matrix $A$ and a vector $c$ over $ZZ[x]$, and by Cramer's rule, at every $x$ at which $D := det A$ does not vanish, the system has exactly one solution, whose width is $N(x) slash D(x)$ for a polynomial $N$; in @ex:plastic, $N slash D = (x^3 + x) slash (2 x^2 + 1)$.
+The proportion must therefore be a root of the _proportion polynomial_
+$ F_rho := b N - a D $
+of the record, and a root $r >= 1$ of $F_rho$ is the proportion of a tiling with the record $rho$ exactly if every positivity constraint is positive at the solution for $x = r$.
+The search isolates the real roots of $F_rho$ in $[1, infinity)$, identifying each by its minimal polynomial, and determines the signs of the positivity constraints at each of them.
+The record is _regular_ if $D$ is not zero, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$; the precise form of this condition is @def:regular.
+At a root of $F_rho$ where $D$ vanishes the system might have further solutions, which the search would not see, so that the search counts the records that are not regular, and its result is _certified_ if there are none.
 
-Evaluating the forms recovers the constraints of @def:system, so that the symbolic system may be used in their place.
+The search exists in two forms, which are defined and proved correct in @app:solving.
+The _direct search_ treats each record on its own, by a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots (@def:reference).
+The _incremental search_, which is the one used for the results of @sec:results, explores the records depth first, as paths in the tree of admissible sequences of placements, and uses each equation as soon as its full placement is made to eliminate one unknown from every floor and wall of the current staircase (@def:explore).
+The work done for a sequence of placements is thus shared by all the records that begin with it, and most of the nodes of the tree are close to its leaves, where staircases have one or two tiers.
+The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot settle in this way to the direct method, which for ten tiles happens to one record in ten thousand.
+Its cost is about $0.6$ microseconds of processor time per record.
 
-#proposition(name: [symbolic system])[
-  Let $rho$ be a record with $k$ inside placements, and let $x != 0$, $W$ and $s = (s_1, s_2, dots)$ be real numbers.
-  Then $(W, 1, s)$ satisfy the constraints of $rho$ at $x$ if and only if $"val"_k (f) > 0$ for every positivity constraint $f$ of the symbolic system of $rho$ and $"val"_k (g) = 0$ for every equation $g$ of it.
-] <prop:forms>
-
-#proof[
-  For $x != 0$ the map $"val"_k$ is a homomorphism from the linear forms to the real numbers: this is a direct verification for each of the four operations, in which numerators are brought to the common power of $x$.
-  It sends the form $W$ to $W$, the form $1$ to $1$, and the form $s_j$ to $s_j$ for $j <= k$.
-  Since placing commutes with homomorphisms, the positivity constraints and the equations of $rho$ on the real initial staircase of $W$ and $1$, with free sides the values of the forms $s_j$, are the values of those of the symbolic system.
-  Only the first $k$ free sides are used, and their values are $s_1, dots, s_k$.
-]
-
-The reference form of the search treats each record separately and uses exact arithmetic throughout.
-Its arithmetic is performed by three routines, which are not part of what is proved here: the statements below hold for any routines that meet the following specifications.
-
-#definition(name: [exact routines])[
-  The _exact routines_ are the following, with their assumed specifications.
-  + _Elimination._ Given a square matrix $A$ over $ZZ[x]$, of size $m$, and a vector $c in ZZ[x]^m$, the routine either fails or returns a polynomial $D$ and polynomials $N_1, dots, N_m$.
-    In the second case there is $lambda in ZZ[x]$ such that $D = lambda det A$ and $N_i = lambda det A_i$ for every $i$, where $A_i$ is the matrix $A$ with its $i$-th column replaced by $c$.
-  + _Roots._ Given a polynomial $q in ZZ[x]$, the routine returns a finite set $"roots"(q)$ of real numbers.
-    If $q != 0$, this is the set of the real numbers $r >= 1$ with $q(r) = 0$.
-  + _Signs._ Given a real number $r$ and a polynomial $q in ZZ[x]$, the routine returns a sign $"sign"(r, q)$, which is $-1$, $0$ or $1$.
-    If $r$ belongs to $"roots"(q')$ for some polynomial $q'$, this is the sign of the real number $q(r)$.
-] <def:primitives>
-
-Nothing is assumed of the elimination when it fails.
-In the implementation, the elimination is the fraction-free elimination of Bareiss @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
-The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
-The sign of $q$ at a root $r$ is zero if and only if the minimal polynomial of $r$ divides $q$, and is otherwise found by evaluating $q$ on an isolating interval for $r$, refined until the value is separated from zero.
-
-#definition(name: [reference method])[
-  Let $a$ and $b$ be integers and let $rho$ be a complete admissible record, with $k$ inside placements.
-  Let $g_1, dots, g_(k + 1)$ be the equations of its symbolic system, as given by @prop:count, and write $g_r = (d_r, c^((r)))$.
-  Let $A$ be the square matrix of size $k + 1$ with entries $A_(r j) := c^((r))_(j + 1)$ for $j <= k$ and $A_(r, k + 1) := c^((r))_1$, and let $c$ be the vector with entries $c_r := -c^((r))_0$, so that the columns of $A$ correspond to the unknowns $s_1, dots, s_k, W$.
-  The _reference method_ treats $rho$ as follows.
-  + It applies the elimination to $A$ and $c$.
-    If the elimination fails, it reports no proportion and counts one _singular situation_.
-  + Otherwise, with $D$ and $N_1, dots, N_(k + 1)$ the polynomials returned, it forms $F_rho := b N_(k + 1) - a D$.
-    If $F_rho = 0$, it reports no proportion and flags the record as _constant_.
-  + Otherwise, if the coefficients of $F_rho (x + 1)$ are all non-negative or all non-positive and its constant coefficient is not zero, it reports no proportion.
-  + Otherwise, for each positivity constraint $f = (d, c')$ of the symbolic system it forms $Q_f := c'_0 D + c'_1 N_(k + 1) + sum_(j = 1)^k c'_(j + 1) N_j$.
-    It reports the numbers $r in "roots"(F_rho)$ for which $"sign"(r, D) != 0$ and $"sign"(r, Q_f) = "sign"(r, D)$ for every $f$, and it counts one singular situation for each $r in "roots"(F_rho)$ with $"sign"(r, D) = 0$.
-  We write $"Ref"_(a, b) (rho)$ for the finite set of numbers reported.
-] <def:reference>
-
-On the solutions of the equations, the unknowns are $N_j slash D$ by Cramer's rule, the width is $N_(k + 1) slash D$, and each positivity constraint has numerator $Q_f slash D$; the proportion must be a root of $F_rho$ for the width to be $a slash b$.
-The third step is justified by the following test.
-
-#proposition(name: [absence of roots])[
-  Let $q in ZZ[x]$ be such that the coefficients of $q(x + 1)$ are all non-negative or all non-positive, and its constant coefficient is not zero.
-  Then $q(r) != 0$ for every real number $r >= 1$.
-] <prop:noroot>
-
-#proof[
-  Let $q(x + 1) = sum_j q_j x^j$, so that $q(r) = q_0 + sum_(j >= 1) q_j (r - 1)^j$ with $r - 1 >= 0$.
-  If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then $q(r) < 0$ likewise.
-]
-
-With routines that meet their specifications, the method reports solutions of the system only, and it reports all of them when it counts no singular situation.
-
-#proposition(name: [reference method on a record])[
-  Let $a$ and $b != 0$ be integers, and let $rho$ be a complete admissible record.
-  + Every $r in "Ref"_(a, b) (rho)$ satisfies $r >= 1$, and there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
-  + If the reference method counts no singular situation for $rho$ and does not flag it as constant, then conversely every real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ belongs to $"Ref"_(a, b) (rho)$.
-] <prop:solve>
-
-#proof[
-  Let $k$ be the number of inside placements of $rho$, and keep the notation of @def:reference.
-  For a real number $r != 0$ and real numbers $W$ and $s_1, dots, s_k$, write $z := (s_1, dots, s_k, W)$.
-  By the definition of $A$ and $c$, the numerator of the equation $g_i$ is $nu_k (g_i) = (A(r) z)_i - c_i (r)$.
-  For $r > 0$ a value has the sign of its numerator, so that, by @prop:forms, $(W, 1, s)$ satisfy the constraints of $rho$ at $r$ if and only if $A(r) z = c(r)$ and $nu_k (f) > 0$ for every positivity constraint $f$ of the symbolic system.
-  Two facts on the matrix $A$ over the ring $ZZ[x]$ are used, both consequences of the identity between a matrix and its adjugate: $A dot.op (det A_1, dots, det A_(k + 1))^top = (det A) c$, and, for every real vector $z$ with $A(r) z = c(r)$, $(det A)(r) z_i = (det A_i)(r)$ for every $i$.
-
-  For the first statement, let $r in "Ref"_(a, b) (rho)$.
-  Then the elimination has succeeded, $F_rho != 0$, and $r in "roots"(F_rho)$, so that $r >= 1$ and $F_rho (r) = 0$, and the signs reported at $r$ are the true signs.
-  In particular $D(r) != 0$.
-  Let $z_i := N_i (r) slash D(r)$, and let $W := z_(k + 1)$ and $s_j := z_j$.
-  Since $D = lambda det A$ and $N_i = lambda det A_i$, the first fact gives $A(r) z = lambda(r) (det A)(r) c(r) slash D(r) = c(r)$.
-  From $F_rho (r) = 0$ and $b != 0$ it follows that $W = N_(k + 1) (r) slash D(r) = a slash b$.
-  For a positivity constraint $f$, the definition of $Q_f$ gives $Q_f (r) = D(r) nu_k (f)$; since $Q_f (r)$ and $D(r)$ have the same sign, which is not zero, $nu_k (f) > 0$.
-  Hence the constraints of $rho$ hold.
-
-  For the second statement, let $r >= 1$ and $s$ be such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$, and let $z := (s_1, dots, s_k, a slash b)$, so that $A(r) z = c(r)$, and $nu_k (f) > 0$ for every positivity constraint $f$.
-  The elimination has succeeded, since otherwise a singular situation is counted.
-  By the second fact, multiplied by $lambda(r)$, $D(r) z_i = N_i (r)$ for every $i$.
-  In particular $F_rho (r) = b N_(k + 1) (r) - a D(r) = D(r) (b dot.op a slash b - a) = 0$.
-  The record is not flagged as constant, so $F_rho != 0$; the test of the third step fails, by @prop:noroot; hence the fourth step is reached and $r in "roots"(F_rho)$.
-  No singular situation is counted, so $"sign"(r, D) != 0$.
-  Finally $Q_f (r) = D(r) nu_k (f)$ with $nu_k (f) > 0$, so $Q_f (r)$ has the sign of $D(r)$, and $r$ is reported.
-]
-
-The proviso of the second statement is what the search verifies.
-
-#definition(name: [regular record])[
-  Let $a$ and $b$ be integers.
-  A complete admissible record is _regular_ for $(a, b)$ if the reference method counts no singular situation for it and does not flag it as constant.
-  For an integer $n >= 0$, the reference search _reports_ the numbers of
-  $ "Ref"_n (a, b) := union.big_rho "Ref"_(a, b) (rho), $
-  where $rho$ ranges over the complete admissible records for $n$ tiles, in which moreover the first tile is wide if $a = b$.
-  The reference search for $n$ tiles is _certified_ if all these records are regular for $(a, b)$.
-] <def:regular>
-
-A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being void when the test of the third step succeeds.
-
-#proposition(name: [correctness of the reference search])[
+#proposition(name: [correctness of the search])[
   Let $a, b >= 1$ and $n >= 0$ be integers.
-  Then $"Ref"_n (a, b) subset.eq P_n (a, b)$.
-  If the reference search for $n$ tiles is certified, then $"Ref"_n (a, b) = P_n (a, b)$.
-] <prop:reference>
+  Every number reported by the direct search or by the incremental search for $n$ tiles and the main rectangle of sides $a$ and $b$ belongs to $P_n (a slash b)$.
+  If the search is certified, the numbers that it reports are exactly the elements of $P_n (a slash b)$.
+] <prop:search>
 
 #proof[
-  Let $r in "Ref"_(a, b) (rho)$ for a complete admissible record $rho$ for $n$ tiles.
-  By @prop:solve, $r >= 1$ and $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ for some $s$, so by @prop:sound there is a similar tiling of $[0, a slash b] times [0, 1]$ of proportion $r$ with $n$ tiles.
-  Hence $r in P_n (a slash b, 1) = P_n (a, b)$, by @prop:scaling.
-  Conversely, let $r in P_n (a, b) = P_n (a slash b, 1)$.
-  If $a != b$, @prop:complete gives a complete admissible record $rho$ for $n$ tiles and $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$; if $a = b$, @prop:square gives the same with the first tile wide in $rho$.
-  If the search is certified, $rho$ is regular, and $r in "Ref"_(a, b) (rho)$ by @prop:solve.
+  For the direct search this is @prop:reference, with the notion of a certified search of @def:regular, and for the incremental search it is @prop:fast, with that of @def:fastcert.
+  Both are proved in @app:solving from @prop:sound, @prop:complete and @prop:square, under the specifications of the arithmetic routines that are stated there.
 ]
 
 By @prop:scaling the set $P_n (a, b)$ is $P_n (a slash b)$.
-The implementation counts the singular situations and the records flagged as constant, and both counts were zero in every computation reported in @sec:results; for the computations made with the search of @sec:optimisations, the counts concern the records that it passes to the reference method, which is what @prop:fast requires.
+The implementation counts the singular situations and the records flagged as constant, and both counts were zero in every computation reported in @sec:results; for the computations made with the incremental search, the counts concern the records that it passes to the direct method, which is what @prop:fast requires.
 We have not proved that the counts are always zero.
 When the search is certified, the set $P_n (a slash b)$ is finite, being the union of the finite sets reported for the finitely many records; this remark is not part of the formal development.
+
+
+Three features of the problem make the incremental search efficient.
+First, records share their beginnings, and the elimination made for a beginning serves every record that continues it.
+Secondly, different records often lead to the same polynomial: for a square and thirteen tiles, $2.8 times 10^11$ records lead to $2.6 times 10^8$ polynomials with a root in $[1, infinity)$, each of which is factorised once.
+Thirdly, when the sign of a positivity constraint at a root cannot be decided numerically, it is almost always because the constraint is exactly zero there: the solution is then a tiling with fewer tiles, one tile of the record having degenerated, as in @fig:pinwheel.
+About one root in a hundred is of this kind, and an exact test of divisibility by the minimal polynomial of the root settles these cases without recourse to the direct method (@def:check).
+
+#figure(
+  image("figures/pinwheel.svg", width: 100%),
+  caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall: the exact solution of the system of its record, with the width of the main rectangle left free, for three values of the proportion. The central tile has height $(x^2 - 1) slash (5 x^2 + 3)$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
+) <fig:pinwheel>
 
 The smallest case in which the search has anything to decide is that of two tiles.
 
@@ -775,526 +692,17 @@ The smallest case in which the search has anything to decide is that of two tile
   caption: [The two placements of the only record that yields a tiling of the square by two tiles, at its proportion $2$.],
 ) <fig:two>
 
-= Optimisations <sec:optimisations>
-
-The reference search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
-The search actually used, the _default search_, shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
-Its cost is about $0.6$ microseconds of processor time per record.
-A record that it cannot settle is passed to the reference method, so that its correctness rests on that of the reference method only for such records.
-
-== Eager elimination <sec:eager>
-
-Records are explored depth first, as paths in the tree of admissible sequences, and the linear forms for floors and walls are maintained along the current path.
-Instead of collecting equations to be solved at the leaves, each equation is used at once to eliminate one unknown from every floor and wall of the current staircase.
-To keep the system homogeneous, the main rectangle is given sides $a t$ and $b t$ for an unknown scale $t$.
-
-#definition(name: [homogeneous system])[
-  Let $R$ be an integral domain and $X$ a unit of $R$; in the method, $R = ZZ[x, x^(-1)]$ and $X = x$.
-  A _form_ over $R$ is a sequence $F = (F_0, F_1, F_2, dots)$ of elements of $R$; it stands for the expression $F_0 t + F_1 s_1 + F_2 s_2 + dots.c$.
-  The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $X$ and by $X^(-1)$.
-  We write $u_j$ for the form whose coefficient of index $j$ is $1$ and whose other coefficients are zero.
-  For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $kappa_1, kappa_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, the free sides being $u_1, u_2, dots$.
-  For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we write likewise $G[v] := sum_(j < N) G_j v_j$.
-] <def:hom>
-
-For a record with $k$ inside placements, values are always taken with $N = k + 1$, so that $v_0$ is the value of the scale and $v_1, dots, v_k$ are the free sides.
-The homogeneous system at scale one is the system of the main rectangle of sides $a$ and $b$, which is that of the main rectangle of sides $a slash b$ and $1$ up to a change of scale.
-
-#proposition(name: [homogeneous system])[
-  Let $rho$ be a record with $k$ inside placements, let $a$ and $b$ be integers, let $chi$ be a homomorphism from $R$ to the real numbers with $alpha := chi(X) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
-  Then $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$ if and only if $kappa_q [v] > 0$ for every positivity constraint and $e_i [v] = 0$ for every equation of the homogeneous system of $rho$.
-  Moreover, if $b >= 1$, then for every real number $alpha > 0$ there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if there is $s'$ such that $(a, b, s')$ satisfy them.
-] <prop:hom>
-
-#proof[
-  The map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers, with proportion $alpha$: it is additive, and $chi(X F_j) = alpha chi(F_j)$ and $chi(X^(-1) F_j) = chi(F_j) slash alpha$.
-  It sends $a u_0$ to $a$, $b u_0$ to $b$, and $u_j$ to $v_j$ for $1 <= j <= k$.
-  The first statement follows as in the proof of @prop:forms, since placing commutes with homomorphisms and only the first $k$ free sides are used.
-  For the second, multiplication by a real number $c > 0$ is a homomorphism of the real numbers to themselves, which preserves the sign of every number.
-  Hence $(W, H, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if $(c W, c H, c s)$ do, and the statement follows with $c = b$.
-]
-
-The pass along a record keeps, besides the staircase, the coefficient by which the last unknown was eliminated, by which the next elimination divides.
-
-#definition(name: [symbolic pass])[
-  A _stage_ is a triple $(S, pi, k)$ of a staircase $S$ over the forms over $R$, a _pivot_ $pi in R$ with $pi != 0$, and an integer $k >= 0$; the _initial stage_ for integers $a$ and $b$ consists of the initial staircase with floor $a u_0$ and wall $b u_0$, the pivot $1$ and $k = 0$.
-  An _elimination_ is a triple $epsilon = (E, m, pi)$ of a form $E$ over $R$, an index $m$ and an element $pi != 0$ of $R$.
-  It _divides_ a form $F$ _exactly_ if $pi$ divides $E_m F_j - F_m E_j$ in $R$ for every $j$, and $epsilon(F)$ then denotes the form with coefficients $(E_m F_j - F_m E_j) slash pi$.
-  Let $rho = (p_1, dots, p_ell)$ be a record with $ell >= 1$.
-  A _successful pass_ along $rho$ is a sequence of stages $Sigma_0, dots, Sigma_(ell - 1)$, where $Sigma_0$ is the initial stage, such that the following holds for every $j <= ell$, with $Sigma_(j - 1) = (S, pi, k)$.
-  The tier of $p_j$ exists in $S$.
-  Let $S^+$ be the staircase obtained by placing $p_j$ on $S$ with free side $pi u_(k + 1)$, and let $k^+$ be $k + 1$ if $p_j$ is inside and $k$ otherwise.
-  The positive quantity $sigma_j$ of $p_j$ on $S$, with that free side, is the _size recorded_ with $p_j$.
-  + If $j = ell$, the placement $p_ell$ has an equation $E$ on $S$, which is the _final equation_ of the pass.
-  + If $j < ell$ and $p_j$ has no equation, then $Sigma_j = (S^+, pi, k^+)$.
-  + If $j < ell$ and $p_j$ has an equation $E$ on $S$, there is an index $m$ with $1 <= m <= k^+$ and $E_m != 0$ such that the elimination $epsilon = (E, m, pi)$ divides exactly every floor and wall of $S^+$, and $Sigma_j = (epsilon(S^+), E_m, k^+)$, where $epsilon(S^+)$ is obtained by applying $epsilon$ to every floor and wall of $S^+$; the elimination $epsilon$ is _recorded_ with $p_j$.
-] <def:elimination>
-
-A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
-A stage therefore represents lengths up to the factor of its pivot.
-The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
-The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
-Nothing is assumed about the first two causes, nor is anything proved about how often the pass fails: the statements below concern successful passes, and a record on which the pass fails is passed to the reference method.
-The third cause never occurs, by @prop:exact.
-
-The forms of a stage are related to those of the homogeneous system, on which no elimination has been made, over any field in which the pivots do not vanish.
-
-#definition(name: [carrying])[
-  Let $psi$ be a homomorphism from $R$ to a field $K$; it is applied to forms coefficient by coefficient.
-  For an elimination $epsilon = (E, m, pi)$ with $psi(pi) != 0$, let $gamma_epsilon$ be the map on the forms over $K$ given by
-  $ gamma_epsilon (G)_j := (psi(E_m) G_j - G_m psi(E_j)) / psi(pi). $
-  An _elimination chain_ over $psi$ consists of eliminations $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, and of forms $e_1, dots, e_r$ over $R$, its _originals_, such that $pi_0 = 1$, $pi_i = (E_i)_(m_i)$ for $i < r$, $psi(pi_(i - 1)) != 0$ for $i <= r$, and
-  $
-    psi(E_i) = Gamma_(i - 1) (psi(e_i)) quad "for" i <= r, quad "where" Gamma_i := gamma_(epsilon_i) compose dots.c compose gamma_(epsilon_1).
-  $
-  Its _current pivot_ is $pi_r := (E_r)_(m_r)$, or $1$ if $r = 0$.
-  A form over $K$ is _carried_ through $epsilon_1, dots, epsilon_r$ by applying $Gamma_r$.
-] <def:chain>
-
-Each $gamma_epsilon$ is linear over $K$, so it commutes with sums, differences and the multiplication by $psi(X)$ and by its inverse: it is a homomorphism of the arithmetic of the forms over $K$ to itself, and so is each $Gamma_i$.
-If $epsilon$ divides $F$ exactly and $psi(pi) != 0$, then $psi(epsilon(F)) = gamma_epsilon (psi(F))$.
-Nothing in the definition of a chain requires the current pivot to have a non-zero image.
-
-#proposition(name: [invariant of the pass])[
-  Let $psi$ be a homomorphism from $R$ to a field $K$, and consider a successful pass along a record $rho = (p_1, dots, p_ell)$, with final equation $E_"fin"$, whose recorded eliminations are, in order, $epsilon_1, dots, epsilon_r$ with $epsilon_i = (E_i, m_i, pi_(i - 1))$.
-  Suppose that $psi((E_i)_(m_i)) != 0$ for every $i <= r$.
-  Then the homogeneous system of $rho$ has $r + 1$ equations $e_1, dots, e_(r + 1)$, and
-  + the eliminations $epsilon_1, dots, epsilon_r$ form an elimination chain over $psi$ with originals $e_1, dots, e_r$, and $psi(pi_r) != 0$;
-  + $psi(E_"fin") = Gamma_r (psi(e_(r + 1)))$;
-  + for every $q <= ell$, the size recorded with $p_q$ satisfies $psi(sigma_q) = Gamma_(r(q)) (psi(kappa_q))$, where $r(q)$ is the number of eliminations recorded with $p_1, dots, p_(q - 1)$.
-] <prop:trace>
-
-#proof[
-  Let $hat(S)_j$ be the staircase obtained by placing $p_1, dots, p_j$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$, so that the $kappa_q$ and the $e_i$ are the positive quantities and the equations of the placements on these staircases.
-  We show by induction on $j < ell$ that the stage $Sigma_j = (S, pi, k)$, reached after $r'$ eliminations, has the following properties: the eliminations $epsilon_1, dots, epsilon_(r')$ form a chain over $psi$ whose originals are the equations of the full placements amongst $p_1, dots, p_j$ and whose current pivot is $pi$, with $psi(pi) != 0$; the staircase $S$ has the tiers of $hat(S)_j$, and $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S$ and the corresponding floor or wall $hat(F)$ of $hat(S)_j$; the number of inside placements amongst $p_1, dots, p_j$ is $k$; and $Gamma_(r') (u_i) = psi(pi) u_i$ for every $i > k$.
-  For $j = 0$ these hold with $r' = 0$, $Gamma_0$ the identity and $pi = 1$.
-
-  Suppose that they hold for $Sigma_(j - 1) = (S, pi, k)$, and consider the placement $p_j$.
-  The maps $F |-> psi(F)$ and $F |-> Gamma_(r') (psi(F))$ are homomorphisms from the forms over $R$ to the forms over $K$.
-  The first sends the staircase $S$ and the free side $pi u_(k + 1)$ to the same staircase and the same form as the second sends $hat(S)_(j - 1)$ and the free side $u_(k + 1)$, by the induction hypothesis, the last property being used for $i = k + 1$.
-  Since placing commutes with homomorphisms, $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S^+$ and the corresponding one of $hat(S)_j$, the size recorded satisfies $psi(sigma_j) = Gamma_(r') (psi(kappa_j))$, and $p_j$ has an equation $E$ on $S$ exactly if it has an equation $e$ on $hat(S)_(j - 1)$, in which case $psi(E) = Gamma_(r') (psi(e))$.
-  This proves the third statement for $q = j$, with $r(j) = r'$, and, when $j = ell$, the second statement and the count of the equations.
-  Let $j < ell$.
-  If $p_j$ has no equation, $Sigma_j = (S^+, pi, k^+)$ and the properties hold for it, with the same chain.
-  If $p_j$ has an equation $E$ and $epsilon = (E, m, pi)$ is the elimination recorded, then $epsilon$ with the original $e$ extends the chain, because $psi(pi) != 0$ and $psi(E) = Gamma_(r') (psi(e))$; the new current pivot is $E_m$, and $psi(E_m) != 0$ by hypothesis.
-  For a floor or wall $F$ of $S^+$, exactness gives $psi(epsilon(F)) = gamma_epsilon (psi(F)) = gamma_epsilon (Gamma_(r') (psi(hat(F))))$, which is the form $psi(hat(F))$ carried through the extended chain.
-  Finally, for $i > k^+$ we have $i != m$, so the coefficient of index $m$ of $u_i$ is zero and $gamma_epsilon (psi(pi) u_i) = psi(E_m) psi(pi) u_i slash psi(pi) = psi(E_m) u_i$.
-  The properties therefore hold for $Sigma_j$, and the first statement is the first property for $j = ell - 1$.
-]
-
-The properties of elimination chains that are used below are the following; they do not depend on the chain arising from a pass.
-
-#proposition(name: [elimination chains])[
-  Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$, let $G$ be a form over $K$, let $N >= 1$ and let $v in K^N$.
-  + There are $c_1, dots, c_r in K$ such that $Gamma_r (G) = psi(pi_r) G + sum_(l <= r) c_l psi(e_l)$.
-  + For every $i <= r$ there are $c_1, dots, c_(i - 1) in K$ such that $psi(E_i) = psi(pi_(i - 1)) psi(e_i) + sum_(l < i) c_l psi(e_l)$.
-  + $Gamma_r (G)_(m_i) = 0$ for every $i <= r$, and $psi((E_i)_(m_l)) = 0$ for all $l < i <= r$.
-  + If $psi(e_l)[v] = 0$ for every $l <= r$, then $Gamma_r (G)[v] = psi(pi_r) G[v]$.
-  + $psi(e_l)[v] = 0$ for every $l <= r$ if and only if $psi(E_l)[v] = 0$ for every $l <= r$.
-  + If $psi((E_i)_(m_i)) != 0$ for every $i <= r$, the indices $m_1, dots, m_r$ are pairwise distinct.
-] <prop:chain>
-
-#proof[
-  All statements but the last are proved by induction on $r$, and are clear for $r = 0$, where $Gamma_0$ is the identity and $pi_0 = 1$.
-  Let $r >= 1$, write $epsilon_r = (E, m, pi)$ with $pi = pi_(r - 1)$, and let $G' := Gamma_(r - 1) (G)$, so that
-  $ Gamma_r (G) = (psi(E_m) G' - G'_m psi(E)) / psi(pi), quad psi(E) = Gamma_(r - 1) (psi(e_r)). $
-  For the first statement, the induction hypothesis gives $G' = psi(pi) G + sum_(l < r) c'_l psi(e_l)$ and $psi(E) = psi(pi) psi(e_r) + sum_(l < r) d_l psi(e_l)$, the latter being also the second statement for $i = r$; for $i < r$ the second statement is that of the chain $epsilon_1, dots, epsilon_(r - 1)$.
-  Substituting,
-  $ Gamma_r (G) = psi(E_m) G - G'_m psi(e_r) + sum_(l < r) (psi(E_m) c'_l - G'_m d_l) / psi(pi) thin psi(e_l), $
-  which is of the form stated, since $pi_r = E_m$.
-  For the third, the coefficient of index $m$ of $Gamma_r (G)$ is $(psi(E_m) G'_m - G'_m psi(E_m)) slash psi(pi) = 0$; and for $i < r$ the coefficients of index $m_i$ of $G'$ and of $psi(E) = Gamma_(r - 1) (psi(e_r))$ are zero by induction, hence so is that of $Gamma_r (G)$, and $psi((E_r)_(m_i)) = 0$.
-  For the fourth, suppose that $psi(e_l)[v] = 0$ for every $l <= r$.
-  By induction $G'[v] = psi(pi) G[v]$ and $psi(E)[v] = psi(pi) psi(e_r)[v] = 0$, so that $Gamma_r (G)[v] = psi(E_m) G'[v] slash psi(pi) = psi(E_m) G[v]$.
-  For the fifth, both conditions include, by induction, that $psi(e_l)[v] = 0$ for every $l < r$; under this condition the fourth statement for the chain $epsilon_1, dots, epsilon_(r - 1)$ gives $psi(E)[v] = psi(pi) psi(e_r)[v]$, and $psi(pi) != 0$.
-  For the last, if $m_l = m_i$ with $l < i$, the third statement gives $psi((E_i)_(m_i)) = psi((E_i)_(m_l)) = 0$.
-]
-
-The first two statements say that the recorded equations are obtained from the originals by a lower triangular matrix, and the third that they are upper triangular in the eliminated unknowns.
-Comparing determinants identifies the pivots, as in the elimination of Bareiss @bareiss1968.
-
-#proposition(name: [pivots as minors])[
-  Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$.
-  Then $psi(pi_r)$ is the determinant of the square matrix of size $r$ with entries $psi((e_i)_(m_l))$, for $1 <= i, l <= r$.
-  If moreover $m_1, dots, m_r$ are pairwise distinct and smaller than $r$, then
-  $ psi(pi_r) = plus.minus det (psi((e_i)_j))_(1 <= i <= r, thin 0 <= j < r). $
-] <prop:minor>
-
-#proof[
-  Let $A$ and $B$ be the square matrices of size $r$ with entries $A_(i l) := psi((e_i)_(m_l))$ and $B_(i l) := psi((E_i)_(m_l))$.
-  By the second statement of @prop:chain, $B = T A$ for a lower triangular matrix $T$ with diagonal entries $psi(pi_0), dots, psi(pi_(r - 1))$.
-  By the third, $B$ is upper triangular, and its diagonal entries are $psi((E_i)_(m_i)) = psi(pi_i)$ for $i = 1, dots, r$.
-  Taking determinants,
-  $ psi(pi_1) dots.c psi(pi_r) = psi(pi_0) dots.c psi(pi_(r - 1)) det A. $
-  Since $pi_0 = 1$, both sides contain the factor $psi(pi_0) dots.c psi(pi_(r - 1))$, which is not zero by the definition of a chain, and $psi(pi_r) = det A$.
-  Under the additional hypothesis, $l |-> m_l$ is a bijection from ${1, dots, r}$ onto ${0, dots, r - 1}$, and $A$ is the matrix $(psi((e_i)_j))$ with its columns permuted accordingly, so that the two determinants differ by the sign of a permutation.
-]
-
-On a complete record every unknown but the scale is eliminated, and the scale coefficient of the final equation plays the part of one more pivot.
-It is the polynomial whose roots are the candidate proportions.
-
-#proposition(name: [the final coefficient is the determinant])[
-  Let $rho$ be a complete admissible record with $k$ inside placements, and consider a successful pass along $rho$, from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$.
-  Let $e_1, dots, e_(k + 1)$ be the equations of the homogeneous system of $rho$, and let $M$ be the square matrix of size $k + 1$ over $R$ with entries $(e_i)_j$, for $1 <= i <= k + 1$ and $0 <= j <= k$.
-  Then the pass records $k$ eliminations, and
-  $ (E_"fin")_0 = plus.minus det M. $
-  Consequently, if $chi$ is a homomorphism from $R$ to the real numbers and $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i$, then $chi((E_"fin")_0) = 0$.
-] <prop:det>
-
-#proof[
-  Let $psi$ be the inclusion of $R$ in its field of fractions.
-  The pivots $(E_i)_(m_i)$ of the recorded eliminations are not zero, by the definition of a pass, so @prop:trace applies.
-  The homogeneous system has $k + 1$ equations by @prop:count, the rules being independent of the arithmetic of lengths; hence the recorded eliminations are $k$ in number, they form a chain with originals $e_1, dots, e_k$ and current pivot $pi_k != 0$, and $psi(E_"fin") = Gamma_k (psi(e_(k + 1)))$.
-  The triple $(E_"fin", 0, pi_k)$, with the original $e_(k + 1)$, therefore extends the chain to one of length $k + 1$ with current pivot $(E_"fin")_0$.
-  The indices $m_1, dots, m_k$ lie between $1$ and $k$, by the definition of a pass, and are pairwise distinct, by the last statement of @prop:chain; with the index $0$ they are $k + 1$ distinct indices smaller than $k + 1$.
-  By @prop:minor, $psi((E_"fin")_0) = plus.minus det psi(M)$, and $psi$ is injective.
-  For the consequence, the real matrix $chi(M)$ sends the vector $w != 0$ to zero, so that $chi(det M) = det chi(M) = 0$.
-]
-
-The consequence holds whether or not a pivot vanishes at the point considered: every solution of the system is amongst the roots of the final coefficient.
-The same argument, with a floor or a wall appended as one more equation, shows that the divisions of the pass are exact.
-
-#proposition(name: [exactness of the divisions])[
-  Let $(S, pi, k)$ be a stage obtained from the initial stage for integers $a$ and $b$ by finitely many steps, each of which leads from a stage to the stage that the second or the third clause of @def:elimination defines for some placement at one of its tiers.
-  Let $p$ be a placement at a tier of $S$ that has an equation $E$ on $S$, and let $S^+$ be the staircase obtained by placing $p$ on $S$ with free side $pi u_(k + 1)$.
-  Then, for every index $m$ with $E_m != 0$, the elimination $(E, m, pi)$ divides exactly every floor and wall of $S^+$.
-] <prop:exact>
-
-#proof[
-  Let $psi$ be the inclusion of $R$ in its field of fractions $K$.
-  The stage has the properties established in the proof of @prop:trace, whose induction applies to the steps considered here, the pivots being non-zero elements of $R$ and $psi$ being injective: there is a chain $epsilon_1, dots, epsilon_r$ over $psi$, with originals $e_1, dots, e_r$ and current pivot $pi$, such that $psi(E) = Gamma_r (psi(e))$ and $psi(F) = Gamma_r (psi(hat(F)))$ for every floor or wall $F$ of $S^+$, where $e$ and $hat(F)$ are forms over $R$.
-  Let $epsilon := (E, m, pi)$, which extends the chain, with the original $e$, to one with current pivot $E_m != 0$, and let $G := gamma_epsilon (psi(F))$, so that
-  $ G_j = psi(E_m F_j - F_m E_j) / psi(pi) quad "and" quad G = Gamma_(r + 1) (psi(hat(F))). $
-  Fix an index $j$.
-  The images under $psi$ of the forms $E_1, dots, E_r, E$ and of the originals form an elimination chain over the identity of $K$, and the triple $(G, j, psi(E_m))$, with the original $psi(hat(F))$, extends it to a chain of length $r + 2$ with current pivot $G_j$.
-  By the first statement of @prop:minor, $G_j$ is the determinant of a matrix whose entries are images under $psi$ of coefficients of $e_1, dots, e_r$, $e$ and $hat(F)$, hence $G_j = psi(Delta)$ for some $Delta in R$.
-  Then $psi(E_m F_j - F_m E_j) = psi(pi Delta)$, and $pi$ divides $E_m F_j - F_m E_j$ because $psi$ is injective.
-]
-
-The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the reference method.
-
-#proposition(name: [the two proportion polynomials])[
-  Let $rho$ be a complete admissible record with $k$ inside placements, let $a$ and $b$ be integers, and consider a successful pass along $rho$ over $R = ZZ[x, x^(-1)]$, from the initial stage for $a$ and $b$, with final equation $E_"fin"$.
-  Suppose that the elimination of the reference method succeeds on $rho$, with the notation of @def:reference.
-  Then there are $lambda in ZZ[x]$ and an integer $e$ such that $D = lambda det A$ and
-  $ lambda (E_"fin")_0 = plus.minus x^e F_rho. $
-] <prop:target>
-
-#proof[
-  Let $lambda$ be given by the specification of the elimination, so that $D = lambda det A$ and $N_(k + 1) = lambda det A_(k + 1)$.
-  To a linear form $f = (d, c)$ of @def:forms assign the form $tau(f)$ over $R$ with coefficients
-  $ tau(f)_0 := x^(-d) (a c_1 + b c_0), quad tau(f)_j := x^(-d) c_(j + 1) quad "for" j >= 1, $
-  which expresses the substitution of $a t$ for $W$ and of $b t$ for $1$.
-  A direct verification on the four operations shows that $tau$ is a homomorphism, and it sends the forms $W$, $1$ and $s_j$ to $a u_0$, $b u_0$ and $u_j$.
-  Since placing commutes with homomorphisms, the equations of the homogeneous system are $e_i = tau(g_i)$.
-  Hence the matrix $M$ of @prop:det has the entries $M_(i 0) = x^(-d_i) (a A_(i, k + 1) - b c_i)$ and $M_(i j) = x^(-d_i) A_(i j)$ for $1 <= j <= k$: it is obtained from $A$ by replacing the last column by $a$ times itself minus $b$ times the vector $c$, moving that column to the first place, and multiplying the $i$-th row by $x^(-d_i)$.
-  The determinant being linear in the last column,
-  $ det M = plus.minus x^e (a det A - b det A_(k + 1)), quad e := -sum_i d_i, $
-  and multiplying by $lambda$ gives $lambda det M = plus.minus x^e (a D - b N_(k + 1)) = minus.plus x^e F_rho$.
-  The statement follows from @prop:det.
-]
-
-For the elimination of Bareiss, $lambda = plus.minus 1$, and the two polynomials have the same roots in $[1, infinity)$; in general the statement shows that every root of the final coefficient in $[1, infinity)$ is a root of $F_rho$, and that every root of $F_rho$ at which $lambda$ does not vanish is a root of the final coefficient.
-The correctness of the default search does not depend on this comparison, which is recorded for its own sake.
-
-The cost of an elimination is proportional to the square of the number of tiers, and most nodes of the search tree are close to the leaves, where staircases have one or two tiers.
-In the implementation, when one tile remains to be placed, on a single tier that is not stale and whose floor and wall are non-zero multiples $c_L t$ and $c_M t$ of the scale, and no forced placement is pending, the final equations $c_L - x c_M$ and $c_M - x c_L$ of the two orientations of the last tile are formed directly, without a separate placement.
-
-Away from the zeros of the pivots, the recorded eliminations determine the solution of the system.
-
-#proposition(name: [back-substitution])[
-  Let $rho$ be a complete admissible record with $k$ inside placements and $n$ placements in all, and consider a successful pass along $rho$, with recorded eliminations $epsilon_1, dots, epsilon_k$, where $epsilon_i = (E_i, m_i, pi_(i - 1))$, final equation $E_"fin"$ and recorded sizes $sigma_1, dots, sigma_n$.
-  Let $chi$ be a homomorphism from $R$ to the real numbers such that $chi((E_i)_(m_i)) != 0$ for every $i$.
-  Let $v in RR^(k + 1)$ be obtained from $(1, 0, dots, 0)$ by replacing, for $i = k, k - 1, dots, 1$ in turn, the coordinate $v_(m_i)$ by
-  $ -1 / chi((E_i)_(m_i)) sum_(j <= k, thin j != m_i) chi((E_i)_j) v_j. $
-  + $v_0 = 1$.
-  + If $chi((E_"fin")_j) = 0$ for every $j >= 1$, then $e_i [v] = 0$ for every $i <= k + 1$ if and only if $chi((E_"fin")_0) = 0$.
-  + If $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i <= k + 1$, then $w = v$.
-  + There is $pi in R$ with $chi(pi) != 0$ such that, for every $q <= n$, the form $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements, in order, has the value $chi(pi) kappa_q [v]$ at $v$.
-] <prop:back>
-
-#proof[
-  By @prop:trace with $psi = chi$, and by the count of @prop:det, the eliminations form a chain over $chi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $chi(pi) != 0$, and $chi(E_"fin") = Gamma_k (chi(e_(k + 1)))$.
-  By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
-  In particular no replacement changes $v_0$, which proves the first statement.
-
-  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ comes to hold; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
-  Hence $chi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
-  The fourth statement of @prop:chain then gives $chi(E_"fin")[v] = Gamma_k (chi(e_(k + 1)))[v] = chi(pi) e_(k + 1) [v]$.
-  Under the hypothesis of the second statement, $chi(E_"fin")[v] = chi((E_"fin")_0) v_0 = chi((E_"fin")_0)$, and the statement follows because $chi(pi) != 0$.
-
-  For the third statement, $chi(E_i)[w] = 0$ for every $i <= k$, by the fifth statement of @prop:chain.
-  We show that $w_(m_i) = v_(m_i)$ by descending induction on $i$.
-  In the equation $chi(E_i)[w] = 0$ the coefficients of the unknowns of index $m_l$ with $l < i$ are zero; the other unknowns are that of index $0$, with $w_0 = v_0$, those of index $m_l$ with $l > i$, with $w_(m_l) = v_(m_l)$ by induction, and that of index $m_i$, whose coefficient is not zero.
-  Hence $w_(m_i)$ is given by the same expression as $v_(m_i)$, whose value was computed from coordinates that did not change afterwards.
-
-  For the fourth, $chi(sigma_q) = Gamma_(r(q)) (chi(kappa_q))$ by @prop:trace, so that carrying it through the eliminations $epsilon_(r(q) + 1), dots, epsilon_k$ gives $Gamma_k (chi(kappa_q))$, whose value at $v$ is $chi(pi) kappa_q [v]$ by the fourth statement of @prop:chain.
-]
-
-== Candidate roots <sec:candidates>
-
-At the end of a successful pass along a complete record, the method examines the final equation.
-If its scale coefficient $c := (E_"fin")_0$ is not zero and its other coefficients are zero, the candidates for the proportion are the roots of $c$ in $[1, infinity)$, by @prop:det.
-The Laurent polynomial $c$ is normalised to a polynomial $"key"(c) in ZZ[x]$, which differs from it by a sign and a power of $x$.
-A polynomial whose expansion in powers of $x - 1$ has non-negative coefficients and positive constant term has no root in $[1, infinity)$, by @prop:noroot, and is discarded.
-The roots of the others are obtained from a table shared by all threads, indexed by the coefficients, so that each polynomial is factorised once; this is the routine of @def:primitives that the reference method uses.
-Different records often lead to the same polynomial: for a square and thirteen tiles, $2.8 times 10^11$ records lead to $2.6 times 10^8$ polynomials with a root in $[1, infinity)$.
-
-== Numerical verification <sec:numeric>
-
-Let $r$ be a candidate root, known through an enclosing interval of floating-point numbers of relative width about $10^(-15)$.
-The tile sizes at $r$ are computed in interval arithmetic with outward rounding: the eliminations along the path are undone in reverse order, each giving the eliminated unknown as a quotient of interval values, and the placements are then replayed on intervals.
-As for the exact routines, the interval arithmetic is not part of what is proved, and enters through its specifications.
-
-#definition(name: [numerical routines])[
-  The _numerical routines_ operate on a set of _intervals_, each of which _encloses_ certain real numbers, and are the following, with their assumed specifications.
-  + _Arithmetic._ Every integer $z$ has an interval $[z]$ that encloses it.
-    There are a sum, a difference, a product and a negation of intervals; if $I$ encloses $alpha$ and $J$ encloses $beta$, then $I + J$, $I - J$, $I J$ and $-I$ enclose $alpha + beta$, $alpha - beta$, $alpha beta$ and $-alpha$.
-    There is a quotient of intervals; if $I$ encloses $alpha$, $J$ encloses $beta$ and $J$ is certainly away from zero, then $I slash J$ encloses $alpha slash beta$.
-  + _Decisions._ An interval may be found _certainly away from zero_, _certainly not positive_ or _certainly positive_; every number that it encloses is then different from zero, not positive, or positive, respectively.
-  + _Enclosure of polynomials._ Given $c in ZZ[x, x^(-1)]$ and an interval $I$, the routine either fails or returns an interval $c(I)$.
-    In the second case, if $I$ is certainly away from zero, then $c(I)$ encloses $c(alpha)$ for every $alpha > 0$ that $I$ encloses.
-  + _Roots._ Every real number $r$ has a stored interval $I_r$.
-    If $r >= 1$ and $q(r) = 0$ for some non-zero $q in ZZ[x]$, then $I_r$ encloses $r$ and is certainly away from zero.
-  + _Minimal polynomials._ A real number $r$ may have a stored polynomial $mu_r in ZZ[x]$, and then $mu_r (r) = 0$.
-    There is a test of divisibility for pairs of polynomials of $ZZ[x]$; if it succeeds for $(f, q)$, then $f$ divides $q$ in $ZZ[x]$.
-  + _Coefficients._ For every $c in ZZ[x, x^(-1)]$ there are polynomials $"key"(c)$ and $"coeffs"(c)$ in $ZZ[x]$ and integers $e$ and $e'$ such that $"key"(c) = plus.minus x^e c$ and $"coeffs"(c) = x^(e') c$.
-] <def:numerics>
-
-Nothing is assumed of a test of divisibility that does not succeed, nor is the stored polynomial assumed to be irreducible.
-The intervals form an arithmetic of lengths for a given interval $I$ of the proportion, the product and the quotient by $x$ being the product and the quotient by $I$.
-
-#definition(name: [numerical check])[
-  Let $rho$ be a complete admissible record with $k$ inside placements and $n$ placements, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for $a$ and $b$, with recorded eliminations $epsilon_1, dots, epsilon_k$, where $epsilon_i = (E_i, m_i, pi_(i - 1))$, and recorded sizes $sigma_1, dots, sigma_n$; and let $r$ be a real number, with stored interval $I := I_r$.
-  The _numerical check_ of $r$ returns a verdict, which is _accept_, _reject_ or _unsure_, as follows.
-  + _Back-substitution._ Let $V_0 := [1]$ and $V_j := [0]$ for $1 <= j <= k$.
-    For $i = k, k - 1, dots, 1$ in turn, the enclosures $(E_i)_j (I)$ are computed for $j = m_i$ and for the indices $j <= k$ other than $m_i$ with $(E_i)_j != 0$; then $V_(m_i)$ is replaced by the quotient by $(E_i)_(m_i) (I)$ of the negation of the sum of the products $(E_i)_j (I) V_j$ over the latter indices, the sum starting from $[0]$.
-    If an enclosure fails, or if some $(E_i)_(m_i) (I)$ is not certainly away from zero, the verdict is unsure.
-  + _Replay._ The record $rho$ is placed on the initial staircase of intervals with floor $[a]$ and wall $[b]$, with free sides $V_1, dots, V_k$ and with $I$ as the interval of the proportion; let $P_1, dots, P_n$ be the positive quantities of its placements.
-  + _Decision._ If some $P_q$ is certainly not positive, the verdict is reject.
-    Otherwise, if every $P_q$ is certainly positive, the verdict is accept.
-    Otherwise the placements $q$ for which $P_q$ is not certainly positive are examined in order, as follows, and the verdict is reject if one of them yields a _certificate_ and unsure if the examination ends without one.
-    The elimination recorded with $p_q$, if any, and those recorded with the later placements are applied in order to $sigma_q$; if one of them does not divide exactly, the examination ends.
-    Let $F$ be the resulting form.
-    If $F_j != 0$ for some $j >= 1$, the examination ends.
-    If $F_0 = 0$, there is a certificate.
-    Otherwise, if $r$ has no stored polynomial, the examination ends; if the test of divisibility succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
-] <def:check>
-
-An accepted root is a solution, and a rejected one is not, whichever way the rejection came about.
-
-#proposition(name: [verdicts of the numerical check])[
-  Let $rho$ be a complete admissible record, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$, and let $alpha > 0$ be a real number whose stored interval encloses $alpha$ and is certainly away from zero.
-  + If $(E_"fin")_j = 0$ for every $j >= 1$, if $(E_"fin")_0 (alpha) = 0$, and if the verdict of the numerical check of $alpha$ is accept, then there is $s$ such that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$.
-  + If the verdict is reject, there is no $s$ such that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$.
-] <prop:numeric>
-
-#proof[
-  Let $chi$ be the evaluation of Laurent polynomials at $alpha$.
-  In both cases the verdict is not unsure, so the back-substitution on intervals has succeeded.
-  For each $i$, the interval $(E_i)_(m_i) (I)$ encloses $chi((E_i)_(m_i))$ and is certainly away from zero, so that $chi((E_i)_(m_i)) != 0$, and @prop:back applies; let $v$ be the vector defined there.
-  The interval $V_j$ encloses $v_j$ at every moment of the two back-substitutions, carried out side by side: this holds at the start, and each replacement preserves it by the specifications of the arithmetic and of the enclosures, the terms omitted from the sum of intervals being those whose coefficient is zero.
-
-  The pairs $(xi, J)$ of a real number and an interval that encloses it form an arithmetic of lengths, with the operations of the real numbers for the proportion $alpha$ on the first component and those of the intervals for the interval $I$ on the second; the specifications say that these operations lead from pairs to pairs, the quotient by $I$ being allowed because $I$ is certainly away from zero.
-  The two projections are homomorphisms.
-  Placing $rho$ on the initial staircase with floor $(a, [a])$ and wall $(b, [b])$, with free sides $(v_j, V_j)$, therefore shows that each $P_q$ encloses the corresponding positivity constraint of $rho$ for $(a, b, (v_1, dots, v_k))$ at $alpha$, which is $kappa_q [v]$ by the proof of @prop:hom.
-
-  For the first statement, the second statement of @prop:back shows that $e_i [v] = 0$ for every $i$, and $kappa_q [v] > 0$ for every $q$ because every $P_q$ is certainly positive.
-  By @prop:hom, $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$.
-
-  For the second statement, suppose that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$, and let $w := (1, s_1, dots, s_k)$.
-  By @prop:hom, $e_i [w] = 0$ for every $i$ and $kappa_q [w] > 0$ for every $q$, and $w = v$ by the third statement of @prop:back.
-  Hence $kappa_q [v] > 0$ for every $q$, and no $P_q$ is certainly not positive.
-  The verdict being reject, there is a certificate for some placement $p_q$: a form $F$ over $ZZ[x, x^(-1)]$, obtained from $sigma_q$ by exact eliminations, with $F_j = 0$ for $j >= 1$, and such that $F_0 = 0$ or $mu_alpha$ divides $"coeffs"(F_0)$.
-  In the second case $"coeffs"(F_0)$ vanishes at $alpha$, because $mu_alpha$ does, and it equals $F_0$ multiplied by a power of $x$, with $alpha != 0$; so $F_0 (alpha) = 0$ in both cases.
-  The previous pivots of the eliminations are $1$ and the pivots $(E_i)_(m_i)$, whose values at $alpha$ are not zero, so each exact elimination agrees with the corresponding map $gamma$ after evaluation, and $chi(F)$ is $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements.
-  By the fourth statement of @prop:back, $chi(F)[v] = chi(pi) kappa_q [v]$ with $chi(pi) != 0$, while $chi(F)[v] = F_0 (alpha) v_0 = 0$.
-  Hence $kappa_q [v] = 0$, a contradiction.
-]
-
-The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles, whose central tile degenerates to a point.
-Such cases are about one in a hundred, and the certificate settles them without recourse to the reference method.
-The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful test of divisibility is correct.
-When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which plays no part in the correctness of the search.
-@fig:pinwheel shows the simplest instance.
-
-#figure(
-  image("figures/pinwheel.svg", width: 100%),
-  caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall: the exact solution of the system of its record, with the width of the main rectangle left free, for three values of the proportion. The central tile has height $(x^2 - 1) slash (5 x^2 + 3)$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
-) <fig:pinwheel>
-
-#proposition(name: [degenerate tiles])[
-  Let $f in ZZ[x]$ be primitive and irreducible over $QQ$, and let $r$ be a real number with $f(r) = 0$.
-  Then, for every $q in ZZ[x]$, the polynomial $f$ divides $q$ in $ZZ[x]$ if and only if $q(r) = 0$.
-] <prop:degenerate>
-
-#proof[
-  If $f$ divides $q$ then $q(r) = 0$.
-  Conversely, suppose that $q(r) = 0$, and let $mu$ be the minimal polynomial of $r$ over $QQ$, which divides $f$ and $q$ in $QQ[x]$ and is not constant.
-  Since $f$ is irreducible, $f$ is the product of $mu$ and a non-zero rational number, and so divides $q$ in $QQ[x]$.
-  Since $f$ is primitive, it then divides $q$ in $ZZ[x]$, by Gauss's lemma.
-]
-
-With the notation of @def:check, when the form $F$ is obtained and involves the scale only, the positive quantity of $p_q$ is zero in the solution $v$ of @prop:back at the root $r$ exactly if $F_0 (r) = 0$, by the fourth statement of that proposition, hence exactly if the minimal polynomial of $r$ divides $"coeffs"(F_0)$.
-The formal development does not prove that the exact eliminations applied to $sigma_q$ always divide exactly, nor that the resulting form involves the scale only; in either event the check returns the verdict unsure.
-
-#definition(name: [default method])[
-  Let $a$ and $b$ be integers.
-  The _default method_ treats a complete admissible record $rho$ as follows.
-  + It carries out the symbolic pass along $rho$ over $ZZ[x, x^(-1)]$, from the initial stage for $a$ and $b$.
-    If the pass fails, $rho$ is _passed to the reference method_.
-  + Otherwise, with $E_"fin"$ the final equation, if $(E_"fin")_0 = 0$ or $(E_"fin")_j != 0$ for some $j >= 1$, the record is passed to the reference method.
-  + Otherwise let $q := "key"((E_"fin")_0)$.
-    If the coefficients of $q(x + 1)$ are non-negative and its constant coefficient is positive, the method reports no proportion.
-  + Otherwise it makes the numerical check of every $r in "roots"(q)$.
-    If some verdict is unsure, the record is passed to the reference method; otherwise the method reports the numbers $r$ whose verdict is accept.
-  For a record passed to the reference method, the default method reports the set $"Ref"_(a, b) (rho)$.
-  We write $"Fast"_(a, b) (rho)$ for the finite set of numbers reported.
-] <def:fastsolve>
-
-For ten tiles, one record in ten thousand is passed to the reference method.
-Whenever the default method settles a record itself, it reports exactly the solutions of its system, with no proviso.
-
-#proposition(name: [default method on a record])[
-  Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
-  Call _solution_ of $rho$ a real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
-  + If $rho$ is not passed to the reference method, $"Fast"_(a, b) (rho)$ is the set of the solutions of $rho$.
-  + Every element of $"Fast"_(a, b) (rho)$ is a solution of $rho$.
-  + If $rho$ is not passed to the reference method, or if it is regular for $(a, b)$, every solution of $rho$ belongs to $"Fast"_(a, b) (rho)$.
-  + $"Ref"_(a, b) (rho) subset.eq "Fast"_(a, b) (rho)$, with equality if $rho$ is regular for $(a, b)$.
-] <prop:fastsolve>
-
-#proof[
-  Suppose that $rho$ is not passed to the reference method.
-  Then the pass is successful, $c := (E_"fin")_0$ is not zero, the other coefficients of $E_"fin"$ are zero, and $q = "key"(c)$ is a non-zero polynomial with the same zeros as $c$ amongst the non-zero real numbers.
-  Let $r$ be a solution of $rho$.
-  By @prop:hom there is $w in RR^(k + 1)$ with $w_0 = 1$ at which the homogeneous system holds for the evaluation at $r$, so $c(r) = 0$ by @prop:det, and $r in "roots"(q)$.
-  In particular the third step does not apply if $rho$ has a solution, by @prop:noroot, so that the first statement holds when it applies.
-  Suppose that the fourth step applies, and let $r in "roots"(q)$, so that $r >= 1$, $c(r) = 0$, and the stored interval of $r$ encloses $r$ and is certainly away from zero.
-  If the verdict for $r$ is accept, $r$ is a solution by @prop:numeric and @prop:hom.
-  If $r$ is a solution, its verdict is not unsure, since $rho$ is not passed to the reference method, and it is not reject, by @prop:numeric and @prop:hom; so it is accept.
-  This proves the first statement.
-
-  The other statements follow from the first and from @prop:solve.
-  If $rho$ is passed to the reference method, $"Fast"_(a, b) (rho) = "Ref"_(a, b) (rho)$ consists of solutions, and contains every solution if $rho$ is regular.
-  If it is not, $"Fast"_(a, b) (rho)$ is the set of all solutions, which contains $"Ref"_(a, b) (rho)$, and equals it if $rho$ is regular.
-]
-
-== The search <sec:tree>
-
-It remains to relate the depth-first search, which never forms the list of the records, to the treatment of the records one at a time.
-The search is split into tasks by the first few placements, and a failure of the symbolic pass hands a whole subtree to the reference method.
-
-#definition(name: [enumeration])[
-  Fix a truth value, _square_.
-  For a bare staircase $S$, an integer $r >= 0$ and a truth value _first_, let $"moves"(S, r, "first")$ be the set of the placements that are admissible at $S$ with $r$ tiles remaining, the tall ones being excluded when both _square_ and _first_ hold.
-  The set $cal(C)(r, "first", S)$ of the _completions_ of $S$ consists of the empty record alone if $S$ is empty; it is empty if $S$ is not empty and $r = 0$; and otherwise it consists of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(C)(r - 1, "false", S')$, where $S'$ is the staircase after $p$.
-  For an integer $d >= 0$, the set $cal(P)_d (r, "first", S)$ of the _prefixes_ consists of the empty record alone if $d = 0$ or $S$ is empty, and otherwise of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(P)_(d - 1) (r - 1, "false", S')$.
-] <def:enumeration>
-
-The completions are the records of @def:admissible, and the prefixes cut them at a given depth.
-
-#proposition(name: [enumeration])[
-  + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide in case both _square_ and _first_ hold.
-    In particular, for the bare initial staircase $S_0$, the set $cal(C)(n, "true", S_0)$ consists of the complete admissible records for $n$ tiles, with the first tile wide if _square_ holds.
-  + For every $d >= 0$, a record belongs to $cal(C)(r, "first", S)$ if and only if it consists of a record $rho_1 in cal(P)_d (r, "first", S)$ followed by a record of $cal(C)(r - ell_1, "first"_1, S_1)$, where $ell_1$ is the length of $rho_1$, $S_1$ is the staircase after $rho_1$, and $"first"_1$ holds exactly if _first_ holds and $rho_1$ is empty.
-] <prop:enumeration>
-
-#proof[
-  The first statement is proved by induction on $r$.
-  If $S$ is empty, the only completion is the empty record, and it is the only record that satisfies the condition, no placement being admissible at the empty staircase.
-  If $S$ is not empty and $r = 0$, there is no completion, and no record satisfies the condition: the empty one does not leave an empty staircase, and no placement is admissible with no tile remaining.
-  If $S$ is not empty and $r >= 1$, a record satisfies the condition exactly if it is not empty, its first placement belongs to $"moves"(S, r, "first")$, and the rest satisfies the condition for $r - 1$, the staircase $S'$ and _first_ false, that is, belongs to $cal(C)(r - 1, "false", S')$ by induction.
-
-  The second statement is proved by induction on $d$.
-  For $d = 0$, and when $S$ is empty, the only prefix is the empty record and the statement is trivial.
-  Let $d >= 1$ and $S$ not empty.
-  If $r = 0$ there are neither completions nor prefixes.
-  If $r >= 1$, a completion is a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(C)(r - 1, "false", S')$, which by induction is a record $rho'_1 in cal(P)_(d - 1) (r - 1, "false", S')$ followed by a completion of the staircase after it, with $r - 1$ diminished by the length of $rho'_1$ and with _first_ false; and the records formed by $p$ followed by such $rho'_1$ are the prefixes in $cal(P)_d (r, "first", S)$.
-]
-
-#definition(name: [default search])[
-  Let $a$ and $b$ be integers, and let _square_ hold exactly if $a = b$.
-  Let $Sigma = (S, pi, k)$ be a stage whose staircase is not empty, reached by the symbolic pass along a record $delta$, and let $r >= 0$.
-  The search _below_ $Sigma$ with $r$ tiles remaining considers every placement $p$ in $"moves"(overline(S), r, "first")$, where $overline(S)$ is the bare staircase underlying $S$ and _first_ holds exactly if $delta$ is empty, and treats it as the symbolic pass does.
-  + If the pass fails at $p$, the search reports $"Ref"_(a, b) (delta p rho')$ for every $rho' in cal(C)(r - 1, "false", S')$, where $S'$ is the bare staircase after $p$.
-  + If $p$ has an equation $E$ and empties the staircase, the search treats the record $delta p$ by the second, third and fourth steps of @def:fastsolve, with $E$ as the final equation, and reports accordingly.
-  + Otherwise it continues below the next stage of the pass, reached along $delta p$, with $r - 1$ tiles remaining.
-  The search with a _forced_ record $rho_1 = (f_1, dots, f_d)$, from the initial stage with $n$ tiles remaining, treats $f_1, dots, f_d$ in turn in the same three ways, each only if it belongs to the set of moves at the stage reached, and reports nothing otherwise; in the first case, at a forced placement $f_j$, it reports only for those completions $rho'$ that begin with the remaining forced placements $f_(j + 1), dots, f_d$, or that are complete before these are exhausted and form a beginning of them; in the third case it passes to the next forced placement, and after the last one it continues with the search below the stage reached.
-  For integers $d, n >= 0$, the _default search_ for $n$ tiles, split at depth $d$, reports the numbers found with $rho_1$ forced, for every $rho_1 in cal(P)_d (n, "true", S_0)$.
-] <def:explore>
-
-In the implementation the prefixes are the tasks distributed to the threads.
-
-The search reports what the default method reports for the records taken one at a time.
-
-#proposition(name: [the search and the records])[
-  Let $a$ and $b$ be integers.
-  For all $d, n >= 0$, the numbers reported by the default search for $n$ tiles, split at depth $d$, are those of
-  $ "Fast"_n (a, b) := union.big_rho "Fast"_(a, b) (rho), $
-  where $rho$ ranges over the complete admissible records for $n$ tiles, in which moreover the first tile is wide if $a = b$.
-] <prop:searched>
-
-#proof[
-  For a stage $Sigma$ reached along $delta$ and a record $rho'$, let $B(Sigma, delta, rho')$ be the set that the default method reports for the record $delta rho'$ when its symbolic pass, having reached $Sigma$ after $delta$, is continued along $rho'$.
-  For the initial stage and the empty $delta$ this is $"Fast"_(a, b) (rho')$.
-  The staircase of a stage and the bare staircase obtained by the same placements have the same flags, since an elimination changes only the lengths.
-
-  We show by induction on $r$ that the numbers reported by the search below $Sigma = (S, pi, k)$ with $r$ tiles remaining are those of the sets $B(Sigma, delta, rho')$ for $rho' in cal(C)(r, "first", overline(S))$.
-  If $r = 0$ nothing is reported, and there is no completion because $S$ is not empty.
-  Let $r >= 1$.
-  The completions are the records $p rho''$ with $p in "moves"(overline(S), r, "first")$ and $rho'' in cal(C)(r - 1, "false", S')$.
-  If the pass fails at $p$, then $B(Sigma, delta, p rho'') = "Ref"_(a, b) (delta p rho'')$ for every such $rho''$, which is what the search reports.
-  If $p$ has an equation and empties the staircase, the only such $rho''$ is the empty record, and $B(Sigma, delta, p)$ is what the search reports.
-  Otherwise the next stage $Sigma'$ has a staircase that is not empty, $B(Sigma, delta, p rho'') = B(Sigma', delta p, rho'')$, and the induction hypothesis applies to $Sigma'$.
-
-  The same case distinction, applied to the forced placements in turn, shows two things for the search with $rho_1$ forced: every number that it reports belongs to $B(Sigma_0, nothing, rho')$ for some $rho' in cal(C)(n, "true", S_0)$, with $Sigma_0$ the initial stage; and it reports every number of $B(Sigma_0, nothing, rho_1 rho_2)$ whenever $rho_1 rho_2 in cal(C)(n, "true", S_0)$.
-  In the first case of the definition, indeed, the search reports for the completions below the forced placement at which the pass fails that continue with the remaining forced placements, and $rho_2$ preceded by these is one of them.
-  By the first statement of @prop:enumeration, the records of $cal(C)(n, "true", S_0)$ are those over which the union is taken, so every number reported belongs to $"Fast"_n (a, b)$.
-  Conversely, by the second statement of @prop:enumeration, every such record is of the form $rho_1 rho_2$ with $rho_1 in cal(P)_d (n, "true", S_0)$, so every number of $"Fast"_n (a, b)$ is reported.
-]
-
-Restricting the first case, at a forced placement, to the completions that continue with the remaining forced placements ensures that no record is treated under two prefixes: the records examined under the prefixes of the split, taken in order, are exactly the complete admissible records, each once, whether or not the pass fails and wherever it does.
-This is proved in the formal development (`examined_split`, `examined_once`).
-An earlier version of the implementation reported, in that case, for all the completions below the failing placement, under every prefix through it; the formalisation exposed this, which left the set of numbers reported unchanged but would have repeated records in the counts, and the implementation was corrected.
-No such failure had been observed.
-
-#definition(name: [certified default search])[
-  Let $a$ and $b$ be integers and $n >= 0$.
-  The default search for $n$ tiles is _certified_ if every complete admissible record for $n$ tiles, in which moreover the first tile is wide if $a = b$, that the default method passes to the reference method is regular for $(a, b)$.
-] <def:fastcert>
-
-This is what the two counts of the reference method establish in a run of the default search, in which the reference method treats only the records passed to it.
-
-#proposition(name: [correctness of the default search])[
-  Let $a, b >= 1$ and $n >= 0$ be integers.
-  + $"Fast"_n (a, b) subset.eq P_n (a, b)$.
-  + If the default search for $n$ tiles is certified, then $"Fast"_n (a, b) = P_n (a, b)$.
-  + $"Ref"_n (a, b) subset.eq "Fast"_n (a, b)$; and if the reference search for $n$ tiles is certified, then so is the default search, and $"Fast"_n (a, b) = "Ref"_n (a, b)$.
-] <prop:fast>
-
-#proof[
-  The first two statements are proved as @prop:reference, with @prop:fastsolve in the place of @prop:solve.
-  An element of $"Fast"_(a, b) (rho)$ is a solution of $rho$, and gives a tiling by @prop:sound and @prop:scaling.
-  Conversely, an element of $P_n (a, b) = P_n (a slash b, 1)$ is a solution of a complete admissible record $rho$ for $n$ tiles, with the first tile wide if $a = b$, by @prop:complete and @prop:square; if the search is certified, $rho$ is not passed to the reference method or is regular, and the solution belongs to $"Fast"_(a, b) (rho)$.
-  The third statement follows record by record from the last statement of @prop:fastsolve, a certified reference search being one in which every record considered is regular.
-]
-
-The first statement needs no proviso: whatever the default search reports is the proportion of a tiling.
-The two searches can differ only at a record that the default method settles itself and that is not regular for the reference method, because a singular situation is counted or the record is flagged as constant; there the default method reports every solution and the reference method may report nothing.
-No such record is known.
-Completeness of the default search needs less than that of the reference search, namely the regularity of the records passed to the reference method only.
-
 = Results <sec:results>
 
 All computations were carried out with the Rust implementation of the search, on a machine with sixteen cores and 128 GB of memory.
-All runs used the default search, except where stated.
-In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the reference method were all zero.
-In the default search these counters concern the records passed to the reference method, so that every unrestricted run of the default search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the reference search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
-The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @app:structure, are made by variants of the search that @sec:search and @sec:optimisations do not cover.
+All runs used the incremental search, except where stated.
+In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the direct method were all zero.
+In the incremental search these counters concern the records passed to the direct method, so that every unrestricted run of the incremental search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the direct search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
+The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @app:structure, are made by variants of the search that @sec:systems and @app:solving do not cover.
 
 == The square <sec:square>
 
-@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search met.
+@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic), the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search met.
 The last number depends on the method of search and is not an invariant of the problem.
 
 #figure(
@@ -1305,10 +713,10 @@ The last number depends on the method of search and is not an invariant of the p
 
 The values for $n <= 7$ agree with those of Henderson and Gerbet, the value for $n = 8$ agrees with Henderson's, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
 The values for $n = 11$, $12$ and $13$ are new.
-Those for $n = 11$ and $n = 12$ were each computed twice, with the reference treatment of degenerate tiles and with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
+Those for $n = 11$ and $n = 12$ were each computed twice, with the direct treatment of degenerate tiles and with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
 
 The search was checked in several further ways.
-For $n <= 9$ the search of @sec:optimisations and the reference search of @sec:solving agree on every proportion and on the number of records realising it.
+For $n <= 9$ the incremental search and the direct search agree on every proportion and on the number of records realising it.
 For $n = 7$ the distribution of the proportions by algebraic degree agrees with that derived from Henderson's published list.
 For main rectangles of aspect ratios $w$ and $1 slash w$ the lists of proportions coincide, as @prop:transposition requires, although the search is not symmetric under transposition.
 
@@ -1449,7 +857,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
   caption: [One tiling from each of the $16$ classes of tilings of the square by four similar rectangles, labelled by proportion, with the number of tilings of the class in brackets; the numbers add up to $t(4) = 89$.],
 ) <fig:classes>
 
-The search of @sec:search counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
+The search of @sec:solving counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
 A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
 A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
 A tiling is identified by its proportion, its orientations and the record described in @prop:representative, the solution of a reported record at a proportion being unique.
@@ -1522,7 +930,7 @@ The search for tilings keeps the record described in @prop:representative, which
 
 The values of @tab:tbc were checked as follows.
 For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
-For $n <= 10$ they agree with a run in which every record is solved by the reference method and every comparison of coordinates is exact.
+For $n <= 10$ they agree with a run in which every record is solved by the direct method and every comparison of coordinates is exact.
 For $n <= 12$ the number of classes obtained from canonical representatives agrees with the number given by Burnside's lemma from the tilings fixed by each symmetry, and the number of records agrees with the count $sum 2^k$ described above.
 The values of all three sequences for $n = 11$ and $n = 12$ rest on the search alone.
 
@@ -1597,9 +1005,654 @@ The tiling shown for a proportion is the first that one run of the search found,
   caption: [One tiling for each of the $245$ proportions achievable with six tiles.],
 ) <fig:six>
 
+= Solving the linear systems <app:solving>
+
+This appendix defines the two forms of the search of @sec:solving and proves @prop:search.
+The direct search solves the system of each record separately; the incremental search eliminates along the tree of records and verifies its candidates numerically.
+The arithmetic of both is performed by routines that are not part of what is proved: the statements hold for any routines that meet the specifications of @def:primitives and @def:numerics.
+
+== Linear forms <sec:forms>
+
+For a main rectangle of sides in the ratio $a slash b$, with $a$ and $b$ positive integers, the height is normalised to $H = 1$ and the width $W$ is kept as an unknown, to be compared with $a slash b$ at the end.
+Every floor and wall arising along a record is then a linear form in $1$, $W$ and the free sides, whose coefficients are polynomials in the proportion divided by a power of it.
+
+#definition(name: [linear forms])[
+  A _linear form_ is a pair $f = (d, c)$ of an integer $d >= 0$ and a sequence $c = (c_0, c_1, c_2, dots)$ of polynomials in $ZZ[x]$; it stands for the expression
+  $ (c_0 + c_1 W + c_2 s_1 + c_3 s_2 + dots.c) / x^d. $
+  The sum and the difference of $(d, c)$ and $(d', c')$ have exponent $D = max(d, d')$ and coefficients $c_j x^(D - d) plus.minus c'_j x^(D - d')$; the product of $(d, c)$ with $x$ is $(d - 1, c)$ if $d > 0$ and $(0, x c)$ if $d = 0$; and the quotient of $(d, c)$ by $x$ is $(d + 1, c)$.
+  With these operations the linear forms are an arithmetic of lengths.
+  For an integer $k >= 0$ and real numbers $x != 0$, $W$ and $s_1, dots, s_k$, the _numerator_ and the _value_ of $f$ are
+  $ nu_k (f) := c_0 (x) + c_1 (x) W + sum_(j = 1)^k c_(j + 1) (x) s_j, quad "val"_k (f) := nu_k (f) / x^d. $
+  The _symbolic system_ of a record $rho$ consists of the positivity constraints and of the equations obtained by placing $rho$ on the initial staircase whose floor is the form $W$ and whose wall is the form $1$, the free sides being the forms $s_1, s_2, dots$.
+] <def:forms>
+
+Evaluating the forms recovers the constraints of @def:system, so that the symbolic system may be used in their place.
+
+#proposition(name: [symbolic system])[
+  Let $rho$ be a record with $k$ inside placements, and let $x != 0$, $W$ and $s = (s_1, s_2, dots)$ be real numbers.
+  Then $(W, 1, s)$ satisfy the constraints of $rho$ at $x$ if and only if $"val"_k (f) > 0$ for every positivity constraint $f$ of the symbolic system of $rho$ and $"val"_k (g) = 0$ for every equation $g$ of it.
+] <prop:forms>
+
+#proof[
+  For $x != 0$ the map $"val"_k$ is a homomorphism from the linear forms to the real numbers: this is a direct verification for each of the four operations, in which numerators are brought to the common power of $x$.
+  It sends the form $W$ to $W$, the form $1$ to $1$, and the form $s_j$ to $s_j$ for $j <= k$.
+  Since placing commutes with homomorphisms, the positivity constraints and the equations of $rho$ on the real initial staircase of $W$ and $1$, with free sides the values of the forms $s_j$, are the values of those of the symbolic system.
+  Only the first $k$ free sides are used, and their values are $s_1, dots, s_k$.
+]
+
+== The direct method <sec:direct>
+
+The direct form of the search treats each record separately and uses exact arithmetic throughout.
+Its arithmetic is performed by three routines, which are not part of what is proved here: the statements below hold for any routines that meet the following specifications.
+
+#definition(name: [exact routines])[
+  The _exact routines_ are the following, with their assumed specifications.
+  + _Elimination._ Given a square matrix $A$ over $ZZ[x]$, of size $m$, and a vector $c in ZZ[x]^m$, the routine either fails or returns a polynomial $D$ and polynomials $N_1, dots, N_m$.
+    In the second case there is $lambda in ZZ[x]$ such that $D = lambda det A$ and $N_i = lambda det A_i$ for every $i$, where $A_i$ is the matrix $A$ with its $i$-th column replaced by $c$.
+  + _Roots._ Given a polynomial $q in ZZ[x]$, the routine returns a finite set $"roots"(q)$ of real numbers.
+    If $q != 0$, this is the set of the real numbers $r >= 1$ with $q(r) = 0$.
+  + _Signs._ Given a real number $r$ and a polynomial $q in ZZ[x]$, the routine returns a sign $"sign"(r, q)$, which is $-1$, $0$ or $1$.
+    If $r$ belongs to $"roots"(q')$ for some polynomial $q'$, this is the sign of the real number $q(r)$.
+] <def:primitives>
+
+Nothing is assumed of the elimination when it fails.
+In the implementation, the elimination is the fraction-free elimination of Bareiss @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
+The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
+The sign of $q$ at a root $r$ is zero if and only if the minimal polynomial of $r$ divides $q$, and is otherwise found by evaluating $q$ on an isolating interval for $r$, refined until the value is separated from zero.
+
+#definition(name: [direct method])[
+  Let $a$ and $b$ be integers and let $rho$ be a complete admissible record, with $k$ inside placements.
+  Let $g_1, dots, g_(k + 1)$ be the equations of its symbolic system, as given by @prop:count, and write $g_r = (d_r, c^((r)))$.
+  Let $A$ be the square matrix of size $k + 1$ with entries $A_(r j) := c^((r))_(j + 1)$ for $j <= k$ and $A_(r, k + 1) := c^((r))_1$, and let $c$ be the vector with entries $c_r := -c^((r))_0$, so that the columns of $A$ correspond to the unknowns $s_1, dots, s_k, W$.
+  The _direct method_ treats $rho$ as follows.
+  + It applies the elimination to $A$ and $c$.
+    If the elimination fails, it reports no proportion and counts one _singular situation_.
+  + Otherwise, with $D$ and $N_1, dots, N_(k + 1)$ the polynomials returned, it forms $F_rho := b N_(k + 1) - a D$.
+    If $F_rho = 0$, it reports no proportion and flags the record as _constant_.
+  + Otherwise, if the coefficients of $F_rho (x + 1)$ are all non-negative or all non-positive and its constant coefficient is not zero, it reports no proportion.
+  + Otherwise, for each positivity constraint $f = (d, c')$ of the symbolic system it forms $Q_f := c'_0 D + c'_1 N_(k + 1) + sum_(j = 1)^k c'_(j + 1) N_j$.
+    It reports the numbers $r in "roots"(F_rho)$ for which $"sign"(r, D) != 0$ and $"sign"(r, Q_f) = "sign"(r, D)$ for every $f$, and it counts one singular situation for each $r in "roots"(F_rho)$ with $"sign"(r, D) = 0$.
+  We write $"Ref"_(a, b) (rho)$ for the finite set of numbers reported.
+] <def:reference>
+
+On the solutions of the equations, the unknowns are $N_j slash D$ by Cramer's rule, the width is $N_(k + 1) slash D$, and each positivity constraint has numerator $Q_f slash D$; the proportion must be a root of $F_rho$ for the width to be $a slash b$.
+The third step is justified by the following test.
+
+#proposition(name: [absence of roots])[
+  Let $q in ZZ[x]$ be such that the coefficients of $q(x + 1)$ are all non-negative or all non-positive, and its constant coefficient is not zero.
+  Then $q(r) != 0$ for every real number $r >= 1$.
+] <prop:noroot>
+
+#proof[
+  Let $q(x + 1) = sum_j q_j x^j$, so that $q(r) = q_0 + sum_(j >= 1) q_j (r - 1)^j$ with $r - 1 >= 0$.
+  If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then $q(r) < 0$ likewise.
+]
+
+With routines that meet their specifications, the method reports solutions of the system only, and it reports all of them when it counts no singular situation.
+
+#proposition(name: [direct method on a record])[
+  Let $a$ and $b != 0$ be integers, and let $rho$ be a complete admissible record.
+  + Every $r in "Ref"_(a, b) (rho)$ satisfies $r >= 1$, and there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
+  + If the direct method counts no singular situation for $rho$ and does not flag it as constant, then conversely every real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ belongs to $"Ref"_(a, b) (rho)$.
+] <prop:solve>
+
+#proof[
+  Let $k$ be the number of inside placements of $rho$, and keep the notation of @def:reference.
+  For a real number $r != 0$ and real numbers $W$ and $s_1, dots, s_k$, write $z := (s_1, dots, s_k, W)$.
+  By the definition of $A$ and $c$, the numerator of the equation $g_i$ is $nu_k (g_i) = (A(r) z)_i - c_i (r)$.
+  For $r > 0$ a value has the sign of its numerator, so that, by @prop:forms, $(W, 1, s)$ satisfy the constraints of $rho$ at $r$ if and only if $A(r) z = c(r)$ and $nu_k (f) > 0$ for every positivity constraint $f$ of the symbolic system.
+  Two facts on the matrix $A$ over the ring $ZZ[x]$ are used, both consequences of the identity between a matrix and its adjugate: $A dot.op (det A_1, dots, det A_(k + 1))^top = (det A) c$, and, for every real vector $z$ with $A(r) z = c(r)$, $(det A)(r) z_i = (det A_i)(r)$ for every $i$.
+
+  For the first statement, let $r in "Ref"_(a, b) (rho)$.
+  Then the elimination has succeeded, $F_rho != 0$, and $r in "roots"(F_rho)$, so that $r >= 1$ and $F_rho (r) = 0$, and the signs reported at $r$ are the true signs.
+  In particular $D(r) != 0$.
+  Let $z_i := N_i (r) slash D(r)$, and let $W := z_(k + 1)$ and $s_j := z_j$.
+  Since $D = lambda det A$ and $N_i = lambda det A_i$, the first fact gives $A(r) z = lambda(r) (det A)(r) c(r) slash D(r) = c(r)$.
+  From $F_rho (r) = 0$ and $b != 0$ it follows that $W = N_(k + 1) (r) slash D(r) = a slash b$.
+  For a positivity constraint $f$, the definition of $Q_f$ gives $Q_f (r) = D(r) nu_k (f)$; since $Q_f (r)$ and $D(r)$ have the same sign, which is not zero, $nu_k (f) > 0$.
+  Hence the constraints of $rho$ hold.
+
+  For the second statement, let $r >= 1$ and $s$ be such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$, and let $z := (s_1, dots, s_k, a slash b)$, so that $A(r) z = c(r)$, and $nu_k (f) > 0$ for every positivity constraint $f$.
+  The elimination has succeeded, since otherwise a singular situation is counted.
+  By the second fact, multiplied by $lambda(r)$, $D(r) z_i = N_i (r)$ for every $i$.
+  In particular $F_rho (r) = b N_(k + 1) (r) - a D(r) = D(r) (b dot.op a slash b - a) = 0$.
+  The record is not flagged as constant, so $F_rho != 0$; the test of the third step fails, by @prop:noroot; hence the fourth step is reached and $r in "roots"(F_rho)$.
+  No singular situation is counted, so $"sign"(r, D) != 0$.
+  Finally $Q_f (r) = D(r) nu_k (f)$ with $nu_k (f) > 0$, so $Q_f (r)$ has the sign of $D(r)$, and $r$ is reported.
+]
+
+The proviso of the second statement is what the search verifies.
+
+#definition(name: [regular record])[
+  Let $a$ and $b$ be integers.
+  A complete admissible record is _regular_ for $(a, b)$ if the direct method counts no singular situation for it and does not flag it as constant.
+  For an integer $n >= 0$, the direct search _reports_ the numbers of
+  $ "Ref"_n (a, b) := union.big_rho "Ref"_(a, b) (rho), $
+  where $rho$ ranges over the complete admissible records for $n$ tiles, in which moreover the first tile is wide if $a = b$.
+  The direct search for $n$ tiles is _certified_ if all these records are regular for $(a, b)$.
+] <def:regular>
+
+A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being void when the test of the third step succeeds.
+
+#proposition(name: [correctness of the direct search])[
+  Let $a, b >= 1$ and $n >= 0$ be integers.
+  Then $"Ref"_n (a, b) subset.eq P_n (a, b)$.
+  If the direct search for $n$ tiles is certified, then $"Ref"_n (a, b) = P_n (a, b)$.
+] <prop:reference>
+
+#proof[
+  Let $r in "Ref"_(a, b) (rho)$ for a complete admissible record $rho$ for $n$ tiles.
+  By @prop:solve, $r >= 1$ and $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$ for some $s$, so by @prop:sound there is a similar tiling of $[0, a slash b] times [0, 1]$ of proportion $r$ with $n$ tiles.
+  Hence $r in P_n (a slash b, 1) = P_n (a, b)$, by @prop:scaling.
+  Conversely, let $r in P_n (a, b) = P_n (a slash b, 1)$.
+  If $a != b$, @prop:complete gives a complete admissible record $rho$ for $n$ tiles and $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$; if $a = b$, @prop:square gives the same with the first tile wide in $rho$.
+  If the search is certified, $rho$ is regular, and $r in "Ref"_(a, b) (rho)$ by @prop:solve.
+]
+
+== Eager elimination <sec:eager>
+
+The direct search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
+The incremental search shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
+A record that it cannot settle is passed to the direct method, so that its correctness rests on that of the direct method only for such records.
+
+
+Records are explored depth first, as paths in the tree of admissible sequences, and the linear forms for floors and walls are maintained along the current path.
+Instead of collecting equations to be solved at the leaves, each equation is used at once to eliminate one unknown from every floor and wall of the current staircase.
+To keep the system homogeneous, the main rectangle is given sides $a t$ and $b t$ for an unknown scale $t$.
+
+#definition(name: [homogeneous system])[
+  Let $R$ be an integral domain and $X$ a unit of $R$; in the method, $R = ZZ[x, x^(-1)]$ and $X = x$.
+  A _form_ over $R$ is a sequence $F = (F_0, F_1, F_2, dots)$ of elements of $R$; it stands for the expression $F_0 t + F_1 s_1 + F_2 s_2 + dots.c$.
+  The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $X$ and by $X^(-1)$.
+  We write $u_j$ for the form whose coefficient of index $j$ is $1$ and whose other coefficients are zero.
+  For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $kappa_1, kappa_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, the free sides being $u_1, u_2, dots$.
+  For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we write likewise $G[v] := sum_(j < N) G_j v_j$.
+] <def:hom>
+
+For a record with $k$ inside placements, values are always taken with $N = k + 1$, so that $v_0$ is the value of the scale and $v_1, dots, v_k$ are the free sides.
+The homogeneous system at scale one is the system of the main rectangle of sides $a$ and $b$, which is that of the main rectangle of sides $a slash b$ and $1$ up to a change of scale.
+
+#proposition(name: [homogeneous system])[
+  Let $rho$ be a record with $k$ inside placements, let $a$ and $b$ be integers, let $chi$ be a homomorphism from $R$ to the real numbers with $alpha := chi(X) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
+  Then $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$ if and only if $kappa_q [v] > 0$ for every positivity constraint and $e_i [v] = 0$ for every equation of the homogeneous system of $rho$.
+  Moreover, if $b >= 1$, then for every real number $alpha > 0$ there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if there is $s'$ such that $(a, b, s')$ satisfy them.
+] <prop:hom>
+
+#proof[
+  The map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers, with proportion $alpha$: it is additive, and $chi(X F_j) = alpha chi(F_j)$ and $chi(X^(-1) F_j) = chi(F_j) slash alpha$.
+  It sends $a u_0$ to $a$, $b u_0$ to $b$, and $u_j$ to $v_j$ for $1 <= j <= k$.
+  The first statement follows as in the proof of @prop:forms, since placing commutes with homomorphisms and only the first $k$ free sides are used.
+  For the second, multiplication by a real number $c > 0$ is a homomorphism of the real numbers to themselves, which preserves the sign of every number.
+  Hence $(W, H, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if $(c W, c H, c s)$ do, and the statement follows with $c = b$.
+]
+
+The pass along a record keeps, besides the staircase, the coefficient by which the last unknown was eliminated, by which the next elimination divides.
+
+#definition(name: [symbolic pass])[
+  A _stage_ is a triple $(S, pi, k)$ of a staircase $S$ over the forms over $R$, a _pivot_ $pi in R$ with $pi != 0$, and an integer $k >= 0$; the _initial stage_ for integers $a$ and $b$ consists of the initial staircase with floor $a u_0$ and wall $b u_0$, the pivot $1$ and $k = 0$.
+  An _elimination_ is a triple $epsilon = (E, m, pi)$ of a form $E$ over $R$, an index $m$ and an element $pi != 0$ of $R$.
+  It _divides_ a form $F$ _exactly_ if $pi$ divides $E_m F_j - F_m E_j$ in $R$ for every $j$, and $epsilon(F)$ then denotes the form with coefficients $(E_m F_j - F_m E_j) slash pi$.
+  Let $rho = (p_1, dots, p_ell)$ be a record with $ell >= 1$.
+  A _successful pass_ along $rho$ is a sequence of stages $Sigma_0, dots, Sigma_(ell - 1)$, where $Sigma_0$ is the initial stage, such that the following holds for every $j <= ell$, with $Sigma_(j - 1) = (S, pi, k)$.
+  The tier of $p_j$ exists in $S$.
+  Let $S^+$ be the staircase obtained by placing $p_j$ on $S$ with free side $pi u_(k + 1)$, and let $k^+$ be $k + 1$ if $p_j$ is inside and $k$ otherwise.
+  The positive quantity $sigma_j$ of $p_j$ on $S$, with that free side, is the _size recorded_ with $p_j$.
+  + If $j = ell$, the placement $p_ell$ has an equation $E$ on $S$, which is the _final equation_ of the pass.
+  + If $j < ell$ and $p_j$ has no equation, then $Sigma_j = (S^+, pi, k^+)$.
+  + If $j < ell$ and $p_j$ has an equation $E$ on $S$, there is an index $m$ with $1 <= m <= k^+$ and $E_m != 0$ such that the elimination $epsilon = (E, m, pi)$ divides exactly every floor and wall of $S^+$, and $Sigma_j = (epsilon(S^+), E_m, k^+)$, where $epsilon(S^+)$ is obtained by applying $epsilon$ to every floor and wall of $S^+$; the elimination $epsilon$ is _recorded_ with $p_j$.
+] <def:elimination>
+
+A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
+A stage therefore represents lengths up to the factor of its pivot.
+The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
+The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
+Nothing is assumed about the first two causes, nor is anything proved about how often the pass fails: the statements below concern successful passes, and a record on which the pass fails is passed to the direct method.
+The third cause never occurs, by @prop:exact.
+
+The forms of a stage are related to those of the homogeneous system, on which no elimination has been made, over any field in which the pivots do not vanish.
+
+#definition(name: [carrying])[
+  Let $psi$ be a homomorphism from $R$ to a field $K$; it is applied to forms coefficient by coefficient.
+  For an elimination $epsilon = (E, m, pi)$ with $psi(pi) != 0$, let $gamma_epsilon$ be the map on the forms over $K$ given by
+  $ gamma_epsilon (G)_j := (psi(E_m) G_j - G_m psi(E_j)) / psi(pi). $
+  An _elimination chain_ over $psi$ consists of eliminations $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, and of forms $e_1, dots, e_r$ over $R$, its _originals_, such that $pi_0 = 1$, $pi_i = (E_i)_(m_i)$ for $i < r$, $psi(pi_(i - 1)) != 0$ for $i <= r$, and
+  $
+    psi(E_i) = Gamma_(i - 1) (psi(e_i)) quad "for" i <= r, quad "where" Gamma_i := gamma_(epsilon_i) compose dots.c compose gamma_(epsilon_1).
+  $
+  Its _current pivot_ is $pi_r := (E_r)_(m_r)$, or $1$ if $r = 0$.
+  A form over $K$ is _carried_ through $epsilon_1, dots, epsilon_r$ by applying $Gamma_r$.
+] <def:chain>
+
+Each $gamma_epsilon$ is linear over $K$, so it commutes with sums, differences and the multiplication by $psi(X)$ and by its inverse: it is a homomorphism of the arithmetic of the forms over $K$ to itself, and so is each $Gamma_i$.
+If $epsilon$ divides $F$ exactly and $psi(pi) != 0$, then $psi(epsilon(F)) = gamma_epsilon (psi(F))$.
+Nothing in the definition of a chain requires the current pivot to have a non-zero image.
+
+#proposition(name: [invariant of the pass])[
+  Let $psi$ be a homomorphism from $R$ to a field $K$, and consider a successful pass along a record $rho = (p_1, dots, p_ell)$, with final equation $E_"fin"$, whose recorded eliminations are, in order, $epsilon_1, dots, epsilon_r$ with $epsilon_i = (E_i, m_i, pi_(i - 1))$.
+  Suppose that $psi((E_i)_(m_i)) != 0$ for every $i <= r$.
+  Then the homogeneous system of $rho$ has $r + 1$ equations $e_1, dots, e_(r + 1)$, and
+  + the eliminations $epsilon_1, dots, epsilon_r$ form an elimination chain over $psi$ with originals $e_1, dots, e_r$, and $psi(pi_r) != 0$;
+  + $psi(E_"fin") = Gamma_r (psi(e_(r + 1)))$;
+  + for every $q <= ell$, the size recorded with $p_q$ satisfies $psi(sigma_q) = Gamma_(r(q)) (psi(kappa_q))$, where $r(q)$ is the number of eliminations recorded with $p_1, dots, p_(q - 1)$.
+] <prop:trace>
+
+#proof[
+  Let $hat(S)_j$ be the staircase obtained by placing $p_1, dots, p_j$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$, so that the $kappa_q$ and the $e_i$ are the positive quantities and the equations of the placements on these staircases.
+  We show by induction on $j < ell$ that the stage $Sigma_j = (S, pi, k)$, reached after $r'$ eliminations, has the following properties: the eliminations $epsilon_1, dots, epsilon_(r')$ form a chain over $psi$ whose originals are the equations of the full placements amongst $p_1, dots, p_j$ and whose current pivot is $pi$, with $psi(pi) != 0$; the staircase $S$ has the tiers of $hat(S)_j$, and $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S$ and the corresponding floor or wall $hat(F)$ of $hat(S)_j$; the number of inside placements amongst $p_1, dots, p_j$ is $k$; and $Gamma_(r') (u_i) = psi(pi) u_i$ for every $i > k$.
+  For $j = 0$ these hold with $r' = 0$, $Gamma_0$ the identity and $pi = 1$.
+
+  Suppose that they hold for $Sigma_(j - 1) = (S, pi, k)$, and consider the placement $p_j$.
+  The maps $F |-> psi(F)$ and $F |-> Gamma_(r') (psi(F))$ are homomorphisms from the forms over $R$ to the forms over $K$.
+  The first sends the staircase $S$ and the free side $pi u_(k + 1)$ to the same staircase and the same form as the second sends $hat(S)_(j - 1)$ and the free side $u_(k + 1)$, by the induction hypothesis, the last property being used for $i = k + 1$.
+  Since placing commutes with homomorphisms, $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S^+$ and the corresponding one of $hat(S)_j$, the size recorded satisfies $psi(sigma_j) = Gamma_(r') (psi(kappa_j))$, and $p_j$ has an equation $E$ on $S$ exactly if it has an equation $e$ on $hat(S)_(j - 1)$, in which case $psi(E) = Gamma_(r') (psi(e))$.
+  This proves the third statement for $q = j$, with $r(j) = r'$, and, when $j = ell$, the second statement and the count of the equations.
+  Let $j < ell$.
+  If $p_j$ has no equation, $Sigma_j = (S^+, pi, k^+)$ and the properties hold for it, with the same chain.
+  If $p_j$ has an equation $E$ and $epsilon = (E, m, pi)$ is the elimination recorded, then $epsilon$ with the original $e$ extends the chain, because $psi(pi) != 0$ and $psi(E) = Gamma_(r') (psi(e))$; the new current pivot is $E_m$, and $psi(E_m) != 0$ by hypothesis.
+  For a floor or wall $F$ of $S^+$, exactness gives $psi(epsilon(F)) = gamma_epsilon (psi(F)) = gamma_epsilon (Gamma_(r') (psi(hat(F))))$, which is the form $psi(hat(F))$ carried through the extended chain.
+  Finally, for $i > k^+$ we have $i != m$, so the coefficient of index $m$ of $u_i$ is zero and $gamma_epsilon (psi(pi) u_i) = psi(E_m) psi(pi) u_i slash psi(pi) = psi(E_m) u_i$.
+  The properties therefore hold for $Sigma_j$, and the first statement is the first property for $j = ell - 1$.
+]
+
+The properties of elimination chains that are used below are the following; they do not depend on the chain arising from a pass.
+
+#proposition(name: [elimination chains])[
+  Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$, let $G$ be a form over $K$, let $N >= 1$ and let $v in K^N$.
+  + There are $c_1, dots, c_r in K$ such that $Gamma_r (G) = psi(pi_r) G + sum_(l <= r) c_l psi(e_l)$.
+  + For every $i <= r$ there are $c_1, dots, c_(i - 1) in K$ such that $psi(E_i) = psi(pi_(i - 1)) psi(e_i) + sum_(l < i) c_l psi(e_l)$.
+  + $Gamma_r (G)_(m_i) = 0$ for every $i <= r$, and $psi((E_i)_(m_l)) = 0$ for all $l < i <= r$.
+  + If $psi(e_l)[v] = 0$ for every $l <= r$, then $Gamma_r (G)[v] = psi(pi_r) G[v]$.
+  + $psi(e_l)[v] = 0$ for every $l <= r$ if and only if $psi(E_l)[v] = 0$ for every $l <= r$.
+  + If $psi((E_i)_(m_i)) != 0$ for every $i <= r$, the indices $m_1, dots, m_r$ are pairwise distinct.
+] <prop:chain>
+
+#proof[
+  All statements but the last are proved by induction on $r$, and are clear for $r = 0$, where $Gamma_0$ is the identity and $pi_0 = 1$.
+  Let $r >= 1$, write $epsilon_r = (E, m, pi)$ with $pi = pi_(r - 1)$, and let $G' := Gamma_(r - 1) (G)$, so that
+  $ Gamma_r (G) = (psi(E_m) G' - G'_m psi(E)) / psi(pi), quad psi(E) = Gamma_(r - 1) (psi(e_r)). $
+  For the first statement, the induction hypothesis gives $G' = psi(pi) G + sum_(l < r) c'_l psi(e_l)$ and $psi(E) = psi(pi) psi(e_r) + sum_(l < r) d_l psi(e_l)$, the latter being also the second statement for $i = r$; for $i < r$ the second statement is that of the chain $epsilon_1, dots, epsilon_(r - 1)$.
+  Substituting,
+  $ Gamma_r (G) = psi(E_m) G - G'_m psi(e_r) + sum_(l < r) (psi(E_m) c'_l - G'_m d_l) / psi(pi) thin psi(e_l), $
+  which is of the form stated, since $pi_r = E_m$.
+  For the third, the coefficient of index $m$ of $Gamma_r (G)$ is $(psi(E_m) G'_m - G'_m psi(E_m)) slash psi(pi) = 0$; and for $i < r$ the coefficients of index $m_i$ of $G'$ and of $psi(E) = Gamma_(r - 1) (psi(e_r))$ are zero by induction, hence so is that of $Gamma_r (G)$, and $psi((E_r)_(m_i)) = 0$.
+  For the fourth, suppose that $psi(e_l)[v] = 0$ for every $l <= r$.
+  By induction $G'[v] = psi(pi) G[v]$ and $psi(E)[v] = psi(pi) psi(e_r)[v] = 0$, so that $Gamma_r (G)[v] = psi(E_m) G'[v] slash psi(pi) = psi(E_m) G[v]$.
+  For the fifth, both conditions include, by induction, that $psi(e_l)[v] = 0$ for every $l < r$; under this condition the fourth statement for the chain $epsilon_1, dots, epsilon_(r - 1)$ gives $psi(E)[v] = psi(pi) psi(e_r)[v]$, and $psi(pi) != 0$.
+  For the last, if $m_l = m_i$ with $l < i$, the third statement gives $psi((E_i)_(m_i)) = psi((E_i)_(m_l)) = 0$.
+]
+
+The first two statements say that the recorded equations are obtained from the originals by a lower triangular matrix, and the third that they are upper triangular in the eliminated unknowns.
+Comparing determinants identifies the pivots, as in the elimination of Bareiss @bareiss1968.
+
+#proposition(name: [pivots as minors])[
+  Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$.
+  Then $psi(pi_r)$ is the determinant of the square matrix of size $r$ with entries $psi((e_i)_(m_l))$, for $1 <= i, l <= r$.
+  If moreover $m_1, dots, m_r$ are pairwise distinct and smaller than $r$, then
+  $ psi(pi_r) = plus.minus det (psi((e_i)_j))_(1 <= i <= r, thin 0 <= j < r). $
+] <prop:minor>
+
+#proof[
+  Let $A$ and $B$ be the square matrices of size $r$ with entries $A_(i l) := psi((e_i)_(m_l))$ and $B_(i l) := psi((E_i)_(m_l))$.
+  By the second statement of @prop:chain, $B = T A$ for a lower triangular matrix $T$ with diagonal entries $psi(pi_0), dots, psi(pi_(r - 1))$.
+  By the third, $B$ is upper triangular, and its diagonal entries are $psi((E_i)_(m_i)) = psi(pi_i)$ for $i = 1, dots, r$.
+  Taking determinants,
+  $ psi(pi_1) dots.c psi(pi_r) = psi(pi_0) dots.c psi(pi_(r - 1)) det A. $
+  Since $pi_0 = 1$, both sides contain the factor $psi(pi_0) dots.c psi(pi_(r - 1))$, which is not zero by the definition of a chain, and $psi(pi_r) = det A$.
+  Under the additional hypothesis, $l |-> m_l$ is a bijection from ${1, dots, r}$ onto ${0, dots, r - 1}$, and $A$ is the matrix $(psi((e_i)_j))$ with its columns permuted accordingly, so that the two determinants differ by the sign of a permutation.
+]
+
+On a complete record every unknown but the scale is eliminated, and the scale coefficient of the final equation plays the part of one more pivot.
+It is the polynomial whose roots are the candidate proportions.
+
+#proposition(name: [the final coefficient is the determinant])[
+  Let $rho$ be a complete admissible record with $k$ inside placements, and consider a successful pass along $rho$, from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$.
+  Let $e_1, dots, e_(k + 1)$ be the equations of the homogeneous system of $rho$, and let $M$ be the square matrix of size $k + 1$ over $R$ with entries $(e_i)_j$, for $1 <= i <= k + 1$ and $0 <= j <= k$.
+  Then the pass records $k$ eliminations, and
+  $ (E_"fin")_0 = plus.minus det M. $
+  Consequently, if $chi$ is a homomorphism from $R$ to the real numbers and $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i$, then $chi((E_"fin")_0) = 0$.
+] <prop:det>
+
+#proof[
+  Let $psi$ be the inclusion of $R$ in its field of fractions.
+  The pivots $(E_i)_(m_i)$ of the recorded eliminations are not zero, by the definition of a pass, so @prop:trace applies.
+  The homogeneous system has $k + 1$ equations by @prop:count, the rules being independent of the arithmetic of lengths; hence the recorded eliminations are $k$ in number, they form a chain with originals $e_1, dots, e_k$ and current pivot $pi_k != 0$, and $psi(E_"fin") = Gamma_k (psi(e_(k + 1)))$.
+  The triple $(E_"fin", 0, pi_k)$, with the original $e_(k + 1)$, therefore extends the chain to one of length $k + 1$ with current pivot $(E_"fin")_0$.
+  The indices $m_1, dots, m_k$ lie between $1$ and $k$, by the definition of a pass, and are pairwise distinct, by the last statement of @prop:chain; with the index $0$ they are $k + 1$ distinct indices smaller than $k + 1$.
+  By @prop:minor, $psi((E_"fin")_0) = plus.minus det psi(M)$, and $psi$ is injective.
+  For the consequence, the real matrix $chi(M)$ sends the vector $w != 0$ to zero, so that $chi(det M) = det chi(M) = 0$.
+]
+
+The consequence holds whether or not a pivot vanishes at the point considered: every solution of the system is amongst the roots of the final coefficient.
+The same argument, with a floor or a wall appended as one more equation, shows that the divisions of the pass are exact.
+
+#proposition(name: [exactness of the divisions])[
+  Let $(S, pi, k)$ be a stage obtained from the initial stage for integers $a$ and $b$ by finitely many steps, each of which leads from a stage to the stage that the second or the third clause of @def:elimination defines for some placement at one of its tiers.
+  Let $p$ be a placement at a tier of $S$ that has an equation $E$ on $S$, and let $S^+$ be the staircase obtained by placing $p$ on $S$ with free side $pi u_(k + 1)$.
+  Then, for every index $m$ with $E_m != 0$, the elimination $(E, m, pi)$ divides exactly every floor and wall of $S^+$.
+] <prop:exact>
+
+#proof[
+  Let $psi$ be the inclusion of $R$ in its field of fractions $K$.
+  The stage has the properties established in the proof of @prop:trace, whose induction applies to the steps considered here, the pivots being non-zero elements of $R$ and $psi$ being injective: there is a chain $epsilon_1, dots, epsilon_r$ over $psi$, with originals $e_1, dots, e_r$ and current pivot $pi$, such that $psi(E) = Gamma_r (psi(e))$ and $psi(F) = Gamma_r (psi(hat(F)))$ for every floor or wall $F$ of $S^+$, where $e$ and $hat(F)$ are forms over $R$.
+  Let $epsilon := (E, m, pi)$, which extends the chain, with the original $e$, to one with current pivot $E_m != 0$, and let $G := gamma_epsilon (psi(F))$, so that
+  $ G_j = psi(E_m F_j - F_m E_j) / psi(pi) quad "and" quad G = Gamma_(r + 1) (psi(hat(F))). $
+  Fix an index $j$.
+  The images under $psi$ of the forms $E_1, dots, E_r, E$ and of the originals form an elimination chain over the identity of $K$, and the triple $(G, j, psi(E_m))$, with the original $psi(hat(F))$, extends it to a chain of length $r + 2$ with current pivot $G_j$.
+  By the first statement of @prop:minor, $G_j$ is the determinant of a matrix whose entries are images under $psi$ of coefficients of $e_1, dots, e_r$, $e$ and $hat(F)$, hence $G_j = psi(Delta)$ for some $Delta in R$.
+  Then $psi(E_m F_j - F_m E_j) = psi(pi Delta)$, and $pi$ divides $E_m F_j - F_m E_j$ because $psi$ is injective.
+]
+
+The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the direct method.
+
+#proposition(name: [the two proportion polynomials])[
+  Let $rho$ be a complete admissible record with $k$ inside placements, let $a$ and $b$ be integers, and consider a successful pass along $rho$ over $R = ZZ[x, x^(-1)]$, from the initial stage for $a$ and $b$, with final equation $E_"fin"$.
+  Suppose that the elimination of the direct method succeeds on $rho$, with the notation of @def:reference.
+  Then there are $lambda in ZZ[x]$ and an integer $e$ such that $D = lambda det A$ and
+  $ lambda (E_"fin")_0 = plus.minus x^e F_rho. $
+] <prop:target>
+
+#proof[
+  Let $lambda$ be given by the specification of the elimination, so that $D = lambda det A$ and $N_(k + 1) = lambda det A_(k + 1)$.
+  To a linear form $f = (d, c)$ of @def:forms assign the form $tau(f)$ over $R$ with coefficients
+  $ tau(f)_0 := x^(-d) (a c_1 + b c_0), quad tau(f)_j := x^(-d) c_(j + 1) quad "for" j >= 1, $
+  which expresses the substitution of $a t$ for $W$ and of $b t$ for $1$.
+  A direct verification on the four operations shows that $tau$ is a homomorphism, and it sends the forms $W$, $1$ and $s_j$ to $a u_0$, $b u_0$ and $u_j$.
+  Since placing commutes with homomorphisms, the equations of the homogeneous system are $e_i = tau(g_i)$.
+  Hence the matrix $M$ of @prop:det has the entries $M_(i 0) = x^(-d_i) (a A_(i, k + 1) - b c_i)$ and $M_(i j) = x^(-d_i) A_(i j)$ for $1 <= j <= k$: it is obtained from $A$ by replacing the last column by $a$ times itself minus $b$ times the vector $c$, moving that column to the first place, and multiplying the $i$-th row by $x^(-d_i)$.
+  The determinant being linear in the last column,
+  $ det M = plus.minus x^e (a det A - b det A_(k + 1)), quad e := -sum_i d_i, $
+  and multiplying by $lambda$ gives $lambda det M = plus.minus x^e (a D - b N_(k + 1)) = minus.plus x^e F_rho$.
+  The statement follows from @prop:det.
+]
+
+For the elimination of Bareiss, $lambda = plus.minus 1$, and the two polynomials have the same roots in $[1, infinity)$; in general the statement shows that every root of the final coefficient in $[1, infinity)$ is a root of $F_rho$, and that every root of $F_rho$ at which $lambda$ does not vanish is a root of the final coefficient.
+The correctness of the incremental search does not depend on this comparison, which is recorded for its own sake.
+
+The cost of an elimination is proportional to the square of the number of tiers, and most nodes of the search tree are close to the leaves, where staircases have one or two tiers.
+In the implementation, when one tile remains to be placed, on a single tier that is not stale and whose floor and wall are non-zero multiples $c_L t$ and $c_M t$ of the scale, and no forced placement is pending, the final equations $c_L - x c_M$ and $c_M - x c_L$ of the two orientations of the last tile are formed directly, without a separate placement.
+
+Away from the zeros of the pivots, the recorded eliminations determine the solution of the system.
+
+#proposition(name: [back-substitution])[
+  Let $rho$ be a complete admissible record with $k$ inside placements and $n$ placements in all, and consider a successful pass along $rho$, with recorded eliminations $epsilon_1, dots, epsilon_k$, where $epsilon_i = (E_i, m_i, pi_(i - 1))$, final equation $E_"fin"$ and recorded sizes $sigma_1, dots, sigma_n$.
+  Let $chi$ be a homomorphism from $R$ to the real numbers such that $chi((E_i)_(m_i)) != 0$ for every $i$.
+  Let $v in RR^(k + 1)$ be obtained from $(1, 0, dots, 0)$ by replacing, for $i = k, k - 1, dots, 1$ in turn, the coordinate $v_(m_i)$ by
+  $ -1 / chi((E_i)_(m_i)) sum_(j <= k, thin j != m_i) chi((E_i)_j) v_j. $
+  + $v_0 = 1$.
+  + If $chi((E_"fin")_j) = 0$ for every $j >= 1$, then $e_i [v] = 0$ for every $i <= k + 1$ if and only if $chi((E_"fin")_0) = 0$.
+  + If $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i <= k + 1$, then $w = v$.
+  + There is $pi in R$ with $chi(pi) != 0$ such that, for every $q <= n$, the form $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements, in order, has the value $chi(pi) kappa_q [v]$ at $v$.
+] <prop:back>
+
+#proof[
+  By @prop:trace with $psi = chi$, and by the count of @prop:det, the eliminations form a chain over $chi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $chi(pi) != 0$, and $chi(E_"fin") = Gamma_k (chi(e_(k + 1)))$.
+  By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
+  In particular no replacement changes $v_0$, which proves the first statement.
+
+  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ comes to hold; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
+  Hence $chi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
+  The fourth statement of @prop:chain then gives $chi(E_"fin")[v] = Gamma_k (chi(e_(k + 1)))[v] = chi(pi) e_(k + 1) [v]$.
+  Under the hypothesis of the second statement, $chi(E_"fin")[v] = chi((E_"fin")_0) v_0 = chi((E_"fin")_0)$, and the statement follows because $chi(pi) != 0$.
+
+  For the third statement, $chi(E_i)[w] = 0$ for every $i <= k$, by the fifth statement of @prop:chain.
+  We show that $w_(m_i) = v_(m_i)$ by descending induction on $i$.
+  In the equation $chi(E_i)[w] = 0$ the coefficients of the unknowns of index $m_l$ with $l < i$ are zero; the other unknowns are that of index $0$, with $w_0 = v_0$, those of index $m_l$ with $l > i$, with $w_(m_l) = v_(m_l)$ by induction, and that of index $m_i$, whose coefficient is not zero.
+  Hence $w_(m_i)$ is given by the same expression as $v_(m_i)$, whose value was computed from coordinates that did not change afterwards.
+
+  For the fourth, $chi(sigma_q) = Gamma_(r(q)) (chi(kappa_q))$ by @prop:trace, so that carrying it through the eliminations $epsilon_(r(q) + 1), dots, epsilon_k$ gives $Gamma_k (chi(kappa_q))$, whose value at $v$ is $chi(pi) kappa_q [v]$ by the fourth statement of @prop:chain.
+]
+
+== Candidate roots <sec:candidates>
+
+At the end of a successful pass along a complete record, the method examines the final equation.
+If its scale coefficient $c := (E_"fin")_0$ is not zero and its other coefficients are zero, the candidates for the proportion are the roots of $c$ in $[1, infinity)$, by @prop:det.
+The Laurent polynomial $c$ is normalised to a polynomial $"key"(c) in ZZ[x]$, which differs from it by a sign and a power of $x$.
+A polynomial whose expansion in powers of $x - 1$ has non-negative coefficients and positive constant term has no root in $[1, infinity)$, by @prop:noroot, and is discarded.
+The roots of the others are obtained from a table shared by all threads, indexed by the coefficients, so that each polynomial is factorised once; this is the routine of @def:primitives that the direct method uses.
+Different records often lead to the same polynomial: for a square and thirteen tiles, $2.8 times 10^11$ records lead to $2.6 times 10^8$ polynomials with a root in $[1, infinity)$.
+
+== Numerical verification <sec:numeric>
+
+Let $r$ be a candidate root, known through an enclosing interval of floating-point numbers of relative width about $10^(-15)$.
+The tile sizes at $r$ are computed in interval arithmetic with outward rounding: the eliminations along the path are undone in reverse order, each giving the eliminated unknown as a quotient of interval values, and the placements are then replayed on intervals.
+As for the exact routines, the interval arithmetic is not part of what is proved, and enters through its specifications.
+
+#definition(name: [numerical routines])[
+  The _numerical routines_ operate on a set of _intervals_, each of which _encloses_ certain real numbers, and are the following, with their assumed specifications.
+  + _Arithmetic._ Every integer $z$ has an interval $[z]$ that encloses it.
+    There are a sum, a difference, a product and a negation of intervals; if $I$ encloses $alpha$ and $J$ encloses $beta$, then $I + J$, $I - J$, $I J$ and $-I$ enclose $alpha + beta$, $alpha - beta$, $alpha beta$ and $-alpha$.
+    There is a quotient of intervals; if $I$ encloses $alpha$, $J$ encloses $beta$ and $J$ is certainly away from zero, then $I slash J$ encloses $alpha slash beta$.
+  + _Decisions._ An interval may be found _certainly away from zero_, _certainly not positive_ or _certainly positive_; every number that it encloses is then different from zero, not positive, or positive, respectively.
+  + _Enclosure of polynomials._ Given $c in ZZ[x, x^(-1)]$ and an interval $I$, the routine either fails or returns an interval $c(I)$.
+    In the second case, if $I$ is certainly away from zero, then $c(I)$ encloses $c(alpha)$ for every $alpha > 0$ that $I$ encloses.
+  + _Roots._ Every real number $r$ has a stored interval $I_r$.
+    If $r >= 1$ and $q(r) = 0$ for some non-zero $q in ZZ[x]$, then $I_r$ encloses $r$ and is certainly away from zero.
+  + _Minimal polynomials._ A real number $r$ may have a stored polynomial $mu_r in ZZ[x]$, and then $mu_r (r) = 0$.
+    There is a test of divisibility for pairs of polynomials of $ZZ[x]$; if it succeeds for $(f, q)$, then $f$ divides $q$ in $ZZ[x]$.
+  + _Coefficients._ For every $c in ZZ[x, x^(-1)]$ there are polynomials $"key"(c)$ and $"coeffs"(c)$ in $ZZ[x]$ and integers $e$ and $e'$ such that $"key"(c) = plus.minus x^e c$ and $"coeffs"(c) = x^(e') c$.
+] <def:numerics>
+
+Nothing is assumed of a test of divisibility that does not succeed, nor is the stored polynomial assumed to be irreducible.
+The intervals form an arithmetic of lengths for a given interval $I$ of the proportion, the product and the quotient by $x$ being the product and the quotient by $I$.
+
+#definition(name: [numerical check])[
+  Let $rho$ be a complete admissible record with $k$ inside placements and $n$ placements, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for $a$ and $b$, with recorded eliminations $epsilon_1, dots, epsilon_k$, where $epsilon_i = (E_i, m_i, pi_(i - 1))$, and recorded sizes $sigma_1, dots, sigma_n$; and let $r$ be a real number, with stored interval $I := I_r$.
+  The _numerical check_ of $r$ returns a verdict, which is _accept_, _reject_ or _unsure_, as follows.
+  + _Back-substitution._ Let $V_0 := [1]$ and $V_j := [0]$ for $1 <= j <= k$.
+    For $i = k, k - 1, dots, 1$ in turn, the enclosures $(E_i)_j (I)$ are computed for $j = m_i$ and for the indices $j <= k$ other than $m_i$ with $(E_i)_j != 0$; then $V_(m_i)$ is replaced by the quotient by $(E_i)_(m_i) (I)$ of the negation of the sum of the products $(E_i)_j (I) V_j$ over the latter indices, the sum starting from $[0]$.
+    If an enclosure fails, or if some $(E_i)_(m_i) (I)$ is not certainly away from zero, the verdict is unsure.
+  + _Replay._ The record $rho$ is placed on the initial staircase of intervals with floor $[a]$ and wall $[b]$, with free sides $V_1, dots, V_k$ and with $I$ as the interval of the proportion; let $P_1, dots, P_n$ be the positive quantities of its placements.
+  + _Decision._ If some $P_q$ is certainly not positive, the verdict is reject.
+    Otherwise, if every $P_q$ is certainly positive, the verdict is accept.
+    Otherwise the placements $q$ for which $P_q$ is not certainly positive are examined in order, as follows, and the verdict is reject if one of them yields a _certificate_ and unsure if the examination ends without one.
+    The elimination recorded with $p_q$, if any, and those recorded with the later placements are applied in order to $sigma_q$; if one of them does not divide exactly, the examination ends.
+    Let $F$ be the resulting form.
+    If $F_j != 0$ for some $j >= 1$, the examination ends.
+    If $F_0 = 0$, there is a certificate.
+    Otherwise, if $r$ has no stored polynomial, the examination ends; if the test of divisibility succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
+] <def:check>
+
+An accepted root is a solution, and a rejected one is not, whichever way the rejection came about.
+
+#proposition(name: [verdicts of the numerical check])[
+  Let $rho$ be a complete admissible record, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$, and let $alpha > 0$ be a real number whose stored interval encloses $alpha$ and is certainly away from zero.
+  + If $(E_"fin")_j = 0$ for every $j >= 1$, if $(E_"fin")_0 (alpha) = 0$, and if the verdict of the numerical check of $alpha$ is accept, then there is $s$ such that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$.
+  + If the verdict is reject, there is no $s$ such that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$.
+] <prop:numeric>
+
+#proof[
+  Let $chi$ be the evaluation of Laurent polynomials at $alpha$.
+  In both cases the verdict is not unsure, so the back-substitution on intervals has succeeded.
+  For each $i$, the interval $(E_i)_(m_i) (I)$ encloses $chi((E_i)_(m_i))$ and is certainly away from zero, so that $chi((E_i)_(m_i)) != 0$, and @prop:back applies; let $v$ be the vector defined there.
+  The interval $V_j$ encloses $v_j$ at every moment of the two back-substitutions, carried out side by side: this holds at the start, and each replacement preserves it by the specifications of the arithmetic and of the enclosures, the terms omitted from the sum of intervals being those whose coefficient is zero.
+
+  The pairs $(xi, J)$ of a real number and an interval that encloses it form an arithmetic of lengths, with the operations of the real numbers for the proportion $alpha$ on the first component and those of the intervals for the interval $I$ on the second; the specifications say that these operations lead from pairs to pairs, the quotient by $I$ being allowed because $I$ is certainly away from zero.
+  The two projections are homomorphisms.
+  Placing $rho$ on the initial staircase with floor $(a, [a])$ and wall $(b, [b])$, with free sides $(v_j, V_j)$, therefore shows that each $P_q$ encloses the corresponding positivity constraint of $rho$ for $(a, b, (v_1, dots, v_k))$ at $alpha$, which is $kappa_q [v]$ by the proof of @prop:hom.
+
+  For the first statement, the second statement of @prop:back shows that $e_i [v] = 0$ for every $i$, and $kappa_q [v] > 0$ for every $q$ because every $P_q$ is certainly positive.
+  By @prop:hom, $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$.
+
+  For the second statement, suppose that $(a, b, s)$ satisfy the constraints of $rho$ at $alpha$, and let $w := (1, s_1, dots, s_k)$.
+  By @prop:hom, $e_i [w] = 0$ for every $i$ and $kappa_q [w] > 0$ for every $q$, and $w = v$ by the third statement of @prop:back.
+  Hence $kappa_q [v] > 0$ for every $q$, and no $P_q$ is certainly not positive.
+  The verdict being reject, there is a certificate for some placement $p_q$: a form $F$ over $ZZ[x, x^(-1)]$, obtained from $sigma_q$ by exact eliminations, with $F_j = 0$ for $j >= 1$, and such that $F_0 = 0$ or $mu_alpha$ divides $"coeffs"(F_0)$.
+  In the second case $"coeffs"(F_0)$ vanishes at $alpha$, because $mu_alpha$ does, and it equals $F_0$ multiplied by a power of $x$, with $alpha != 0$; so $F_0 (alpha) = 0$ in both cases.
+  The previous pivots of the eliminations are $1$ and the pivots $(E_i)_(m_i)$, whose values at $alpha$ are not zero, so each exact elimination agrees with the corresponding map $gamma$ after evaluation, and $chi(F)$ is $chi(sigma_q)$ carried through the eliminations recorded with $p_q$ and with the later placements.
+  By the fourth statement of @prop:back, $chi(F)[v] = chi(pi) kappa_q [v]$ with $chi(pi) != 0$, while $chi(F)[v] = F_0 (alpha) v_0 = 0$.
+  Hence $kappa_q [v] = 0$, a contradiction.
+]
+
+The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles of @fig:pinwheel, whose central tile degenerates to a point.
+Such cases are about one in a hundred, and the certificate settles them without recourse to the direct method.
+The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful test of divisibility is correct.
+When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which plays no part in the correctness of the search.
+
+#proposition(name: [degenerate tiles])[
+  Let $f in ZZ[x]$ be primitive and irreducible over $QQ$, and let $r$ be a real number with $f(r) = 0$.
+  Then, for every $q in ZZ[x]$, the polynomial $f$ divides $q$ in $ZZ[x]$ if and only if $q(r) = 0$.
+] <prop:degenerate>
+
+#proof[
+  If $f$ divides $q$ then $q(r) = 0$.
+  Conversely, suppose that $q(r) = 0$, and let $mu$ be the minimal polynomial of $r$ over $QQ$, which divides $f$ and $q$ in $QQ[x]$ and is not constant.
+  Since $f$ is irreducible, $f$ is the product of $mu$ and a non-zero rational number, and so divides $q$ in $QQ[x]$.
+  Since $f$ is primitive, it then divides $q$ in $ZZ[x]$, by Gauss's lemma.
+]
+
+With the notation of @def:check, when the form $F$ is obtained and involves the scale only, the positive quantity of $p_q$ is zero in the solution $v$ of @prop:back at the root $r$ exactly if $F_0 (r) = 0$, by the fourth statement of that proposition, hence exactly if the minimal polynomial of $r$ divides $"coeffs"(F_0)$.
+The formal development does not prove that the exact eliminations applied to $sigma_q$ always divide exactly, nor that the resulting form involves the scale only; in either event the check returns the verdict unsure.
+
+#definition(name: [incremental method])[
+  Let $a$ and $b$ be integers.
+  The _incremental method_ treats a complete admissible record $rho$ as follows.
+  + It carries out the symbolic pass along $rho$ over $ZZ[x, x^(-1)]$, from the initial stage for $a$ and $b$.
+    If the pass fails, $rho$ is _passed to the direct method_.
+  + Otherwise, with $E_"fin"$ the final equation, if $(E_"fin")_0 = 0$ or $(E_"fin")_j != 0$ for some $j >= 1$, the record is passed to the direct method.
+  + Otherwise let $q := "key"((E_"fin")_0)$.
+    If the coefficients of $q(x + 1)$ are non-negative and its constant coefficient is positive, the method reports no proportion.
+  + Otherwise it makes the numerical check of every $r in "roots"(q)$.
+    If some verdict is unsure, the record is passed to the direct method; otherwise the method reports the numbers $r$ whose verdict is accept.
+  For a record passed to the direct method, the incremental method reports the set $"Ref"_(a, b) (rho)$.
+  We write $"Fast"_(a, b) (rho)$ for the finite set of numbers reported.
+] <def:fastsolve>
+
+For ten tiles, one record in ten thousand is passed to the direct method.
+Whenever the incremental method settles a record itself, it reports exactly the solutions of its system, with no proviso.
+
+#proposition(name: [incremental method on a record])[
+  Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
+  Call _solution_ of $rho$ a real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
+  + If $rho$ is not passed to the direct method, $"Fast"_(a, b) (rho)$ is the set of the solutions of $rho$.
+  + Every element of $"Fast"_(a, b) (rho)$ is a solution of $rho$.
+  + If $rho$ is not passed to the direct method, or if it is regular for $(a, b)$, every solution of $rho$ belongs to $"Fast"_(a, b) (rho)$.
+  + $"Ref"_(a, b) (rho) subset.eq "Fast"_(a, b) (rho)$, with equality if $rho$ is regular for $(a, b)$.
+] <prop:fastsolve>
+
+#proof[
+  Suppose that $rho$ is not passed to the direct method.
+  Then the pass is successful, $c := (E_"fin")_0$ is not zero, the other coefficients of $E_"fin"$ are zero, and $q = "key"(c)$ is a non-zero polynomial with the same zeros as $c$ amongst the non-zero real numbers.
+  Let $r$ be a solution of $rho$.
+  By @prop:hom there is $w in RR^(k + 1)$ with $w_0 = 1$ at which the homogeneous system holds for the evaluation at $r$, so $c(r) = 0$ by @prop:det, and $r in "roots"(q)$.
+  In particular the third step does not apply if $rho$ has a solution, by @prop:noroot, so that the first statement holds when it applies.
+  Suppose that the fourth step applies, and let $r in "roots"(q)$, so that $r >= 1$, $c(r) = 0$, and the stored interval of $r$ encloses $r$ and is certainly away from zero.
+  If the verdict for $r$ is accept, $r$ is a solution by @prop:numeric and @prop:hom.
+  If $r$ is a solution, its verdict is not unsure, since $rho$ is not passed to the direct method, and it is not reject, by @prop:numeric and @prop:hom; so it is accept.
+  This proves the first statement.
+
+  The other statements follow from the first and from @prop:solve.
+  If $rho$ is passed to the direct method, $"Fast"_(a, b) (rho) = "Ref"_(a, b) (rho)$ consists of solutions, and contains every solution if $rho$ is regular.
+  If it is not, $"Fast"_(a, b) (rho)$ is the set of all solutions, which contains $"Ref"_(a, b) (rho)$, and equals it if $rho$ is regular.
+]
+
+== The search <sec:tree>
+
+It remains to relate the depth-first search, which never forms the list of the records, to the treatment of the records one at a time.
+The search is split into tasks by the first few placements, and a failure of the symbolic pass hands a whole subtree to the direct method.
+
+#definition(name: [enumeration])[
+  Fix a truth value, _square_.
+  For a bare staircase $S$, an integer $r >= 0$ and a truth value _first_, let $"moves"(S, r, "first")$ be the set of the placements that are admissible at $S$ with $r$ tiles remaining, the tall ones being excluded when both _square_ and _first_ hold.
+  The set $cal(C)(r, "first", S)$ of the _completions_ of $S$ consists of the empty record alone if $S$ is empty; it is empty if $S$ is not empty and $r = 0$; and otherwise it consists of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(C)(r - 1, "false", S')$, where $S'$ is the staircase after $p$.
+  For an integer $d >= 0$, the set $cal(P)_d (r, "first", S)$ of the _prefixes_ consists of the empty record alone if $d = 0$ or $S$ is empty, and otherwise of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(P)_(d - 1) (r - 1, "false", S')$.
+] <def:enumeration>
+
+The completions are the records of @def:admissible, and the prefixes cut them at a given depth.
+
+#proposition(name: [enumeration])[
+  + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide in case both _square_ and _first_ hold.
+    In particular, for the bare initial staircase $S_0$, the set $cal(C)(n, "true", S_0)$ consists of the complete admissible records for $n$ tiles, with the first tile wide if _square_ holds.
+  + For every $d >= 0$, a record belongs to $cal(C)(r, "first", S)$ if and only if it consists of a record $rho_1 in cal(P)_d (r, "first", S)$ followed by a record of $cal(C)(r - ell_1, "first"_1, S_1)$, where $ell_1$ is the length of $rho_1$, $S_1$ is the staircase after $rho_1$, and $"first"_1$ holds exactly if _first_ holds and $rho_1$ is empty.
+] <prop:enumeration>
+
+#proof[
+  The first statement is proved by induction on $r$.
+  If $S$ is empty, the only completion is the empty record, and it is the only record that satisfies the condition, no placement being admissible at the empty staircase.
+  If $S$ is not empty and $r = 0$, there is no completion, and no record satisfies the condition: the empty one does not leave an empty staircase, and no placement is admissible with no tile remaining.
+  If $S$ is not empty and $r >= 1$, a record satisfies the condition exactly if it is not empty, its first placement belongs to $"moves"(S, r, "first")$, and the rest satisfies the condition for $r - 1$, the staircase $S'$ and _first_ false, that is, belongs to $cal(C)(r - 1, "false", S')$ by induction.
+
+  The second statement is proved by induction on $d$.
+  For $d = 0$, and when $S$ is empty, the only prefix is the empty record and the statement is trivial.
+  Let $d >= 1$ and $S$ not empty.
+  If $r = 0$ there are neither completions nor prefixes.
+  If $r >= 1$, a completion is a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(C)(r - 1, "false", S')$, which by induction is a record $rho'_1 in cal(P)_(d - 1) (r - 1, "false", S')$ followed by a completion of the staircase after it, with $r - 1$ diminished by the length of $rho'_1$ and with _first_ false; and the records formed by $p$ followed by such $rho'_1$ are the prefixes in $cal(P)_d (r, "first", S)$.
+]
+
+#definition(name: [incremental search])[
+  Let $a$ and $b$ be integers, and let _square_ hold exactly if $a = b$.
+  Let $Sigma = (S, pi, k)$ be a stage whose staircase is not empty, reached by the symbolic pass along a record $delta$, and let $r >= 0$.
+  The search _below_ $Sigma$ with $r$ tiles remaining considers every placement $p$ in $"moves"(overline(S), r, "first")$, where $overline(S)$ is the bare staircase underlying $S$ and _first_ holds exactly if $delta$ is empty, and treats it as the symbolic pass does.
+  + If the pass fails at $p$, the search reports $"Ref"_(a, b) (delta p rho')$ for every $rho' in cal(C)(r - 1, "false", S')$, where $S'$ is the bare staircase after $p$.
+  + If $p$ has an equation $E$ and empties the staircase, the search treats the record $delta p$ by the second, third and fourth steps of @def:fastsolve, with $E$ as the final equation, and reports accordingly.
+  + Otherwise it continues below the next stage of the pass, reached along $delta p$, with $r - 1$ tiles remaining.
+  The search with a _forced_ record $rho_1 = (f_1, dots, f_d)$, from the initial stage with $n$ tiles remaining, treats $f_1, dots, f_d$ in turn in the same three ways, each only if it belongs to the set of moves at the stage reached, and reports nothing otherwise; in the first case, at a forced placement $f_j$, it reports only for those completions $rho'$ that begin with the remaining forced placements $f_(j + 1), dots, f_d$, or that are complete before these are exhausted and form a beginning of them; in the third case it passes to the next forced placement, and after the last one it continues with the search below the stage reached.
+  For integers $d, n >= 0$, the _incremental search_ for $n$ tiles, split at depth $d$, reports the numbers found with $rho_1$ forced, for every $rho_1 in cal(P)_d (n, "true", S_0)$.
+] <def:explore>
+
+In the implementation the prefixes are the tasks distributed to the threads.
+
+The search reports what the incremental method reports for the records taken one at a time.
+
+#proposition(name: [the search and the records])[
+  Let $a$ and $b$ be integers.
+  For all $d, n >= 0$, the numbers reported by the incremental search for $n$ tiles, split at depth $d$, are those of
+  $ "Fast"_n (a, b) := union.big_rho "Fast"_(a, b) (rho), $
+  where $rho$ ranges over the complete admissible records for $n$ tiles, in which moreover the first tile is wide if $a = b$.
+] <prop:searched>
+
+#proof[
+  For a stage $Sigma$ reached along $delta$ and a record $rho'$, let $B(Sigma, delta, rho')$ be the set that the incremental method reports for the record $delta rho'$ when its symbolic pass, having reached $Sigma$ after $delta$, is continued along $rho'$.
+  For the initial stage and the empty $delta$ this is $"Fast"_(a, b) (rho')$.
+  The staircase of a stage and the bare staircase obtained by the same placements have the same flags, since an elimination changes only the lengths.
+
+  We show by induction on $r$ that the numbers reported by the search below $Sigma = (S, pi, k)$ with $r$ tiles remaining are those of the sets $B(Sigma, delta, rho')$ for $rho' in cal(C)(r, "first", overline(S))$.
+  If $r = 0$ nothing is reported, and there is no completion because $S$ is not empty.
+  Let $r >= 1$.
+  The completions are the records $p rho''$ with $p in "moves"(overline(S), r, "first")$ and $rho'' in cal(C)(r - 1, "false", S')$.
+  If the pass fails at $p$, then $B(Sigma, delta, p rho'') = "Ref"_(a, b) (delta p rho'')$ for every such $rho''$, which is what the search reports.
+  If $p$ has an equation and empties the staircase, the only such $rho''$ is the empty record, and $B(Sigma, delta, p)$ is what the search reports.
+  Otherwise the next stage $Sigma'$ has a staircase that is not empty, $B(Sigma, delta, p rho'') = B(Sigma', delta p, rho'')$, and the induction hypothesis applies to $Sigma'$.
+
+  The same case distinction, applied to the forced placements in turn, shows two things for the search with $rho_1$ forced: every number that it reports belongs to $B(Sigma_0, nothing, rho')$ for some $rho' in cal(C)(n, "true", S_0)$, with $Sigma_0$ the initial stage; and it reports every number of $B(Sigma_0, nothing, rho_1 rho_2)$ whenever $rho_1 rho_2 in cal(C)(n, "true", S_0)$.
+  In the first case of the definition, indeed, the search reports for the completions below the forced placement at which the pass fails that continue with the remaining forced placements, and $rho_2$ preceded by these is one of them.
+  By the first statement of @prop:enumeration, the records of $cal(C)(n, "true", S_0)$ are those over which the union is taken, so every number reported belongs to $"Fast"_n (a, b)$.
+  Conversely, by the second statement of @prop:enumeration, every such record is of the form $rho_1 rho_2$ with $rho_1 in cal(P)_d (n, "true", S_0)$, so every number of $"Fast"_n (a, b)$ is reported.
+]
+
+Restricting the first case, at a forced placement, to the completions that continue with the remaining forced placements ensures that no record is treated under two prefixes: the records examined under the prefixes of the split, taken in order, are exactly the complete admissible records, each once, whether or not the pass fails and wherever it does.
+This is proved in the formal development (`examined_split`, `examined_once`).
+An earlier version of the implementation reported, in that case, for all the completions below the failing placement, under every prefix through it; the formalisation exposed this, which left the set of numbers reported unchanged but would have repeated records in the counts, and the implementation was corrected.
+No such failure had been observed.
+
+#definition(name: [certified incremental search])[
+  Let $a$ and $b$ be integers and $n >= 0$.
+  The incremental search for $n$ tiles is _certified_ if every complete admissible record for $n$ tiles, in which moreover the first tile is wide if $a = b$, that the incremental method passes to the direct method is regular for $(a, b)$.
+] <def:fastcert>
+
+This is what the two counts of the direct method establish in a run of the incremental search, in which the direct method treats only the records passed to it.
+
+#proposition(name: [correctness of the incremental search])[
+  Let $a, b >= 1$ and $n >= 0$ be integers.
+  + $"Fast"_n (a, b) subset.eq P_n (a, b)$.
+  + If the incremental search for $n$ tiles is certified, then $"Fast"_n (a, b) = P_n (a, b)$.
+  + $"Ref"_n (a, b) subset.eq "Fast"_n (a, b)$; and if the direct search for $n$ tiles is certified, then so is the incremental search, and $"Fast"_n (a, b) = "Ref"_n (a, b)$.
+] <prop:fast>
+
+#proof[
+  The first two statements are proved as @prop:reference, with @prop:fastsolve in the place of @prop:solve.
+  An element of $"Fast"_(a, b) (rho)$ is a solution of $rho$, and gives a tiling by @prop:sound and @prop:scaling.
+  Conversely, an element of $P_n (a, b) = P_n (a slash b, 1)$ is a solution of a complete admissible record $rho$ for $n$ tiles, with the first tile wide if $a = b$, by @prop:complete and @prop:square; if the search is certified, $rho$ is not passed to the direct method or is regular, and the solution belongs to $"Fast"_(a, b) (rho)$.
+  The third statement follows record by record from the last statement of @prop:fastsolve, a certified direct search being one in which every record considered is regular.
+]
+
+The first statement needs no proviso: whatever the incremental search reports is the proportion of a tiling.
+The two searches can differ only at a record that the incremental method settles itself and that is not regular for the direct method, because a singular situation is counted or the record is flagged as constant; there the incremental method reports every solution and the direct method may report nothing.
+No such record is known.
+Completeness of the incremental search needs less than that of the direct search, namely the regularity of the records passed to the direct method only.
+
 = Formalisation <app:formal>
 
-The statements of @sec:tilings, @sec:search and @sec:optimisations have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
+The statements of @sec:tilings, @sec:staircases, @sec:systems and @app:solving have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
 The development contains no unproved statement and no axiom of its own; its main theorems depend only on the three axioms `propext`, `Classical.choice` and `Quot.sound` of Lean and Mathlib.
 @tab:formal lists, for each definition and proposition of those sections, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
 The proofs given in this paper follow those of the development, statement by statement.
@@ -1777,7 +1830,7 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
       )
     }),
-    caption: [The definitions and propositions of @sec:tilings, @sec:search and @sec:optimisations, and the Lean declarations that formalise them.],
+    caption: [The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems and @app:solving, and the Lean declarations that formalise them.],
   ) <tab:formal>
 ]
 
@@ -1811,7 +1864,7 @@ The statements of the paper and those of the development differ in the following
 - *The search.* The sets of @def:enumeration are lists, in the order in which the search tries the placements.
   The numbers found by the search of @def:explore form a predicate, defined by recursion, and the parallel execution is not modelled.
   The development models the search as in @def:explore, including the restriction to the remaining forced placements when the pass fails at a forced placement (`forcedCompletions`), and proves in addition that every complete admissible record is examined under exactly one prefix (`examined_once`).
-  The optional restriction of the search to tilings with few tiles in one orientation, which the default search does not impose, is not modelled.
+  The optional restriction of the search to tilings with few tiles in one orientation, which the incremental search does not impose, is not modelled.
 
 == What is not formalised <sec:unformalised>
 
@@ -1823,7 +1876,7 @@ The formal development is about a model of the method, and the following lies ou
   This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the test of divisibility.
   Both sets of specifications are shown to be consistent by exhibiting routines that meet them.
 - *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for want of an unknown to eliminate.
-  It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the reference method, or returns the verdict unsure, when the check fails.
+  It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the direct method, or returns the verdict unsure, when the check fails.
 - *Regularity.* It is not proved that every record is regular in the sense of @def:regular.
   The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast have their absence as a hypothesis.
 - *Uniqueness.* It is not proved that a tiling, or a mosaic class, arises from a single record.
@@ -1844,7 +1897,7 @@ This appendix collects properties of the sets of proportions, with their proofs,
 The proofs are complete, except that the following classical results are used without proof, each being named where it is used.
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
 Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
-A few remarks rest on computations made with the search of @sec:search; they are marked as such, and no proof depends on them.
+A few remarks rest on computations made with the search of @sec:solving; they are marked as such, and no proof depends on them.
 Nothing in this appendix has been formalised, except @prop:persistence.
 @tab:structure collects the counts to which the appendix refers.
 

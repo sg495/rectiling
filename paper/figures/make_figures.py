@@ -8,12 +8,11 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import sympy as sp
 from matplotlib.patches import Rectangle
 
-COLOURS = tuple(mcolors.TABLEAU_COLORS)
+COLOURS = ("#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7", "#F0E442")
 FITS = ("inside", "full-height", "full-width", "full")
 X = sp.Symbol("x", positive=True)
 OUT = Path(__file__).parent
@@ -148,9 +147,9 @@ def tilings(n):
 
 
 def draw(ax, tiles, width=1.0, height=1.0, outline=True):
-    """Draws tiles in the colours of the default Matplotlib cycle, in placement order."""
+    """Draws outlined tiles in the colours of the palette of Okabe and Ito, in placement order."""
     for k, (x, y, w, h) in enumerate(tiles):
-        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0))
+        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0.35))
     if outline:
         ax.add_patch(Rectangle((0, 0), width, height, fc="none", ec="k", lw=0.6))
     ax.set_xlim(-0.05 * width, 1.05 * width)
