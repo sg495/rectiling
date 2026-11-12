@@ -175,6 +175,7 @@ The region of the initial staircase of $W$ and $H$ is the main rectangle $[0, W]
 This and the other figures of this section are drawn from tilings found by the search, at their exact proportions.
 
 #figure(
+  placement: auto,
   image("figures/staircase.svg", width: 55%),
   caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
