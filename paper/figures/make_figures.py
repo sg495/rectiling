@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 """Generates the figures of the paper from staircase placement sequences."""
 
+import csv
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
@@ -211,6 +212,36 @@ def catalogue(n, columns, path, size, labels=True):
     plt.close(fig)
 
 
+def sequences_plot(path):
+    """Plots the numbers of proportions, bags, classes and tilings for a square on a logarithmic scale."""
+    rows = list(csv.reader((OUT.parent / "data" / "tilings-counts.csv").read_text().splitlines()[2:]))
+    proportions = [row[1] for row in csv.reader((OUT.parent / "data" / "counts.csv").read_text().splitlines()[2:])]
+    number = lambda cell: int(cell.replace(",", "")) if cell else None
+    series = {
+        "$t(n)$": ([number(r[4]) for r in rows], "#0072B2", "o"),
+        "$b(n)$": ([number(r[3]) for r in rows], "#E69F00", "s"),
+        "$c(n)$": ([number(r[2]) for r in rows], "#009E73", "^"),
+        "$a(n)$": ([number(v) for v in proportions], "#D55E00", "D"),
+    }
+    fig, ax = plt.subplots(figsize=(4.6, 3.1))
+    for name, (values, colour, marker) in series.items():
+        points = [(n, v) for n, v in enumerate(values, start=1) if v]
+        ax.plot(*zip(*points), color=colour, marker=marker, ms=3.2, lw=0.9, mec="w", mew=0.4, label=name)
+    ax.set_yscale("log")
+    ax.set_xticks(range(1, 14))
+    ax.set_xlabel("$n$", fontsize=8)
+    ax.tick_params(labelsize=7, width=0.4, length=2.5)
+    ax.grid(True, which="major", color="0.88", lw=0.4)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_linewidth(0.4)
+    ax.legend(fontsize=7, frameon=False, loc="upper left")
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def main():
     """Generates all figures."""
     three = tilings(3)
@@ -223,6 +254,7 @@ def main():
     grid([t for _, t, _ in cubic], len(cubic), OUT / "shared-cubic.svg")
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
     catalogue(6, 14, OUT / "six-tiles.svg", 0.47)
+    sequences_plot(OUT / "sequences.svg")
     print("three tiles:", [(round(v, 6), m) for v, _, m in three])
     print("tilings with four tiles:", len(four), "sharing the cubic:", len(cubic))
 

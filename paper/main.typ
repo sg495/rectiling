@@ -244,10 +244,11 @@ The search therefore restricts the sequences of placements by two rules, which a
 After the first placement, which is inside, the tier $T_1$ to the right of the tile has a started floor.
 The third placement is made at $T_1$ and makes $T_0$ stale: no tile can be placed there until its floor is lengthened.
 The fourth placement, of full height at $T_1$, does lengthen the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ with a started floor, so that a tile of full height or a full tile at $T_2$, which would lengthen that floor, is excluded.
+The fifth placement, a full tile at $T_1$, removes that tier, and the tier that was $T_2$ becomes $T_1$, its floor still started.
 
 #figure(
   image("figures/rules.svg", width: 100%),
-  caption: [The staircases after one, three and four placements of the record of the tiling of @fig:staircase. The anchor of a stale tier is grey, and started floors are drawn dashed in red.],
+  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The anchor of a stale tier is grey, and started floors are drawn dashed in red.],
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
@@ -694,7 +695,7 @@ The smallest case in which the search has anything to decide is that of two tile
 
 = Results <sec:results>
 
-All computations were carried out with the Rust implementation of the search, on a machine with sixteen cores and 128 GB of memory.
+All computations were carried out with the Rust implementation of the search, on an M4 Max 128 GB machine.
 All runs used the incremental search, except where stated.
 In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the direct method were all zero.
 In the incremental search these counters concern the records passed to the direct method, so that every unrestricted run of the incremental search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the direct search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
@@ -803,8 +804,9 @@ For $m = n + 1$ this is
 $ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
 
 #proposition(name: [upper bound])[
-  For every $n >= 1$, $a(n) <= n 2^(n - 1) M(n)$.
-  In particular $limsup a(n)^(1 slash n) <= 27 slash 2$.
+  The number of proportions for the square satisfies
+  $ limsup_(n -> infinity) a(n)^(1 slash n) <= 27 / 2. $
+  More precisely, $a(n) <= n 2^(n - 1) M(n)$ for every $n >= 1$.
 ] <prop:upper>
 
 #proof[
@@ -814,7 +816,7 @@ $ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
   By @prop:tiling-network, $Z_(frak(N)(tau), epsilon) (x) = 1$, so that $x$ is a root of $N - D$, where $N slash D$ is this function in lowest terms.
   By @prop:reactance, $N - D$ is not zero and has degree at most $n$, and it depends only on the isomorphism class of the rooted map with its orientation vector.
   By @prop:nonseparable and the result of Tutte there are at most $M(n)$ rooted maps, each with at most $2^(n - 1)$ orientation vectors in which the distinguished edge has orientation $-1$, and each pair contributes at most $n$ roots.
-  This gives the first statement, and the second follows by Stirling's formula, by which $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$.
+  This gives the bound on $a(n)$, and the limit follows by Stirling's formula, by which $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$.
 ]
 
 
@@ -844,13 +846,18 @@ Indeed the proportions are finitely many, by @prop:upper, as are the records, an
 A tiling determines its bag, and symmetric tilings have the same bag, so that
 $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
 The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
-@tab:tbc gives the values that we computed, and @fig:classes shows the sixteen classes for four tiles.
+@tab:tbc gives the values that we computed, @fig:sequences plots the four sequences, and @fig:classes shows the sixteen classes for four tiles.
 
 #figure(
   kind: table,
   datatable(csv("data/tilings-counts.csv")),
   caption: [Bags, classes under symmetry and tilings for the unit square, with the number of proportions for comparison.],
 ) <tab:tbc>
+
+#figure(
+  image("figures/sequences.svg", width: 62%),
+  caption: [The numbers of tilings, classes, bags and proportions for the square, on a logarithmic scale. The numbers of bags and of proportions differ by less than six per cent throughout, and their curves nearly coincide.],
+) <fig:sequences>
 
 #figure(
   image("figures/classes-4.svg", width: 100%),
@@ -985,6 +992,16 @@ The proportion $2$ has the most bags, and the most classes, for every $n$ from $
 For @conj:growth-symmetry, the quotient $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$, to $1.0003$.
 For @conj:growth-rate, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$.
 The three statements are independent of one another as far as we know.
+
+#heading(numbering: none)[Use of AI Systems]
+
+This project was carried out with responsible use of AI systems.
+The author formulated, implemented and proved an initial version of Sections 1-4, which AI systems optimised and improved upon.
+The results of Section 5 were found by computation, and the propositions/conjectures of Section 5 were formulated and proved by AI system on individual request of the author.
+An initial version of the solution methods for linear systems in Appendix B were proposed by the author, but were then autonomously improved by AI systems with the objective of optimising various aspects of the search algorithm.
+Lean formalisation was carried out by AI systems on general request of the author.
+Properties and conjectures in Appendix D were autonomously formulated by AI systems, on request of the author by theme of investigation.
+The paper was written and reviewed by AI systems --- under the authors' own direction, supervision, and revision --- based on the fullness of project data: development transcripts, source code, documentation, version history, test suites, and benchmarking results.
 
 #bibliography("refs.bib", style: "ieee")
 

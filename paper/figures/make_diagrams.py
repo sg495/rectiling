@@ -12,7 +12,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sympy as sp
-from matplotlib.patches import Rectangle
+from matplotlib.patches import FancyArrowPatch, Rectangle
+from matplotlib.path import Path as MplPath
 
 from make_figures import COLOURS, Tier, X, draw, place, replay, witness_tiles
 
@@ -139,6 +140,8 @@ def fits_figure(path, value, witness):
         assert abs(x - t.ax) < EPS and abs(y - t.ay) < EPS and w <= t.floor + EPS and h <= t.wall + EPS
         assert (narrow, low) == (fit in ("inside", "full-height"), fit in ("inside", "full-width")), (fit, k)
         draw(ax, tiles[: k + 1])
+        for u in sts[k]:
+            ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.4", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="0.45", zorder=3))
         ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="k", lw=0.6, zorder=5))
         ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
@@ -156,8 +159,8 @@ def rules_figure(path, value, witness):
     """Draws the staircases of a listed tiling that carry the most flags, marking stale tiers and started floors."""
     tiles, sts = stages(value, witness)
     ranked = sorted(range(1, len(sts) - 1), key=lambda k: (-any(r != "stale" for _, r in excluded(sts[k])), -any(t.stale for t in sts[k]), -len(sts[k]), k))
-    picks = sorted(ranked[:3])
-    fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.45))
+    picks = sorted(set(ranked[:3]) | {5})
+    fig, axes = plt.subplots(1, len(picks), figsize=(6.8, 1.95))
     notes = []
     for ax, k in zip(axes, picks):
         draw(ax, tiles[:k])
@@ -242,7 +245,7 @@ def construction_figure(path, value, witness):
                 first = j
         assert first == moves[k][0], (k, first, moves[k])
         mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first])
-        ax.set_title(f"before placement {k + 1}", fontsize=6, pad=2)
+        ax.set_title("no placement" if k == 0 else f"after {k} placement{'' if k == 1 else 's'}", fontsize=6, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
     fig.savefig(path)
     plt.close(fig)
@@ -426,8 +429,10 @@ def network_figure(path, tiles):
         bend = -1.6 * (x + w / 2 - (nodes[top][0] + nodes[bottom][0]) / 2) / max(h, 0.35)
         right.annotate("", xy=nodes[bottom], xytext=nodes[top], arrowprops=dict(arrowstyle="-|>", color=COLOURS[k % len(COLOURS)], lw=1.2, shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle=f"arc3,rad={bend:.3f}"))
     top, bottom = next(c for c in comps if c[2] > 1 - EPS), next(c for c in comps if c[2] < EPS)
-    right.annotate("", xy=nodes[top], xytext=nodes[bottom], arrowprops=dict(arrowstyle="-|>", color="k", lw=0.6, ls="--", shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle="arc3,rad=1.6"))
-    right.text(1.36, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
+    (sx, sy), (tx, ty), reach = nodes[top], nodes[bottom], 0.95
+    curve = MplPath([(tx + 0.03, ty), (tx + reach, ty), (sx + reach, sy), (sx + 0.03, sy)], [MplPath.MOVETO, MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4])
+    right.add_patch(FancyArrowPatch(path=curve, arrowstyle="-|>", color="k", lw=0.6, ls="--", mutation_scale=7))
+    right.text(sx + 0.75 * reach + 0.03, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
     for c, (x, y) in nodes.items():
         right.plot([x], [y], marker="o", mfc="w", mec="k", ms=4, zorder=3)
         right.text(x - 0.06, y, f"${names[c]}$", fontsize=7, va="center", ha="right")
