@@ -997,11 +997,11 @@ The three statements are independent of one another as far as we know.
 
 This project was carried out with responsible use of AI systems.
 The author formulated, implemented and proved an initial version of Sections 1-4, which AI systems optimised and improved upon.
-The results of Section 5 were found by computation, and the propositions/conjectures of Section 5 were formulated and proved by AI system on individual request of the author.
+The results of Section 5 were found by computation, and the propositions/conjectures of Section 5 were formulated and proved by AI system on individual request by the author.
 An initial version of the solution methods for linear systems in Appendix B were proposed by the author, but were then autonomously improved by AI systems with the objective of optimising various aspects of the search algorithm.
-Lean formalisation was carried out by AI systems on general request of the author.
-Properties and conjectures in Appendix D were autonomously formulated by AI systems, on request of the author by theme of investigation.
-The paper was written and reviewed by AI systems --- under the authors' own direction, supervision, and revision --- based on the fullness of project data: development transcripts, source code, documentation, version history, test suites, and benchmarking results.
+Lean formalisation was carried out by AI systems on general request by the author.
+Properties and conjectures in Appendix D were autonomously formulated by AI systems, on request by the author by theme of investigation.
+The paper was written and reviewed by AI systems --- under the author's own direction, supervision, and revision --- based on the fullness of project data: development transcripts, source code, documentation, version history, test suites, and benchmarking results.
 
 #bibliography("refs.bib", style: "ieee")
 
