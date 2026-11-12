@@ -940,6 +940,7 @@ The search for tilings keeps the record described in @prop:representative, which
 The values of @tab:tbc were checked as follows.
 For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
 For $n <= 10$ they agree with a run in which every record is solved by the direct method and every comparison of coordinates is exact.
+For $n <= 9$ the values of $t(n)$ agree with a count of the tilings through their plane networks, described in @sec:full-side, which does not use the staircase construction and is carried out in floating-point arithmetic.
 For $n <= 12$ the number of classes obtained from canonical representatives agrees with the number given by Burnside's lemma from the tilings fixed by each symmetry, and the number of records agrees with the count $sum 2^k$ described above.
 The values of all three sequences for $n = 11$ and $n = 12$ rest on the search alone.
 
