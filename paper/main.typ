@@ -2563,7 +2563,7 @@ The functions themselves grow at least threefold with each tile.
   Hence $(frak(N)', epsilon')$ is proper, and its impedance function agrees with $F + x^delta$ at every $x > 0$, hence identically.
   So the sets $S_+ := {F + x : F in cal(F)_n}$ and $S_- := {F + 1 slash x : F in cal(F)_n}$ are contained in $cal(F)_(n + 1)$, and each has $2 E(n)$ elements.
 
-  Let $G in S_+ sect S_-$, say $G = F_1 + x = F_2 + 1 slash x$ with $F_1, F_2 in cal(F)_n$.
+  Let $G in S_+ inter S_-$, say $G = F_1 + x = F_2 + 1 slash x$ with $F_1, F_2 in cal(F)_n$.
   Then $F_1 (x) = F_2 (x) + 1 slash x - x > 1 slash x - x$ on $(0, infinity)$, by the second statement of @prop:reactance, so that $F_1$ tends to $infinity$ at $0$.
   By the fourth statement of @prop:reactance every element of $cal(F)_n$ tends to $0$ or to $infinity$ at $0$, and inversion exchanges the two kinds, so that $E(n)$ elements of $cal(F)_n$ tend to $infinity$ at $0$.
   As $G$ determines $F_1$, the intersection has at most $E(n)$ elements, and $S := S_+ union S_-$ has at least $3 E(n)$.
