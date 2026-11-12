@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-#import "template.typ": template, appendix, proposition, conjecture, definition, example, proof
+#import "template.typ": appendix, conjecture, definition, example, proof, proposition, template
 #import "tables.typ": datatable
 
 #let todo(body) = text(fill: rgb("#b00020"))[[To do: #body]]
 
 #show: template.with(
-  title: [Enumerating the Dissections of a Square into Similar Rectangles],
-  authors: ((name: "Stefano Gogioso", affil: "Hashberg"),),
+  title: [Rectangular Dissections into Similar Rectangles],
+  authors: ((name: "Stefano Gogioso", affil: "Hashberg Ltd"),),
   abstract: [
     We describe an exact procedure which, for a given $n$ and a main rectangle of rational aspect ratio, finds every proportion $x >= 1$ such that the main rectangle can be cut into $n$ rectangles of proportion $x$, each proportion being identified as a real algebraic number by its minimal polynomial.
     The procedure places tiles one at a time on a staircase, and solves exactly, for each sequence of placements, a linear system whose coefficients are polynomials in the proportion.
     We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
-    For the square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
+    For the special case of a square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
     For $n <= 12$ we also count the tilings themselves, their classes under the symmetries of the square, and the multisets of tiles that occur.
     We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, that $a(n)$ grows at most like $(27 slash 2)^n$, and that for main rectangles wider than a bound depending on $n$ the number of proportions is the number of impedance functions of the corresponding electrical networks; we state conjectures on the rational proportions and on the growth of the sequences.
   ],
@@ -187,15 +187,17 @@ A tile that is as high as the wall has its height determined by the staircase, a
   A fit is _narrow_ if it is inside or full height, and _low_ if it is inside or full width.
   Let $S = (T_0, dots, T_(m - 1))$ be a staircase over $cal(L)$ with $i < m$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $s in cal(L)$, the _free side_.
   The _size_ $(w, h)$ of the tile of $p$ is
-  $ (w, h) := cases(
-    (x s, s) & "if" phi "is inside and" o "is wide,",
-    (s, x s) & "if" phi "is inside and" o "is tall,",
-    (x M, M) & "if" phi "is full height and" o "is wide,",
-    (M slash x, M) & "if" phi "is full height and" o "is tall,",
-    (L, L slash x) & "if" phi "is full width and" o "is wide,",
-    (L, x L) & "if" phi "is full width and" o "is tall,",
-    (L, M) & "if" phi "is full.",
-  ) $
+  $
+    (w, h) := cases(
+      (x s, s) & "if" phi "is inside and" o "is wide,",
+      (s, x s) & "if" phi "is inside and" o "is tall,",
+      (x M, M) & "if" phi "is full height and" o "is wide,",
+      (M slash x, M) & "if" phi "is full height and" o "is tall,",
+      (L, L slash x) & "if" phi "is full width and" o "is wide,",
+      (L, x L) & "if" phi "is full width and" o "is tall,",
+      (L, M) & "if" phi "is full.",
+    )
+  $
   The _positive quantity_ of $p$ is $s$ if $phi$ is inside, $M$ if $phi$ is full height, and $L$ if $phi$ is full width or full.
   If $phi$ is full, the _equation_ of $p$ is the length $L - x M$ if $o$ is wide and $M - x L$ if $o$ is tall; other placements have no equation.
   _Placing_ $p$ on $S$ with free side $s$ gives the staircase $S'$ obtained as follows.
@@ -871,7 +873,9 @@ The forms of a stage are related to those of the homogeneous system, on which no
   For an elimination $epsilon = (E, m, pi)$ with $psi(pi) != 0$, let $gamma_epsilon$ be the map on the forms over $K$ given by
   $ gamma_epsilon (G)_j := (psi(E_m) G_j - G_m psi(E_j)) / psi(pi). $
   An _elimination chain_ over $psi$ consists of eliminations $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, and of forms $e_1, dots, e_r$ over $R$, its _originals_, such that $pi_0 = 1$, $pi_i = (E_i)_(m_i)$ for $i < r$, $psi(pi_(i - 1)) != 0$ for $i <= r$, and
-  $ psi(E_i) = Gamma_(i - 1) (psi(e_i)) quad "for" i <= r, quad "where" Gamma_i := gamma_(epsilon_i) compose dots.c compose gamma_(epsilon_1). $
+  $
+    psi(E_i) = Gamma_(i - 1) (psi(e_i)) quad "for" i <= r, quad "where" Gamma_i := gamma_(epsilon_i) compose dots.c compose gamma_(epsilon_1).
+  $
   Its _current pivot_ is $pi_r := (E_r)_(m_r)$, or $1$ if $r = 0$.
   A form over $K$ is _carried_ through $epsilon_1, dots, epsilon_r$ by applying $Gamma_r$.
 ] <def:chain>
@@ -1747,80 +1751,178 @@ The proofs given in this paper follow those of the development, statement by sta
 #let lean-row(statement, ..declarations) = (statement, declarations.pos().join(linebreak()))
 
 #[
-#show figure.where(kind: table): set block(breakable: true)
-#figure(
-  kind: table,
-  block(breakable: true, {
-    set text(size: 0.82em)
-    set par(justify: false)
-    show raw: set text(size: 0.8em)
-    table(
-      columns: (auto, 1fr),
-      align: (left + top, left + top),
-      table.header([*Statement*], [*Module: declarations*]),
-      table.hline(stroke: 0.05em),
-      ..lean-row([@def:rectangle], [`Geometry`: `Rect`, `Rect.closed`, `Rect.inner`, `Rect.Nondegenerate`, `Rect.HasProportion`]),
-      ..lean-row([@def:tiling], [`Geometry`: `IsTiling`, `IsSimilarTiling`, `IsTiling.perm`, `IsTiling.eq_of_not_disjoint`, `Rect.separated_of_disjoint`]),
-      ..lean-row([@def:counts], [`Persistence`: `TilesWith`]),
-      ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`]),
-      ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`]),
-      ..lean-row([@prop:subdivision], [`Refinement`: `IsSimilarTiling.refine`], [`Persistence`: `Rect.isTiling_four`, `TilesWith.add_three`]),
-      ..lean-row([@def:staircase], [`Staircase`: `Algebra`, `Tier`, `initial`, `realAlgebra`, `unitAlgebra`, `Algebra.IsHom`, `Tier.map`]),
-      ..lean-row([@def:region], [`Layout`: `geom`, `GTier.Mem`, `unfilled`, `region`, `Positive`, `region_initial`]),
-      ..lean-row([@def:placement], [`Staircase`: `Fit`, `Placement`, `tileSize`, `positiveOf`, `equationOf`, `place`, `length_place`, `place_map`], [`Layout`: `tileAt`]),
-      ..lean-row([@def:admissible], [`Staircase`: `Allows`, `Admits`, `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`]),
-      ..lean-row([@prop:bound], [`Soundness`: `CompleteFrom.allowed`, `Complete.length`], [`Completeness`: `Allowed.completeFrom`]),
-      ..lean-row([@def:system], [`Staircase`: `positives`, `equations`, `Satisfies`, `run_congr`], [`Layout`: `tiles`]),
-      ..lean-row([@prop:count], [`Staircase`: `length_equations`], [`Solver`: `length_symEquations`], [`Reduced`: `length_homEquations`]),
-      ..lean-row([@prop:step], [`Layout`: `geom_place`], [`Region`: `StepHyp`, `step_region`], [`Soundness`: `positive_parts`]),
-      ..lean-row([@def:doom], [`Soundness`: `DoomF`, `DoomW`]),
-      ..lean-row([@prop:size], [`Soundness`: `size_facts`]),
-      ..lean-row([@prop:doom], [`Soundness`: `StepData.doomF`, `StepData.doomW`]),
-      ..lean-row([@prop:fit], [`Soundness`: `not_doom`, `StepData.positive_place`]),
-      ..lean-row([@prop:sound], [`Soundness`: `tiles_from`, `soundness`]),
-      ..lean-row([@def:extends], [`Extension`: `Ext`]),
-      ..lean-row([@prop:near], [`Extension`: `exists_gap`, `IsTiling.exists_tile_above_right`, `IsTiling.exists_tile_below_right`]),
-      ..lean-row([@def:state], [`Extension`: `GInv`, `FlagsOK`], [`Completeness`: `CInv`]),
-      ..lean-row([@prop:anchor], [`Extension`: `Around.not_mem`, `GInv.anchor_tile`]),
-      ..lean-row([@prop:extension], [`Extension`: `GInv.step`], [`Completeness`: `exists_first_tier`, `tileSize_of_tile`, `CInv.step`]),
-      ..lean-row([@prop:complete], [`Completeness`: `complete_from`, `completeness`]),
-      ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
-      ..lean-row([@def:mosaic], [not formalised]),
-      ..lean-row([@def:forms], [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`]),
-      ..lean-row([@prop:forms], [`Forms`: `formAlgebra_isHom`, `satisfies_iff_forms`]),
-      ..lean-row([@def:primitives], [`Solver`: `Primitives`, `Primitives.ideal`]),
-      ..lean-row([@def:reference], [`Solver`: `systemMatrix`, `systemRhs`, `target`, `numerator`, `NoRootTest`, `Solved`, `solve`]),
-      ..lean-row([@prop:noroot], [`Solver`: `NoRootTest.ne_zero`]),
-      ..lean-row([@prop:solve], [`Solver`: `map_mulVec_cramer`, `map_cramer_of_solution`, `solve_sound`, `solve_complete`, `solve_spec`]),
-      ..lean-row([@def:regular], [`Main`: `Reported`, `Certified`]),
-      ..lean-row([@prop:reference], [`Main`: `reported_sound`, `reported_complete`, `reported_iff`]),
-      ..lean-row([@def:hom], [`Elimination`: `Vec`, `unitVec`, `vecAlgebra`], [`BackSubstitution`: `dot`], [`Reduced`: `homInitial`, `homEquations`, `homPositives`, `val`], [`Certified`: `Coeff`, `propX`, `evalL`]),
-      ..lean-row([@prop:hom], [`Reduced`: `satisfies_iff_hom`, `satisfies_scale`], [`Fast`: `solvable_iff`]),
-      ..lean-row([@def:elimination], [`Elimination`: `Stage`, `Stage.side`, `Elim`, `Step`, `Divisible`, `elimForm`, `Run`, `Run.pivots`], [`Reduced`: `Stage.init`], [`Fast`: `Limits`, `advance`, `run`, `run_spec`]),
-      ..lean-row([@def:chain], [`Elimination`: `carryStep`, `carry`, `carry_isHom`, `mapVec_elimForm`, `Elims`]),
-      ..lean-row([@prop:trace], [`Elimination`: `step_link`, `Trace`, `Run.trace`], [`BackSubstitution`: `Trace.elims`, `Trace.size`]),
-      ..lean-row([@prop:chain], [`Determinant`: `Elims.carry_eq`, `Elims.row`], [`BackSubstitution`: `Elims.carry_pivot`, `Elims.pairwise`, `Elims.dot_carry`, `Elims.true_of_stage`, `Elims.stage_of_true`, `nodup_pivots`]),
-      ..lean-row([@prop:minor], [`Exact`: `Elims.pivot_eq_det`], [`Determinant`: `Elims.chain`, `Elims.det_eq`]),
-      ..lean-row([@prop:det], [`Reduced`: `Run.final_eq_det`, `Run.final_vanishes`]),
-      ..lean-row([@prop:exact], [`Exact`: `Elims.mapRecords`, `Elims.divisible`, `Stage.Linked`, `Stage.Linked.divisible`, `Reached`, `division_exact`]),
-      ..lean-row([@prop:target], [`Target`: `toHom`, `toHom_isHom`, `homEquations_eq`, `Run.final_eq_target`]),
-      ..lean-row([@prop:back], [`BackSubstitution`: `back`, `back_solves`, `back_unique`, `covers`], [`Reduced`: `solutionOf`, `Run.solution`, `Run.prev_ne_zero`]),
-      ..lean-row([@def:numerics], [`Certified`: `Numerics`, `Numerics.ideal`]),
-      ..lean-row([@def:check], [`Certified`: `rowSum`, `backIv`, `Numerics.ivAlgebra`, `carryExact`, `degenerate`, `Verdict`, `check`]),
-      ..lean-row([@prop:numeric], [`Certified`: `backIv_mem`, `Numerics.encl_positives`, `carryExact_spec`, `degenerate_spec`, `check_accept`, `check_reject`]),
-      ..lean-row([@prop:degenerate], [`Certified`: `dvd_iff_evalAt_eq_zero`]),
-      ..lean-row([@def:fastsolve], [`Fast`: `FastNoRoot`, `leaf`, `direct`, `fastSolve`, `Delegated`]),
-      ..lean-row([@prop:fastsolve], [`Fast`: `Solvable`, `leaf_spec`, `direct_spec`, `fastSolve_sound`, `fastSolve_complete`, `solve_subset_fastSolve`, `fastSolve_eq_solve`]),
-      ..lean-row([@def:enumeration], [`Enumeration`: `candidates`, `moves`, `completions`, `after`, `prefixes`]),
-      ..lean-row([@prop:enumeration], [`Enumeration`: `mem_completions`, `mem_completions_initial`, `mem_completions_iff_prefix`]),
-      ..lean-row([@def:explore], [`Search`: `explore`, `exploreForced`, `Searched`]),
-      ..lean-row([@prop:searched], [`Search`: `below`, `fastSolve_eq_below`, `explore_iff`, `exploreForced_sub`, `exploreForced_sup`, `searched_iff`]),
-      ..lean-row([@def:fastcert], [`Fast`: `FastReported`, `FastCertified`]),
-      ..lean-row([@prop:fast], [`Fast`: `fast_sound`, `fast_complete`, `fast_iff`, `reported_imp_fast`, `Certified.fast`, `fast_iff_reported`]),
-    )
-  }),
-  caption: [The definitions and propositions of @sec:tilings, @sec:search and @sec:optimisations, and the Lean declarations that formalise them.],
-) <tab:formal>
+  #show figure.where(kind: table): set block(breakable: true)
+  #figure(
+    kind: table,
+    block(breakable: true, {
+      set text(size: 0.82em)
+      set par(justify: false)
+      show raw: set text(size: 0.8em)
+      table(
+        columns: (auto, 1fr),
+        align: (left + top, left + top),
+        table.header([*Statement*], [*Module: declarations*]),
+        table.hline(stroke: 0.05em),
+        ..lean-row(
+          [@def:rectangle],
+          [`Geometry`: `Rect`, `Rect.closed`, `Rect.inner`, `Rect.Nondegenerate`, `Rect.HasProportion`],
+        ),
+        ..lean-row(
+          [@def:tiling],
+          [`Geometry`: `IsTiling`, `IsSimilarTiling`, `IsTiling.perm`, `IsTiling.eq_of_not_disjoint`, `Rect.separated_of_disjoint`],
+        ),
+        ..lean-row([@def:counts], [`Persistence`: `TilesWith`]),
+        ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`]),
+        ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`]),
+        ..lean-row(
+          [@prop:subdivision],
+          [`Refinement`: `IsSimilarTiling.refine`],
+          [`Persistence`: `Rect.isTiling_four`, `TilesWith.add_three`],
+        ),
+        ..lean-row(
+          [@def:staircase],
+          [`Staircase`: `Algebra`, `Tier`, `initial`, `realAlgebra`, `unitAlgebra`, `Algebra.IsHom`, `Tier.map`],
+        ),
+        ..lean-row([@def:region], [`Layout`: `geom`, `GTier.Mem`, `unfilled`, `region`, `Positive`, `region_initial`]),
+        ..lean-row(
+          [@def:placement],
+          [`Staircase`: `Fit`, `Placement`, `tileSize`, `positiveOf`, `equationOf`, `place`, `length_place`, `place_map`],
+          [`Layout`: `tileAt`],
+        ),
+        ..lean-row(
+          [@def:admissible],
+          [`Staircase`: `Allows`, `Admits`, `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`],
+        ),
+        ..lean-row(
+          [@prop:bound],
+          [`Soundness`: `CompleteFrom.allowed`, `Complete.length`],
+          [`Completeness`: `Allowed.completeFrom`],
+        ),
+        ..lean-row(
+          [@def:system],
+          [`Staircase`: `positives`, `equations`, `Satisfies`, `run_congr`],
+          [`Layout`: `tiles`],
+        ),
+        ..lean-row(
+          [@prop:count],
+          [`Staircase`: `length_equations`],
+          [`Solver`: `length_symEquations`],
+          [`Reduced`: `length_homEquations`],
+        ),
+        ..lean-row(
+          [@prop:step],
+          [`Layout`: `geom_place`],
+          [`Region`: `StepHyp`, `step_region`],
+          [`Soundness`: `positive_parts`],
+        ),
+        ..lean-row([@def:doom], [`Soundness`: `DoomF`, `DoomW`]),
+        ..lean-row([@prop:size], [`Soundness`: `size_facts`]),
+        ..lean-row([@prop:doom], [`Soundness`: `StepData.doomF`, `StepData.doomW`]),
+        ..lean-row([@prop:fit], [`Soundness`: `not_doom`, `StepData.positive_place`]),
+        ..lean-row([@prop:sound], [`Soundness`: `tiles_from`, `soundness`]),
+        ..lean-row([@def:extends], [`Extension`: `Ext`]),
+        ..lean-row(
+          [@prop:near],
+          [`Extension`: `exists_gap`, `IsTiling.exists_tile_above_right`, `IsTiling.exists_tile_below_right`],
+        ),
+        ..lean-row([@def:state], [`Extension`: `GInv`, `FlagsOK`], [`Completeness`: `CInv`]),
+        ..lean-row([@prop:anchor], [`Extension`: `Around.not_mem`, `GInv.anchor_tile`]),
+        ..lean-row(
+          [@prop:extension],
+          [`Extension`: `GInv.step`],
+          [`Completeness`: `exists_first_tier`, `tileSize_of_tile`, `CInv.step`],
+        ),
+        ..lean-row([@prop:complete], [`Completeness`: `complete_from`, `completeness`]),
+        ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
+        ..lean-row([@def:mosaic], [not formalised]),
+        ..lean-row(
+          [@def:forms],
+          [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`],
+        ),
+        ..lean-row([@prop:forms], [`Forms`: `formAlgebra_isHom`, `satisfies_iff_forms`]),
+        ..lean-row([@def:primitives], [`Solver`: `Primitives`, `Primitives.ideal`]),
+        ..lean-row(
+          [@def:reference],
+          [`Solver`: `systemMatrix`, `systemRhs`, `target`, `numerator`, `NoRootTest`, `Solved`, `solve`],
+        ),
+        ..lean-row([@prop:noroot], [`Solver`: `NoRootTest.ne_zero`]),
+        ..lean-row(
+          [@prop:solve],
+          [`Solver`: `map_mulVec_cramer`, `map_cramer_of_solution`, `solve_sound`, `solve_complete`, `solve_spec`],
+        ),
+        ..lean-row([@def:regular], [`Main`: `Reported`, `Certified`]),
+        ..lean-row([@prop:reference], [`Main`: `reported_sound`, `reported_complete`, `reported_iff`]),
+        ..lean-row(
+          [@def:hom],
+          [`Elimination`: `Vec`, `unitVec`, `vecAlgebra`],
+          [`BackSubstitution`: `dot`],
+          [`Reduced`: `homInitial`, `homEquations`, `homPositives`, `val`],
+          [`Certified`: `Coeff`, `propX`, `evalL`],
+        ),
+        ..lean-row([@prop:hom], [`Reduced`: `satisfies_iff_hom`, `satisfies_scale`], [`Fast`: `solvable_iff`]),
+        ..lean-row(
+          [@def:elimination],
+          [`Elimination`: `Stage`, `Stage.side`, `Elim`, `Step`, `Divisible`, `elimForm`, `Run`, `Run.pivots`],
+          [`Reduced`: `Stage.init`],
+          [`Fast`: `Limits`, `advance`, `run`, `run_spec`],
+        ),
+        ..lean-row([@def:chain], [`Elimination`: `carryStep`, `carry`, `carry_isHom`, `mapVec_elimForm`, `Elims`]),
+        ..lean-row(
+          [@prop:trace],
+          [`Elimination`: `step_link`, `Trace`, `Run.trace`],
+          [`BackSubstitution`: `Trace.elims`, `Trace.size`],
+        ),
+        ..lean-row(
+          [@prop:chain],
+          [`Determinant`: `Elims.carry_eq`, `Elims.row`],
+          [`BackSubstitution`: `Elims.carry_pivot`, `Elims.pairwise`, `Elims.dot_carry`, `Elims.true_of_stage`, `Elims.stage_of_true`, `nodup_pivots`],
+        ),
+        ..lean-row([@prop:minor], [`Exact`: `Elims.pivot_eq_det`], [`Determinant`: `Elims.chain`, `Elims.det_eq`]),
+        ..lean-row([@prop:det], [`Reduced`: `Run.final_eq_det`, `Run.final_vanishes`]),
+        ..lean-row(
+          [@prop:exact],
+          [`Exact`: `Elims.mapRecords`, `Elims.divisible`, `Stage.Linked`, `Stage.Linked.divisible`, `Reached`, `division_exact`],
+        ),
+        ..lean-row([@prop:target], [`Target`: `toHom`, `toHom_isHom`, `homEquations_eq`, `Run.final_eq_target`]),
+        ..lean-row(
+          [@prop:back],
+          [`BackSubstitution`: `back`, `back_solves`, `back_unique`, `covers`],
+          [`Reduced`: `solutionOf`, `Run.solution`, `Run.prev_ne_zero`],
+        ),
+        ..lean-row([@def:numerics], [`Certified`: `Numerics`, `Numerics.ideal`]),
+        ..lean-row(
+          [@def:check],
+          [`Certified`: `rowSum`, `backIv`, `Numerics.ivAlgebra`, `carryExact`, `degenerate`, `Verdict`, `check`],
+        ),
+        ..lean-row(
+          [@prop:numeric],
+          [`Certified`: `backIv_mem`, `Numerics.encl_positives`, `carryExact_spec`, `degenerate_spec`, `check_accept`, `check_reject`],
+        ),
+        ..lean-row([@prop:degenerate], [`Certified`: `dvd_iff_evalAt_eq_zero`]),
+        ..lean-row([@def:fastsolve], [`Fast`: `FastNoRoot`, `leaf`, `direct`, `fastSolve`, `Delegated`]),
+        ..lean-row(
+          [@prop:fastsolve],
+          [`Fast`: `Solvable`, `leaf_spec`, `direct_spec`, `fastSolve_sound`, `fastSolve_complete`, `solve_subset_fastSolve`, `fastSolve_eq_solve`],
+        ),
+        ..lean-row([@def:enumeration], [`Enumeration`: `candidates`, `moves`, `completions`, `after`, `prefixes`]),
+        ..lean-row(
+          [@prop:enumeration],
+          [`Enumeration`: `mem_completions`, `mem_completions_initial`, `mem_completions_iff_prefix`],
+        ),
+        ..lean-row([@def:explore], [`Search`: `explore`, `exploreForced`, `Searched`]),
+        ..lean-row(
+          [@prop:searched],
+          [`Search`: `below`, `fastSolve_eq_below`, `explore_iff`, `exploreForced_sub`, `exploreForced_sup`, `searched_iff`],
+        ),
+        ..lean-row([@def:fastcert], [`Fast`: `FastReported`, `FastCertified`]),
+        ..lean-row(
+          [@prop:fast],
+          [`Fast`: `fast_sound`, `fast_complete`, `fast_iff`, `reported_imp_fast`, `Certified.fast`, `fast_iff_reported`],
+        ),
+      )
+    }),
+    caption: [The definitions and propositions of @sec:tilings, @sec:search and @sec:optimisations, and the Lean declarations that formalise them.],
+  ) <tab:formal>
 ]
 
 == Differences between the statements <sec:differences>
@@ -2116,7 +2218,9 @@ The second, third and sixth are the classical properties of the impedance of a n
   $ kappa / (x - upright(i) omega) + kappa / (x + upright(i) omega) = (2 kappa x) / (x^2 + omega^2). $
   The difference between $F$ and the right-hand side of the formula of the statement is a rational function without poles that is bounded at infinity, hence a constant, and it is odd, hence zero.
   Finally
-  $ F(x) / x = c_infinity + c_0 / x^2 + sum_j (2 kappa_j) / (x^2 + omega_j^2), quad x F(x) = c_infinity x^2 + c_0 + sum_j (2 kappa_j x^2) / (x^2 + omega_j^2). $
+  $
+    F(x) / x = c_infinity + c_0 / x^2 + sum_j (2 kappa_j) / (x^2 + omega_j^2), quad x F(x) = c_infinity x^2 + c_0 + sum_j (2 kappa_j x^2) / (x^2 + omega_j^2).
+  $
 ]
 
 By the fifth statement $F(x)$ tends to $0$ or to $infinity$ as $x$ tends to infinity, and by the fourth it does likewise as $x$ tends to $0$ from the right.
@@ -2712,7 +2816,9 @@ So, for $w$ large enough, the number of the proportions of the similar guillotin
 
 A series–parallel network is a single edge, or a multiset of at least two networks joined in series, none of them itself a series composition, or the same in parallel.
 So the numbers $sigma_n$ satisfy
-$ product_(j >= 1) (1 - z^j)^(-beta_j) = 1 + sum_(n >= 1) sigma_n z^n, quad beta_1 = 2, quad beta_j = sigma_j slash 2 quad "for" j >= 2. $
+$
+  product_(j >= 1) (1 - z^j)^(-beta_j) = 1 + sum_(n >= 1) sigma_n z^n, quad beta_1 = 2, quad beta_j = sigma_j slash 2 quad "for" j >= 2.
+$
 The quotients $sigma_(n + 1) slash sigma_n$, corrected by the factor $(1 - 3 slash (2 n + 2))^(-1)$, are $6.15881$, $6.15887$ and $6.15889$ at $n = 100$, $200$ and $399$.
 So the growth constant of $g(n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
 That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is numerical.
