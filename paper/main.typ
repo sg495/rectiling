@@ -1957,7 +1957,7 @@ Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutt
 The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
 Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
-The steps of three and of five, and hence every step other than one, two and four, do not depend on the main rectangle being a square.
+The steps of three, five and seven, and hence every step other than one, two and four, do not depend on the main rectangle being a square.
 
 #proposition(name: [persistence for every main rectangle])[
   For all $W, H > 0$, every $n >= 0$ and every $k$ with $k = 3$ or $k >= 5$, $P_n (W, H) subset.eq P_(n + k) (W, H)$.
@@ -1966,10 +1966,11 @@ The steps of three and of five, and hence every step other than one, two and fou
 #proof[
   The unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$: into four by its mid-lines; into six, one of side $2 slash 3$ and five of side $1 slash 3$; into eight, one of side $3 slash 4$ and seven of side $1 slash 4$; into seven by cutting one of four squares into four; and cutting one square into four adds three to $m$.
   The affine map that sends the unit square onto a tile of width $w$ and height $h$ sends such a dissection to a tiling of the tile by $m$ rectangles whose widths and heights are in the ratio $w slash h$, hence of the proportion of the tile.
-  Replacing one tile of a similar tiling with $n$ tiles by this tiling gives a similar tiling of the same main rectangle and of the same proportion with $n + m - 1$ tiles, as in the proof of @prop:subdivision.
+  For $n = 0$ there is nothing to prove, as in @prop:subdivision.
+  Replacing one tile of a similar tiling with $n >= 1$ tiles by this tiling gives a similar tiling of the same main rectangle and of the same proportion with $n + m - 1$ tiles, as in the proof of @prop:subdivision.
 ]
 
-The step of four is particular to the square.
+The step of four can fail when the main rectangle is not a square.
 According to the search, $4 in P_2 (2)$ and $4 in.not P_6 (2)$, and $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$; for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
 
 The same constructions, applied to the tile at a corner, are injective on tilings, and give inequalities for the numbers $t(n)$ of @def:tbc.
@@ -1987,17 +1988,17 @@ They are far from the growth observed in @tab:tbc.
   In each of the first three statements we give a map from similar tilings of the unit square with $n$ tiles to similar tilings with more tiles, and show that the tiling is determined by its image.
 
   For the first, cut the tile at the bottom-left corner into four by its mid-lines.
-  In the image the tile at the bottom-left corner, of width $a$ and height $b$, and the tiles with corners $(a, 0)$, $(0, b)$ and $(a, b)$ are the four pieces; their union is the tile that was cut, and the other tiles are unchanged.
+  In the image the tile at the bottom-left corner, of width $a$ and height $b$, and the tiles with corners $(a, 0)$, $(0, b)$ and $(a, b)$ are the four pieces; their union is the tile that was cut, namely $[0, 2 a] times [0, 2 b]$, and the other tiles are unchanged.
 
   For the second, there are four dissections of the unit square into one square of side $2 slash 3$ and five of side $1 slash 3$, according to the corner that the large square occupies.
   Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map of the proof of @prop:persistence-rectangles; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
   Let the tile at the bottom-left corner of the image have width $a$ and height $b$.
   If it is the large piece, then $(A, B) = (3 a slash 2, 3 b slash 2)$, and $[a, 3 a slash 2] times [0, b slash 2]$ is a tile of the image.
-  If it is a small piece, then $(A, B) = (3 a, 3 b)$, and the tile of the image that contains the points just to the right of $(a, 0)$ is a piece of width $a$ or $2 a$, so that $[a, 3 a slash 2] times [0, b slash 2]$ is not a tile.
+  If it is a small piece, then $(A, B) = (3 a, 3 b)$, and the tile of the image that contains the points just to the right of $(a, 0)$ is a piece with corner $(a, 0)$ and of width $a$ or $2 a$, so that $[a, 3 a slash 2] times [0, b slash 2]$, which has the same corner, is not a tile.
   The image thus determines which case holds, hence $A$ and $B$; the pieces are the tiles of the image contained in $[0, A] times [0, B]$, which gives the position of the large piece, and the other tiles are unchanged.
 
   For the third, let the tiling have proportion $x > 1$; there are $t(n) - s(n)$ such tilings.
-  The construction of @prop:persistence gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
+  The construction of @prop:persistence for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
   The transpose of this tiling is a similar tiling of the same proportion in which the tile at the bottom-left corner is tall, so that the tilings obtained in the two ways are different.
   In either case, removing the four tiles that contain the corners of the square, after transposing if the tile at the bottom-left corner is tall, leaves the scaled copy of the original tiling.
 
@@ -2235,7 +2236,7 @@ The second, third and sixth are the classical properties of the impedance of a n
 By the fifth statement $F(x)$ tends to $0$ or to $infinity$ as $x$ tends to infinity, and by the fourth it does likewise as $x$ tends to $0$ from the right.
 Reversing all orientations replaces $F(x)$ by $F(1 slash x)$, since it inverts every resistance as a function of $x$.
 
-For the square, the proportions are the roots in $[1, infinity)$ of the polynomials $N - D$.
+For the square, the proportions are among the roots in $[1, infinity)$ of the polynomials $N - D$.
 Since $N$ and $D$ have opposite parities, such a polynomial retains all the information of the function.
 
 #proposition(name: [the difference determines the function])[
@@ -2559,7 +2560,7 @@ The functions themselves grow at least threefold with each tile.
   Let $x > 0$, and let $(phi, i)$ be the flow of value $1$ of $frak(N)$ for the resistances $x^(epsilon_e)$.
   Extending it by $phi(s') := phi(s) + x^delta$ and $i_(e') := 1$ gives a flow of value $1$ of $frak(N)'$: the law of Ohm holds on $e'$, and the law of Kirchhoff holds at $s$, where the current $1$ that enters by $e'$ replaces the value of the flow.
   By @prop:flow it is the flow of value $1$ of $frak(N)'$, so that the impedance of $frak(N)'$ is $F(x) + x^delta$, and its currents are those of $frak(N)$ and the constant $1$.
-  Hence $(frak(N)', epsilon')$ is proper and its impedance function is $F + x^delta$.
+  Hence $(frak(N)', epsilon')$ is proper, and its impedance function agrees with $F + x^delta$ at every $x > 0$, hence identically.
   So the sets $S_+ := {F + x : F in cal(F)_n}$ and $S_- := {F + 1 slash x : F in cal(F)_n}$ are contained in $cal(F)_(n + 1)$, and each has $2 E(n)$ elements.
 
   Let $G in S_+ sect S_-$, say $G = F_1 + x = F_2 + 1 slash x$ with $F_1, F_2 in cal(F)_n$.
@@ -2574,7 +2575,7 @@ The functions themselves grow at least threefold with each tile.
 ]
 
 Equality holds for $n = 1$, where $E(2) = 3$; the quotients $E(n + 1) slash E(n)$ of @tab:structure increase from $3$ to $7.84$.
-The proportions for the square are the roots in $[1, infinity)$ of the polynomials $N - D$ of the functions of $cal(F)_n$, by the second statement of @prop:functions, a function and its inverse having the same roots, so that $a(n) <= n E(n)$ by the fifth statement of @prop:reactance.
+The proportions for the square are among the roots in $[1, infinity)$ of the polynomials $N - D$ of the functions of $cal(F)_n$, by the second statement of @prop:functions, a function and its inverse having the same roots, so that $a(n) <= n E(n)$ by the fifth statement of @prop:reactance.
 The argument of @prop:functions-growth does not extend to the square, where a function may have several roots in $[1, infinity)$ or none and different functions may share a root; we do not know whether $a(n + 1) > a(n)$ for every $n$.
 
 == Rational proportions that need both orientations <sec:rational>
