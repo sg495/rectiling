@@ -134,7 +134,9 @@ The step of three was observed by Einstein @einstein2023.
   If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
 ]
 
-The steps of one and two fail, and so does the step of four for some main rectangles that are not squares (@sec:persistence).
+The steps of one and two fail: according to the search, $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$.
+The step of four fails for some main rectangles that are not squares: $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$, and $4 in P_2 (2)$ and $4 in.not P_6 (2)$.
+Further data are in @sec:persistence.
 @fig:persistence illustrates the three constructions of the proof.
 
 #figure(
