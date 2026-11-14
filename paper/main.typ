@@ -396,14 +396,14 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
 For records that obey the rules this follows from the rules themselves, so that the rules, which were introduced to avoid repetitions, are also needed for every solution to be a tiling.
 The argument has two parts.
-The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region of the staircase.
+The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers (@def:region).
 The second is combinatorial (@prop:doom, @prop:fit): along a record that obeys the rules and empties the staircase, these strict inequalities always hold, because a floor or a wall that is not positive in certain positions can never be removed from the staircase.
 We begin with the first part.
 
 #proposition[
   Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with floor $L$ and wall $M$, whose tile has size $(w, h)$ with $w, h > 0$.
   Suppose that $w < L$ if $phi$ is narrow, and that $h < M$ if $phi$ is low.
-  Let $S'$ be the staircase after the placement and let $T$ be the tile of $p$.
+  Let $S'$ be the staircase after the placement, let $T$ be the tile of $p$, and let $U(S)$ and $U(S')$ be the regions of the two staircases (@def:region).
   Then $S'$ is positive, and
   $ T subset.eq U(S), quad U(S') subset.eq U(S), quad U(S) subset.eq T union U(S'), $
   and the interior of $T$ is disjoint from $U(S')$.
