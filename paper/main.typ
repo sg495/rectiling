@@ -240,7 +240,7 @@ A tile that is as high as the wall has its height determined by the staircase, a
   The _positive quantity_ of $p$ is $s$ if $phi$ is inside, $M$ if $phi$ is full height, and $L$ if $phi$ is full width or full.
   If $phi$ is full, the _equation_ of $p$ is the length $L - x M$ if $o$ is wide and $M - x L$ if $o$ is tall; other placements have no equation.
   If $S$ is a real staircase, read in the main rectangle $[0, W] times [0, H]$, the _tile_ of $p$ is the quadruple $(a_i, b_i, w, h)$, where $(a_i, b_i)$ is the anchor of $T_i$.
-  A placement with $i >= m$, at a tier that does not exist, has no size, no positive quantity, no equation and no tile.
+  By convention, a placement with $i >= m$, at a tier that does not exist, has no size, no positive quantity, no equation and no tile.
 ] <def:placement>
 
 A placement and a free side determine a tile; placing it changes the staircase as follows.
@@ -251,14 +251,14 @@ A placement and a free side determine a tile; placing it changes the staircase a
   _Placing_ $p$ on $S$ with free side $s$ gives the staircase $S'$ obtained from $S$ by the following steps.
   + Every tier before $T_i$ becomes stale.
   + If $phi$ is not low and $i > 0$, the floor of $T_(i - 1)$ is replaced by $L_(i - 1) + w$ and its stale flag is cleared.
-  + The tier $T_i$ is replaced, according to the fit $phi$:
-    + if $phi$ is inside, by two tiers, the first with floor $w$, wall $M - h$ and both flags clear, the second with floor $L - w$, wall $h$, stale flag clear and started flag set;
-    + if $phi$ is full height, by one tier with floor $L - w$, wall $M$, stale flag clear and started flag set;
-    + if $phi$ is full width, by one tier with floor $L$, wall $M - h$ and both flags clear;
-    + if $phi$ is full, by no tier.
+  + The tier $T_i$ is replaced, according to the fit $phi$.
+    + If $phi$ is inside, $T_i$ is replaced by two tiers: the first with floor $w$, wall $M - h$ and both flags clear; the second with floor $L - w$, wall $h$, stale flag clear and started flag set.
+    + If $phi$ is full height, $T_i$ is replaced by one tier: floor $L - w$, wall $M$, stale flag clear and started flag set.
+    + If $phi$ is full width, $T_i$ is replaced by one tier: floor $L$, wall $M - h$ and both flags clear.
+    + If $phi$ is full, $T_i$ is replaced by no tier.
   + If $phi$ is not narrow and $i + 1 < m$, the wall of $T_(i + 1)$ is replaced by $M_(i + 1) + h$.
   The tiers after $T_i$ are otherwise unchanged.
-  Placing a placement with $i >= m$ leaves the staircase unchanged.
+  By convention, placing a placement with $i >= m$ gives $S' := S$, so that placing is defined for every placement; such a placement is never allowed (@def:admissible).
 ] <def:placing>
 
 @fig:fits shows one placement of each fit, taken from the record of the tiling of @fig:staircase.
