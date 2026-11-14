@@ -212,13 +212,13 @@ This and the other figures of this section are drawn from tilings found by the s
 #figure(
   placement: auto,
   image("figures/staircase.svg", width: 55%),
-  caption: [The staircase left by the first three placements of the record of a tiling of the square by seven tiles, of proportion $1.8695...$. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that leave the anchor to the right and upwards. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
+  caption: [A staircase of proportion $\~1.8695$ after three placements. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that extend to the right and above, respectively, of the anchor. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
 
 == Placements <sec:placements>
 
-A tile placed at the anchor of a tier may or may not be as wide as the floor, and may or may not be as high as the wall.
-This gives four kinds of placement, each of which turns a staircase into another.
+A tile placed at the anchor of a tier may be at most as wide as the floor and at most as high as the wall, and must be non-empty.
+This gives four kinds of placement, each turning a staircase into another.
 A tile that is as high as the wall has its height determined by the staircase, and its width by its orientation; a tile that is as wide as the floor is treated symmetrically; a tile that is neither has one side free.
 
 #definition(name: [placement])[
@@ -239,13 +239,27 @@ A tile that is as high as the wall has its height determined by the staircase, a
   $
   The _positive quantity_ of $p$ is $s$ if $phi$ is inside, $M$ if $phi$ is full height, and $L$ if $phi$ is full width or full.
   If $phi$ is full, the _equation_ of $p$ is the length $L - x M$ if $o$ is wide and $M - x L$ if $o$ is tall; other placements have no equation.
-  _Placing_ $p$ on $S$ with free side $s$ gives the staircase $S'$ obtained as follows.
-  + Every tier before $T_i$ becomes stale; if $phi$ is not low and $i > 0$, the floor $L_(i - 1)$ of $T_(i - 1)$ is then replaced by $L_(i - 1) + w$ and its stale flag is cleared.
-  + The tier $T_i$ is replaced by two tiers if $phi$ is inside, the first with floor $w$, wall $M - h$ and both flags clear, the second with floor $L - w$, wall $h$, stale flag clear and started flag set; by one tier with floor $L - w$, wall $M$, stale flag clear and started flag set if $phi$ is full height; by one tier with floor $L$, wall $M - h$ and both flags clear if $phi$ is full width; and by nothing if $phi$ is full.
-  + The tiers after $T_i$ are kept, except that, if $phi$ is not narrow and $i + 1 < m$, the wall $M_(i + 1)$ of $T_(i + 1)$ is replaced by $M_(i + 1) + h$.
   If $S$ is a real staircase, read in the main rectangle $[0, W] times [0, H]$, the _tile_ of $p$ is the quadruple $(a_i, b_i, w, h)$, where $(a_i, b_i)$ is the anchor of $T_i$.
-  A placement with $i >= m$, at a tier that does not exist, leaves the staircase unchanged and has no positive quantity, no equation and no tile.
+  A placement with $i >= m$, at a tier that does not exist, has no size, no positive quantity, no equation and no tile.
 ] <def:placement>
+
+A placement and a free side determine a tile; placing it changes the staircase as follows.
+
+#definition(name: [placing])[
+  Let $S = (T_0, dots, T_(m - 1))$ be a staircase over $cal(L)$, with floors $L_j$ and walls $M_j$, let $p = (i, phi, o)$ be a placement with $i < m$, and let $s in cal(L)$.
+  Let $L := L_i$ and $M := M_i$, and let $(w, h)$ be the size of the tile of $p$ on $S$ with free side $s$.
+  _Placing_ $p$ on $S$ with free side $s$ gives the staircase $S'$ obtained from $S$ by the following steps.
+  + Every tier before $T_i$ becomes stale.
+  + If $phi$ is not low and $i > 0$, the floor of $T_(i - 1)$ is replaced by $L_(i - 1) + w$ and its stale flag is cleared.
+  + The tier $T_i$ is replaced, according to the fit $phi$:
+    + if $phi$ is inside, by two tiers, the first with floor $w$, wall $M - h$ and both flags clear, the second with floor $L - w$, wall $h$, stale flag clear and started flag set;
+    + if $phi$ is full height, by one tier with floor $L - w$, wall $M$, stale flag clear and started flag set;
+    + if $phi$ is full width, by one tier with floor $L$, wall $M - h$ and both flags clear;
+    + if $phi$ is full, by no tier.
+  + If $phi$ is not narrow and $i + 1 < m$, the wall of $T_(i + 1)$ is replaced by $M_(i + 1) + h$.
+  The tiers after $T_i$ are otherwise unchanged.
+  Placing a placement with $i >= m$ leaves the staircase unchanged.
+] <def:placing>
 
 @fig:fits shows one placement of each fit, taken from the record of the tiling of @fig:staircase.
 
@@ -1755,9 +1769,10 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@def:region], [`Layout`: `geom`, `GTier.Mem`, `unfilled`, `region`, `Positive`, `region_initial`]),
         ..lean-row(
           [@def:placement],
-          [`Staircase`: `Fit`, `Placement`, `tileSize`, `positiveOf`, `equationOf`, `place`, `length_place`, `place_map`],
+          [`Staircase`: `Fit`, `Placement`, `tileSize`, `positiveOf`, `equationOf`],
           [`Layout`: `tileAt`],
         ),
+        ..lean-row([@def:placing], [`Staircase`: `place`, `length_place`, `place_map`]),
         ..lean-row(
           [@def:admissible],
           [`Staircase`: `Allows`, `Admits`, `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`],
