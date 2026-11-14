@@ -319,7 +319,12 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
 The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened.
 The second concerns a horizontal segment that carries the tops of some tiles and the bottoms of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
-The bound on the number of tiers, by which the search abandons partial records, excludes nothing.
+
+A record is thus subject to two conditions, which serve different purposes.
+To obey the rules is the condition used in the proofs: soundness and completeness are established in @sec:systems for the records that obey the rules.
+To be complete and admissible for $n$ tiles is the condition used by the search: it requires in addition that, after each placement, the staircase has no more tiers than there are tiles still to be placed, and that it becomes empty only with the last tile.
+A placement removes at most one tier, so a staircase with more tiers than remaining tiles can no longer be emptied, and the search may abandon such a sequence at once.
+The next proposition says that nothing is lost in doing so: for records of $n$ placements the two conditions coincide.
 
 #proposition[
   A record is complete admissible for $n$ tiles if and only if it consists of $n$ placements and obeys the rules from the bare initial staircase.
