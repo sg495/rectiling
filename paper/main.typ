@@ -265,7 +265,7 @@ A placement and a free side determine a tile; placing it changes the staircase a
 
 #figure(
   image("figures/fits.svg", width: 100%),
-  caption: [Four of the seven placements of the record of the tiling of @fig:staircase, one of each fit. In each panel the tile just placed is outlined, the floor and the wall of its tier before the placement are drawn thick, the rectangle that they span is hatched, and the anchors of the staircase after the placement are circled. The inside tile is narrower than the floor and lower than the wall; the tile of full width is as wide as the floor, and the one of full height as high as the wall; the full tile, which is the last, is both.],
+  caption: [Four placements in the building of a 7-tile tiling, exemplifying the four kinds of fit. In each panel, the tile just placed is the one sitting in the hatched area, with the floor and wall of its tier before the placement drawn thick.],
 ) <fig:fits>
 
 Only an inside placement makes use of the free side.
@@ -280,15 +280,29 @@ In particular, the number of tiers and the flags of the staircases obtained by s
 A tiling generally admits several orderings in which its tiles can be placed, and tilings that differ only in how the corners of their tiles alternate along a segment impose the same conditions on the sizes of the tiles, as is explained informally in @sec:mosaic.
 The search therefore restricts the sequences of placements by two rules, which are expressed by the two flags, and abandons a sequence when fewer tiles remain to be placed than there are tiers.
 
-#definition(name: [admissible record])[
-  A placement $p = (i, phi, o)$ is _allowed_ at a staircase $S = (T_0, dots, T_(m - 1))$ if $i < m$, the tier $T_i$ is not stale and, in case $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
-  It is _admissible_ at $S$ with $r$ tiles remaining if it is allowed at $S$, $r >= 1$, and the number $m'$ of tiers after the placement satisfies $m' <= r - 1$, and $m' = 0$ only if $r = 1$.
+#definition(name: [allowed and admissible placements])[
+  A placement $p = (i, phi, o)$ is _allowed_ at a staircase $S = (T_0, dots, T_(m - 1))$ if the following three conditions hold:
+
+  + $i < m$;
+  + the tier $T_i$ is not stale;
+  + in case $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
+
+  A placement $p$ is _admissible_ at $S$ with $r$ tiles remaining if the following three conditions hold:
+
+  + $p$ is allowed at $S$;
+  + $r >= 1$;
+  + the number $m'$ of tiers after the placement satisfies both:
+    + $m' <= r - 1$,
+    + $m' = 0$ only if $r = 1$.
+] <def:admissible>
+
+#definition(name: [record])[
   A _record_ is a finite sequence $rho = (p_1, dots, p_ell)$ of placements.
   Given a sequence $s_1, s_2, dots$ of free sides, _placing_ $rho$ on a staircase $S$ means placing $p_1, dots, p_ell$ in turn, the $j$-th inside placement of $rho$ being made with free side $s_j$.
   The record $rho$ _obeys the rules_ from $S$ if each of its placements is allowed at the staircase on which it is placed and the staircase left by the last one is empty.
   The record $rho$ is _complete admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible, with $n - j + 1$ tiles remaining, at the staircase on which it is placed, and the staircase left by the last one is empty.
   The _first tile is wide_ in $rho$ if $rho$ is empty or $p_1$ is wide.
-] <def:admissible>
+] <def:record>
 
 @fig:rules shows the flags along the record of the tiling of @fig:staircase.
 After the first placement, which is inside, the tier $T_1$ to the right of the tile has a started floor.
@@ -1627,7 +1641,7 @@ The search is split into tasks by the first few placements, and a failure of the
   For an integer $d >= 0$, the set $cal(P)_d (r, "first", S)$ of the _prefixes_ consists of the empty record alone if $d = 0$ or $S$ is empty, and otherwise of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(P)_(d - 1) (r - 1, "false", S')$.
 ] <def:enumeration>
 
-The completions are the records of @def:admissible, and the prefixes cut them at a given depth.
+The completions are the records of @def:record, and the prefixes cut them at a given depth.
 
 #proposition(name: [enumeration])[
   + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide in case both _square_ and _first_ hold.
@@ -1775,8 +1789,9 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@def:placing], [`Staircase`: `place`, `length_place`, `place_map`]),
         ..lean-row(
           [@def:admissible],
-          [`Staircase`: `Allows`, `Admits`, `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`],
+          [`Staircase`: `Allows`, `Admits`],
         ),
+        ..lean-row([@def:record], [`Staircase`: `Allowed`, `CompleteFrom`, `Complete`, `FirstWide`, `allowed_map`]),
         ..lean-row(
           [@prop:bound],
           [`Soundness`: `CompleteFrom.allowed`, `Complete.length`],
