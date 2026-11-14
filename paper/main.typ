@@ -39,14 +39,14 @@ The procedure builds tilings one tile at a time over a staircase-shaped frontier
 We reproduce all the values above, by a method independent of both earlier ones, and extend the sequence by three terms:
 $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 
-@sec:tilings fixes definitions.
-@sec:staircases presents the staircases on which tilings are built and the rules that restrict the sequences of placements.
-@sec:systems associates a linear system with each sequence, proves that the construction is sound and complete, and describes the search; the technical part of solving the systems, with the optimisations that make thirteen tiles feasible, is in @app:solving.
-The results are in @sec:results, and further properties of the sets of proportions, with some conjectures, in @app:structure.
-The propositions of @sec:staircases, @sec:systems and @app:solving have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the direct search and of the incremental search.
-The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
-The implementation itself is not verified.
-@app:formal relates the statements of this paper to those of the formal development, and lists what the latter does not cover.
+// @sec:tilings fixes definitions.
+// @sec:staircases presents the staircases on which tilings are built and the rules that restrict the sequences of placements.
+// @sec:systems associates a linear system with each sequence, proves that the construction is sound and complete, and describes the search; the technical part of solving the systems, with the optimisations that make thirteen tiles feasible, is in @app:solving.
+// The results are in @sec:results, and further properties of the sets of proportions, with some conjectures, in @app:structure.
+// The propositions of @sec:staircases, @sec:systems and @app:solving have been formalised in Lean 4 with Mathlib: the soundness and the completeness of the staircase construction, and the correctness of the direct search and of the incremental search.
+// The statements on the two searches take as hypotheses specifications of the exact and of the numerical arithmetic routines, and their completeness is proved under a condition of regularity of the linear systems examined, which the searches verify by counting the exceptions.
+// The implementation itself is not verified.
+// @app:formal relates the statements of this paper to those of the formal development, and lists what the latter does not cover.
 
 = Tilings <sec:tilings>
 
@@ -136,11 +136,11 @@ The step of three was observed by Einstein @einstein2023.
   If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
 ]
 
-@fig:persistence illustrates the three constructions of the proof.
+@fig:persistence illustrates the constructions of the proof.
 
 #figure(
-  image("figures/persistence.svg", width: 92%),
-  caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four and five more tiles given by @prop:subdivision: one tile cut into four, a reduced copy of the tiling at the centre of a pinwheel of four tiles, and one tile cut into six. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
+  image("figures/persistence.svg", width: 100%),
+  caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four, five and seven more tiles given by @prop:subdivision: one tile cut into four; a reduced copy of the tiling at the centre of a pinwheel of four tiles, which requires the main rectangle to be a square; one tile cut into six; and one tile cut into eight. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
 ) <fig:persistence>
 
 The steps of one and two fail, and so does the step of four for some main rectangles that are not squares.
@@ -1727,7 +1727,11 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
         ..lean-row([@def:counts], [`Persistence`: `TilesWith`]),
         ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`], [`Persistence`: `TilesWith.scale`]),
-        ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`], [`Persistence`: `TilesWith.transpose`, `tilesWith_main_inv`]),
+        ..lean-row(
+          [@prop:transposition],
+          [`Geometry`: `IsSimilarTiling.transpose`],
+          [`Persistence`: `TilesWith.transpose`, `tilesWith_main_inv`],
+        ),
         ..lean-row(
           [@prop:subdivision],
           [`Refinement`: `IsSimilarTiling.refine`],

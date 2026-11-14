@@ -459,21 +459,22 @@ def mosaic_figure(path, choice):
 
 
 def persistence_figure(path, value, witness):
-    """Draws a listed tiling and the tilings with three, four and five more tiles obtained by cutting a tile into four, by the pinwheel and by cutting a tile into six, each from its record, the tiles of the listed tiling keeping their colours and the new tiles being grey."""
+    """Draws a listed tiling and the tilings with three, four, five and seven more tiles obtained by cutting a tile into four, by the pinwheel and by cutting a tile into six and into eight, each from its record, the tiles of the listed tiling keeping their colours and the new tiles being grey."""
     tiles = witness_tiles(value, witness)
     k = max(range(len(tiles)), key=lambda j: tiles[j][2] * tiles[j][3])
     a, b, w, h = tiles[k]
     kept = {j: t for j, t in enumerate(tiles) if j != k}
     four = [(a + w * u / 2, b + h * v / 2, w / 2, h / 2) for u in range(2) for v in range(2)]
     six = [(a, b, 2 * w / 3, 2 * h / 3)] + [(a + w * u / 3, b + h * v / 3, w / 3, h / 3) for u, v in ((2, 0), (2, 1), (2, 2), (1, 2), (0, 2))]
+    eight = [(a, b, 3 * w / 4, 3 * h / 4)] + [(a + w * u / 4, b + h * v / 4, w / 4, h / 4) for u, v in ((3, 0), (3, 1), (3, 2), (3, 3), (2, 3), (1, 3), (0, 3))]
     x = float(value)
     p = x / (x + 1)
     scale = (x - 1) / (x + 1)
     pinwheel = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
     copy = {j: (1 - p + scale * u, 1 - p + scale * v, scale * c, scale * d) for j, (u, v, c, d) in enumerate(tiles)}
-    cases = ((dict(enumerate(tiles)), []), (kept, four), (copy, pinwheel), (kept, six))
+    cases = ((dict(enumerate(tiles)), []), (kept, four), (copy, pinwheel), (kept, six), (kept, eight))
     records = []
-    fig, axes = plt.subplots(1, 4, figsize=(5.8, 1.62))
+    fig, axes = plt.subplots(1, 5, figsize=(7.2, 1.62))
     for ax, (old, new) in zip(axes, cases):
         built = list(old.values()) + new
         record = record_of(built)
@@ -488,7 +489,7 @@ def persistence_figure(path, value, witness):
         ax.set_aspect("equal")
         ax.axis("off")
         records.append(record)
-    for ax, title in zip(axes, ("a tiling", "three more tiles", "four more tiles", "five more tiles")):
+    for ax, title in zip(axes, ("a tiling", "three more tiles", "four more tiles (square)", "five more tiles", "seven more tiles")):
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
     fig.savefig(path)
