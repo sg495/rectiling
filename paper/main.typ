@@ -114,43 +114,53 @@ The step of three was observed by Einstein @einstein2023.
 #proposition(name: [persistence])[
   Let $W, H > 0$ and $n >= 0$.
   + $P_n (W, H) subset.eq P_(n + 3) (W, H)$.
-  + $P_n (W, H) subset.eq P_(n + k) (W, H)$ for every $k >= 5$.
   + If $n >= 2$, then $P_n (1) subset.eq P_(n + 4) (1)$.
+  + $P_n (W, H) subset.eq P_(n + k) (W, H)$ for every $k >= 5$.
 ] <prop:subdivision>
 
 #proof[
-  Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
-  The corner of $M$ lies in some tile, so $n >= 1$.
+  The $P_n (W, H) subset.eq P_(n + 3) (W, H)$ inclusion is shown by subdividing one rectangle into 4 rectangles, all scaled by 1/2.
+  The $P_n (1) subset.eq P_(n + 4) (1)$ inclusion is shown by embedding a square tiling as a subdivision of the central tile of a 5-tile pinwheel tiling, where $n >= 2$ is necessary to make the two tilings distinct; as later remarked, this is not true for general rectangles.
+  The $P_n (W, H) subset.eq P_(n + k) (W, H)$ inclusion for all $k >=5$ follows from the $k=3$ (shown above), $k=5$ and $k=7$ cases (shown later), by the following observation: every $k >= 5$ can be written as $3a + 5b + 7c$ for non-negative $a, b, c$, because $5 = 2 "mod" 3$ and $7 = 1 "mod" 3$.
+  The $P_n (W, H) subset.eq P_(n + 5) (W, H)$ inclusion is shown by subdividing one rectangle into 6 rectangles, one scaled by 2/3 and five scaled by 1/3.
+  The $P_n (W, H) subset.eq P_(n + 7) (W, H)$ inclusion is shown by subdividing one rectangle into 8 rectangles, one scaled by 3/4 and seven scaled by 1/4.
+  @fig:persistence illustrates all four constructions.
+  // Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
+  // The corner of $M$ lies in some tile, so $n >= 1$.
 
-  The unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$: into four by its mid-lines; into six, one of side $2 slash 3$ and five of side $1 slash 3$; into eight, one of side $3 slash 4$ and seven of side $1 slash 4$; into seven by cutting one of four squares into four; and cutting one square into four adds three to $m$.
-  Let $R_1 = (a, b, w, h)$.
-  The affine map $(u, v) |-> (a + w u, b + h v)$ sends the unit square onto $R_1$, and sends such a dissection to a tiling $Q_1, dots, Q_m$ of $R_1$ by rectangles whose widths and heights are in the ratio $w slash h$, hence of proportion $x$.
-  The sequence $Q_1, dots, Q_m, R_2, dots, R_n$ is then a tiling of $M$: its union is that of the original tiles, the interiors of the $Q_i$ are pairwise disjoint, and each of them lies in the interior of $R_1$, which is disjoint from the interiors of $R_2, dots, R_n$.
-  It has $n + m - 1$ tiles of proportion $x$.
-  The case $m = 4$ gives the first statement, and the cases $m = k + 1 >= 6$ the second.
+  // The unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$: into four by its mid-lines; into six, one of side $2 slash 3$ and five of side $1 slash 3$; into eight, one of side $3 slash 4$ and seven of side $1 slash 4$; into seven by cutting one of four squares into four; and cutting one square into four adds three to $m$.
+  // Let $R_1 = (a, b, w, h)$.
+  // The affine map $(u, v) |-> (a + w u, b + h v)$ sends the unit square onto $R_1$, and sends such a dissection to a tiling $Q_1, dots, Q_m$ of $R_1$ by rectangles whose widths and heights are in the ratio $w slash h$, hence of proportion $x$.
+  // The sequence $Q_1, dots, Q_m, R_2, dots, R_n$ is then a tiling of $M$: its union is that of the original tiles, the interiors of the $Q_i$ are pairwise disjoint, and each of them lies in the interior of $R_1$, which is disjoint from the interiors of $R_2, dots, R_n$.
+  // It has $n + m - 1$ tiles of proportion $x$.
+  // The case $m = 4$ gives the first statement, and the cases $m = k + 1 >= 6$ the second.
 
-  For the third statement, let $W = H = 1$ and suppose first that $x > 1$.
-  Let $p := x slash (x + 1)$.
-  Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, have proportion $x$ and leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling, by @prop:scaling.
-  This gives a similar tiling of the unit square of proportion $x$ with $n + 4$ tiles.
-  If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
+  // For the third statement, let $W = H = 1$ and suppose first that $x > 1$.
+  // Let $p := x slash (x + 1)$.
+  // Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, have proportion $x$ and leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling, by @prop:scaling.
+  // This gives a similar tiling of the unit square of proportion $x$ with $n + 4$ tiles.
+  // If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
 ]
 
-@fig:persistence illustrates the constructions of the proof.
 
 #figure(
   image("figures/persistence.svg", width: 100%),
   caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four, five and seven more tiles given by @prop:subdivision: one tile cut into four; a reduced copy of the tiling at the centre of a pinwheel of four tiles, which requires the main rectangle to be a square; one tile cut into six; and one tile cut into eight. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
 ) <fig:persistence>
 
-The steps of one and two fail, and so does the step of four for some main rectangles that are not squares.
-According to the search, $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$; $3 slash 2 in P_1 (3 slash 2)$, while $3 slash 2 in.not P_5 (3 slash 2)$; and $4 in P_2 (2)$, while $4 in.not P_6 (2)$.
+Steps of $k=1$ and $k=2$ fail to persist in general, and so does the step of $k=4$ for some main rectangles that are not squares.
+As counterexamples:
+
+- $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$;
+- $3 slash 2 in P_1 (3 slash 2)$, while $3 slash 2 in.not P_5 (3 slash 2)$;
+- $4 in P_2 (2)$, while $4 in.not P_6 (2)$.
+
 @fig:steps shows the three tilings.
-For the square, no proportion with two, three or four tiles recurs with one tile more, and five of the eleven proportions with four tiles do not recur with six; further counts are in @sec:persistence.
+For the square, no proportion with $n=2, 3, 4$ tiles persists at $n=3, 4, 5$ respectively (counterexamples for $k=1$), while five out of the eleven proportions with $n=4$ tiles do not persist at $n=6$ (counterexample for $k=2$); further counts are in @sec:persistence.
 
 #figure(
   image("figures/steps.svg", width: 64%),
-  caption: [Tilings whose proportions do not recur, according to the search: the proportion $2$ of the square with two tiles, not achievable in the square with three or with four tiles; the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with one tile, not achievable in it with five; and the proportion $4$ of the rectangle of aspect ratio $2$ with two tiles, not achievable in it with six.],
+  caption: [Tilings whose proportions do not persist, according to the search: the proportion $2$ of the square with $n=2$ tiles, not achievable in the square with $n=3, 4$ tiles (counterexample for $k=1, 2$); the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with $n=1$ tile, not achievable in it with $n=5$ (counterexample for $k=4$); and the proportion $4$ of the rectangle of aspect ratio $2$ with $n=2$ tiles, not achievable in it with $n=6$ (counterexample for $k=4$).],
 ) <fig:steps>
 
 @fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search of @sec:solving; the remaining ones are their transposes.
@@ -178,6 +188,7 @@ The staircase is therefore defined first as a combinatorial object carrying leng
   A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations; the _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
 ] <def:staircase>
 
+No law is assumed of these operations, such as associativity or the existence of a neutral element: the statements made for an arbitrary arithmetic of lengths use only that homomorphisms preserve the operations, and two of the arithmetics used below, the linear forms and the intervals, do not satisfy the laws of a module.
 Several arithmetics of lengths occur.
 The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
 The second has a single element, so that a staircase over it, a _bare staircase_, carries only the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
