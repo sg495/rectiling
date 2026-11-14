@@ -300,7 +300,8 @@ The search therefore restricts the sequences of placements by two rules, which a
   A _record_ is a finite sequence $rho = (p_1, dots, p_ell)$ of placements.
   Given a sequence $s_1, s_2, dots$ of free sides, _placing_ $rho$ on a staircase $S$ means placing $p_1, dots, p_ell$ in turn, the $j$-th inside placement of $rho$ being made with free side $s_j$.
   The record $rho$ _obeys the rules_ from $S$ if each of its placements is allowed at the staircase on which it is placed and the staircase left by the last one is empty.
-  The record $rho$ is _complete admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible, with $n - j + 1$ tiles remaining, at the staircase on which it is placed, and the staircase left by the last one is empty.
+  The record $rho$ is _admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible, with $n - j + 1$ tiles remaining, at the staircase on which it is placed.
+  An admissible record is _complete_ if, in addition, the staircase left by its last placement is empty.
   The _first tile is wide_ in $rho$ if $rho$ is empty or $p_1$ is wide.
 ] <def:record>
 
