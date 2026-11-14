@@ -59,11 +59,11 @@ def outline_rest(ax, tiles):
         ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="0.72", lw=0.35, zorder=2))
 
 
-def mark_anchors(ax, tiers, size=4.0, chosen=None):
-    """Circles the anchors of a staircase, in grey for stale tiers and in black for a chosen one."""
+def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False):
+    """Marks the anchors of a staircase, in black for a chosen one; with flags, the mark of a stale tier is grey and that of a started tier is a square."""
     for t in tiers:
-        colour = "k" if t is chosen else ("0.7" if t.stale else "w")
-        ax.plot([t.ax], [t.ay], marker="o", mfc=colour, mec="k", ms=size, zorder=6)
+        colour = "k" if t is chosen else ("0.7" if flags and t.stale else "w")
+        ax.plot([t.ax], [t.ay], marker="s" if flags and t.started else "o", mfc=colour, mec="k", ms=size, zorder=6)
 
 
 def excluded(tiers):
@@ -166,12 +166,9 @@ def rules_figure(path, value, witness):
         draw(ax, tiles[:k])
         outline_rest(ax, tiles[k:])
         for j, t in enumerate(sts[k]):
-            if t.started:
-                ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="w", lw=1.2, solid_capstyle="butt", zorder=4)
-            style = dict(color="#cc0000", lw=1.2, ls=(0, (3, 1.5))) if t.started else dict(color="k", lw=1.1)
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], solid_capstyle="butt", zorder=4, **style)
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             ax.text(t.ax + 0.025, t.ay + 0.022, f"$T_{j}$", fontsize=7, ha="left", va="bottom", zorder=7)
-        mark_anchors(ax, sts[k], size=4.6)
+        mark_anchors(ax, sts[k], size=4.6, flags=True)
         ax.set_title(f"after {k} placement{'' if k == 1 else 's'}", fontsize=7, pad=3)
         notes.append((k, [(j, t.stale, t.started) for j, t in enumerate(sts[k])], excluded(sts[k]), moves_of(witness)[k]))
     fig.tight_layout(pad=0.2, w_pad=0.5)
@@ -238,13 +235,13 @@ def construction_figure(path, value, witness):
         first = None
         for j, t in enumerate(sts[k]):
             ext = extends(tiles, t.ax + t.floor, t.ay)
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             if ext:
-                ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="w", lw=1.2, solid_capstyle="butt", zorder=4)
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="#cc0000" if ext else "k", lw=1.2 if ext else 1.1, ls=(0, (3, 1.5)) if ext else "-", solid_capstyle="butt", zorder=4)
+                ax.plot([t.ax + t.floor, t.ax + t.floor + 0.09], [t.ay, t.ay], color="k", lw=1.1, ls=(0, (1, 1.2)), solid_capstyle="butt", zorder=4)
             if not ext and first is None:
                 first = j
         assert first == moves[k][0], (k, first, moves[k])
-        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first])
+        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first], flags=True)
         ax.set_title("no placement" if k == 0 else f"after {k} placement{'' if k == 1 else 's'}", fontsize=6, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
     fig.savefig(path)

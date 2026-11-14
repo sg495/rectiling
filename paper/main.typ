@@ -300,7 +300,7 @@ The search therefore restricts the sequences of placements by two rules, which a
   A _record_ is a finite sequence $rho = (p_1, dots, p_ell)$ of placements.
   Given a sequence $s_1, s_2, dots$ of free sides, _placing_ $rho$ on a staircase $S$ means placing $p_1, dots, p_ell$ in turn, the $j$-th inside placement of $rho$ being made with free side $s_j$.
   The record $rho$ _obeys the rules_ from $S$ if each of its placements is allowed at the staircase on which it is placed and the staircase left by the last one is empty.
-  The record $rho$ is _admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible, with $n - j + 1$ tiles remaining, at the staircase on which it is placed.
+  The record $rho$ is _admissible for $n$ tiles_ if, on the bare initial staircase, each placement $p_j$ is admissible at the staircase on which it is placed, with $n - j + 1$ tiles remaining.
   An admissible record is _complete_ if, in addition, the staircase left by its last placement is empty.
   The _first tile is wide_ in $rho$ if $rho$ is empty or $p_1$ is wide.
 ] <def:record>
@@ -313,7 +313,7 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 
 #figure(
   image("figures/rules.svg", width: 100%),
-  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The anchor of a stale tier is grey, and started floors are drawn dashed in red.],
+  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The anchor of a tier is a circle, or a square if the tier is started, and it is filled grey if the tier is stale.],
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
@@ -595,7 +595,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/construction.svg", width: 100%),
-  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, the floors that extend in the tiling are drawn dashed in red and the others in black; the tile placed next is the one at the anchor of the first tier whose floor does not extend, marked in black, and the anchor of a stale tier is grey.],
+  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, a floor that extends in the tiling is continued by a dotted segment beyond its right end. The anchors are marked as in @fig:rules: a square for a started tier, filled grey for a stale one. The tile placed next is the one at the anchor of the first tier whose floor does not extend, which is filled black.],
 ) <fig:construction>
 
 #proof[
