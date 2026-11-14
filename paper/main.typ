@@ -83,10 +83,11 @@ Scaling the plane preserves proportions, so that only the aspect ratio of the ma
 ] <prop:scaling>
 
 #proof[
-  Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by $(c a, c b, c w, c h)$.
-  The new sides are positive, and $c w = x c h$ if $w = x h$, and likewise with the sides exchanged, so the new tiles have proportion $x$.
-  A point $p$ lies in a new tile, or in its interior, exactly when $p slash c$ lies in the old one, or in its interior; hence the new tiles cover $[0, c W] times [0, c H]$ exactly and have pairwise disjoint interiors.
-  This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
+  Proportions are invariant under scaling.
+  // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by $(c a, c b, c w, c h)$.
+  // The new sides are positive, and $c w = x c h$ if $w = x h$, and likewise with the sides exchanged, so the new tiles have proportion $x$.
+  // A point $p$ lies in a new tile, or in its interior, exactly when $p slash c$ lies in the old one, or in its interior; hence the new tiles cover $[0, c W] times [0, c H]$ exactly and have pairwise disjoint interiors.
+  // This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
 ]
 
 Exchanging the two axes turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, and wide tiles into tall ones.
@@ -97,21 +98,24 @@ Exchanging the two axes turns a tiling of a rectangle into a tiling of the recta
 ] <prop:transposition>
 
 #proof[
-  Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by its _transpose_ $(b, a, h, w)$.
-  The transpose has positive sides and proportion $x$, the two conditions $w = x h$ and $h = x w$ being exchanged.
-  A point $(u, v)$ lies in the transpose of a tile, or in its interior, exactly when $(v, u)$ lies in the tile, or in its interior; hence the transposes cover $[0, H] times [0, W]$ exactly and have pairwise disjoint interiors.
-  This gives $P_n (W, H) subset.eq P_n (H, W)$, and the other inclusion is the same statement with $W$ and $H$ exchanged.
-  Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
+  Proportions are invariant under exchange of width/height.
+  // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by its _transpose_ $(b, a, h, w)$.
+  // The transpose has positive sides and proportion $x$, the two conditions $w = x h$ and $h = x w$ being exchanged.
+  // A point $(u, v)$ lies in the transpose of a tile, or in its interior, exactly when $(v, u)$ lies in the tile, or in its interior; hence the transposes cover $[0, H] times [0, W]$ exactly and have pairwise disjoint interiors.
+  // This gives $P_n (W, H) subset.eq P_n (H, W)$, and the other inclusion is the same statement with $W$ and $H$ exchanged.
+  // Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
 ]
 
-The sets of proportions grow with $n$ along steps of three, as Einstein observed @einstein2023.
-Whether they grow along steps of one is not known to us.
+The sets of proportions are nested along steps of three, as Einstein observed @einstein2023.
+They are also nested along every step of five or more, for every main rectangle, and along steps of four for a square with at least two tiles (@prop:persistence, @prop:persistence-rectangles).
+They are not nested along steps of one or two (@sec:persistence).
 
 #proposition(name: [subdivision])[
   For all $W, H > 0$ and $n >= 0$, $P_n (W, H) subset.eq P_(n + 3) (W, H)$.
 ] <prop:subdivision>
 
 #proof[
+  Any rectangle
   Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
   The corner of $M$ lies in some tile, so $n >= 1$.
   Let $R_1 = (a, b, w, h)$, and let $Q_1, dots, Q_4$ be the rectangles of width $w slash 2$ and height $h slash 2$ with corners $(a, b)$, $(a + w slash 2, b)$, $(a, b + h slash 2)$ and $(a + w slash 2, b + h slash 2)$.
