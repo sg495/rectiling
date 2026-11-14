@@ -396,7 +396,9 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
 For records that obey the rules this follows from the rules themselves, so that the rules, which were introduced to avoid repetitions, are also needed for every solution to be a tiling.
 The argument has two parts.
-The first is geometric: on a positive staircase, a tile that fits its tier as its fit says is cut out of the region.
+The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region of the staircase.
+The second is combinatorial (@prop:doom, @prop:fit): along a record that obeys the rules and empties the staircase, these strict inequalities always hold, because a floor or a wall that is not positive in certain positions can never be removed from the staircase.
+We begin with the first part.
 
 #proposition[
   Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with floor $L$ and wall $M$, whose tile has size $(w, h)$ with $w, h > 0$.
@@ -435,7 +437,7 @@ The first is geometric: on a positive staircase, a tile that fits its tier as it
   It is in no strip of a tier before $T_i$, since $v < b + M <= b_j$ for $j < i$; in none of the strips that replace that of $T_i$, which require $v >= b + h$ or $u >= a + w$; and in no strip of a tier after $T_i$, which requires $u >= a_j >= a + L >= a + w$.
 ]
 
-The second part is combinatorial: a floor or a wall that has become non-positive in certain positions can never be removed from the staircase, so that such a staircase cannot be emptied.
+For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
 
 #definition(name: [defective staircase])[
   A real staircase is _floor-defective_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
