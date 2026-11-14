@@ -166,7 +166,6 @@ def rules_figure(path, value, witness):
         draw(ax, tiles[:k])
         outline_rest(ax, tiles[k:])
         for j, t in enumerate(sts[k]):
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             ax.text(t.ax + 0.025, t.ay + 0.022, f"$T_{j}$", fontsize=7, ha="left", va="bottom", zorder=7)
         mark_anchors(ax, sts[k], size=4.6, flags=True)
         ax.set_title(f"after {k} placement{'' if k == 1 else 's'}", fontsize=7, pad=3)
