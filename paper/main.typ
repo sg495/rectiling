@@ -136,15 +136,22 @@ The step of three was observed by Einstein @einstein2023.
   If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
 ]
 
-The steps of one and two fail: according to the search, $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$.
-The step of four fails for some main rectangles that are not squares: $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$, and $4 in P_2 (2)$ and $4 in.not P_6 (2)$.
-Further data are in @sec:persistence.
 @fig:persistence illustrates the three constructions of the proof.
 
 #figure(
   image("figures/persistence.svg", width: 92%),
   caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four and five more tiles given by @prop:subdivision: one tile cut into four, a reduced copy of the tiling at the centre of a pinwheel of four tiles, and one tile cut into six. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
 ) <fig:persistence>
+
+The steps of one and two fail, and so does the step of four for some main rectangles that are not squares.
+According to the search, $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$; $3 slash 2 in P_1 (3 slash 2)$, while $3 slash 2 in.not P_5 (3 slash 2)$; and $4 in P_2 (2)$, while $4 in.not P_6 (2)$.
+@fig:steps shows the three tilings.
+For the square, no proportion with two, three or four tiles recurs with one tile more, and five of the eleven proportions with four tiles do not recur with six; further counts are in @sec:persistence.
+
+#figure(
+  image("figures/steps.svg", width: 64%),
+  caption: [Tilings whose proportions do not recur, according to the search: the proportion $2$ of the square with two tiles, not achievable in the square with three or with four tiles; the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with one tile, not achievable in it with five; and the proportion $4$ of the rectangle of aspect ratio $2$ with two tiles, not achievable in it with six.],
+) <fig:steps>
 
 @fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search of @sec:solving; the remaining ones are their transposes.
 
@@ -1719,8 +1726,8 @@ The proofs given in this paper follow those of the development, statement by sta
           [`Geometry`: `IsTiling`, `IsSimilarTiling`, `IsTiling.perm`, `IsTiling.eq_of_not_disjoint`, `Rect.separated_of_disjoint`],
         ),
         ..lean-row([@def:counts], [`Persistence`: `TilesWith`]),
-        ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`]),
-        ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`]),
+        ..lean-row([@prop:scaling], [`Scaling`: `IsSimilarTiling.scale`], [`Persistence`: `TilesWith.scale`]),
+        ..lean-row([@prop:transposition], [`Geometry`: `IsSimilarTiling.transpose`], [`Persistence`: `TilesWith.transpose`, `tilesWith_main_inv`]),
         ..lean-row(
           [@prop:subdivision],
           [`Refinement`: `IsSimilarTiling.refine`],
@@ -1881,7 +1888,7 @@ The statements of the paper and those of the development differ in the following
   The development has no notion of the proportion of a rectangle as a number: it states that a rectangle has proportion $x$, as in @def:rectangle, and the remark that follows that definition is not formalised.
 - *Sets of proportions.* The development does not define the sets $P_n (W, H)$.
   Its statements are about the existence of a list of $n$ rectangles that is a similar tiling of proportion $x$ of the rectangle with corner at the origin and given sides, which is the membership of $x$ in $P_n (W, H)$.
-  @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow; the consequence $P_n (w) = P_n (1 slash w)$ is not stated in the development.
+  @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow; the consequence $P_n (w) = P_n (1 slash w)$ is the theorem `tilesWith_main_inv`.
   Of @prop:subdivision, the development states the steps of three and of five for an arbitrary main rectangle with positive sides, and every step of at least three for the unit square with at least two tiles; the second statement follows from these for every $k >= 5$ other than $7$, and for $k = 7$ the development contains the dissection into eight (`Rect.isTiling_eight`) but not the statement.
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
@@ -1955,8 +1962,8 @@ By @prop:subdivision, proportions persist when three tiles, or five or more, are
 The steps of one and two fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
 Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
-The step of four can fail when the main rectangle is not a square.
-According to the search, $4 in P_2 (2)$ and $4 in.not P_6 (2)$, and $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$; for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
+The step of four can fail when the main rectangle is not a square, as the examples after @prop:subdivision show.
+According to the search, for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
 
 The same constructions, applied to the tile at a corner, are injective on tilings, and give inequalities for the numbers $t(n)$ of @def:tbc.
 They are much weaker than the growth observed in @tab:tbc.

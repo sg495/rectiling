@@ -496,6 +496,20 @@ def persistence_figure(path, value, witness):
     return records
 
 
+def steps_figure(path):
+    """Draws three tilings found by the search whose proportions do not recur with one or two more tiles in the square, or with four more in the other two main rectangles."""
+    cases = (("2.0", "0wW 0fW", 1, 1, "$2 \\in P_2(1)$"), ("1.5", "0fW", 3, 2, "$3/2 \\in P_1(3/2)$"), ("4.0", "0wW 0fW", 2, 1, "$4 \\in P_2(2)$"))
+    fig, axes = plt.subplots(1, 3, figsize=(4.6, 1.3), gridspec_kw={"width_ratios": [width / height for _, _, width, height, _ in cases]})
+    for ax, (value, witness, width, height, title) in zip(axes, cases):
+        tiles = [tuple(c / height for c in tile) for tile in witness_tiles(value, witness, width, height)]
+        draw(ax, tiles, width / height, 1.0)
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_title(title, fontsize=7, pad=3)
+    fig.tight_layout(pad=0.2, w_pad=0.8)
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def pinwheel_figure(path):
     """Draws the exact solutions of the system of the pinwheel record of five tiles, with the width of the main rectangle free, for three proportions."""
     moves = [(0, "inside", False), (0, "full-height", False), (0, "full-width", False), (1, "full", True), (0, "full", False)]
@@ -559,6 +573,7 @@ def main():
     mosaic_figure(OUT / "mosaic.svg", choice)
     value, witness = next((v, w) for v, w in listing(5) if w == "0iW 0wW 1wT 1fT 0fW")
     print("persistence:", value, witness, persistence_figure(OUT / "persistence.svg", value, witness))
+    steps_figure(OUT / "steps.svg")
     print("pinwheel:", pinwheel_figure(OUT / "pinwheel.svg"))
     print("two tiles:", two_tiles_figure(OUT / "two-tiles.svg"))
     print("sporadic:", sporadic_figure(OUT / "sporadic.svg"))

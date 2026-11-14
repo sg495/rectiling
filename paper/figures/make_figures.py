@@ -185,11 +185,11 @@ def distinct(found):
     return out
 
 
-def witness_tiles(value, witness):
-    """Computes the tiles of the tiling described by a proportion and a witness sequence from the search tool."""
+def witness_tiles(value, witness, width=1, height=1):
+    """Computes the tiles of the tiling of a main rectangle of integer sides described by a proportion and a witness sequence from the search tool."""
     codes = {"i": "inside", "h": "full-height", "w": "full-width", "f": "full"}
     moves = [(int(m[0]), codes[m[1]], m[2] == "T") for m in witness.split()]
-    _, tiles, equations, sides = replay(moves)
+    _, tiles, equations, sides = replay(moves, width, height)
     x = sp.Float(value, 30)
     solution = {}
     if sides:
