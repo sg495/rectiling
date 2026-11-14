@@ -10,17 +10,16 @@
   abstract: [
     We describe an exact procedure which, for a given $n$ and a main rectangle of rational aspect ratio, finds every proportion $x >= 1$ such that the main rectangle can be cut into $n$ rectangles of proportion $x$, each proportion being identified as a real algebraic number by its minimal polynomial.
     The procedure places tiles one at a time on a staircase, and solves exactly, for each sequence of placements, a linear system whose coefficients are polynomials in the proportion.
-    We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
+    // We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
     For the special case of a square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
     For $n <= 12$ we also count the tilings themselves, their classes under the symmetries of the square, and the multisets of tiles that occur.
-    We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, and that $a(n)$ grows at most like $(27 slash 2)^n$.
+    // We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, and that $a(n)$ grows at most like $(27 slash 2)^n$.
   ],
-  keywords: [tilings, similar rectangles, rectangulations, Baxter numbers, exact enumeration, real algebraic numbers],
 )
 
 = Introduction <sec:intro>
 
-A rectangle can be cut into finitely many rectangles that are all similar to one another, each lying either way round, and one may ask which proportions the pieces can have.
+A rectangle can be cut into finitely many rectangles that are all similar to one another, each in either orientation; the question is which proportions the pieces can have.
 For a square cut into two pieces the only possibility is a pair of halves, of proportion $2$.
 For three pieces there are three: thirds, of proportion $3$; a half-height slab on two quarter-size pieces, of proportion $3 slash 2$; and a third arrangement, in which no two pieces are congruent, whose proportion $1.7548...$ is the real root of $x^3 - 2 x^2 + x - 1$, the square of the plastic ratio.
 
@@ -67,8 +66,8 @@ A tiling is a dissection in the usual sense: the tiles cover the main rectangle 
   For $x >= 1$, a tiling is _similar of proportion $x$_ if every tile has proportion $x$.
 ] <def:tiling>
 
-The order of the tiles plays no part: every rearrangement of a tiling is a tiling, and the tiles of a tiling are pairwise distinct, because a rectangle meets its own interior.
-Two rectangles with disjoint interiors are separated by a horizontal or a vertical line, so that the interior of each misses the other altogether; conversely, two tiles of a tiling whose interiors meet are equal.
+The order of the tiles is immaterial: every rearrangement of a tiling is a tiling.
+Two rectangles with disjoint interiors are separated by a horizontal or a vertical line, so that the interior of each is disjoint from the closure of the other; conversely, two tiles of a tiling whose interiors meet are equal.
 Both remarks are used repeatedly below.
 
 #definition(name: [achievable proportions])[
@@ -143,7 +142,7 @@ Whether they grow along steps of one is not known to us.
 The search places tiles one at a time, starting at the bottom-left corner of the main rectangle, in such a way that the region already covered is always closed under moving left and down.
 The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile always sits in one of its concave corners.
 
-In the search the lengths of the steps of the staircase are expressions in unknown quantities, and nothing guarantees beforehand that they take positive values.
+In the search the lengths of the steps of the staircase are expressions in unknown quantities, and need not take positive values.
 The staircase is therefore defined first as a combinatorial object carrying lengths of an arbitrary kind, and its geometric reading is defined afterwards.
 
 #definition(name: [staircase])[
@@ -368,9 +367,9 @@ The first is geometric: on a positive staircase, a tile that fits its tier as it
 
 The second part is combinatorial: a floor or a wall that has become non-positive in certain positions can never be removed from the staircase, so that such a staircase cannot be emptied.
 
-#definition(name: [doomed staircase])[
-  A real staircase is _floor-doomed_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
-  It is _wall-doomed_ if it has a tier whose wall is not positive and before which every tier is stale.
+#definition(name: [defective staircase])[
+  A real staircase is _floor-defective_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
+  It is _wall-defective_ if it has a tier whose wall is not positive and before which every tier is stale.
 ] <def:doom>
 
 The empty staircase is neither.
@@ -389,51 +388,51 @@ The next statement records what the constraints of a single placement give.
   For a full placement the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
 ]
 
-A doomed staircase stays doomed under every allowed placement whose constraints hold, because the floor or the wall at fault could be made positive only by a placement that one of the two rules forbids.
+A defective staircase stays defective under every allowed placement whose constraints hold, because the floor or the wall that is not positive could be made positive only by a placement that one of the two rules forbids.
 
-#proposition(name: [persistence of doom])[
+#proposition(name: [persistence of defects])[
   Let $x > 0$, let $S$ be a real staircase, and let $p$ be a placement that is allowed at $S$, made with a free side for which its positive quantity is positive and its equation, if it has one, is zero.
   Let $S'$ be the staircase after the placement.
-  If $S$ is floor-doomed then so is $S'$, and if $S$ is wall-doomed then so is $S'$.
+  If $S$ is floor-defective then so is $S'$, and if $S$ is wall-defective then so is $S'$.
 ] <prop:doom>
 
 #proof[
   Let $p = (i, phi, o)$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $(w, h)$ be the size of the tile, so that $w, h > 0$ by @prop:size.
 
-  Suppose that $S$ is wall-doomed, and let $T_j$ be a tier whose wall is not positive and before which every tier is stale.
+  Suppose that $S$ is wall-defective, and let $T_j$ be a tier whose wall is not positive and before which every tier is stale.
   Since $p$ is allowed, $T_i$ is not stale, so $j <= i$.
   If $j < i$, the wall of $T_j$ is unchanged, and the tiers before $T_j$ remain stale: the placement makes every tier before $T_i$ stale, and clears the flag of $T_(i - 1)$ at most, which is not before $T_j$.
   If $j = i$ then $M <= 0$.
   The fit $phi$ is then low, for otherwise $h = M <= 0$.
   Hence every tier before $T_i$ is stale in $S'$, and the first of the tiers that replace $T_i$ has wall $M - h < 0$.
-  In both cases $S'$ is wall-doomed.
+  In both cases $S'$ is wall-defective.
 
-  Suppose that $S$ is floor-doomed, and let $T_j$ be a tier whose floor is not positive and which is started or last.
+  Suppose that $S$ is floor-defective, and let $T_j$ be a tier whose floor is not positive and which is started or last.
   If $j < i$ then $T_j$ is not last, hence it is started.
   Its floor and its started flag are unchanged by the placement, unless $j = i - 1$ and $phi$ is not low; but that case does not arise, since $p$ is allowed and $T_(i - 1)$ is then not started.
   If $j = i$ then $L <= 0$.
   The fit $phi$ is then narrow, for otherwise the positive quantity of $p$ is $L$.
   Hence the last of the tiers that replace $T_i$ has floor $L - w < 0$ and is started.
   If $j > i$, the floor and the started flag of $T_j$ are unchanged, and $T_j$ is the last tier of $S'$ if it is the last tier of $S$.
-  In every case $S'$ is floor-doomed.
+  In every case $S'$ is floor-defective.
 ]
 
-It follows that doom cannot occur along a record that empties the staircase, and from this that every tile fits.
+It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
 
 #proposition(name: [strict fit])[
   Let $x > 0$, let $rho$ be a record that obeys the rules from a real staircase $S$, placed with free sides $s$, and suppose that every positivity constraint of $rho$ on $S$ is positive and every equation is zero.
-  Then $S$ is neither floor-doomed nor wall-doomed.
+  Then $S$ is neither floor-defective nor wall-defective.
   If moreover $S$ is positive and $rho$ is not empty, then the first placement $p = (i, phi, o)$ of $rho$ has a tile of size $(w, h)$ with $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, where $L$ and $M$ are the floor and the wall of $T_i$, and the staircase after $p$ is positive.
 ] <prop:fit>
 
 #proof[
   The first statement is proved by induction on the length of $rho$.
-  If $rho$ is empty then $S$ is empty and is not doomed.
-  Otherwise let $S'$ be the staircase after the first placement; the rest of $rho$ obeys the rules from $S'$ and its constraints hold, so $S'$ is not doomed by induction, and neither is $S$ by @prop:doom.
+  If $rho$ is empty then $S$ is empty and is not defective.
+  Otherwise let $S'$ be the staircase after the first placement; the rest of $rho$ obeys the rules from $S'$ and its constraints hold, so $S'$ is not defective by induction, and neither is $S$ by @prop:doom.
 
-  For the second statement, let $S'$ be the staircase after $p$, which is not doomed by the first statement applied to the rest of $rho$, and recall that $w, h > 0$ by @prop:size.
-  If $phi$ is narrow and $w >= L$, then the last of the tiers that replace $T_i$ in $S'$ is started and has floor $L - w <= 0$, so that $S'$ is floor-doomed.
-  If $phi$ is low and $h >= M$, then every tier before $T_i$ is stale in $S'$ and the first of the tiers that replace $T_i$ has wall $M - h <= 0$, so that $S'$ is wall-doomed.
+  For the second statement, let $S'$ be the staircase after $p$, which is not defective by the first statement applied to the rest of $rho$, and recall that $w, h > 0$ by @prop:size.
+  If $phi$ is narrow and $w >= L$, then the last of the tiers that replace $T_i$ in $S'$ is started and has floor $L - w <= 0$, so that $S'$ is floor-defective.
+  If $phi$ is low and $h >= M$, then every tier before $T_i$ is stale in $S'$ and the first of the tiers that replace $T_i$ has wall $M - h <= 0$, so that $S'$ is wall-defective.
   Hence $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, and $S'$ is positive by @prop:step.
 ]
 
@@ -446,7 +445,7 @@ Soundness follows by removing the tiles from the region one at a time.
 
 #proof[
   By @prop:bound the record $rho$ has $n$ placements and obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend on the flags only.
-  By @prop:fit the staircase $S_0$ is not doomed.
+  By @prop:fit the staircase $S_0$ is not defective.
   Its only tier is the last one and has no tier before it, so its floor $W$ and its wall $H$ are positive, and $S_0$ is positive.
 
   We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that they are as many as the placements of $rho'$.
@@ -587,14 +586,14 @@ Repeating the step until no tile remains gives the record.
 #proof[
   The initial staircase of $W$ and $H$, with every tile remaining, is a state: the staircase is positive, its region is the main rectangle, which contains every tile, and its only tier is neither stale nor started.
   We show, by induction on the number $r$ of remaining tiles of a state with staircase $S$, that there are a record $rho'$ of $r$ placements and free sides such that $rho'$ obeys the rules from $S$, its constraints on $S$ hold, its tiles on $S$ are the remaining tiles in some order, and each of its placements is wide exactly if its tile satisfies $w = x h$.
-  If $r = 0$ then $S$ is empty, since otherwise there would be a remaining tile by @prop:anchor, and the empty record will do.
+  If $r = 0$ then $S$ is empty, since otherwise there would be a remaining tile by @prop:anchor, and the empty record suffices.
   If $r > 0$ then $S$ is not empty, since the interior of a remaining tile is contained in $U(S)$.
   Then @prop:extension gives a placement $p$, with a free side, whose tile is a remaining tile $Q$ and after which there is a state with $r - 1$ remaining tiles, namely those other than $Q$.
   By induction that state has a record $rho''$ with free sides as stated, and $rho'$ is $p$ followed by $rho''$, the free side of $p$, if $p$ is inside, being put before those of $rho''$.
   Applied to the initial state this gives a record $rho$ of $n$ placements that obeys the rules from the initial staircase, which is complete admissible for $n$ tiles by @prop:bound.
 ]
 
-A square tile is both wide and tall, so that a tiling with square tiles arises from several records; this multiplicity is harmless, since only proportions are counted.
+A square tile is both wide and tall, so that a tiling with square tiles arises from several records; this does not affect the count of proportions.
 For a square main rectangle, transposition allows the first tile to be taken wide, which halves the number of orientations to be examined.
 
 #proposition(name: [completeness for a square])[
@@ -606,11 +605,11 @@ For a square main rectangle, transposition allows the first tile to be taken wid
   Let $rho$ and $s$ be given by @prop:complete.
   If $rho$ is empty there is nothing to prove.
   Otherwise its first placement is made at the only tier of the initial staircase, so its tile $T = (0, 0, w, h)$ has its corner at the origin.
-  If $w = x h$ the first placement is wide, and $rho$ will do.
+  If $w = x h$ the first placement is wide, and $rho$ suffices.
   Otherwise $h = x w$, since $T$ has proportion $x$.
   The transposes of $R_1, dots, R_n$ form a similar tiling of the same square, of proportion $x$, as in the proof of @prop:transposition; let $rho'$ and $s'$ be given by @prop:complete for it.
   The tile of the first placement of $rho'$ has its corner at the origin and is the transpose of some $R_j$, whose corner is then the origin; the interiors of $R_j$ and $T$ meet, so $R_j = T$.
-  That tile is thus $(0, 0, h, w)$, and $h = x w$ says that the first placement of $rho'$ is wide.
+  That tile is thus $(0, 0, h, w)$, and $h = x w$ means that the first placement of $rho'$ is wide.
 ]
 
 == The search <sec:solving>
@@ -626,7 +625,7 @@ $ F_rho := b N - a D $
 of the record, and a root $r >= 1$ of $F_rho$ is the proportion of a tiling with the record $rho$ exactly if every positivity constraint is positive at the solution for $x = r$.
 The search isolates the real roots of $F_rho$ in $[1, infinity)$, identifying each by its minimal polynomial, and determines the signs of the positivity constraints at each of them.
 The record is _regular_ if $D$ is not zero, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$; the precise form of this condition is @def:regular.
-At a root of $F_rho$ where $D$ vanishes the system might have further solutions, which the search would not see, so that the search counts the records that are not regular, and its result is _certified_ if there are none.
+At a root of $F_rho$ where $D$ vanishes the system might have further solutions, which the search would not find, so that the search counts the records that are not regular, and its result is _certified_ if there are none.
 
 The search exists in two forms, which are defined and proved correct in @app:solving.
 The _direct search_ treats each record on its own, by a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots (@def:reference).
@@ -704,7 +703,7 @@ The computations restricted to guillotine tilings or to tilings with few tiles i
 
 == The square <sec:square>
 
-@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic), the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search met.
+@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic), the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search encountered.
 The last number depends on the method of search and is not an invariant of the problem.
 
 #figure(
@@ -829,7 +828,7 @@ The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from
 ] <conj:logconvex>
 
 @conj:logconvex holds for $n <= 12$.
-The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and with it $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount that is far too small to be seen in the values computed.
+The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and with it $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount too small to be detected in the values computed.
 Whether $a(n)^(1 slash n)$ converges is not known (@sec:growth-rate).
 
 == Tilings, classes and bags <sec:tilings-counts>
@@ -1142,7 +1141,7 @@ With routines that meet their specifications, the method reports solutions of th
   Finally $Q_f (r) = D(r) nu_k (f)$ with $nu_k (f) > 0$, so $Q_f (r)$ has the sign of $D(r)$, and $r$ is reported.
 ]
 
-The proviso of the second statement is what the search verifies.
+The search verifies the hypothesis of the second statement.
 
 #definition(name: [regular record])[
   Let $a$ and $b$ be integers.
@@ -1153,7 +1152,7 @@ The proviso of the second statement is what the search verifies.
   The direct search for $n$ tiles is _certified_ if all these records are regular for $(a, b)$.
 ] <def:regular>
 
-A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being void when the test of the third step succeeds.
+A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being vacuous when the test of the third step succeeds.
 
 #proposition(name: [correctness of the direct search])[
   Let $a, b >= 1$ and $n >= 0$ be integers.
@@ -1223,7 +1222,7 @@ The pass along a record keeps, besides the staircase, the coefficient by which t
   + If $j < ell$ and $p_j$ has an equation $E$ on $S$, there is an index $m$ with $1 <= m <= k^+$ and $E_m != 0$ such that the elimination $epsilon = (E, m, pi)$ divides exactly every floor and wall of $S^+$, and $Sigma_j = (epsilon(S^+), E_m, k^+)$, where $epsilon(S^+)$ is obtained by applying $epsilon$ to every floor and wall of $S^+$; the elimination $epsilon$ is _recorded_ with $p_j$.
 ] <def:elimination>
 
-A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the price of multiplying every length by the new pivot and dividing it by the old one.
+A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the cost of multiplying every length by the new pivot and dividing it by the old one.
 A stage therefore represents lengths up to the factor of its pivot.
 The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
 The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
@@ -1322,7 +1321,7 @@ Comparing determinants identifies the pivots, as in the elimination of Bareiss @
   Under the additional hypothesis, $l |-> m_l$ is a bijection from ${1, dots, r}$ onto ${0, dots, r - 1}$, and $A$ is the matrix $(psi((e_i)_j))$ with its columns permuted accordingly, so that the two determinants differ by the sign of a permutation.
 ]
 
-On a complete record every unknown but the scale is eliminated, and the scale coefficient of the final equation plays the part of one more pivot.
+On a complete record every unknown but the scale is eliminated, and the scale coefficient of the final equation acts as one more pivot.
 It is the polynomial whose roots are the candidate proportions.
 
 #proposition(name: [the final coefficient is the determinant])[
@@ -1387,7 +1386,7 @@ The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the d
 ]
 
 For the elimination of Bareiss, $lambda = plus.minus 1$, and the two polynomials have the same roots in $[1, infinity)$; in general the statement shows that every root of the final coefficient in $[1, infinity)$ is a root of $F_rho$, and that every root of $F_rho$ at which $lambda$ does not vanish is a root of the final coefficient.
-The correctness of the incremental search does not depend on this comparison, which is recorded for its own sake.
+The correctness of the incremental search does not depend on this comparison, which is stated for completeness.
 
 The cost of an elimination is proportional to the square of the number of tiers, and most nodes of the search tree are close to the leaves, where staircases have one or two tiers.
 In the implementation, when one tile remains to be placed, on a single tier that is not stale and whose floor and wall are non-zero multiples $c_L t$ and $c_M t$ of the scale, and no forced placement is pending, the final equations $c_L - x c_M$ and $c_M - x c_L$ of the two orientations of the last tile are formed directly, without a separate placement.
@@ -1473,7 +1472,7 @@ The intervals form an arithmetic of lengths for a given interval $I$ of the prop
     Otherwise, if $r$ has no stored polynomial, the examination ends; if the test of divisibility succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
 ] <def:check>
 
-An accepted root is a solution, and a rejected one is not, whichever way the rejection came about.
+An accepted root is a solution, and a rejected one is not, with or without a certificate.
 
 #proposition(name: [verdicts of the numerical check])[
   Let $rho$ be a complete admissible record, with a successful pass over $ZZ[x, x^(-1)]$ from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$, and let $alpha > 0$ be a real number whose stored interval encloses $alpha$ and is certainly away from zero.
@@ -1507,7 +1506,7 @@ An accepted root is a solution, and a rejected one is not, whichever way the rej
 The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles of @fig:pinwheel, whose central tile degenerates to a point.
 Such cases are about one in a hundred, and the certificate settles them without recourse to the direct method.
 The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful test of divisibility is correct.
-When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which plays no part in the correctness of the search.
+When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which is not used in the correctness of the search.
 
 #proposition(name: [degenerate tiles])[
   Let $f in ZZ[x]$ be primitive and irreducible over $QQ$, and let $r$ be a real number with $f(r) = 0$.
@@ -1539,7 +1538,7 @@ The formal development does not prove that the exact eliminations applied to $si
 ] <def:fastsolve>
 
 For ten tiles, one record in ten thousand is passed to the direct method.
-Whenever the incremental method settles a record itself, it reports exactly the solutions of its system, with no proviso.
+Whenever the incremental method settles a record itself, it reports exactly the solutions of its system, unconditionally.
 
 #proposition(name: [incremental method on a record])[
   Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
@@ -1666,7 +1665,7 @@ This is what the two counts of the direct method establish in a run of the incre
   The third statement follows record by record from the last statement of @prop:fastsolve, a certified direct search being one in which every record considered is regular.
 ]
 
-The first statement needs no proviso: whatever the incremental search reports is the proportion of a tiling.
+The first statement is unconditional: every number that the incremental search reports is the proportion of a tiling.
 The two searches can differ only at a record that the incremental method settles itself and that is not regular for the direct method, because a singular situation is counted or the record is flagged as constant; there the incremental method reports every solution and the direct method may report nothing.
 No such record is known.
 Completeness of the incremental search needs less than that of the direct search, namely the regularity of the records passed to the direct method only.
@@ -1896,7 +1895,7 @@ The formal development is about a model of the method, and the following lies ou
 - *The arithmetic routines.* The routines of @def:primitives and @def:numerics are assumed to meet their specifications, and every statement on the two searches is quantified over them.
   This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the test of divisibility.
   Both sets of specifications are shown to be consistent by exhibiting routines that meet them.
-- *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for want of an unknown to eliminate.
+- *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for lack of an unknown to eliminate.
   It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the direct method, or returns the verdict unsure, when the check fails.
 - *Regularity.* It is not proved that every record is regular in the sense of @def:regular.
   The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast have their absence as a hypothesis.
@@ -1930,7 +1929,7 @@ Nothing in this appendix has been formalised, except @prop:persistence.
 
 Throughout, an _orientation vector_ for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
 An orientation vector $epsilon$ on the tiles of a similar tiling of proportion $x$ is _an orientation vector of the tiling_ if every tile $T$ is tall for $x$ when $epsilon_T = +1$ and wide for $x$ when $epsilon_T = -1$.
-For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector will do, the tiles being squares.
+For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector is one, the tiles being squares.
 
 == Persistence <sec:persistence>
 
@@ -1977,7 +1976,7 @@ The step of four can fail when the main rectangle is not a square.
 According to the search, $4 in P_2 (2)$ and $4 in.not P_6 (2)$, and $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$; for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
 
 The same constructions, applied to the tile at a corner, are injective on tilings, and give inequalities for the numbers $t(n)$ of @def:tbc.
-They are far from the growth observed in @tab:tbc.
+They are much weaker than the growth observed in @tab:tbc.
 
 #proposition(name: [steps of three, four and five])[
   Let $n >= 1$, and let $s(n)$ be the number of tilings of the unit square by $n$ squares.
@@ -2097,7 +2096,7 @@ The two determinants are polynomials of low degree in the conductances.
 
 == The network of a tiling <sec:tiling-network>
 
-The vertices of the network of a tiling are the horizontal lines of the picture, and its edges are the tiles; the current in a tile is its width, and the potential of a line is its height.
+The vertices of the network of a tiling are the horizontal lines of the tiling, and its edges are the tiles; the current in a tile is its width, and the potential of a line is its height.
 The lines are taken to be the connected components of the union of the horizontal sides, so that the network is defined also when four tiles meet at a point.
 @fig:network shows an example.
 
@@ -2161,7 +2160,7 @@ The aspect ratio $W slash H$ of @def:counts is the value at $x$ of the inverse $
 The statements below are therefore made for impedance functions only.
 
 The next statement collects the properties of these functions.
-The first, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile playing the part of an inductor and a wide one that of a capacitor, and constitute Foster's reactance theorem @foster1924; the second is the corresponding property of positive real functions @brune1931.
+The first, third and sixth are the classical properties of the impedance of a network of inductors and capacitors, a tall tile corresponding to an inductor and a wide one to a capacitor, and constitute Foster's reactance theorem @foster1924; the second is the corresponding property of positive real functions @brune1931.
 For tilings, that the aspect ratio of the main rectangle is a rational function of those of the tiles, with rational coefficients, is a theorem of Dehn @dehn1903; Freiling, Laczkovich and Rinne show that a rectangle of proportion $v$ can be tiled by rectangles of proportion $u$ exactly if $v = Q(u)$ for an odd rational function $Q$ with rational coefficients that maps the right half-plane into itself @flr1997, and Prasolov and Skopenkov state these properties in electrical terms @prasolov2011.
 They are proved here from @prop:flow, since the proof is short.
 
@@ -2387,7 +2386,7 @@ This follows from the unoriented statement, since the dual cycle separates the t
 
 The additive constants of $phi$ and $psi$ may be chosen so that the main rectangle is $[0, I] times [0, Z I]$, where $Z$ is the impedance.
 
-The third step is that the inverse of an impedance function of a plane network is the impedance function of the dual network, in which currents and differences of potential exchange their parts.
+The third step is that the inverse of an impedance function of a plane network is the impedance function of the dual network, in which currents and differences of potential are exchanged.
 For a tiling this is transposition.
 
 #proposition(name: [duality])[
@@ -2495,7 +2494,7 @@ A function of the first kind takes each large value exactly once on $[1, infinit
   Let $W(n)$ be the largest of the finitely many bounds of the five steps.
 ]
 
-The rationality of $w$ plays no part.
+The rationality of $w$ is not used.
 
 The threshold can be made explicit by bounding the coefficients of the polynomials involved, which is done by counting spanning trees.
 The following formulas of Kirchhoff, for a network with conductances $y$, are assumed @kirchhoff1847; in the generality needed they are instances of the all-minors matrix-tree theorem @chaiken1982.
@@ -2541,7 +2540,7 @@ The following formulas of Kirchhoff, for a network with conductances $y$, are as
   This step is covered by the first and the second.
 ]
 
-The bound is far from the truth: for $n <= 9$ the counts are observed to be constant from $w = floor(n^2 slash 4) + 2$ onwards.
+The bound is not sharp: for $n <= 9$ the counts are observed to be constant from $w = floor(n^2 slash 4) + 2$ onwards.
 The next statement shows that the two statements of @prop:wide-full cannot both hold below that width, by exhibiting two functions with a common solution.
 
 #proposition(name: [a coincidence])[
@@ -2573,7 +2572,7 @@ The largest of these, $w = 1000003$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$,
 For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $9865302$ for $n = 11$ is new and was computed once.
 
 
-The functions themselves grow at least threefold with each tile.
+The number of functions at least triples with each tile.
 
 #proposition(name: [growth of the number of functions])[
   For every $n >= 1$, $E(n + 1) >= 3 E(n)$.
@@ -2659,7 +2658,7 @@ The first use of the identity removes the squares of the largest possible size.
 
 #proof[
   A square of side $1$ occupies a full column, so the squares of side $1$ cut the rectangle into rectangles of height $1$, each of which is dissected by the squares that it contains.
-  Pushing these together gives the dissection.
+  Translating these rectangles so that they are adjacent gives the dissection.
   In it every vertical line crosses at least two squares, so that $h >= 4$, and @eq:reciprocals gives the inequality.
 ]
 
@@ -2982,7 +2981,7 @@ By the third statement of @prop:segments, a flow is regular whenever no four til
   Choosing one regular full-side root for each class thus gives $g(n)$ distinct tilings.
 ]
 
-The first statement gives a way of counting the tilings that is independent of the search of @sec:solving: a plane network in which no current vanishes identically has a non-separable graph $G^+$, since a part of the network that hangs from the rest at a single vertex $u$ and contains no pole carries no current: making the potential equal to $phi(u)$ on that part gives a flow of the same value, which is the flow by the uniqueness in @prop:flow; and when a vertex $u$ of $G^+$ is removed some component contains no pole, the poles being joined by $e_0$ unless $u$ is one of them.
+The first statement gives a way of counting the tilings that is independent of the search of @sec:solving: a plane network in which no current vanishes identically has a non-separable graph $G^+$, since a part of the network that is attached to the rest at a single vertex $u$ and contains no pole carries no current: making the potential equal to $phi(u)$ on that part gives a flow of the same value, which is the flow by the uniqueness in @prop:flow; and when a vertex $u$ of $G^+$ is removed some component contains no pole, the poles being joined by $e_0$ unless $u$ is one of them.
 So it suffices to go through the non-separable planar maps with $n + 1$ edges, rooted at $e_0$ directed from $t$ to $s$ with a fixed side, and for each of them and each orientation vector to find the regular points $x > 1$ with value $1$ among the roots of a polynomial; the tilings by squares are counted in the same way, as the plane networks with unit resistances, impedance $1$ and a regular flow.
 We carried this out in floating-point arithmetic for $n <= 9$, and it reproduces the values of $t(n)$ in @tab:tbc.
 The same computation gives $g(n)$.
@@ -2996,7 +2995,7 @@ It holds for $n <= 10$. For $n <= 9$, according to this computation in floating-
 The quotient $t(n) slash g(n)$ is $0.257$, $0.291$, $0.287$, $0.293$, $0.295$ and $0.298$ for $n = 4, dots, 9$; it increases slowly from six tiles on, and the values do not show whether it remains below $1$.
 A second computation, in integer arithmetic, certifies regular full-side roots by an exact change of sign on a small interval on which the potentials of the vertices are shown to be pairwise distinct; it certifies $24202856$ pairs for nine tiles, and for ten tiles $77189138$ pairs among the first $80445440$ examined, which exceeds $t(10) = 77188146$.
 
-The conjecture cannot be proved one network at a time.
+The inequality does not hold for each network separately.
 Let $frak(N)$ be ten blocks in series, each of nine edges in parallel, with $90$ edges in all.
 Its impedance function for an orientation vector with $a_j$ tall edges in the $j$-th block is $sum_j x slash (a_j + (9 - a_j) x^2)$, every point is regular, and the number of the pairs of an orientation vector and a solution $x > 1$ of $F(x) = 1$, counted in exact arithmetic by the changes of sign of $N - D$ at rational points, is at least $1.008 dot.op 2^(90)$.
 Distinct orientation vectors give pairs that are not isomorphic, since an isomorphism of this plane network with itself fixes the poles and $e_0$, and then every edge in turn; so this network has more tilings of the square of proportion larger than $1$ than orientation vectors.
@@ -3080,7 +3079,7 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ]
 
 The constant $C$ is numerically $0.25$.
-The bound is of no use for the values of $n$ within reach: the factor $(1 + (2 slash 27)^5)^(-n)$ is $0.99997$ for $n = 13$, and $C (n + 1) lambda^n$ falls below the bound of @prop:upper only for $n$ of the order of $10^7$.
+The bound gives nothing for the values of $n$ computed: the factor $(1 + (2 slash 27)^5)^(-n)$ is $0.99997$ for $n = 13$, and $C (n + 1) lambda^n$ falls below the bound of @prop:upper only for $n$ of the order of $10^7$.
 Its interest is that the rate $27 slash 2$ of the planar maps is not that of the tilings.
 The pattern can be widened, to four edges with $epsilon_a + epsilon_d = epsilon_b + epsilon_c$, which lowers the bound slightly; and other patterns have the same effect.
 For nine tiles $0.6$ per cent of the pairs have a square block, while $3.3$ per cent have no regular full-side root.
@@ -3099,8 +3098,8 @@ By @prop:deficit the limits, if they exist, are smaller than $27 slash 2$.
 The values computed do not show this.
 If $a(n)$ were a constant times $mu^n n^(-gamma)$, then $gamma$ would be $log(mu a(n) slash a(n + 1)) slash log((n + 1) slash n)$ for every $n$.
 For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and the quotient of $a(n)$ by $(27 slash 2)^n n^(-11 slash 2)$ takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$; likewise the quotient of $t(n)$ by $2^n M(n)$ increases slowly, to $0.2920$ for twelve tiles.
-These fits, which @fig:sequences shows, describe the terms computed and nothing more: by @prop:deficit both quotients tend to zero.
-A deficit of the size proved, or of the size that the proportion of pairs without regular points suggests, is invisible in thirteen terms.
+These fits, which @fig:sequences shows, describe only the terms computed: by @prop:deficit both quotients tend to zero.
+A deficit of the size proved, or of the size that the proportion of pairs without regular points suggests, cannot be detected in thirteen terms.
 
 == Mosaic classes <sec:mosaic>
 
@@ -3133,7 +3132,7 @@ We have not proved this expectation, and the search does not rely on it: it coun
 
 The same bound for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
 The proof of @prop:upper bounds the number of triples of a rooted map, an orientation vector and a proportion.
-The network of the tiling will not serve here, since by @prop:multiplicity a tiling with crossings has several records and one network.
+The network of the tiling cannot be used here, since by @prop:multiplicity a tiling with crossings has several records and one network.
 Associate instead with a record the network whose vertices are the horizontal segments created by its placements, two segments of equal height that meet at a crossing being kept distinct and joined in the order given by the record; the tiling still gives a flow on it, in which no current vanishes.
 The map that sends a record with orientations and a proportion to the triple of this network with the edge joining its poles, the orientations and the proportion is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, secondly, a mosaic class is determined by its plane network together with the directions of its edges, and, thirdly, the network of a record with the added edge is a non-separable planar map.
 Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
