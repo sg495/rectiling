@@ -95,6 +95,7 @@ Default method:
 - `TilesWith.add_three`, `TilesWith.add_five`. A rectangle with positive sides that can be cut into n rectangles of proportion x can be cut into n + 3 and into n + 5.
 - `Achievable.add_four`. For x > 1, if the unit square can be cut into n rectangles of proportion x, it can be cut into n + 4.
 - `achievable_one`. The unit square can be cut into n squares for every n ≥ 6.
+- `tilesWith_main_inv`. The main rectangles of aspect ratios w and 1/w can be cut into n rectangles of the same proportions.
 - `persistence`. If the unit square can be cut into n ≥ 2 rectangles of proportion x, it can be cut into n + k, for every k ≥ 3; `persistence_of_one_lt` drops the hypothesis on n when x > 1.
 
 ## How the proofs go

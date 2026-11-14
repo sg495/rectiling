@@ -1,5 +1,6 @@
 -- SPDX-License-Identifier: LGPL-3.0-or-later
 import Rectiling.Refinement
+import Rectiling.Scaling
 
 /-!
 # Persistence of proportions
@@ -203,6 +204,29 @@ def TilesWith (x : ℝ) (R : Rect) (n : ℕ) : Prop :=
 /-- The unit square can be cut into `n` rectangles of proportion `x`. -/
 def Achievable (n : ℕ) (x : ℝ) : Prop :=
   TilesWith x (Rect.main 1 1) n
+
+/-- The transpose of a rectangle that can be cut into `n` rectangles of proportion `x` can be cut likewise. -/
+theorem TilesWith.transpose {x : ℝ} {R : Rect} {n : ℕ} (h : TilesWith x R n) :
+    TilesWith x R.transpose n := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  exact ⟨tiles.map Rect.transpose, by simp [hlen], htil.transpose⟩
+
+/-- The image under a homothety of a rectangle that can be cut into `n` rectangles of proportion `x` can be cut likewise. -/
+theorem TilesWith.scale {x c : ℝ} {R : Rect} {n : ℕ} (hc : 0 < c) (h : TilesWith x R n) :
+    TilesWith x (R.scale c) n := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  exact ⟨tiles.map (Rect.scale c), by simp [hlen], htil.scale hc⟩
+
+/-- **Inverse aspect ratio.** The main rectangles of aspect ratios `w` and `1 / w` can be cut into `n` rectangles of the same proportions. -/
+theorem tilesWith_main_inv {x w : ℝ} {n : ℕ} (hw : 0 < w) :
+    TilesWith x (Rect.main w 1) n ↔ TilesWith x (Rect.main (1 / w) 1) n := by
+  have key : ∀ {v : ℝ}, 0 < v → TilesWith x (Rect.main v 1) n → TilesWith x (Rect.main (1 / v) 1) n := by
+    intro v hv h
+    have h' := h.transpose.scale (one_div_pos.mpr hv)
+    have e : (Rect.main v 1).transpose.scale (1 / v) = Rect.main (1 / v) 1 := by
+      simp [Rect.transpose, Rect.scale, Rect.main, hv.ne']
+    rwa [e] at h'
+  exact ⟨key hw, fun h => by simpa using key (one_div_pos.mpr hw) h⟩
 
 /-- A tiling of a rectangle with positive sides has at least one tile. -/
 theorem IsTiling.exists_cons {R : Rect} {tiles : List Rect} (hR : R.Nondegenerate)
