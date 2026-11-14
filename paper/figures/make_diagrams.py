@@ -330,27 +330,6 @@ def sporadic_figure(path):
     return out
 
 
-def persistence_figure(path):
-    """Draws a listed tiling by three tiles and the tiling by seven obtained from it by the pinwheel, the latter from its record."""
-    value, witness = next((v, w) for v, w in listing(3) if abs(float(v) - 1.7548776662) < 1e-6)
-    inner = witness_tiles(value, witness)
-    x = float(value)
-    p = x / (x + 1)
-    scale = (x - 1) / (x + 1)
-    built = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
-    built += [(1 - p + scale * a, 1 - p + scale * b, scale * w, scale * h) for a, b, w, h in inner]
-    record = record_of(built)
-    tiles = witness_tiles(value, record)
-    assert all(abs(a - b) < 1e-8 for t, g in zip(sorted(tiles), sorted(built)) for a, b in zip(t, g))
-    fig, axes = plt.subplots(1, 2, figsize=(3.6, 1.85))
-    draw(axes[0], inner)
-    draw(axes[1], tiles)
-    fig.tight_layout(pad=0.3)
-    fig.savefig(path)
-    plt.close(fig)
-    return record
-
-
 def classes(n):
     """Reads the classes of tilings under symmetry listed by the search for n tiles, as triples of a proportion, the size of the class and a witness."""
     fits = {"inside": "i", "full height": "h", "full width": "w", "full": "f"}
@@ -479,21 +458,42 @@ def mosaic_figure(path, choice):
     plt.close(fig)
 
 
-def symmetry_figure(path, value, witness):
-    """Draws a listed tiling, its transpose, and the tiling obtained by cutting one tile into four."""
+def persistence_figure(path, value, witness):
+    """Draws a listed tiling and the tilings with three, four and five more tiles obtained by cutting a tile into four, by the pinwheel and by cutting a tile into six, each from its record, the tiles of the listed tiling keeping their colours and the new tiles being grey."""
     tiles = witness_tiles(value, witness)
-    fig, axes = plt.subplots(1, 3, figsize=(4.8, 1.75))
-    draw(axes[0], tiles)
-    draw(axes[1], [(y, x, h, w) for x, y, w, h in tiles])
     k = max(range(len(tiles)), key=lambda j: tiles[j][2] * tiles[j][3])
-    x, y, w, h = tiles[k]
-    quarters = [(x, y, w / 2, h / 2), (x + w / 2, y, w / 2, h / 2), (x, y + h / 2, w / 2, h / 2), (x + w / 2, y + h / 2, w / 2, h / 2)]
-    draw(axes[2], tiles[:k] + tiles[k + 1 :] + quarters)
-    for ax, title in zip(axes, ("a tiling", "its transpose", "three more tiles")):
+    a, b, w, h = tiles[k]
+    kept = {j: t for j, t in enumerate(tiles) if j != k}
+    four = [(a + w * u / 2, b + h * v / 2, w / 2, h / 2) for u in range(2) for v in range(2)]
+    six = [(a, b, 2 * w / 3, 2 * h / 3)] + [(a + w * u / 3, b + h * v / 3, w / 3, h / 3) for u, v in ((2, 0), (2, 1), (2, 2), (1, 2), (0, 2))]
+    x = float(value)
+    p = x / (x + 1)
+    scale = (x - 1) / (x + 1)
+    pinwheel = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
+    copy = {j: (1 - p + scale * u, 1 - p + scale * v, scale * c, scale * d) for j, (u, v, c, d) in enumerate(tiles)}
+    cases = ((dict(enumerate(tiles)), []), (kept, four), (copy, pinwheel), (kept, six))
+    records = []
+    fig, axes = plt.subplots(1, 4, figsize=(5.8, 1.62))
+    for ax, (old, new) in zip(axes, cases):
+        built = list(old.values()) + new
+        record = record_of(built)
+        drawn = witness_tiles(value, record)
+        assert len(drawn) == len(built) and all(any(max(abs(c - d) for c, d in zip(t, g)) < 1e-8 for g in built) for t in drawn)
+        for t in drawn:
+            index = next((j for j, g in old.items() if max(abs(c - d) for c, d in zip(t, g)) < 1e-8), None)
+            ax.add_patch(Rectangle(t[:2], t[2], t[3], fc="#d9d9d9" if index is None else COLOURS[index], ec="k", lw=0.35))
+        ax.add_patch(Rectangle((0, 0), 1, 1, fc="none", ec="k", lw=0.6))
+        ax.set_xlim(-0.05, 1.05)
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_aspect("equal")
+        ax.axis("off")
+        records.append(record)
+    for ax, title in zip(axes, ("a tiling", "three more tiles", "four more tiles", "five more tiles")):
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
     fig.savefig(path)
     plt.close(fig)
+    return records
 
 
 def pinwheel_figure(path):
@@ -557,13 +557,11 @@ def main():
     choice = mosaic_choice()
     print("mosaic:", choice)
     mosaic_figure(OUT / "mosaic.svg", choice)
-    value, witness = next((v, w) for v, w in listing(5) if "i" in w and "T" in w)
-    print("symmetry:", value, witness)
-    symmetry_figure(OUT / "symmetry.svg", value, witness)
+    value, witness = next((v, w) for v, w in listing(5) if w == "0iW 0wW 1wT 1fT 0fW")
+    print("persistence:", value, witness, persistence_figure(OUT / "persistence.svg", value, witness))
     print("pinwheel:", pinwheel_figure(OUT / "pinwheel.svg"))
     print("two tiles:", two_tiles_figure(OUT / "two-tiles.svg"))
     print("sporadic:", sporadic_figure(OUT / "sporadic.svg"))
-    print("persistence:", persistence_figure(OUT / "persistence.svg"))
     print("classes:", classes_figure(OUT / "classes-4.svg", 4, 8, 0.8), classes_figure(OUT / "classes-5.svg", 5, 11, 0.6))
     tiles, witness = regenerated(*SPORADIC_SIX)
     print("network:", witness, network_figure(OUT / "network.svg", tiles), "components")

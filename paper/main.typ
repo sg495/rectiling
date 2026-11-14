@@ -106,31 +106,41 @@ Exchanging the two axes turns a tiling of a rectangle into a tiling of the recta
   // Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
 ]
 
-The sets of proportions are nested along steps of three, as Einstein observed @einstein2023.
-They are also nested along every step of five or more, for every main rectangle, and along steps of four for a square with at least two tiles (@prop:persistence, @prop:persistence-rectangles).
-They are not nested along steps of one or two (@sec:persistence).
+The sets of proportions are nested along every step other than one and two, with the exception of the step of four when the main rectangle is not a square.
+The step of three was observed by Einstein @einstein2023.
 
-#proposition(name: [subdivision])[
-  For all $W, H > 0$ and $n >= 0$, $P_n (W, H) subset.eq P_(n + 3) (W, H)$.
+#proposition(name: [persistence])[
+  Let $W, H > 0$ and $n >= 0$.
+  + $P_n (W, H) subset.eq P_(n + 3) (W, H)$.
+  + $P_n (W, H) subset.eq P_(n + k) (W, H)$ for every $k >= 5$.
+  + If $n >= 2$, then $P_n (1) subset.eq P_(n + 4) (1)$.
 ] <prop:subdivision>
 
 #proof[
-  Any rectangle
   Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
   The corner of $M$ lies in some tile, so $n >= 1$.
-  Let $R_1 = (a, b, w, h)$, and let $Q_1, dots, Q_4$ be the rectangles of width $w slash 2$ and height $h slash 2$ with corners $(a, b)$, $(a + w slash 2, b)$, $(a, b + h slash 2)$ and $(a + w slash 2, b + h slash 2)$.
-  They have proportion $x$, since $w slash 2 = x h slash 2$ if $w = x h$ and likewise with the sides exchanged.
-  They form a tiling of $R_1$: the two with the same ordinate of the corner are separated by the line of abscissa $a + w slash 2$ and cover a rectangle of width $w$ and height $h slash 2$, and the two rectangles so obtained are separated by the line of ordinate $b + h slash 2$ and cover $R_1$.
-  The sequence $Q_1, dots, Q_4, R_2, dots, R_n$ is then a tiling of $M$: its union is that of the original tiles, the interiors of the $Q_i$ are pairwise disjoint, and each of them lies in the interior of $R_1$, which is disjoint from the interiors of $R_2, dots, R_n$.
-  It has $n + 3$ tiles of proportion $x$.
+
+  The unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$: into four by its mid-lines; into six, one of side $2 slash 3$ and five of side $1 slash 3$; into eight, one of side $3 slash 4$ and seven of side $1 slash 4$; into seven by cutting one of four squares into four; and cutting one square into four adds three to $m$.
+  Let $R_1 = (a, b, w, h)$.
+  The affine map $(u, v) |-> (a + w u, b + h v)$ sends the unit square onto $R_1$, and sends such a dissection to a tiling $Q_1, dots, Q_m$ of $R_1$ by rectangles whose widths and heights are in the ratio $w slash h$, hence of proportion $x$.
+  The sequence $Q_1, dots, Q_m, R_2, dots, R_n$ is then a tiling of $M$: its union is that of the original tiles, the interiors of the $Q_i$ are pairwise disjoint, and each of them lies in the interior of $R_1$, which is disjoint from the interiors of $R_2, dots, R_n$.
+  It has $n + m - 1$ tiles of proportion $x$.
+  The case $m = 4$ gives the first statement, and the cases $m = k + 1 >= 6$ the second.
+
+  For the third statement, let $W = H = 1$ and suppose first that $x > 1$.
+  Let $p := x slash (x + 1)$.
+  Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, have proportion $x$ and leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling, by @prop:scaling.
+  This gives a similar tiling of the unit square of proportion $x$ with $n + 4$ tiles.
+  If $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $n + 4$ squares.
 ]
 
-@fig:symmetry illustrates @prop:transposition and @prop:subdivision.
+The steps of one and two fail, and so does the step of four for some main rectangles that are not squares (@sec:persistence).
+@fig:persistence illustrates the three constructions of the proof.
 
 #figure(
-  image("figures/symmetry.svg", width: 72%),
-  caption: [A similar tiling of the square by five tiles, its transpose, in which wide and tall tiles are exchanged, and the tiling by eight tiles obtained by cutting one tile into four.],
-) <fig:symmetry>
+  image("figures/persistence.svg", width: 92%),
+  caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four and five more tiles given by @prop:subdivision: one tile cut into four, a reduced copy of the tiling at the centre of a pinwheel of four tiles, and one tile cut into six. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
+) <fig:persistence>
 
 @fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search of @sec:solving; the remaining ones are their transposes.
 
@@ -974,7 +984,7 @@ Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388
 
 #proof[
   Let $cal(T)$ be a similar tiling of the square with $n - 3$ tiles in which two tiles have different short sides $s != s'$.
-  Cutting the first of these tiles into four, as in @prop:subdivision, gives a tiling with $n$ tiles whose bag is obtained from that of $cal(T)$ by replacing one copy of $s$ by four copies of $s slash 2$; cutting the second gives the bag in which one copy of $s'$ is replaced by four copies of $s' slash 2$.
+  Cutting the first of these tiles into four, as in the proof of @prop:subdivision, gives a tiling with $n$ tiles whose bag is obtained from that of $cal(T)$ by replacing one copy of $s$ by four copies of $s slash 2$; cutting the second gives the bag in which one copy of $s'$ is replaced by four copies of $s' slash 2$.
   The two bags have the same proportion, and they differ: the sums of the short sides differ by $s - s'$.
   Tilings with tiles of two sizes exist for every number of tiles from three onwards: for $m >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles.
 ]
@@ -1710,7 +1720,7 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row(
           [@prop:subdivision],
           [`Refinement`: `IsSimilarTiling.refine`],
-          [`Persistence`: `Rect.isTiling_four`, `TilesWith.add_three`],
+          [`Persistence`: `Rect.isTiling_four`, `Rect.isTiling_six`, `TilesWith.add_three`, `TilesWith.add_five`, `persistence`],
         ),
         ..lean-row(
           [@def:staircase],
@@ -1868,7 +1878,7 @@ The statements of the paper and those of the development differ in the following
 - *Sets of proportions.* The development does not define the sets $P_n (W, H)$.
   Its statements are about the existence of a list of $n$ rectangles that is a similar tiling of proportion $x$ of the rectangle with corner at the origin and given sides, which is the membership of $x$ in $P_n (W, H)$.
   @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow as in the proofs given; the consequence $P_n (w) = P_n (1 slash w)$ is not stated in the development.
-  @prop:subdivision is formalised for an arbitrary main rectangle with positive sides.
+  Of @prop:subdivision, the development states the steps of three and of five for an arbitrary main rectangle with positive sides, and every step of at least three for the unit square with at least two tiles; the second statement follows from these for every $k >= 5$ other than $7$, and for $k = 7$ the development contains the dissection into eight (`Rect.isTiling_eight`) but not the statement.
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
@@ -1922,7 +1932,7 @@ The proofs are complete, except that the following classical results are used wi
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
 Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
 A few remarks rest on computations made with the search of @sec:solving; they are marked as such, and no proof depends on them.
-Nothing in this appendix has been formalised, except @prop:persistence.
+Nothing in this appendix has been formalised.
 @tab:structure collects the counts to which the appendix refers.
 
 #figure(
@@ -1937,44 +1947,9 @@ For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector is on
 
 == Persistence <sec:persistence>
 
-Proportions persist when tiles are added.
-Cutting one tile into four gives three more tiles, as in @prop:subdivision; cutting it as a square is cut into six squares gives five more; and four more are obtained by surrounding the tiling with a pinwheel.
-
-#proposition(name: [persistence])[
-  For all $n >= 2$ and $k >= 3$, $P_n (1) subset.eq P_(n + k) (1)$.
-] <prop:persistence>
-
-#proof[
-  Every $k >= 3$ is a sum of threes, fours and fives, so it suffices to treat $k in {3, 4, 5}$.
-  Replacing a tile of a tiling by a tiling of that tile gives a tiling, and a rectangle of proportion $x$ can be tiled by four rectangles of proportion $x$, and by six: this gives $k = 3$ and $k = 5$.
-  For $k = 4$ and $x > 1$, let $p := x slash (x + 1)$.
-  Four rectangles with sides $p$ and $p slash x$, placed in the four corners of the unit square in a pinwheel, leave a central square of side $(x - 1) slash (x + 1)$, which is tiled by a scaled copy of the given tiling.
-  For $k = 4$ and $x = 1$, the hypothesis $n >= 2$ gives $n + 4 >= 6$, and the unit square can be cut into $m$ squares for every $m >= 6$.
-]
-
-@fig:persistence shows the step of four for the tiling by three tiles whose proportion is the square of the plastic ratio.
-
-#figure(
-  image("figures/persistence.svg", width: 48%),
-  caption: [A tiling of the square by three tiles of proportion $1.7548...$, and the tiling by seven tiles of the same proportion obtained by placing a reduced copy of it at the centre of a pinwheel of four tiles; the second is drawn from its record.],
-) <fig:persistence>
-
-@prop:persistence has been formalised in Lean (@app:formal).
-The steps $k = 1$ and $k = 2$ fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
+By @prop:subdivision, proportions persist when three tiles, or five or more, are added, and for the square also when four are added.
+The steps of one and two fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
 Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
-
-The steps of three, five and seven, and hence every step other than one, two and four, do not depend on the main rectangle being a square.
-
-#proposition(name: [persistence for every main rectangle])[
-  For every real number $w > 0$, every $n >= 0$ and every $k$ with $k = 3$ or $k >= 5$, $P_n (w) subset.eq P_(n + k) (w)$.
-] <prop:persistence-rectangles>
-
-#proof[
-  The unit square can be cut into $m$ squares for $m = 4$ and for every $m >= 6$: into four by its mid-lines; into six, one of side $2 slash 3$ and five of side $1 slash 3$; into eight, one of side $3 slash 4$ and seven of side $1 slash 4$; into seven by cutting one of four squares into four; and cutting one square into four adds three to $m$.
-  The affine map that sends the unit square onto a tile of width $w$ and height $h$ sends such a dissection to a tiling of the tile by $m$ rectangles whose widths and heights are in the ratio $w slash h$, hence of the proportion of the tile.
-  For $n = 0$ there is nothing to prove, as in @prop:subdivision.
-  Replacing one tile of a similar tiling with $n >= 1$ tiles by this tiling gives a similar tiling of the same main rectangle and of the same proportion with $n + m - 1$ tiles, as in the proof of @prop:subdivision.
-]
 
 The step of four can fail when the main rectangle is not a square.
 According to the search, $4 in P_2 (2)$ and $4 in.not P_6 (2)$, and $3 slash 2 in P_1 (3 slash 2)$ and $3 slash 2 in.not P_5 (3 slash 2)$; for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
@@ -1997,12 +1972,12 @@ They are much weaker than the growth observed in @tab:tbc.
   In the image the tile at the bottom-left corner, of width $a$ and height $b$, and the tiles with corners $(a, 0)$, $(0, b)$ and $(a, b)$ are the four pieces; their union is the tile that was cut, namely $[0, 2 a] times [0, 2 b]$, and the other tiles are unchanged.
 
   For the second, let the tiling have proportion $x > 1$; there are $t(n) - s(n)$ such tilings.
-  The construction of @prop:persistence for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
+  The construction of the third statement of @prop:subdivision for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
   The transpose of this tiling is a similar tiling of the same proportion in which the tile at the bottom-left corner is tall, so that the tilings obtained in the two ways are different.
   In either case, removing the four tiles that contain the corners of the square, after transposing if the tile at the bottom-left corner is tall, leaves the scaled copy of the original tiling.
 
   For the third, there are four dissections of the unit square into one square of side $2 slash 3$ and five of side $1 slash 3$, according to the corner that the large square occupies.
-  Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map of the proof of @prop:persistence-rectangles; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
+  Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map of the proof of @prop:subdivision; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
   Let the tile at the bottom-left corner of the image have width $a$ and height $b$.
   If it is the large piece, then $(A, B) = (3 a slash 2, 3 b slash 2)$, and $[a, 3 a slash 2] times [0, b slash 2]$ is a tile of the image.
   If it is a small piece, then $(A, B) = (3 a, 3 b)$, and the tile of the image that contains the points just to the right of $(a, 0)$ is a piece with corner $(a, 0)$ and of width $a$ or $2 a$, so that $[a, 3 a slash 2] times [0, b slash 2]$, which has the same corner, is not a tile.
@@ -2627,7 +2602,7 @@ These are obtained by surrounding with a pinwheel the three most elongated recta
   For $m >= 3$, a rectangle of sides $2 m - 3$ and $2$ is dissected into $m - 2$ squares of side $2$ and two of side $1$.
   For $m >= 4$, a rectangle of sides $3 m - 7$ and $3$ is dissected into $m - 3$ squares of side $3$, one of side $2$ and two of side $1$.
   So $m$, $m - 3 slash 2$ and $m - 7 slash 3$ belong to $P_m (1)$ for $m >= 2$, $m >= 3$ and $m >= 4$ respectively, and they exceed $1$.
-  By @prop:persistence with $k = 4$, they belong to $P_(m + 4) (1)$.
+  By the third statement of @prop:subdivision, they belong to $P_(m + 4) (1)$.
 ]
 
 That the three rectangles cannot be dissected into $n$ squares is reduced below to three finite statements, of which the first is the following.
