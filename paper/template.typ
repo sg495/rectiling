@@ -25,6 +25,7 @@
   theorem: "plain",
   lemma: "plain",
   proposition: "plain",
+  observation: "plain",
   corollary: "plain",
   conjecture: "plain",
   definition: "definition",
@@ -367,6 +368,9 @@
 
 /// Typesets a proposition.
 #let proposition(name: none, body) = statement("Proposition", name: name, style: statement-styles.proposition, body)
+
+/// Typesets an observation.
+#let observation(name: none, body) = statement("Observation", name: name, style: statement-styles.observation, body)
 
 /// Typesets a corollary.
 #let corollary(name: none, body) = statement("Corollary", name: name, style: statement-styles.corollary, body)

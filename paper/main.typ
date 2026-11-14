@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
-#import "template.typ": appendix, conjecture, definition, example, proof, proposition, template
+#import "template.typ": appendix, conjecture, definition, example, observation, proof, proposition, template
 #import "tables.typ": datatable
 
 #let todo(body) = text(fill: rgb("#b00020"))[[To do: #body]]
@@ -76,35 +76,37 @@ Both remarks are used repeatedly below.
 ] <def:counts>
 
 The sets $P_n (w)$ are finite in every case treated in this paper, as a by-product of the computation; see @sec:solving.
+A statement labelled Observation is given without proof; its proof is in the formal development (@app:formal).
 Scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
 
-#proposition(name: [scaling])[
+#observation(name: [scaling])[
   For all $W, H, c > 0$ and $n >= 0$, $P_n (c W, c H) = P_n (W, H)$.
 ] <prop:scaling>
 
-#proof[
-  Proportions are invariant under scaling.
-  // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by $(c a, c b, c w, c h)$.
-  // The new sides are positive, and $c w = x c h$ if $w = x h$, and likewise with the sides exchanged, so the new tiles have proportion $x$.
-  // A point $p$ lies in a new tile, or in its interior, exactly when $p slash c$ lies in the old one, or in its interior; hence the new tiles cover $[0, c W] times [0, c H]$ exactly and have pairwise disjoint interiors.
-  // This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
-]
+// #proof[
+//   Proportions are invariant under scaling.
+//   // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by $(c a, c b, c w, c h)$.
+//   // The new sides are positive, and $c w = x c h$ if $w = x h$, and likewise with the sides exchanged, so the new tiles have proportion $x$.
+//   // A point $p$ lies in a new tile, or in its interior, exactly when $p slash c$ lies in the old one, or in its interior; hence the new tiles cover $[0, c W] times [0, c H]$ exactly and have pairwise disjoint interiors.
+//   // This shows that $P_n (W, H) subset.eq P_n (c W, c H)$, and the same statement for the rectangle $[0, c W] times [0, c H]$ and the factor $1 slash c$ gives the other inclusion.
+// ]
 
-Exchanging the two axes turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, and wide tiles into tall ones.
+The _transpose_ of a rectangle $(a, b, w, h)$ is $(b, a, h, w)$.
+Transposing every tile turns a tiling of a rectangle into a tiling of the rectangle with the sides exchanged, and wide tiles into tall ones.
 
-#proposition(name: [transposition])[
+#observation(name: [transposition])[
   For all $W, H > 0$ and $n >= 0$, $P_n (W, H) = P_n (H, W)$.
   Consequently $P_n (w) = P_n (1 slash w)$ for all $w > 0$.
 ] <prop:transposition>
 
-#proof[
-  Proportions are invariant under exchange of width/height.
-  // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by its _transpose_ $(b, a, h, w)$.
-  // The transpose has positive sides and proportion $x$, the two conditions $w = x h$ and $h = x w$ being exchanged.
-  // A point $(u, v)$ lies in the transpose of a tile, or in its interior, exactly when $(v, u)$ lies in the tile, or in its interior; hence the transposes cover $[0, H] times [0, W]$ exactly and have pairwise disjoint interiors.
-  // This gives $P_n (W, H) subset.eq P_n (H, W)$, and the other inclusion is the same statement with $W$ and $H$ exchanged.
-  // Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
-]
+// #proof[
+//   Proportions are invariant under exchange of width/height.
+//   // Let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and replace each tile $(a, b, w, h)$ by its _transpose_ $(b, a, h, w)$.
+//   // The transpose has positive sides and proportion $x$, the two conditions $w = x h$ and $h = x w$ being exchanged.
+//   // A point $(u, v)$ lies in the transpose of a tile, or in its interior, exactly when $(v, u)$ lies in the tile, or in its interior; hence the transposes cover $[0, H] times [0, W]$ exactly and have pairwise disjoint interiors.
+//   // This gives $P_n (W, H) subset.eq P_n (H, W)$, and the other inclusion is the same statement with $W$ and $H$ exchanged.
+//   // Finally $P_n (w) = P_n (w, 1) = P_n (1, w) = P_n (1 slash w, 1)$, the last equality by @prop:scaling with $c = 1 slash w$.
+// ]
 
 The sets of proportions are nested along every step other than one and two, with the exception of the step of four when the main rectangle is not a square.
 The step of three was observed by Einstein @einstein2023.
@@ -623,7 +625,7 @@ For a square main rectangle, transposition allows the first tile to be taken wid
   Otherwise its first placement is made at the only tier of the initial staircase, so its tile $T = (0, 0, w, h)$ has its corner at the origin.
   If $w = x h$ the first placement is wide, and $rho$ suffices.
   Otherwise $h = x w$, since $T$ has proportion $x$.
-  The transposes of $R_1, dots, R_n$ form a similar tiling of the same square, of proportion $x$, as in the proof of @prop:transposition; let $rho'$ and $s'$ be given by @prop:complete for it.
+  The transposes of $R_1, dots, R_n$ form a similar tiling of the same square, of proportion $x$, as in @prop:transposition; let $rho'$ and $s'$ be given by @prop:complete for it.
   The tile of the first placement of $rho'$ has its corner at the origin and is the transpose of some $R_j$, whose corner is then the origin; the interiors of $R_j$ and $T$ meet, so $R_j = T$.
   That tile is thus $(0, 0, h, w)$, and $h = x w$ means that the first placement of $rho'$ is wide.
 ]
@@ -1879,7 +1881,7 @@ The statements of the paper and those of the development differ in the following
   The development has no notion of the proportion of a rectangle as a number: it states that a rectangle has proportion $x$, as in @def:rectangle, and the remark that follows that definition is not formalised.
 - *Sets of proportions.* The development does not define the sets $P_n (W, H)$.
   Its statements are about the existence of a list of $n$ rectangles that is a similar tiling of proportion $x$ of the rectangle with corner at the origin and given sides, which is the membership of $x$ in $P_n (W, H)$.
-  @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow as in the proofs given; the consequence $P_n (w) = P_n (1 slash w)$ is not stated in the development.
+  @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow; the consequence $P_n (w) = P_n (1 slash w)$ is not stated in the development.
   Of @prop:subdivision, the development states the steps of three and of five for an arbitrary main rectangle with positive sides, and every step of at least three for the unit square with at least two tiles; the second statement follows from these for every $k >= 5$ other than $7$, and for $k = 7$ the development contains the dissection into eight (`Rect.isTiling_eight`) but not the statement.
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
