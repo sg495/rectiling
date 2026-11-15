@@ -71,6 +71,12 @@ Networks and the number of proportions:
 - `Rectiling/TilingCount.lean` — the theorems `finite_similarTilings` and `finite_similarTilingSets`.
 - `Rectiling/Growth.lean` — the number `tutteM` and the theorem `limsup_le_of_le_tutteM`.
 - `Rectiling/CombinatorialMap.lean` — combinatorial maps `CMap`, rooted non-separable planar maps `RootedMap` up to isomorphism, and the statement `TutteEnumeration` of the theorem of Tutte, which is not proved; `tools/tutte_check.py` counts the maps of these definitions with at most five edges.
+- `Rectiling/MapNetwork.lean` — the invariance of the polynomial under the reversal of reference directions (`Network.pairPoly_reverse`, `Network.UIso.pairPoly_eq`), isomorphisms of maps `CMap.Iso`, the network `CMap.net` and the polynomial `RootedMap.poly` of a rooted map, and the proportions `RootedMapClass.rootSet` of a class of rooted maps.
+- `Rectiling/TilingMap.lean` — the tiles at the corners of a point of a tiling (`IsTiling.exists_nw`, `IsTiling.exists_se`, `IsTiling.top_right_corner`), the darts `Dart`, the rule of the rotation `IsRotation`, the rotation `nextDart` and the map `tilingMap` of a tiling.
+- `Rectiling/TilingMapFlow.lean` — the network `tilingNet` of the map of a tiling, the flow that the tiling gives on it (`IsTilingMap.tilingNet_isFlow`), and the proportion as a root of its polynomial (`IsSimilarTiling.aeval_tilingNet`).
+- `Rectiling/TilingMapNonseparable.lean` — the map of a tiling is connected, has no loop and no cut vertex (`IsTilingMap.connected`, `IsTilingMap.loopless`, `IsTilingMap.noCutVertex`).
+- `Rectiling/TilingMapPlanar.lean` — the map of a tiling satisfies the formula of Euler (`IsTilingMap.planar`).
+- `Rectiling/UpperBound.lean` — the rooted map of a tiling `IsTilingMap.rooted`, and the theorems `Achievable.exists_rootedMapClass`, `ncard_achievable_le_tutte` and `limsup_achievable_le`.
 
 ## Main theorems
 
@@ -121,7 +127,12 @@ Networks and the number of proportions:
 - `finite_achievable`, `ncard_achievable_le`. The set of proportions with which the unit square can be cut into n similar rectangles is finite, and has at most n times as many elements as there are classes of networks with n edges and an orientation vector.
 - `finite_similarTilings`. The unit square has finitely many similar tilings with n tiles.
 - `limsup_le_of_le_tutteM`. A sequence a with a(n) ≤ n 2^(n−1) M(n) for n ≥ 1, where M(n) = 2 (3n)! / ((2n+1)! (n+1)!), has limsup a(n)^(1/n) ≤ 27/2.
-- Not yet proved: that a(n) ≤ n 2^(n−1) M(n) under the hypothesis `TutteEnumeration`; this needs the planar map of a tiling.
+- `RootedMap.Isomorphic.poly_eq`. Isomorphic rooted maps have the same polynomials, for orientation vectors that correspond under a bijection between their edges; the polynomial of a network does not depend on the reference directions of its edges (`Network.pairPoly_reverse`).
+- `IsTilingMap.tilingNet_isFlow`. For a tiling of the W × H rectangle, the heights of the vertices of its map and the widths of the tiles form a flow of value W on the network of the map.
+- `IsTilingMap.planar`, `IsTilingMap.loopless`, `IsTilingMap.noCutVertex`. The map of a tiling with n tiles is connected, has no loop and no cut vertex, and its numbers of vertices, edges and faces satisfy V + F = E + 2, with E = n + 1.
+- `Achievable.exists_rootedMapClass`. A proportion with which the unit square can be cut into n similar rectangles is one of the at most n 2^(n−1) proportions of a class of rooted non-separable planar maps with n + 1 edges: the roots of the polynomials of the class for the orientation vectors in which the edge before the root is wide.
+- `ncard_achievable_le_tutte`. Under the hypothesis `TutteEnumeration`, the number of proportions with which the unit square can be cut into n ≥ 1 similar rectangles is at most n 2^(n−1) M(n).
+- `limsup_achievable_le`. Under the same hypothesis, the upper limit of the n-th roots of that number is at most 27/2.
 
 ## How the proofs go
 
