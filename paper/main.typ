@@ -21,7 +21,7 @@
 
 A rectangle can be cut into finitely many rectangles that are all similar to one another, each in either orientation; the question is which proportions the pieces can have.
 For a square cut into two pieces the only possibility is a pair of halves, of proportion $2$.
-For three pieces there are three: thirds, of proportion $3$; a half-height slab on two quarter-size pieces, of proportion $3 slash 2$; and a third arrangement, in which no two pieces are congruent, whose proportion $1.7548...$ is the real root of $x^3 - 2 x^2 + x - 1$, the square of the plastic ratio.
+For three pieces there are three: thirds, of proportion $3$; a half-height slab above two quarter-size pieces, of proportion $3 slash 2$; and a third arrangement, in which no two pieces are congruent, whose proportion $1.7548...$ is the real root of $x^3 - 2 x^2 + x - 1$, the square of the plastic ratio.
 
 The qualitative question was settled in the 1990s.
 Dehn had shown that a rectangle can be cut into squares only if its sides are commensurable @dehn1903, and Brooks, Smith, Stone and Tutte had recast dissections of rectangles as planar electrical networks @bsst1940.
@@ -51,7 +51,7 @@ $ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
 = Tilings <sec:tilings>
 
 We work in the real plane with axis-parallel rectangles.
-A rectangle is given by its bottom-left corner and its two side lengths, and its proportion disregards which side is the longer.
+A rectangle is given by its bottom-left corner and its two side lengths, and its proportion does not depend on which side is the longer.
 
 #definition(name: [rectangle])[
   A _rectangle_ is a quadruple $R = (a, b, w, h)$ of real numbers with $w, h > 0$, which stands for the set $[a, a + w] times [b, b + h]$; its _corner_ is the point $(a, b)$, its _width_ is $w$, its _height_ is $h$, and its _interior_ is $(a, a + w) times (b, b + h)$.
@@ -219,7 +219,7 @@ This and the other figures of this section are drawn from tilings found by the s
 
 A tile placed at the anchor of a tier may be at most as wide as the floor and at most as high as the wall, and must be non-empty.
 This gives four kinds of placement, each turning a staircase into another.
-A tile that is as high as the wall has its height determined by the staircase, and its width by its orientation; a tile that is as wide as the floor is treated symmetrically; a tile that is neither has one side free.
+A tile that is as high as the wall has its height determined by the staircase, and its width by its orientation; a tile that is as wide as the floor is treated symmetrically; a tile that is neither has one free side.
 
 #definition(name: [placement])[
   A _placement_ is a triple $p = (i, phi, o)$ of the index $i >= 0$ of a tier, a _fit_ $phi$, which is _inside_, _full height_, _full width_ or _full_, and an _orientation_ $o$, which is _wide_ or _tall_.
@@ -371,7 +371,7 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 
 #proof[
   Each placement of the record is made at a tier that exists, so the number of tiers increases by one with each inside placement, decreases by one with each full placement, and is otherwise unchanged.
-  It passes from $m$ to zero, so the number of full placements exceeds the number of inside placements by $m$.
+  It goes from $m$ to zero, so the number of full placements exceeds the number of inside placements by $m$.
   The second statement follows from @prop:bound, the initial staircase having one tier.
 ]
 
@@ -393,7 +393,7 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 
 == Soundness <sec:sound>
 
-The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
+The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes this.
 For records that obey the rules this follows from the rules themselves, so that the rules, which were introduced to avoid repetitions, are also needed for every solution to be a tiling.
 The argument has two parts.
 The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers.
@@ -516,14 +516,14 @@ Soundness follows by removing the tiles from the region one at a time.
 ] <prop:sound>
 
 #proof[
-  By @prop:bound the record $rho$ has $n$ placements and obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend on the flags only.
+  By @prop:bound the record $rho$ has $n$ placements and obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend only on the flags.
   By @prop:fit the staircase $S_0$ is not defective.
   Its only tier is the last one and has no tier before it, so its floor $W$ and its wall $H$ are positive, and $S_0$ is positive.
 
   We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that their number is the number of placements of $rho'$.
   If $rho'$ is empty then $S$ is empty and so is $U(S)$.
   Otherwise let $p$ be the first placement of $rho'$, let $T$ be its tile and $S'$ the staircase after it.
-  By @prop:size the tile $T$ is a rectangle of proportion $x$, and by @prop:fit it fits its tier strictly where its fit says so and $S'$ is positive, so that @prop:step applies.
+  By @prop:size the tile $T$ is a rectangle of proportion $x$, and by @prop:fit it fits its tier strictly where its fit requires and $S'$ is positive, so that @prop:step applies.
   By induction the tiles of the rest of $rho'$ are rectangles of proportion $x$ contained in $U(S')$, with pairwise disjoint interiors, which cover $U(S')$.
   Hence all the tiles are contained in $U(S)$, because $T subset.eq U(S)$ and $U(S') subset.eq U(S)$; the interior of $T$ is disjoint from the later tiles, because it is disjoint from $U(S')$; and the tiles cover $U(S)$, because $U(S) subset.eq T union U(S')$.
 
@@ -666,7 +666,7 @@ Repeating the step until no tile remains gives the record.
 ]
 
 A square tile is both wide and tall, so that a tiling with square tiles arises from several records; this does not affect the count of proportions.
-For a square main rectangle, transposition allows the first tile to be taken wide, which halves the number of orientations to be examined.
+For a square main rectangle, transposition allows the first tile to be taken to be wide, which halves the number of orientations to be examined.
 
 #proposition[
   Let $x >= 1$, let $W > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, W]$ of proportion $x$.
@@ -687,7 +687,7 @@ For a square main rectangle, transposition allows the first tile to be taken wid
 == The search <sec:solving>
 
 By @prop:sound and @prop:complete, the proportions achievable with $n$ tiles in a main rectangle of sides $a slash b$ and $1$ are the numbers $x >= 1$ at which the constraints of some complete admissible record for $n$ tiles have a solution with $W = a slash b$ and $H = 1$; for a square, by @prop:square, only the records in which the first tile is wide need be considered.
-The search examines these records, of which there are finitely many, and finds the proportions of each exactly.
+The search examines these records, of which there are finitely many, and determines the proportions of each exactly.
 
 Let $rho$ be a complete admissible record with $k$ inside placements, and take $H = 1$.
 Every floor and wall that arises along $rho$ is a linear form in $1$, $W$ and the free sides $s_1, dots, s_k$, whose coefficients are polynomials in $x$ divided by a power of $x$, and by @prop:count the record has $k + 1$ equations in the $k + 1$ unknowns $s_1, dots, s_k$ and $W$.
@@ -703,7 +703,7 @@ The search exists in two forms, which are defined and proved correct in @app:sol
 The _direct search_ treats each record on its own, by a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots (@def:reference).
 The _incremental search_, which is the one used for the results of @sec:results, explores the records depth first, as paths in the tree of admissible sequences of placements, and uses each equation as soon as its full placement is made to eliminate one unknown from every floor and wall of the current staircase (@def:explore).
 The work done for a sequence of placements is thus shared by all the records that begin with it, and most of the nodes of the tree are close to its leaves, where staircases have one or two tiers.
-The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot decide in this way to the direct method, which for ten tiles happens to one record in ten thousand.
+The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot decide in this way to the direct method, which for ten tiles occurs for one record in ten thousand.
 Its cost is about $0.6$ microseconds of processor time per record.
 
 #proposition[
@@ -919,7 +919,7 @@ The number $t(n)$ is finite.
 Indeed there are finitely many proportions, by @prop:upper, and finitely many records, and a record has at most one solution at a given proportion: since the constraints are linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
 A tiling determines its bag, and symmetric tilings have the same bag, so that
 $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
-The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
+The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
 @tab:tbc gives the values that we computed, @fig:sequences plots the four sequences, and @fig:classes shows the sixteen classes for four tiles.
 
 #figure(
@@ -943,7 +943,7 @@ A tiling of proportion $x > 1$ has one orientation vector, and the search examin
 A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
 A tiling is identified by its proportion, its orientations and the record described in @prop:representative, since the solution of a reported record at a proportion is unique.
 The order of the coordinates of the sides of its tiles, which determines that record, the crossings and the symmetries, is computed exactly: the coordinates are elements of the number field of the proportion, floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
-This, and the count of bags, assume that the polynomial stored for a proportion is its minimal polynomial, which the search for proportions does not need.
+Both this and the count of bags assume that the polynomial stored for a proportion is its minimal polynomial, which the search for proportions does not need.
 
 #proposition[
   Let $cal(T)$ be a similar tiling, with a choice of orientation for each tile.
@@ -1014,7 +1014,7 @@ For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry a
 For $n <= 10$ they agree with a run in which every record is solved by the direct method and every comparison of coordinates is exact.
 For $n <= 9$ the values of $t(n)$ agree with a count of the tilings through their plane networks, described in @sec:full-side, which does not use the staircase construction and is carried out in floating-point arithmetic.
 For $n <= 12$ the number of classes obtained from canonical representatives agrees with the number given by Burnside's lemma from the tilings fixed by each symmetry, and the number of records agrees with the count $sum 2^k$ described above.
-The values of all three sequences for $n = 11$ and $n = 12$ rest on the search alone.
+The values of all three sequences for $n = 11$ and $n = 12$ depend on the search alone.
 
 Some features of the table can be proved.
 
@@ -1085,7 +1085,7 @@ The paper was written and reviewed by AI systems --- under the author's own dire
 = Catalogue of tilings <app:catalogue>
 
 @fig:five and @fig:six show one tiling for each proportion achievable with five and with six tiles, labelled by proportion; the cases of three and four tiles are in @fig:three and @fig:four.
-The tiling shown for a proportion is the first that one run of the search found, and is in general one of several.
+The tiling shown for a proportion is the first found by one run of the search, and is in general one of several.
 
 #figure(
   image("figures/five-tiles.svg", width: 100%),
@@ -1180,7 +1180,7 @@ The third step is justified by the following test.
   If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then similarly $q(r) < 0$.
 ]
 
-With routines that meet their specifications, the method reports solutions of the system only, and it reports all of them when it counts no singular situation.
+With routines that meet their specifications, the method reports only solutions of the system, and it reports all of them when it counts no singular situation.
 
 #proposition[
   Let $a$ and $b != 0$ be integers, and let $rho$ be a complete admissible record.
@@ -1193,7 +1193,7 @@ With routines that meet their specifications, the method reports solutions of th
   For a real number $r != 0$ and real numbers $W$ and $s_1, dots, s_k$, write $z := (s_1, dots, s_k, W)$.
   By the definition of $A$ and $c$, the numerator of the equation $g_i$ is $nu_k (g_i) = (A(r) z)_i - c_i (r)$.
   For $r > 0$ a value has the sign of its numerator, so that, by @prop:forms, $(W, 1, s)$ satisfy the constraints of $rho$ at $r$ if and only if $A(r) z = c(r)$ and $nu_k (f) > 0$ for every positivity constraint $f$ of the symbolic system.
-  Two facts on the matrix $A$ over the ring $ZZ[x]$ are used, both consequences of the identity between a matrix and its adjugate: $A dot.op (det A_1, dots, det A_(k + 1))^top = (det A) c$, and, for every real vector $z$ with $A(r) z = c(r)$, $(det A)(r) z_i = (det A_i)(r)$ for every $i$.
+  Two facts about the matrix $A$ over the ring $ZZ[x]$ are used, both consequences of the identity between a matrix and its adjugate: $A dot.op (det A_1, dots, det A_(k + 1))^top = (det A) c$, and, for every real vector $z$ with $A(r) z = c(r)$, $(det A)(r) z_i = (det A_i)(r)$ for every $i$.
 
   For the first statement, let $r in "Ref"_(a, b) (rho)$.
   Then the elimination has succeeded, $F_rho != 0$, and $r in "roots"(F_rho)$, so that $r >= 1$ and $F_rho (r) = 0$, and the signs reported at $r$ are the true signs.
@@ -1274,7 +1274,7 @@ The homogeneous system at scale one is the system of the main rectangle of sides
   The map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers, with proportion $alpha$: it is additive, and $chi(X F_j) = alpha chi(F_j)$ and $chi(X^(-1) F_j) = chi(F_j) slash alpha$.
   It sends $a u_0$ to $a$, $b u_0$ to $b$, and $u_j$ to $v_j$ for $1 <= j <= k$.
   The first statement follows as in the proof of @prop:forms, since placing commutes with homomorphisms and only the first $k$ free sides are used.
-  For the second, multiplication by a real number $c > 0$ is a homomorphism of the real numbers to themselves, which preserves the sign of every number.
+  For the second, multiplication by a real number $c > 0$ is a homomorphism from the real numbers to themselves, which preserves the sign of every number.
   Hence $(W, H, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if $(c W, c H, c s)$ do, and the statement follows with $c = b$.
 ]
 
@@ -1481,7 +1481,7 @@ Away from the zeros of the pivots, the recorded eliminations determine the solut
   By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
   In particular no replacement changes $v_0$, which proves the first statement.
 
-  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ becomes true; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
+  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ becomes true; the later replacements change only the coordinates $v_(m_l)$ with $l < i$, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
   Hence $chi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
   The fourth statement of @prop:chain then gives $chi(E_"fin")[v] = Gamma_k (chi(e_(k + 1)))[v] = chi(pi) e_(k + 1) [v]$.
   Under the hypothesis of the second statement, $chi(E_"fin")[v] = chi((E_"fin")_0) v_0 = chi((E_"fin")_0)$, and the statement follows because $chi(pi) != 0$.
@@ -1614,7 +1614,7 @@ Whenever the incremental method decides a record itself, it reports exactly the 
 
 #proposition[
   Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
-  Call _solution_ of $rho$ a real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
+  A _solution_ of $rho$ is a real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
   + If $rho$ is not passed to the direct method, $"Fast"_(a, b) (rho)$ is the set of solutions of $rho$.
   + Every element of $"Fast"_(a, b) (rho)$ is a solution of $rho$.
   + If $rho$ is not passed to the direct method, or if it is regular for $(a, b)$, every solution of $rho$ belongs to $"Fast"_(a, b) (rho)$.
@@ -1713,7 +1713,7 @@ The search reports what the incremental method reports for the records taken one
 
 Restricting the first case, at a forced placement, to the completions that continue with the remaining forced placements ensures that no record is treated under two prefixes: the records examined under the prefixes of the split, taken in order, are exactly the complete admissible records, each once, whether or not the pass fails and wherever it does.
 This is proved in the formal development (`examined_split`, `examined_once`).
-An earlier version of the implementation reported, in that case, for all the completions below the failing placement, under every prefix through it; the formalisation exposed this, which left the set of numbers reported unchanged but would have repeated records in the counts, and the implementation was corrected.
+An earlier version of the implementation reported, in that case, for all the completions below the failing placement, under every prefix through it; the formalisation exposed this, which left the set of numbers reported unchanged but would have counted records more than once, and the implementation was corrected.
 No such failure had been observed.
 
 #definition(name: [certified incremental search])[
@@ -1740,7 +1740,7 @@ This is what the two counts of the direct method establish in a run of the incre
 The first statement is unconditional: every number that the incremental search reports is the proportion of a tiling.
 The two searches can differ only at a record that the incremental method decides itself and that is not regular for the direct method, because a singular situation is counted or the record is flagged as constant; there the incremental method reports every solution and the direct method may report nothing.
 No such record is known.
-Completeness of the incremental search needs less than that of the direct search, namely the regularity of the records passed to the direct method only.
+Completeness of the incremental search needs less than that of the direct search, namely the regularity only of the records passed to the direct method.
 
 = Formalisation <app:formal>
 
@@ -1970,13 +1970,13 @@ The formal development is about a model of the method, and the following lies ou
 
 - *The implementation.* The Rust code is not verified.
   The model follows it closely, and the differences are listed in the development's documentation; the main ones are that the model gives every inside placement its own unknown, where the code reuses a small number of slots, and that the caches are absent from the model.
-- *The arithmetic routines.* The routines of @def:primitives and @def:numerics are assumed to meet their specifications, and every statement on the two searches is quantified over them.
+- *The arithmetic routines.* The routines of @def:primitives and @def:numerics are assumed to meet their specifications, and every statement about the two searches is quantified over them.
   This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the divisibility test.
   Both sets of specifications are shown to be consistent by exhibiting routines that meet them.
 - *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for lack of an unknown to eliminate.
   It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the direct method, or returns the verdict unsure, when the check fails.
 - *Regularity.* It is not proved that every record is regular in the sense of @def:regular.
-  The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast have their absence as a hypothesis.
+  The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast take their absence as a hypothesis.
 - *Uniqueness.* It is not proved that a tiling, or a mosaic class, arises from a single record.
   The agreement of the number of records with the Baxter numbers is checked by computation, and within the development for at most seven tiles.
 - *Counts and statistics.* The development is about the set of proportions reported.
@@ -2053,7 +2053,7 @@ They are much weaker than the growth observed in @tab:tbc.
 
 == Networks <sec:networks>
 
-Brooks, Smith, Stone and Tutte associate with a tiling of a rectangle an electrical network, in which the tiles are resistors @bsst1940 @prasolov2011.
+Brooks, Smith, Stone and Tutte associate an electrical network with a tiling of a rectangle, in which the tiles are resistors @bsst1940 @prasolov2011.
 For a similar tiling the resistances are $x$ and $1 slash x$, and the properties of the aspect ratio as a function of $x$ come from letting $x$ be a complex number.
 Networks are therefore defined with complex resistances.
 
@@ -2338,12 +2338,12 @@ The derivative of an impedance function has a geometric meaning.
   In the tiling the tile of $e$ has width $i_e W$ and height $r_e i_e W$, where $W$ is the width of the main rectangle, by @prop:tiling-network, so that its area is $r_e i_e^2 W^2$ and the area of the main rectangle is $F(x) W^2$.
 ]
 
-Since $abs(x F'(x)) <= F(x)$, this proves again that $F(x) slash x$ is non-increasing and $x F(x)$ non-decreasing.
+Since $abs(x F'(x)) <= F(x)$, this again proves that $F(x) slash x$ is non-increasing and $x F(x)$ non-decreasing.
 At a solution $x > 1$ of $F(x) = 1$ at which no current vanishes and $F'(x) > 0$, the tall tiles of the corresponding tiling of the square cover more than half of it, and at one with $F'(x) < 0$, less than half.
 
 == From a network to a tiling <sec:converse>
 
-The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is different from zero gives a tiling with one tile for each edge, whose own network is obtained from the given one by identifying vertices of equal potential that lie on a common face.
+The correspondence of Brooks, Smith, Stone and Tutte has a converse @bsst1940: a planar network with positive resistances in which every current is non-zero gives a tiling with one tile for each edge, whose own network is obtained from the given one by identifying vertices of equal potential that lie on a common face.
 The abscissas of the tiling are given by a potential on the faces of the network, which exists by planarity.
 
 #definition(name: [plane network])[
@@ -2422,7 +2422,7 @@ This follows from the unoriented statement, since the dual cycle separates the t
 
   This holds for all but finitely many $c$.
   Every rectangle meets such a line, so it lies in the main rectangle.
-  Two rectangles whose interiors met would have overlapping sections on such a line.
+  Two rectangles whose interiors intersected would have overlapping sections on such a line.
   The union of the rectangles is closed and contains every point of the main rectangle at such a height, hence all of it.
   The width of $rct(e)$ is $i_e$ by the choice of $psi$, and its height is $r_e i_e$ by Ohm's law.
 ]
@@ -2441,7 +2441,7 @@ For a tiling this is transposition.
 
 #proof[
   The graph of $frak(N)^*$ is the dual of $G^+$ with the edge dual to $e_0$ removed, that is, the dual of the plane graph $G^+ slash e_0$ obtained by contracting $e_0$.
-  It is connected, it has no loop because $G^+$ has no bridge, its poles are distinct because $e_0$ is not a bridge, and they lie on the face that corresponds to the vertex of $G^+ slash e_0$ made of $s$ and $t$.
+  It is connected, it has no loop because $G^+$ has no bridge, its poles are distinct because $e_0$ is not a bridge, and they lie on the face that corresponds to the vertex of $G^+ slash e_0$ formed by $s$ and $t$.
   Let $(phi, i)$ be a flow of value $I != 0$ on $frak(N)$ for positive real resistances $r$, and let $psi$ be as in @prop:face-potential.
   On $frak(N)^*$ take the potential $psi$ and, in the edge $e^*$ directed from $lft(e)$ to $rgt(e)$, the current $r_e i_e = phi(e^-) - phi(e^+)$.
   Ohm's law holds with the resistance $1 slash r_e$.
@@ -2477,7 +2477,7 @@ The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ til
   So $G^+$ has no bridge when the pair is proper, and @prop:dual applies; its second statement, applied at every $x > 0$, shows that the dual pair $(frak(N)^*, -epsilon)$ is proper, and its first statement that the impedance function of the dual pair is $1 slash F$.
   Finally $F = 1 slash F$ would give $F^2 = 1$, which is impossible for an odd function.
 
-  The second statement is @prop:tiling-network, with the remark that the currents of the flow of the tiling are the widths of the tiles, which are not zero, and that the flow of value $1$ at the proportion $x$ is that flow divided by $W$, by @prop:flow.
+  The second statement is @prop:tiling-network, noting that the currents of the flow of the tiling are the widths of the tiles, which are not zero, and that the flow of value $1$ at the proportion $x$ is that flow divided by $W$, by @prop:flow.
 
   The third statement is @prop:bsst with $I = 1$, with the edges directed so that the currents are positive and the additive constants chosen as in the remark that follows that proposition.
 ]
@@ -2593,7 +2593,7 @@ The next statement shows that the two statements of @prop:wide-full cannot both 
 ] <prop:coincidence>
 
 #proof[
-  Place $a$ wide tiles of height $1$ side by side, of total width $a x$, and beside them a block of $b$ tiles, of height $1$ in all.
+  Place $a$ wide tiles of height $1$ side by side, of total width $a x$, and beside them a block of $b$ tiles, of total height $1$.
   If the $b$ tiles are tall and side by side, the block has width $b slash x$; if they are wide and stacked, it has width $x slash b$.
   The functions $a x + b slash x$ and $a x + x slash b$ are different; they are the inverses of the impedance functions of these two tilings, so they belong to $cal(F)_n$ by the second and first statements of @prop:functions, and they tend to $infinity$ at infinity; and they take the value $a b + 1$ at $x = b$.
   The largest value of $a b$ is $floor(n^2 slash 4)$.
@@ -2638,7 +2638,7 @@ The number of functions at least triples with each tile.
   As $G$ determines $F_1$, the intersection has at most $E(n)$ elements, and $S := S_+ union S_-$ has at least $3 E(n)$.
 
   The inverses of the elements of $S$ belong to $cal(F)_(n + 1)$, by the first statement of @prop:functions.
-  They are not in $S$: an element $F + x^delta$ of $S$ takes at $1$ the value $F(1) + 1 > 1$, and its inverse a value smaller than $1$.
+  They are not in $S$: an element $F + x^delta$ of $S$ takes the value $F(1) + 1 > 1$ at $1$, and its inverse a value smaller than $1$.
   Hence $2 E(n + 1) >= 2 abs(S) >= 6 E(n)$.
   The second statement follows from $E(1) = 1$, since the functions of the network with one edge are $x$ and $1 slash x$, and the third from @prop:wide-full and @prop:threshold, since the threshold $m (1 + 4^m slash 2)$ is increasing in $m$.
 ]
@@ -2654,7 +2654,7 @@ A similar tiling of the unit square of proportion $x$ whose tiles are all wide b
 So a proportion $x in P_n (1)$ is achieved by $n$ tiles of a single orientation exactly when a rectangle of sides $x$ and $1$ can be dissected into $n$ squares.
 
 By @tab:rational some rational proportions are achievable with $n$ tiles only if both orientations are used, and from ten tiles onwards the search finds exactly three: $n - 4$, $n - 11 slash 2$ and $n - 19 slash 3$.
-These are obtained by surrounding with a pinwheel the three most elongated rectangles that can be dissected into $n - 4$ squares.
+These are obtained by surrounding the three most elongated rectangles that can be dissected into $n - 4$ squares with a pinwheel.
 
 #proposition[
   The proportion $n - 4$ belongs to $P_n (1)$ for every $n >= 6$, the proportion $n - 11 slash 2$ for every $n >= 7$, and the proportion $n - 19 slash 3$ for every $n >= 8$.
@@ -2679,7 +2679,7 @@ That the three rectangles cannot be dissected into $n$ squares is reduced below 
   Suppose that the unit square is dissected into five squares.
   Each corner of the unit square lies in exactly one of the squares, and no square contains two corners.
   Let $A$, $B$, $C$ and $D$ be the squares at the corners, in order around the unit square from the bottom-left corner, of sides $a$, $b$, $c$ and $d$, and let $Q$ be the fifth square.
-  A square that has a segment in common with two sides of the unit square contains a corner or has side $1$, so $Q$ has a segment in common with at most one side, say not with the bottom, right or top side.
+  A square that has a segment in common with two sides of the unit square contains a corner or has side $1$, so $Q$ has a segment in common with at most one side, say with none of the bottom, right and top sides.
   Each of these three sides is then covered by its two corner squares, so that $a + b = b + c = c + d = 1$.
   Hence $c = a$ and $d = b$, so that $a + d = 1$, and the left side is covered by $A$ and $D$ as well.
   The squares $A = [0, a]^2$ and $C = [1 - a, 1]^2$ have disjoint interiors, so $a <= 1 slash 2$; similarly $b <= 1 slash 2$.
@@ -2773,7 +2773,7 @@ The third finite statement needs a longer analysis, by the number of squares tha
   Suppose that $u_Q > 0$.
   To the left of $Q$ the lines cross two squares, and as before all the lower squares there have one side $sigma_L$ and all the upper squares the side $3 - sigma_L$.
   The line of abscissa $u_Q$ is not a cut, so it crosses the interior of a lower or of an upper square.
-  If of a lower one, then $sigma_L = sigma$; if of an upper one, then $3 - sigma_L = theta^*$; these exclude each other because $c > 0$.
+  If it is a lower one, then $sigma_L = sigma$; if it is an upper one, then $3 - sigma_L = theta^*$; these are mutually exclusive because $c > 0$.
   So exactly one of the two kinds of square straddles the line of abscissa $u_Q$, and the squares of the other kind end there.
   The same holds at $u_Q + c$ if $u_Q + c < omega$.
   Up to the reflections of the rectangle in its two axes, four cases remain.
@@ -2885,7 +2885,7 @@ For guillotine tilings the functions can be described directly, and are those of
 
 By induction on $n$, the ratio of the width to the height of the main rectangle of a similar guillotine tiling of proportion $x$ with $n$ tiles, with an orientation vector, is $F(x)$ for some $F in cal(G)_n$: the function is $x$ for a wide tile and $1 slash x$ for a tall one, two tilings side by side give the sum, and two tilings one above the other give the other operation.
 Conversely every $F in cal(G)_n$ and every $x > 0$ arise in this way, from a tiling whose tiles have height $x^(plus.minus 1)$ times their width.
-The numbers $sigma_n$ begin $2, 6, 20, 80, 340, 1570, 7540$.
+The numbers $sigma_n$ begin with $2, 6, 20, 80, 340, 1570, 7540$.
 The sequence A338781 of the OEIS @oeisA338781 is half the largest number of distinct resistances obtainable from $n$ resistors of two kinds by series and parallel combinations.
 
 #proposition[
@@ -2906,7 +2906,7 @@ The sequence A338781 of the OEIS @oeisA338781 is half the largest number of dist
 ]
 
 In particular the resistances of the first statement come in pairs, exchanged by swapping the two kinds of resistor and exchanging series with parallel.
-A comment in the entry A338781 presents this as unproved, but the entry also links a note by Einstein with a proof that the largest number of resistances is even, so the pairing is not new.
+A comment in the entry A338781 presents this as unproved, but the entry also links to a note by Einstein containing a proof that the largest number of resistances is even, so the pairing is not new.
 
 The proof of @prop:wide-full applies to guillotine tilings, with $cal(F)_n$ replaced by $cal(G)_n$; its fourth step is then immediate, since a guillotine tiling exists for every $x > 0$.
 So, for $w$ large enough, the number of proportions of similar guillotine tilings of $[0, w] times [0, 1]$ with $n$ tiles is $abs(cal(G)_n) slash 2$.
@@ -2918,7 +2918,7 @@ $
 $
 The quotients $sigma_(n + 1) slash sigma_n$, corrected by the factor $(1 - 3 slash (2 n + 2))^(-1)$, are $6.15881$, $6.15887$ and $6.15889$ at $n = 100$, $200$ and $399$.
 So the growth constant of $g(n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
-That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is numerical.
+That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is known only numerically.
 
 The number of proportions achievable by guillotine tilings is a decreasing share of the total in @tab:structure: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
 
@@ -2931,7 +2931,7 @@ The number of proportions achievable by guillotine tilings is a decreasing share
 == Tilings with a tile along a side <sec:full-side>
 
 We do not know whether $t(n + 1) >= t(n)$ for every $n$, nor whether $a(n + 1) > a(n)$.
-This section gives a lower bound for $t(n + 1)$ by a number of networks with $n$ edges, which in the range computed exceeds $t(n)$.
+This section gives a lower bound for $t(n + 1)$ in terms of a number of networks with $n$ edges, which in the range computed exceeds $t(n)$.
 The tilings that it counts consist of a tiling of a rectangle with $n$ tiles and of one more tile along a whole side of the square.
 It first shows that a tiling can be recovered from its network, and conversely.
 
@@ -2950,7 +2950,7 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
 #proposition[
   Let $frak(N)$ be a plane network with positive real resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current vanishes, with the edges directed so that the currents are positive.
   + At every vertex other than the poles, the edges that leave it are consecutive in the cyclic order around it.
-  + For every vertex $v$, the set $S_v$ is a horizontal segment at height $phi(v)$, and it is the union of the top sides of the rectangles of the edges that leave $v$, as well as the union of the bottom sides of the rectangles of the edges that enter $v$, when $v$ has edges of the kind considered. In counter-clockwise order around $v$, the edges that leave $v$ come in the order of their rectangles from left to right, and are followed by the edges that enter $v$ in the order of their rectangles from right to left. The sets $S_s$ and $S_t$ are the top and the bottom side of the main rectangle.
+  + For every vertex $v$, the set $S_v$ is a horizontal segment at height $phi(v)$, and it is the union of the top sides of the rectangles of the edges that leave $v$, as well as the union of the bottom sides of the rectangles of the edges that enter $v$, when $v$ has such edges. In counter-clockwise order around $v$, the edges that leave $v$ come in the order of their rectangles from left to right, and are followed by the edges that enter $v$ in the order of their rectangles from right to left. The sets $S_s$ and $S_t$ are the top and the bottom side of the main rectangle.
   + If $v != w$ and $S_v$ meets $S_w$, then they meet in a single point, which is a corner of four tiles.
 ] <prop:segments>
 
@@ -2971,7 +2971,7 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
 
   For the third, $S_v$ and $S_w$ are at the same height, so neither $v$ nor $w$ is a pole, the potential of every other vertex lying strictly between those of the poles.
   Suppose that the two segments have a common point $p$ that is not an end of both.
-  Both have positive length, so they then have a common point $q$ whose abscissa is that of no corner of a tile; the points just above $q$ lie in the interior of a single tile $rct(e)$.
+  Both have positive length, so they then have a common point $q$ whose abscissa is not that of any corner of a tile; the points just above $q$ lie in the interior of a single tile $rct(e)$.
   By the second statement $q$ lies on the bottom side of the rectangle of an edge that enters $v$, which is then $rct(e)$, so that $e^+ = v$; likewise $e^+ = w$, which is absurd.
   So the segments have only an end $p$ in common, the right end of $S_v$ and the left end of $S_w$, say.
   By the second statement, the last rectangle above $S_v$, the first above $S_w$, the last below $S_v$ and the first below $S_w$ are four tiles with a corner at $p$; they are distinct, since their edges differ in their heads or in their tails and no edge joins $v$ and $w$, which have the same potential.
@@ -3047,7 +3047,7 @@ For $n <= 9$, on the other hand, no network has more such tilings than it has or
 == The rate of growth <sec:growth-rate>
 
 By @prop:upper the numbers $a(n)$ grow at most like $(27 slash 2)^n$, and the values computed are compatible with that rate.
-It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a certain local pattern has no regular point, hence gives no tiling by @prop:full-side, and the pairs that avoid a local pattern grow at a smaller rate than all pairs.
+It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a certain local pattern has no regular point, hence gives no tiling by @prop:full-side, and the pairs that avoid a local pattern grow more slowly than all pairs.
 
 #definition(name: [square block])[
   A _square block_ of a pair $(frak(N), epsilon)$ is a face of $G^+$ whose boundary is a cycle of four edges $a$, $b$, $d$, $c$ of $G$, where $a$ joins a vertex $u$ to a vertex $v_1$, $b$ joins $v_1$ to a vertex $w$, $c$ joins $u$ to a vertex $v_2$ and $d$ joins $v_2$ to $w$, such that $v_1$ and $v_2$ have degree two in $G^+$ and the four edges have the same orientation.
@@ -3070,7 +3070,7 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ]
 
 #proposition[
-  Let $(frak(N), epsilon)$ be a pair with $n$ edges, with $G^+$ non-separable and without square block, and let $S$ be a set of $k$ of its edges.
+  Let $(frak(N), epsilon)$ be a pair with $n$ edges, with $G^+$ non-separable and without a square block, and let $S$ be a set of $k$ of its edges.
   Replace every edge $e in S$, with ends $u$ and $w$, by six edges of the orientation of $e$: two edges joining $u$ and $w$ and, between them in the drawing, two paths of two edges from $u$ to $w$ through new vertices $v_1$ and $v_2$.
   + The result is a pair with $n + 5 k$ edges, with $G^+$ non-separable.
   + Its square blocks are the $k$ faces bounded by the two paths of a replaced edge.
@@ -3078,7 +3078,7 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ] <prop:substitution>
 
 #proof[
-  For the first statement, the edge $e_0$ and the poles are untouched, and there are no loops.
+  For the first statement, the edge $e_0$ and the poles are unchanged, and there are no loops.
   If a new vertex is removed, what remains contains a copy of $G^+$ in which each replaced edge is represented by one of the two edges that join its ends, and the other new vertices are attached to it.
   If an old vertex $y$ is removed, $G^+ - y$ is connected, each replaced edge not at $y$ is again represented, and every new vertex remains joined to an end of its edge other than $y$.
 
@@ -3096,7 +3096,7 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ]
 
 #proposition[
-  Let $A(n)$ be the number of isomorphism classes of pairs with $n$ edges with $G^+$ non-separable and without square block, and let
+  Let $A(n)$ be the number of isomorphism classes of pairs with $n$ edges with $G^+$ non-separable and without a square block, and let
   $ lambda := (27 slash 2) / (1 + (2 slash 27)^5) = 13.49996... $
   There is a constant $C$ such that, for every $n >= 1$,
   $ g(n) <= A(n) <= C lambda^n, quad t(n) <= (n + 1) A(n). $
