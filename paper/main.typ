@@ -399,42 +399,45 @@ The argument has two parts.
 The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers.
 The second is combinatorial (@prop:doom, @prop:fit): along a record that obeys the rules and empties the staircase, these strict inequalities always hold, because a floor or a wall that is not positive in certain positions can never be removed from the staircase.
 We begin with the first part.
+It rests on the position of the strips of a positive staircase relative to one another.
+
+#observation[
+  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $T_i$ be a tier of $S$ with anchor $(a, b)$, floor $L$ and wall $M$.
+  + The strip of a tier is determined by its anchor and its wall; that of $T_i$ is $[a, W] times [b, b + M]$, and $a + L <= W$ and $b + M <= H$.
+  + The strips of the tiers before $T_i$ lie in the half-plane of ordinates at least $b + M$.
+  + The strips of the tiers after $T_i$ lie in the half-plane of abscissas at least $a + L$ and in the half-plane of ordinates at most $b$.
+  + If $T_i$ is not the last tier, the strip of $T_(i + 1)$ is $[a + L, W] times [b', b]$, where $b'$ is the ordinate of its anchor; if $T_i$ is the last tier, $a + L = W$.
+  Consequently a point $(u, v)$ of $U(S)$ with $u < a + L$ and $v < b + M$ lies in the strip of $T_i$, so that $u >= a$ and $v >= b$.
+] <obs:strips>
 
 #proposition[
-  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with floor $L$ and wall $M$, whose tile has size $(w, h)$ with $w, h > 0$.
+  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with anchor $(a, b)$, floor $L$ and wall $M$, whose tile $T$ has size $(w, h)$ with $w, h > 0$.
   Suppose that $w < L$ if $phi$ is narrow, and that $h < M$ if $phi$ is low.
-  Let $S'$ be the staircase after the placement, let $T$ be the tile of $p$, and let $U(S)$ and $U(S')$ be the regions of the two staircases according to @def:region.
-  Then $S'$ is positive, and
-  $ T subset.eq U(S), quad U(S') subset.eq U(S), quad U(S) subset.eq T union U(S'), $
-  and the interior of $T$ is disjoint from $U(S')$.
+  Let $S'$ be the staircase after the placement, and let $U(S)$ and $U(S')$ be the regions of the two staircases according to @def:region.
+  + Every tier of $S$ other than $T_i$ has the same anchor in $S'$, and the tiers that replace $T_i$ have the anchors $(a, b + h)$, if $phi$ is low, followed by $(a + w, b)$, if $phi$ is narrow.
+  + $S'$ is positive.
+  + $T subset.eq U(S)$, $U(S') subset.eq U(S)$ and $U(S) subset.eq T union U(S')$, and the interior of $T$ is disjoint from $U(S')$.
 ] <prop:step>
 
 #proof[
-  Write $(a_j, b_j)$, $L_j$ and $M_j$ for the anchors, floors and walls of $S$, and $(a, b)$ for the anchor of $T_i$.
-  Since $S$ is positive, the relations $a_(j + 1) = a_j + L_j$ and $b_(j - 1) = b_j + M_j$ give $b_j >= b + M$ for $j < i$, and $a_j >= a + L$ and $b_j + M_j <= b$ for $j > i$, and also $a + L <= W$; moreover $a_(i + 1) = a + L$ and $b_(i + 1) + M_(i + 1) = b$ if $T_i$ is not the last tier, and $a + L = W$ if it is.
-  Recall that $w = L$ if $phi$ is not narrow and $h = M$ if $phi$ is not low, so that $w <= L$ and $h <= M$ in every case.
+  A placement changes the region only inside the strip $R := [a, W] times [b, b + M]$ of its own tier: it removes the tile from the bottom-left corner of $R$, and the two parts of $R$ that are left, above the tile and to its right, become the strips of the new tiers or are absorbed by the strip of the next tier.
 
-  We first determine the anchors of $S'$.
-  The anchor of a tier depends only on the sum of the floors from that tier onwards and on the sum of the walls up to that tier.
-  For a tier before $T_i$ the walls up to it are unchanged, and so is the sum of the floors from it onwards: the tiers that replace $T_i$ have floors $w$ and $L - w$, or $L - w$ alone with $w$ added to the floor of $T_(i - 1)$, or $L$, or there are none and $L = w$ is added to the floor of $T_(i - 1)$.
-  For a tier after $T_i$ the floors from it onwards are unchanged, and so is the sum of the walls up to it: the tiers that replace $T_i$ have walls $M - h$ and $h$, or $M$, or $M - h$ alone with $h$ added to the wall of $T_(i + 1)$, or there are none and $M = h$ is added to the wall of $T_(i + 1)$.
-  Hence every tier of $S$ other than $T_i$ has the same anchor in $S'$, and the same computation gives the anchors of the tiers that replace $T_i$: they are $(a, b + h)$ and $(a + w, b)$ if $phi$ is inside, $(a + w, b)$ if $phi$ is full height, and $(a, b + h)$ if $phi$ is full width.
-  The strips of $S'$ are therefore the following.
-  The strips of the tiers before $T_i$ are those of $S$, since their anchors and walls are unchanged.
-  The strip of $T_i$, which is $[a, W] times [b, b + M]$, is replaced by $[a, W] times [b + h, b + M]$ if $phi$ is low, together with $[a + w, W] times [b, b + h]$ if $phi$ is inside, and by $[a + w, W] times [b, b + M]$ if $phi$ is full height.
-  The strips of the tiers after $T_i$ are those of $S$, except that the strip $[a + L, W] times [b_(i + 1), b]$ of $T_(i + 1)$ becomes $[a + L, W] times [b_(i + 1), b + h]$ if $phi$ is not narrow.
+  _The anchors._
+  In @def:placing, what the tiers that replace $T_i$ lack of the floor $L$ is added to the floor of $T_(i - 1)$, and what they lack of the wall $M$ is added to the wall of $T_(i + 1)$.
+  The sums of floors and of walls that give the anchors of the other tiers are therefore unchanged, and the tiers that replace $T_i$ are anchored at the corners of the tile that remain on the boundary of the region, as in @fig:fits.
+  The floors and walls of $S'$ are those of $S$, possibly increased by $w$ or by $h$, together with $w$, $L - w$ or $L$ and $h$, $M - h$ or $M$ for the new tiers, where $L - w$ occurs only if $phi$ is narrow and $M - h$ only if $phi$ is low; so $S'$ is positive.
 
-  The staircase $S'$ is positive: the floor of $T_(i - 1)$ and the wall of $T_(i + 1)$ can only grow, and the new tiers have floors $w$, $L - w$ with $phi$ narrow, or $L$, and walls $M - h$ with $phi$ low, $h$, or $M$.
-  The tile $T = [a, a + w] times [b, b + h]$ lies in the strip of $T_i$, because $w <= L$, $a + L <= W$ and $h <= M$.
-  Each strip of $S'$ lies in $U(S)$: this is clear for the unchanged ones and for those that replace the strip of $T_i$, which are parts of it, and a point of the enlarged strip of $T_(i + 1)$ lies in the old one if its ordinate is at most $b$, and in the strip of $T_i$ otherwise, since $a + L >= a$ and $h <= M$.
-  Now let $(u, v)$ be a point of $U(S)$.
-  If it lies in a strip of $S$ other than that of $T_i$, it lies in the corresponding strip of $S'$, which is the same or larger.
-  Suppose that it lies in the strip of $T_i$.
-  If $phi$ is low and $v >= b + h$, it lies in the strip $[a, W] times [b + h, b + M]$ of $S'$.
-  Otherwise $v <= b + h$; if $u <= a + w$ it lies in $T$; if $u > a + w$ and $phi$ is narrow, it lies in the strip of $S'$ with anchor $(a + w, b)$; and if $u > a + w$ and $phi$ is not narrow, then $u > a + L$, so that $T_i$ is not the last tier, and the point lies in the enlarged strip of $T_(i + 1)$.
-  This proves that $U(S) subset.eq T union U(S')$.
-  Finally let $(u, v)$ be a point of the interior of $T$, so that $a < u < a + w$ and $b < v < b + h$.
-  It is in no strip of a tier before $T_i$, since $v < b + M <= b_j$ for $j < i$; in none of the strips that replace that of $T_i$, which require $v >= b + h$ or $u >= a + w$; and in no strip of a tier after $T_i$, which requires $u >= a_j >= a + L >= a + w$.
+  _The region._
+  Since $w <= L$ and $h <= M$, the tile $T = [a, a + w] times [b, b + h]$ lies in $R$, hence in $U(S)$, by @obs:strips.
+  Let $A := [a, W] times [b + h, b + M]$ and $B := [a + w, W] times [b, b + h]$ be the parts of $R$ above the tile and to its right.
+  If $h < M$, then $A$ is the strip of the new tier with anchor $(a, b + h)$.
+  If $w < L$, then $B$ is the strip of the new tier with anchor $(a + w, b)$.
+  If $w = L$ and $T_i$ is not the last tier, then $B$ lies directly above the strip of $T_(i + 1)$, whose wall the placement increases by $h$, and that strip becomes its union with $B$.
+  No other strip changes: the placement otherwise alters only the floor of $T_(i - 1)$ and some flags, on which strips do not depend.
+  Hence $U(S')$ is contained in $U(S)$, and it contains the part of $U(S)$ outside the tile, that is, $U(S) subset.eq T union U(S')$.
+  The interior of $T$ is disjoint from $A$ and from $B$, and from every other strip by @obs:strips; so it is disjoint from $U(S')$.
+
+  The verification that the tiers of @def:placing have these anchors for each of the four fits, and the cases in which $A$ or $B$ is a segment, are in the formal proof (@app:formal).
 ]
 
 For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
@@ -579,13 +582,12 @@ In a state, the tile at each anchor is still to be placed.
 
 #proof[
   Let $(a, b)$, $L$ and $M_i$ be the anchor, the floor and the wall of the tier $T_i$.
-  As in the proof of @prop:step, the strips of the earlier tiers lie in the half-plane of ordinates at least $b + M_i$, those of the later tiers in the half-plane of abscissas at least $a + L$, and $a + L <= W$.
-  Consequently a point $(u, v)$ with $v < b + M_i$ and $u < a + L$, and with $u < a$ or $v < b$, does not belong to $U(S)$.
+  By @obs:strips, a point $(u, v)$ with $v < b + M_i$ and $u < a + L$, and with $u < a$ or $v < b$, does not belong to $U(S)$.
   The points $(a, b)$ and $(a, b + M_i)$ belong to the strip of $T_i$, hence to the main rectangle, so that $0 <= a < a + L <= W$ and $0 <= b < b + M_i <= H$.
   By @prop:near some tile $T = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
   Let $u_0$ be the mean of $a$ and $min(a' + w', a + L)$, and $v_0$ the mean of $b$ and $min(b' + h', b + M_i)$.
   The point $(u_0, v_0)$ lies in the interior of $T$ and in the strip of $T_i$, so $T$ is not placed, and its interior is contained in $U(S)$.
-  If $a' < a$, the point with abscissa the mean of $a'$ and $a$ and with ordinate $v_0$ lies in the interior of $T$, but not in $U(S)$ by the remark above; hence $a' = a$.
+  If $a' < a$, the point with abscissa the mean of $a'$ and $a$ and with ordinate $v_0$ lies in the interior of $T$, but not in $U(S)$, as was just noted; hence $a' = a$.
   If $b' < b$, the point with abscissa $u_0$ and with ordinate the mean of $b'$ and $b$ lies in the interior of $T$, but not in $U(S)$; hence $b' = b$.
 ]
 
@@ -641,7 +643,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
   By the choice of $phi$, @prop:step applies: $S'$ is positive, $U(S') subset.eq U(S)$, $U(S) subset.eq Q union U(S')$, and the interior of $Q$ is disjoint from $U(S')$.
   The interiors of the tiles placed before, and that of $Q$, are therefore disjoint from $U(S')$, and $U(S')$ is contained in the main rectangle.
   A remaining tile other than $Q$ has its interior in $U(S)$ and disjoint from that of $Q$, hence disjoint from $Q$ itself, so its interior is contained in $U(S')$.
-  It remains to examine the flags of $S'$; recall from the proof of @prop:step that the tiers of $S$ other than $T_i$ keep their anchors.
+  It remains to examine the flags of $S'$; by the first statement of @prop:step, the tiers of $S$ other than $T_i$ keep their anchors.
   The tiers before $T_i$ have floors that extend in $S$.
   Those that are stale in $S'$ have the same floor as in $S$, so their floors extend; none of them is started in $S$, hence none is started in $S'$, where the started flags of these tiers are the same.
   The tiers that replace $T_i$ are not stale, and the only one that is started is the last one in the case of a narrow fit; its anchor is $(a + w, b)$ and its floor is $L - w$, so its floor ends at $(a + L, b)$, as that of $T_i$ does, and does not extend.
@@ -958,7 +960,7 @@ Both this and the count of bags assume that the polynomial stored for a proporti
   This is so if $j = i - 1$ and the tile placed is as high as the wall of $T_i$, since the top side of that tile continues the floor to the right.
   Otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile as high as the wall at the next tier, whose top side then continues the floor to the right, so that the floor extends; and a stale tier is never removed, so that the record could not be complete.
   Suppose that the floor of $T_i$ extends, and let $Q$ be its right end.
-  The tile that makes it extend is still to be placed, since points of its interior lie in the strip of the next tier; so its interior lies in the region of the staircase, which contains no point to the left of $Q$ and below the floor, by the remark made in the proof of @prop:anchor.
+  The tile that makes it extend is still to be placed, since points of its interior lie in the strip of the next tier; so its interior lies in the region of the staircase, which contains no point to the left of $Q$ and below the floor, by @obs:strips.
   Its left side is therefore at the abscissa of $Q$; let $U$ be this tile, whose top left corner is $Q$.
   If the tile placed at $T_i$ is narrower than the floor, the remainder of the floor is started, and it remains so until a tile $V$ is placed whose bottom side ends at $Q$; if it is as wide as the floor, it is itself such a tile $V$.
   As long as the floor is started, $U$ cannot be placed, since it would lengthen the floor.
@@ -994,7 +996,7 @@ The record constructed in the proof of @prop:complete is of this kind, and the s
 
   Let $Q$ be a crossing, $V$ the tile to its upper left and $U$ the tile to its lower right.
   Suppose that $U$ is placed before $V$ in $rho_X$, at a tier $T_i$.
-  The interior of $V$ lies in the region of the staircase, which, by the remark in the proof of @prop:anchor, contains no point to the left of the anchor of $T_i$ and below the top of its wall; so $U$ is as high as the wall. Then $i > 0$, since $Q$ is not on the boundary of the square, the floor of $T_(i - 1)$ ends at $Q$, and it extends.
+  The interior of $V$ lies in the region of the staircase, which, by @obs:strips, contains no point to the left of the anchor of $T_i$ and below the top of its wall; so $U$ is as high as the wall. Then $i > 0$, since $Q$ is not on the boundary of the square, the floor of $T_(i - 1)$ ends at $Q$, and it extends.
   As $T_(i - 1)$ comes before the tier chosen, its floor $X$-extends, and $Q$ is not in $X$.
   Suppose that $V$ is placed before $U$, at a tier $T_i$.
   The interior of $U$ lies in the region of the staircase, which contains no point below the floor of $T_i$ and to the left of its end; so $V$ is as wide as the floor, which ends at $Q$ and extends.
@@ -1817,6 +1819,11 @@ The proofs given in this paper follow those of the development, statement by sta
           [`Reduced`: `length_homEquations`],
         ),
         ..lean-row(
+          [@obs:strips],
+          [`Layout`: `geom_bounds`],
+          [`Region`: `stepHyp_of_positive`],
+        ),
+        ..lean-row(
           [@prop:step],
           [`Layout`: `geom_place`],
           [`Region`: `StepHyp`, `step_region`],
@@ -1951,7 +1958,7 @@ The statements of the paper and those of the development differ in the following
   A linear form of the development has a coefficient for every natural number, with no finiteness condition.
 - *Records.* A record is a list of placements, and the free sides are given by a function on the natural numbers.
   In @prop:complete the development states the orientations as a relation between the list of placements and the list of tiles.
-- *Proofs by cases.* @prop:step is formalised in two parts, one on the region and one on positivity, and the description of the anchors after a placement is a separate statement.
+- *Proofs by cases.* The three statements of @prop:step are separate statements of the development, on the anchors, on positivity and on the region; the hypotheses that the last one uses are those of @obs:strips, which the development collects in one structure.
   @prop:fit combines two statements of the development.
   The state of @def:state is formalised with the placed and remaining tiles as two lists whose concatenation is a rearrangement of the tiling.
 - *Rings.* The statements on elimination chains are formalised over an arbitrary commutative ring with a homomorphism to a field, and @prop:det over an integral domain; the paper assumes an integral domain throughout.
