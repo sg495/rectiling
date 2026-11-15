@@ -35,5 +35,6 @@ import Rectiling.TilingCount
 import Rectiling.Growth
 import Rectiling.CombinatorialMap
 import Rectiling.MapNetwork
+import Rectiling.TilingMap
 import Rectiling.Audit
 import Rectiling.Check
