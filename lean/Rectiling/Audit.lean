@@ -4,6 +4,7 @@ import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
+import Rectiling.ProportionBound
 
 /-!
 # Axioms of the main theorems
@@ -64,3 +65,20 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.achievable_one
 #print axioms Rectiling.persistence
 #print axioms Rectiling.persistence_of_one_lt
+
+#print axioms Rectiling.Network.Proper.exists_isFlow
+#print axioms Rectiling.Network.IsFlow.unique
+#print axioms Rectiling.Network.IsFlow.impedance_eq
+#print axioms Rectiling.Network.Proper.impedance_pos
+#print axioms Rectiling.Network.Proper.pairPoly_ne_zero
+#print axioms Rectiling.Network.natDegree_pairPoly_le
+#print axioms Rectiling.Network.IsFlow.aeval_pairPoly
+#print axioms Rectiling.IsTiling.sum_bottom_eq_sum_top
+#print axioms Rectiling.IsTiling.heightNetwork_isFlow
+#print axioms Rectiling.IsTiling.heightNetwork_proper
+#print axioms Rectiling.IsTiling.impedance_heightNetwork
+#print axioms Rectiling.IsSimilarTiling.aeval_pairPoly
+#print axioms Rectiling.Network.Iso.pairPoly_eq
+#print axioms Rectiling.Achievable.exists_class
+#print axioms Rectiling.finite_achievable
+#print axioms Rectiling.ncard_achievable_le

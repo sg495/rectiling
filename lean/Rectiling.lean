@@ -26,5 +26,6 @@ import Rectiling.Network
 import Rectiling.NetworkPolynomial
 import Rectiling.CrossSection
 import Rectiling.TilingNetwork
+import Rectiling.ProportionBound
 import Rectiling.Audit
 import Rectiling.Check
