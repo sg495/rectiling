@@ -331,16 +331,13 @@ The next proposition says that nothing is lost in doing so: for records of $n$ p
 ] <prop:bound>
 
 #proof[
-  No placement is allowed at the empty staircase, so that in a record that obeys the rules no placement follows one that leaves the staircase empty.
-  Suppose that $rho = (p_1, dots, p_ell)$ obeys the rules from a bare staircase $S$ with $m$ tiers.
-  We show, by induction on $ell$, that $m <= ell$ and that each $p_j$ is admissible, with $ell - j + 1$ tiles remaining, at the staircase on which it is placed.
-  If $ell = 0$ then $S$ is empty and there is nothing to prove.
-  Otherwise let $S'$, with $m'$ tiers, be the staircase after $p_1$; then $m <= m' + 1$, the remaining placements obey the rules from $S'$, and by induction $m' <= ell - 1$ and the remaining placements are admissible as stated.
-  Hence $m <= ell$, and $p_1$ is admissible with $ell$ tiles remaining: it is allowed, $ell >= 1$, $m' <= ell - 1$, and if $m' = 0$ then no placement follows $p_1$, so that $ell = 1$.
-  Applied to the bare initial staircase, this shows that a record of $n$ placements that obeys the rules is complete admissible for $n$ tiles.
-  Conversely, an admissible placement is allowed, so a record that is complete admissible for $n$ tiles obeys the rules from the bare initial staircase, and it remains to see that it has $n$ placements.
-  More generally, if each placement $p_j$ of $rho$ is admissible, with $r - j + 1$ tiles remaining, on a staircase $S$ that is not empty, and the staircase left by the last one is empty, then $ell = r$, by induction on $ell$.
-  Indeed $ell >= 1$; if the staircase after $p_1$ is empty then $r = 1$ by admissibility and no placement follows, so that $ell = 1$; otherwise $ell - 1 = r - 1$ by induction.
+  Let $rho = (p_1, dots, p_n)$ obey the rules from the bare initial staircase, and let $m_j$ be the number of tiers after $p_j$, so that $m_n = 0$.
+  A placement removes at most one tier, so $m_j <= n - j$.
+  No placement is allowed at the empty staircase, so $m_j > 0$ for $j < n$.
+  Since $p_j$ is allowed, these are the conditions of @def:admissible with $n - j + 1$ tiles remaining.
+
+  Conversely, let $rho = (p_1, dots, p_ell)$ be complete admissible for $n$ tiles; it obeys the rules from the bare initial staircase, since an admissible placement is allowed.
+  That staircase is not empty, so $ell >= 1$, and $p_ell$ leaves no tier, which @def:admissible permits only with one tile remaining; so $n - ell + 1 = 1$.
 ]
 
 = Linear systems <sec:systems>
@@ -372,7 +369,7 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 #proof[
   Each placement of the record is made at a tier that exists, so the number of tiers increases by one with each inside placement, decreases by one with each full placement, and is otherwise unchanged.
   It goes from $m$ to zero, so the number of full placements exceeds the number of inside placements by $m$.
-  The second statement follows from @prop:bound, the initial staircase having one tier.
+  The second statement follows from @prop:bound, since the initial staircase has one tier.
 ]
 
 #example[
@@ -457,10 +454,8 @@ The next statement records what the constraints of a single placement give.
 
 #proof[
   Let $L$ and $M$ be the floor and the wall of the tier.
-  For an inside placement, $s > 0$ and the size is $(x s, s)$ or $(s, x s)$.
-  For a placement of full height, $M > 0$ and the size is $(x M, M)$ or $(M slash x, M)$.
-  For a placement of full width, $L > 0$ and the size is $(L, L slash x)$ or $(L, x L)$.
-  For a full placement, the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
+  If the fit is not full, one side of the tile is the positive quantity of $p$, and the other is that side multiplied or divided by $x$ (@def:placement).
+  If the fit is full, the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$ or $M = x L$, so $M > 0$.
 ]
 
 A defective staircase stays defective under every allowed placement whose constraints hold, because the floor or the wall that is not positive could be made positive only by a placement that one of the two rules forbids.
@@ -468,47 +463,47 @@ A defective staircase stays defective under every allowed placement whose constr
 #proposition[
   Let $x > 0$, let $S$ be a real staircase, and let $p$ be a placement that is allowed at $S$, made with a free side for which its positive quantity is positive and its equation, if it has one, is zero.
   Let $S'$ be the staircase after the placement.
-  If $S$ is floor-defective then so is $S'$, and if $S$ is wall-defective then so is $S'$.
+  + If $S$ is floor-defective, then so is $S'$.
+  + If $S$ is wall-defective, then so is $S'$.
 ] <prop:doom>
 
 #proof[
   Let $p = (i, phi, o)$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $(w, h)$ be the size of the tile, so that $w, h > 0$ by @prop:size.
+  Outside $T_i$, the placement makes the tiers before $T_i$ stale; if $phi$ is not low, it lengthens the floor of $T_(i - 1)$ and clears its stale flag; if $phi$ is not narrow, it increases the wall of $T_(i + 1)$; and it changes nothing else (@def:placing).
 
-  Suppose that $S$ is wall-defective, and let $T_j$ be a tier whose wall is not positive and before which every tier is stale.
-  Since $p$ is allowed, $T_i$ is not stale, so $j <= i$.
-  If $j < i$, the wall of $T_j$ is unchanged, and the tiers before $T_j$ remain stale: the placement makes every tier before $T_i$ stale, and clears the flag of $T_(i - 1)$ at most, which is not before $T_j$.
-  If $j = i$ then $M <= 0$.
-  The fit $phi$ is then low, for otherwise $h = M <= 0$.
-  Hence every tier before $T_i$ is stale in $S'$, and the first of the tiers that replace $T_i$ has wall $M - h < 0$.
-  In both cases $S'$ is wall-defective.
+  _Floors._
+  Let $T_j$ be started or last, with a floor that is not positive.
+  If $j < i$, then $T_j$ is not last, so it is started, and by the second rule its floor is not lengthened.
+  If $j > i$, then $T_j$ keeps its floor and its started flag, and is last in $S'$ if it is last in $S$.
+  If $j = i$, then $L <= 0$ is not the positive quantity of $p$, so $phi$ is narrow, and the last tier that replaces $T_i$ is started, with floor $L - w < 0$.
 
-  Suppose that $S$ is floor-defective, and let $T_j$ be a tier whose floor is not positive and which is started or last.
-  If $j < i$ then $T_j$ is not last, hence it is started.
-  Its floor and its started flag are unchanged by the placement, unless $j = i - 1$ and $phi$ is not low; but that case does not arise, since $p$ is allowed and $T_(i - 1)$ is then not started.
-  If $j = i$ then $L <= 0$.
-  The fit $phi$ is then narrow, for otherwise the positive quantity of $p$ is $L$.
-  Hence the last of the tiers that replace $T_i$ has floor $L - w < 0$ and is started.
-  If $j > i$, the floor and the started flag of $T_j$ are unchanged, and $T_j$ is the last tier of $S'$ if it is the last tier of $S$.
-  In every case $S'$ is floor-defective.
+  _Walls._
+  Let $T_j$ have a wall that is not positive and only stale tiers before it.
+  By the first rule $T_i$ is not stale, so $j <= i$.
+  If $j < i$, the wall of $T_j$ is unchanged and the tiers before it stay stale.
+  If $j = i$, then $M <= 0 < h$, so $phi$ is low, and the first tier that replaces $T_i$ has wall $M - h < 0$ and only stale tiers before it.
+
+  The identification of the tiers of $S'$ with those of $S$ and those that replace $T_i$, for each of the four fits, is in the formal proof (@app:formal).
 ]
 
 It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
 
 #proposition[
   Let $x > 0$, let $rho$ be a record that obeys the rules from a real staircase $S$, placed with free sides $s$, and suppose that every positivity constraint of $rho$ on $S$ is positive and every equation is zero.
-  Then $S$ is neither floor-defective nor wall-defective.
-  If moreover $S$ is positive and $rho$ is not empty, then the first placement $p = (i, phi, o)$ of $rho$ has a tile of size $(w, h)$ with $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, where $L$ and $M$ are the floor and the wall of $T_i$, and the staircase after $p$ is positive.
+  + $S$ is neither floor-defective nor wall-defective.
+  + Suppose that $S$ is positive and that $rho$ is not empty, let $p = (i, phi, o)$ be the first placement of $rho$, let $L$ and $M$ be the floor and the wall of $T_i$, and let $(w, h)$ be the size of the tile of $p$.
+    Then $w < L$ if $phi$ is narrow, $h < M$ if $phi$ is low, and the staircase after $p$ is positive.
 ] <prop:fit>
 
 #proof[
-  The first statement is proved by induction on the length of $rho$.
-  If $rho$ is empty then $S$ is empty and is not defective.
-  Otherwise let $S'$ be the staircase after the first placement; the rest of $rho$ obeys the rules from $S'$ and its constraints hold, so $S'$ is not defective by induction, and neither is $S$ by @prop:doom.
+  For the first statement, a defective staircase stays defective under every placement of $rho$, by @prop:doom, and the staircase left by $rho$ is empty, hence not defective.
 
-  For the second statement, let $S'$ be the staircase after $p$, which is not defective by the first statement applied to the rest of $rho$, and recall that $w, h > 0$ by @prop:size.
-  If $phi$ is narrow and $w >= L$, then the last of the tiers that replace $T_i$ in $S'$ is started and has floor $L - w <= 0$, so that $S'$ is floor-defective.
-  If $phi$ is low and $h >= M$, then every tier before $T_i$ is stale in $S'$ and the first of the tiers that replace $T_i$ has wall $M - h <= 0$, so that $S'$ is wall-defective.
-  Hence $w < L$ if $phi$ is narrow and $h < M$ if $phi$ is low, and $S'$ is positive by @prop:step.
+  For the second, let $S'$ be the staircase after $p$; it is not defective, by the first statement applied to the rest of $rho$.
+  If $phi$ is narrow, the last tier that replaces $T_i$ is started and has floor $L - w$, which is therefore positive.
+  If $phi$ is low, the first tier that replaces $T_i$ has wall $M - h$ and only stale tiers before it, so $M - h$ is positive.
+  Since $w, h > 0$ by @prop:size, $S'$ is positive by the second statement of @prop:step.
+
+  The induction on the record and the numbering of the free sides in the rest of $rho$ are in the formal proof (@app:formal).
 ]
 
 Soundness follows by removing the tiles from the region one at a time.
@@ -519,19 +514,16 @@ Soundness follows by removing the tiles from the region one at a time.
 ] <prop:sound>
 
 #proof[
-  By @prop:bound the record $rho$ has $n$ placements and obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend only on the flags.
-  By @prop:fit the staircase $S_0$ is not defective.
-  Its only tier is the last one and has no tier before it, so its floor $W$ and its wall $H$ are positive, and $S_0$ is positive.
+  By @prop:bound, $rho = (p_1, dots, p_n)$ obeys the rules from the bare initial staircase, hence from the real initial staircase $S_0$ of $W$ and $H$, since the rules depend only on the flags.
+  By the first statement of @prop:fit, $S_0$ is not defective; its only tier is last and has no tier before it, so $W > 0$ and $H > 0$, and $S_0$ is positive.
 
-  We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that their number is the number of placements of $rho'$.
-  If $rho'$ is empty then $S$ is empty and so is $U(S)$.
-  Otherwise let $p$ be the first placement of $rho'$, let $T$ be its tile and $S'$ the staircase after it.
-  By @prop:size the tile $T$ is a rectangle of proportion $x$, and by @prop:fit it fits its tier strictly where its fit requires and $S'$ is positive, so that @prop:step applies.
-  By induction the tiles of the rest of $rho'$ are rectangles of proportion $x$ contained in $U(S')$, with pairwise disjoint interiors, which cover $U(S')$.
-  Hence all the tiles are contained in $U(S)$, because $T subset.eq U(S)$ and $U(S') subset.eq U(S)$; the interior of $T$ is disjoint from the later tiles, because it is disjoint from $U(S')$; and the tiles cover $U(S)$, because $U(S) subset.eq T union U(S')$.
+  Let $S_j$ be the staircase after $p_j$, and $Q_j$ the tile of $p_j$, which is a rectangle of proportion $x$ by @prop:size.
+  By the second statement of @prop:fit, applied to $(p_j, dots, p_n)$ on $S_(j - 1)$ for $j = 1, dots, n$ in turn, $Q_j$ fits its tier strictly where its fit requires and $S_j$ is positive.
+  So @prop:step applies to every placement: $Q_j subset.eq U(S_(j - 1))$, $U(S_j) subset.eq U(S_(j - 1)) subset.eq Q_j union U(S_j)$, and the interior of $Q_j$ is disjoint from $U(S_j)$.
 
-  Applied to $rho$ and $S_0$, whose region is $[0, W] times [0, H]$, this shows that the tiles of $rho$ lie in the main rectangle, cover it, and have pairwise disjoint interiors.
-  They are $n$ rectangles of proportion $x$, and $x >= 1$.
+  Since $U(S_0) = [0, W] times [0, H]$ and $U(S_n)$ is empty, the tiles lie in the main rectangle and cover it, and the interior of $Q_j$ is disjoint from every later tile, which lies in $U(S_j)$.
+
+  The formal proof (@app:formal) obtains these properties by one induction on the record, from an arbitrary positive real staircase, and keeps account of the numbering of the free sides.
 ]
 
 == Completeness <sec:complete>
@@ -1784,7 +1776,7 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row(
           [@prop:subdivision],
           [`Refinement`: `IsSimilarTiling.refine`],
-          [`Persistence`: `Rect.isTiling_four`, `Rect.isTiling_six`, `TilesWith.add_three`, `TilesWith.add_five`, `persistence`],
+          [`Persistence`: `Rect.isTiling_four`, `Rect.isTiling_six`, `Rect.isTiling_eight`, `TilesWith.add_three`, `TilesWith.add_five`, `TilesWith.add_seven`, `TilesWith.add_of_five_le`, `persistence`],
         ),
         ..lean-row(
           [@def:staircase],
@@ -1949,7 +1941,7 @@ The statements of the paper and those of the development differ in the following
 - *Sets of proportions.* The development does not define the sets $P_n (W, H)$.
   Its statements are about the existence of a list of $n$ rectangles that is a similar tiling of proportion $x$ of the rectangle with corner at the origin and given sides, which is the membership of $x$ in $P_n (W, H)$.
   @prop:scaling and the first statement of @prop:transposition are formalised as the invariance of tilings under scaling and transposition, from which the equalities of sets follow; the consequence $P_n (w) = P_n (1 slash w)$ is the theorem `tilesWith_main_inv`.
-  Of @prop:subdivision, the development states the steps of three and of five for an arbitrary main rectangle with positive sides, and every step of at least three for the unit square with at least two tiles; the second statement follows from these for every $k >= 5$ other than $7$, and for $k = 7$ the development contains the dissection into eight (`Rect.isTiling_eight`) but not the statement.
+  The three statements of @prop:subdivision are `TilesWith.add_three`, `persistence` and `TilesWith.add_of_five_le`, the first and the last for an arbitrary main rectangle with positive sides; the development states the second for every step of at least three.
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
@@ -2043,12 +2035,12 @@ They are much weaker than the growth observed in @tab:tbc.
   In the image the tile at the bottom-left corner, of width $a$ and height $b$, and the tiles with corners $(a, 0)$, $(0, b)$ and $(a, b)$ are the four pieces; their union is the tile that was cut, namely $[0, 2 a] times [0, 2 b]$, and the other tiles are unchanged.
 
   For the second, let the tiling have proportion $x > 1$; there are $t(n) - s(n)$ such tilings.
-  The construction of the third statement of @prop:subdivision for $x > 1$, which does not use the hypothesis $n >= 2$, gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
+  A similar tiling of the unit square of proportion $x > 1$ has at least two tiles, so the construction of the second statement of @prop:subdivision applies and gives a tiling with $n + 4$ tiles, in which the four tiles of the pinwheel are those that contain the corners of the unit square; we take the pinwheel in which the tile at the bottom-left corner is wide.
   The transpose of this tiling is a similar tiling of the same proportion in which the tile at the bottom-left corner is tall, so that the tilings obtained in the two ways are different.
   In either case, removing the four tiles that contain the corners of the square, after transposing if the tile at the bottom-left corner is tall, leaves the scaled copy of the original tiling.
 
   For the third, there are four dissections of the unit square into one square of side $2 slash 3$ and five of side $1 slash 3$, according to the corner that the large square occupies.
-  Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map of the proof of @prop:subdivision; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
+  Replace the tile $[0, A] times [0, B]$ at the bottom-left corner by the image of one of them under the affine map $(u, v) |-> (A u, B v)$; this gives four tilings with $n + 5$ tiles for each tiling with $n$ tiles.
   Let the tile at the bottom-left corner of the image have width $a$ and height $b$.
   If it is the large piece, then $(A, B) = (3 a slash 2, 3 b slash 2)$, and $[a, 3 a slash 2] times [0, b slash 2]$ is a tile of the image.
   If it is a small piece, then $(A, B) = (3 a, 3 b)$, and the tile of the image that contains the points just to the right of $(a, 0)$ is a piece with corner $(a, 0)$ and of width $a$ or $2 a$, so that $[a, 3 a slash 2] times [0, b slash 2]$, which has the same corner, is not a tile.
@@ -2673,7 +2665,7 @@ These are obtained by surrounding the three most elongated rectangles that can b
   For $m >= 3$, a rectangle of sides $2 m - 3$ and $2$ is dissected into $m - 2$ squares of side $2$ and two of side $1$.
   For $m >= 4$, a rectangle of sides $3 m - 7$ and $3$ is dissected into $m - 3$ squares of side $3$, one of side $2$ and two of side $1$.
   So $m$, $m - 3 slash 2$ and $m - 7 slash 3$ belong to $P_m (1)$ for $m >= 2$, $m >= 3$ and $m >= 4$ respectively, and they exceed $1$.
-  By the third statement of @prop:subdivision, they belong to $P_(m + 4) (1)$.
+  By the second statement of @prop:subdivision, they belong to $P_(m + 4) (1)$.
 ]
 
 That the three rectangles cannot be dissected into $n$ squares is reduced below to three finite statements, of which the first is the following.
