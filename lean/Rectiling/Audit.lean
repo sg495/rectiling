@@ -8,6 +8,7 @@ import Rectiling.Counts
 import Rectiling.Multiplicity
 import Rectiling.ProportionBound
 import Rectiling.TilingCount
+import Rectiling.CountsFinite
 import Rectiling.CombinatorialMap
 
 /-!
@@ -120,3 +121,17 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.tutteM_le
 #print axioms Rectiling.limsup_le_of_le_tutteM
 #print axioms Rectiling.TutteEnumeration.card_eq_tutteM
+#print axioms Rectiling.finite_similarTilingFinsets
+#print axioms Rectiling.finite_squareTilings
+#print axioms Rectiling.finite_oblongTilings
+#print axioms Rectiling.finite_classes
+#print axioms Rectiling.finite_bags
+#print axioms Rectiling.finite_proportions
+#print axioms Rectiling.parity_ncard_similarTilings
+#print axioms Rectiling.ncard_proportions_lt_ncard_bags'
+#print axioms Rectiling.ncard_orbit_le
+#print axioms Rectiling.bag_eq_of_mem_orbit
+#print axioms Rectiling.ncard_chain
+#print axioms Rectiling.IsTiling.isCrossing_iff_isSetCrossing
+#print axioms Rectiling.IsSetTiling.isSetCrossing_iff
+#print axioms Rectiling.IsSimilarSetTiling.quarter_turn_isCrossing

@@ -69,6 +69,7 @@ Networks and the number of proportions:
 - `Rectiling/TilingNetwork.lean` — the network of the heights of a tiling `heightNetwork`, the flow that the tiling gives on it, and the proportion as a root of its polynomial.
 - `Rectiling/ProportionBound.lean` — isomorphisms of networks, the classes `PairClass` of networks with an orientation vector, and the theorems `finite_achievable` and `ncard_achievable_le`.
 - `Rectiling/TilingCount.lean` — the theorems `finite_similarTilings` and `finite_similarTilingSets`.
+- `Rectiling/CountsFinite.lean` — the finiteness of the sets counted (`finite_similarTilingFinsets`, `finite_squareTilings`, `finite_oblongTilings`, `finite_classes`, `finite_bags`, `finite_proportions`), the statements on cardinalities without hypotheses of finiteness (`parity_ncard_similarTilings`, `ncard_proportions_lt_ncard_bags'`), the inequalities between the numbers of proportions, bags, classes and tilings (`ncard_orbit_le`, `bag_eq_of_mem_orbit`, `ncard_chain`), and the agreement of the two notions of crossing (`IsTiling.isCrossing_iff_isSetCrossing`, `IsSetTiling.isSetCrossing_iff`).
 - `Rectiling/Growth.lean` — the number `tutteM` and the theorem `limsup_le_of_le_tutteM`.
 - `Rectiling/CombinatorialMap.lean` — combinatorial maps `CMap`, rooted non-separable planar maps `RootedMap` up to isomorphism, and the statement `TutteEnumeration` of the theorem of Tutte, which is not proved; `tools/tutte_check.py` counts the maps of these definitions with at most five edges.
 

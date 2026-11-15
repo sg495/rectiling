@@ -32,6 +32,7 @@ import Rectiling.CrossSection
 import Rectiling.TilingNetwork
 import Rectiling.ProportionBound
 import Rectiling.TilingCount
+import Rectiling.CountsFinite
 import Rectiling.Growth
 import Rectiling.CombinatorialMap
 import Rectiling.Audit
