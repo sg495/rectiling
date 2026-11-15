@@ -4,6 +4,7 @@ import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
+import Rectiling.Counts
 
 /-!
 # Axioms of the main theorems
@@ -64,3 +65,21 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.achievable_one
 #print axioms Rectiling.persistence
 #print axioms Rectiling.persistence_of_one_lt
+#print axioms Rectiling.isTiling_iff_isSetTiling
+#print axioms Rectiling.IsTiling.toFinset_eq_iff_perm
+#print axioms Rectiling.isSimilarSetTiling_iff
+#print axioms Rectiling.mem_similarTilings_iff
+#print axioms Rectiling.mem_proportions_iff
+#print axioms Rectiling.image_fst_bags
+#print axioms Rectiling.image_sym_mem_similarTilings
+#print axioms Rectiling.orbit_eq_of_mem
+#print axioms Rectiling.IsSimilarSetTiling.squares_of_reflection
+#print axioms Rectiling.image_transpose_ne
+#print axioms Rectiling.even_ncard_oblongTilings
+#print axioms Rectiling.ncard_similarTilings_mod_two
+#print axioms Rectiling.IsSimilarSetTiling.quarter_turn
+#print axioms Rectiling.exists_two_sizes
+#print axioms Rectiling.exists_bags_ne
+#print axioms Rectiling.exists_two_bags
+#print axioms Rectiling.not_injOn_fst_bags
+#print axioms Rectiling.ncard_proportions_lt_ncard_bags

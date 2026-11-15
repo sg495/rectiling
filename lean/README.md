@@ -56,6 +56,7 @@ Default method (namespace `Rectiling.Fast`):
 Structure of the sequence:
 
 - `Rectiling/Persistence.lean` — the predicates `TilesWith` and `Achievable`, the cuts of a rectangle into four, six and eight rectangles similar to it, the pinwheel, and the theorem `persistence`.
+- `Rectiling/Counts.lean` — tilings as finite sets of rectangles (`IsSetTiling`, `isTiling_iff_isSetTiling`), the symmetries of the unit square (`Rect.rot`, `Rect.sym`), the sets counted by the numbers of tilings, classes, bags and proportions (`SimilarTilings`, `Classes`, `Bags`, `Proportions`), the parity of the number of tilings (`ncard_similarTilings_mod_two`), the tilings fixed by a reflection in a diagonal or by a quarter turn (`IsSimilarSetTiling.squares_of_reflection`, `IsSimilarSetTiling.quarter_turn`), and two bags with the same proportion for six or more tiles (`exists_two_bags`, `ncard_proportions_lt_ncard_bags`); the statements on cardinalities take the finiteness of the sets as a hypothesis.
 
 ## Main theorems
 

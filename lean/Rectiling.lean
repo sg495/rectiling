@@ -3,6 +3,7 @@ import Rectiling.Geometry
 import Rectiling.Scaling
 import Rectiling.Refinement
 import Rectiling.Persistence
+import Rectiling.Counts
 import Rectiling.Staircase
 import Rectiling.Layout
 import Rectiling.Region
