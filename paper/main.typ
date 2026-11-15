@@ -188,7 +188,7 @@ The staircase is therefore defined first as a combinatorial object with lengths 
   A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations; the _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
 ] <def:staircase>
 
-No law is assumed of these operations, such as associativity or the existence of a neutral element: the statements made for an arbitrary arithmetic of lengths use only that homomorphisms preserve the operations, and two of the arithmetics used below, the linear forms and the intervals, do not satisfy the laws of a module.
+No law is assumed of these operations, such as associativity or the existence of a neutral element: the statements made for an arbitrary arithmetic of lengths use only the fact that homomorphisms preserve the operations, and two of the arithmetics used below, the linear forms and the intervals, do not satisfy the laws of a module.
 Several arithmetics of lengths occur.
 The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
 The second has a single element, so that a staircase over it, a _bare staircase_, is determined by the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
@@ -454,10 +454,10 @@ The next statement records what the constraints of a single placement give.
 
 #proof[
   Let $L$ and $M$ be the floor and the wall of the tier.
-  For an inside placement $s > 0$ and the size is $(x s, s)$ or $(s, x s)$.
-  For a placement of full height $M > 0$ and the size is $(x M, M)$ or $(M slash x, M)$.
-  For a placement of full width $L > 0$ and the size is $(L, L slash x)$ or $(L, x L)$.
-  For a full placement the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
+  For an inside placement, $s > 0$ and the size is $(x s, s)$ or $(s, x s)$.
+  For a placement of full height, $M > 0$ and the size is $(x M, M)$ or $(M slash x, M)$.
+  For a placement of full width, $L > 0$ and the size is $(L, L slash x)$ or $(L, x L)$.
+  For a full placement, the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$, whence $M = L slash x > 0$, or $M = x L > 0$.
 ]
 
 A defective staircase stays defective under every allowed placement whose constraints hold, because the floor or the wall that is not positive could be made positive only by a placement that one of the two rules forbids.
@@ -555,7 +555,7 @@ The construction relies on finding the tiles that lie next to a given point.
 #proof[
   Since there are finitely many tiles, there is $epsilon$ with $0 < epsilon < W - c$ such that no tile has the abscissa of its corner in $(c, c + epsilon]$, and there is $eta$ with $0 < eta < H - d$ such that no tile has the ordinate of its corner in $(d, d + eta]$.
   The point $(c + epsilon, d + eta)$ lies in the main rectangle, hence in some tile $(a', b', w', h')$.
-  Then $a' <= c + epsilon$, so that $a' <= c$ by the choice of $epsilon$, and $c < c + epsilon <= a' + w'$; likewise $b' <= d < b' + h'$.
+  Then $a' <= c + epsilon$, so that $a' <= c$ by the choice of $epsilon$, and $c < c + epsilon <= a' + w'$; similarly $b' <= d < b' + h'$.
   For the second statement, choose $epsilon$ as before and $eta$ with $0 < eta < d$ such that no tile has the ordinate $b' + h'$ of its top side in $[d - eta, d)$.
   The point $(c + epsilon, d - eta)$ lies in some tile $(a', b', w', h')$, for which $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
 ]
@@ -900,7 +900,7 @@ The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from
 ] <conj:logconvex>
 
 @conj:logconvex holds for $n <= 12$.
-The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and with it $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount too small to be detected in the values computed.
+The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and hence $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount too small to be detected in the values computed.
 Whether $a(n)^(1 slash n)$ converges is not known (@sec:growth-rate).
 
 == Tilings, classes and bags <sec:tilings-counts>
@@ -986,7 +986,7 @@ The record constructed in the proof of @prop:complete is of this kind, and the s
   For the existence, we repeat the construction of @prop:complete with the first tier whose floor does not $X$-extend, and with the fourth condition of @def:state replaced by the condition that the floor of every stale tier $X$-extends and the floor of no started tier does.
   The proof of @prop:extension applies with the following changes.
   If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, contrary to the choice of $T_i$.
-  The proof that $h <= M$ uses only that the floor of $T_(i - 1)$ extends.
+  The proof that $h <= M$ uses only the fact that the floor of $T_(i - 1)$ extends.
   The placement is allowed, since the floor of a stale tier $X$-extends, and the floor of $T_(i - 1)$ $X$-extends while that of a started tier does not.
   The orientation is the one chosen for $Q$; when $Q$ is a square, the sizes and the equations of the two orientations coincide.
   After the placement, the started tier, if any, has a floor that ends where the floor of $T_i$ did, and so does not $X$-extend.
@@ -1177,7 +1177,7 @@ The third step is justified by the following test.
 
 #proof[
   Let $q(x + 1) = sum_j q_j x^j$, so that $q(r) = q_0 + sum_(j >= 1) q_j (r - 1)^j$ with $r - 1 >= 0$.
-  If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then $q(r) < 0$ likewise.
+  If the $q_j$ are non-negative then $q_0 > 0$ and the sum is non-negative, so $q(r) > 0$; if they are non-positive then similarly $q(r) < 0$.
 ]
 
 With routines that meet their specifications, the method reports solutions of the system only, and it reports all of them when it counts no singular situation.
@@ -1258,7 +1258,7 @@ To keep the system homogeneous, the main rectangle is given sides $a t$ and $b t
   The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $X$ and by $X^(-1)$.
   We write $u_j$ for the form whose coefficient of index $j$ is $1$ and whose other coefficients are zero.
   For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $kappa_1, kappa_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$.
-  For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we write likewise $G[v] := sum_(j < N) G_j v_j$.
+  For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we similarly write $G[v] := sum_(j < N) G_j v_j$.
 ] <def:hom>
 
 For a record with $k$ inside placements, values are always taken with $N = k + 1$, so that $v_0$ is the value of the scale and $v_1, dots, v_k$ are the free sides.
@@ -1330,7 +1330,7 @@ Nothing in the definition of a chain requires the current pivot to have a non-ze
 
 #proof[
   Let $hat(S)_j$ be the staircase obtained by placing $p_1, dots, p_j$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$, so that the $kappa_q$ and the $e_i$ are the positive quantities and the equations of the placements on these staircases.
-  We show by induction on $j < ell$ that the stage $Sigma_j = (S, pi, k)$, reached after $r'$ eliminations, has the following properties: the eliminations $epsilon_1, dots, epsilon_(r')$ form a chain over $psi$ whose originals are the equations of the full placements amongst $p_1, dots, p_j$ and whose current pivot is $pi$, with $psi(pi) != 0$; the staircase $S$ has the tiers of $hat(S)_j$, and $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S$ and the corresponding floor or wall $hat(F)$ of $hat(S)_j$; the number of inside placements amongst $p_1, dots, p_j$ is $k$; and $Gamma_(r') (u_i) = psi(pi) u_i$ for every $i > k$.
+  We show by induction on $j < ell$ that the stage $Sigma_j = (S, pi, k)$, reached after $r'$ eliminations, has the following properties: the eliminations $epsilon_1, dots, epsilon_(r')$ form a chain over $psi$ whose originals are the equations of the full placements among $p_1, dots, p_j$ and whose current pivot is $pi$, with $psi(pi) != 0$; the staircase $S$ has the tiers of $hat(S)_j$, and $psi(F) = Gamma_(r') (psi(hat(F)))$ for every floor or wall $F$ of $S$ and the corresponding floor or wall $hat(F)$ of $hat(S)_j$; the number of inside placements among $p_1, dots, p_j$ is $k$; and $Gamma_(r') (u_i) = psi(pi) u_i$ for every $i > k$.
   For $j = 0$ these hold with $r' = 0$, $Gamma_0$ the identity and $pi = 1$.
 
   Suppose that they hold for $Sigma_(j - 1) = (S, pi, k)$, and consider the placement $p_j$.
@@ -1414,7 +1414,7 @@ It is the polynomial whose roots are the candidate proportions.
   For the consequence, the real matrix $chi(M)$ sends the vector $w != 0$ to zero, so that $chi(det M) = det chi(M) = 0$.
 ]
 
-The consequence holds whether or not a pivot vanishes at the point considered: every solution of the system is amongst the roots of the final coefficient.
+The consequence holds whether or not a pivot vanishes at the point considered: every solution of the system is among the roots of the final coefficient.
 The same argument, with a floor or a wall appended as one more equation, shows that the divisions of the pass are exact.
 
 #proposition[
@@ -1577,7 +1577,7 @@ An accepted root is a solution, and a rejected one is not, with or without a cer
 
 The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles of @fig:pinwheel, whose central tile degenerates to a point.
 Such cases are about one in a hundred, and the certificate decides them without recourse to the direct method.
-The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful divisibility test is correct.
+The rejection that it justifies uses only the facts that the stored polynomial vanishes at the root and that a successful divisibility test is correct.
 When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which is not used in the correctness of the search.
 
 #proposition[
@@ -1623,7 +1623,7 @@ Whenever the incremental method decides a record itself, it reports exactly the 
 
 #proof[
   Suppose that $rho$ is not passed to the direct method.
-  Then the pass is successful, $c := (E_"fin")_0$ is not zero, the other coefficients of $E_"fin"$ are zero, and $q = "key"(c)$ is a non-zero polynomial with the same zeros as $c$ amongst the non-zero real numbers.
+  Then the pass is successful, $c := (E_"fin")_0$ is not zero, the other coefficients of $E_"fin"$ are zero, and $q = "key"(c)$ is a non-zero polynomial with the same zeros as $c$ among the non-zero real numbers.
   Let $r$ be a solution of $rho$.
   By @prop:hom there is $w in RR^(k + 1)$ with $w_0 = 1$ at which the homogeneous system holds for the evaluation at $r$, so $c(r) = 0$ by @prop:det, and $r in "roots"(q)$.
   In particular the third step does not apply if $rho$ has a solution, by @prop:noroot, so that the first statement holds when it applies.
@@ -1958,7 +1958,7 @@ The statements of the paper and those of the development differ in the following
   In the development the quotient of a division that is not exact is defined to be zero, and a successful pass is an inductive predicate that requires every division to be exact.
 - *The invariant of the pass.* @prop:trace is formalised for a pass that starts at any stage related to a staircase without eliminations as in its proof, and its three conclusions are derived from one inductive relation between the records of the pass and the homogeneous system.
 - *Minors.* The two statements of @prop:minor are proved separately in the development, by the same comparison of determinants; the paper derives the second from the first.
-- *Exactness.* @prop:exact is formalised for the stages reached by the model of the method, which are amongst those of its statement; the lemmas from which it follows hold for all of them.
+- *Exactness.* @prop:exact is formalised for the stages reached by the model of the method, which are among those of its statement; the lemmas from which it follows hold for all of them.
 - *The search.* The sets of @def:enumeration are lists, in the order in which the search tries the placements.
   The numbers found by the search of @def:explore form a predicate, defined by recursion, and the parallel execution is not modelled.
   The development models the search as in @def:explore, including the restriction to the remaining forced placements when the pass fails at a forced placement (`forcedCompletions`), and proves in addition that every complete admissible record is examined under exactly one prefix (`examined_once`).
@@ -2102,7 +2102,7 @@ When the real parts of the resistances all have the same sign, its real part is 
   This is positive, since $phi$ is not constant.
 ]
 
-For real positive resistances the potential is largest at one pole and smallest at the other, and the impedance cannot be much smaller than the resistances of the edges at a pole.
+For positive real resistances the potential is largest at one pole and smallest at the other, and the impedance cannot be much smaller than the resistances of the edges at a pole.
 In such a network the matrix $L_t$ is real and invertible, so that a flow of real value has a real potential, up to an additive constant.
 
 #proposition[
@@ -2119,7 +2119,7 @@ In such a network the matrix $L_t$ is real and invertible, so that a flow of rea
   $ sum_(e in.rev v) y_e (phi(v) - phi(v_e)) = -I delta_(v t) <= 0, $
   and every term is non-negative, so that every neighbour of $v$ lies in $A$.
   By connectedness $A = V$, which contradicts the fact that $phi$ is not constant, as $I > 0$.
-  So $s in A$, and likewise $phi$ is smallest at $t$.
+  So $s in A$, and similarly $phi$ is smallest at $t$.
   Kirchhoff's law at $s$ then gives
   $ I = sum_(e in.rev s) y_e (phi(s) - phi(v_e)) <= (phi(s) - phi(t)) sum_(e in.rev s) y_e. $
 ]
@@ -2294,10 +2294,10 @@ Since $N$ and $D$ have opposite parities, such a polynomial retains all the info
   By the fourth statement of @prop:reactance, $N$ and $D$ have no monomial in common, so the coefficients of $N - D$ are those of $N$ and of $-D$, whose greatest common divisor is $1$.
   Let $P := plus.minus (N - D)$, and let $P_0$ and $P_1$ be its even and odd parts.
   Then ${N, D} = {plus.minus P_0, plus.minus P_1}$, and the signs are those that make the leading coefficients positive.
-  So $P$ determines ${N, D}$, and with it ${N slash D, D slash N}$.
+  So $P$ determines ${N, D}$, and hence ${N slash D, D slash N}$.
 ]
 
-The behaviour of $F$ at the two ends of $(0, infinity)$ fixes the signs of $N - D$ there, and with them the parity of the number of its positive roots.
+The behaviour of $F$ at the two ends of $(0, infinity)$ fixes the signs of $N - D$ there, and hence the parity of the number of its positive roots.
 
 #proposition[
   For $F = N slash D$ as in @prop:reactance, let $d := deg(N - D)$, and let $rho.alt$ be the number of roots of $N - D$ in $(0, infinity)$, counted with multiplicity; these roots are the solutions of $F(x) = 1$.
@@ -2329,7 +2329,7 @@ The derivative of an impedance function has a geometric meaning.
 ] <prop:slope>
 
 #proof[
-  Let $(phi, i)$ be the flow of value $1$ for real positive resistances $r$, and let $j$ be a real function on the edges that satisfies Kirchhoff's law with value $c$.
+  Let $(phi, i)$ be the flow of value $1$ for positive real resistances $r$, and let $j$ be a real function on the edges that satisfies Kirchhoff's law with value $c$.
   Multiplying Kirchhoff's law for $j$ at each vertex $v$ by $phi(v)$ and summing gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
   With $j = i$ this is $Z = sum_e r_e i_e^2$.
   The currents are rational functions of the resistances, by Cramer's rule and @prop:flow; let a dot denote the derivative along a differentiable family of resistances.
@@ -2395,7 +2395,7 @@ The duality is used in its oriented form: if the edges of a minimal cut are all 
 This follows from the unoriented statement, since the dual cycle separates the two sides of the cut, by the Jordan curve theorem.
 
 #proposition[
-  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current $i_e$ is zero.
+  Let $frak(N)$ be a plane network with positive real resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current $i_e$ is zero.
   Direct every edge so that $i_e > 0$, and let $psi$ be as in @prop:face-potential.
   Then the rectangles
   $ rct(e) := [psi(rgt(e)), psi(lft(e))] times [phi(e^+), phi(e^-)], quad e in E, $
@@ -2436,13 +2436,13 @@ For a tiling this is transposition.
   Let $frak(N)$ be a plane network such that $G^+$ has no bridge.
   Let $frak(N)^*$ consist of the graph whose vertices are the faces of $G^+$, with an edge $e^*$ joining $lft(e)$ and $rgt(e)$ for every edge $e$ of $G$, and of the poles $f_R$ and $f_L$.
   + $frak(N)^*$ is a plane network, and $Z_(frak(N)^*, -epsilon) = 1 slash Z_(frak(N), epsilon)$ for every orientation vector $epsilon$.
-  + For real positive resistances $r_e$ on $frak(N)$ and $1 slash r_e$ on $frak(N)^*$, the current in $e^*$ for a flow of non-zero value on $frak(N)^*$ vanishes exactly when the current in $e$ for a flow of non-zero value on $frak(N)$ does.
+  + For positive real resistances $r_e$ on $frak(N)$ and $1 slash r_e$ on $frak(N)^*$, the current in $e^*$ for a flow of non-zero value on $frak(N)^*$ vanishes exactly when the current in $e$ for a flow of non-zero value on $frak(N)$ does.
 ] <prop:dual>
 
 #proof[
   The graph of $frak(N)^*$ is the dual of $G^+$ with the edge dual to $e_0$ removed, that is, the dual of the plane graph $G^+ slash e_0$ obtained by contracting $e_0$.
   It is connected, it has no loop because $G^+$ has no bridge, its poles are distinct because $e_0$ is not a bridge, and they lie on the face that corresponds to the vertex of $G^+ slash e_0$ made of $s$ and $t$.
-  Let $(phi, i)$ be a flow of value $I != 0$ on $frak(N)$ for real positive resistances $r$, and let $psi$ be as in @prop:face-potential.
+  Let $(phi, i)$ be a flow of value $I != 0$ on $frak(N)$ for positive real resistances $r$, and let $psi$ be as in @prop:face-potential.
   On $frak(N)^*$ take the potential $psi$ and, in the edge $e^*$ directed from $lft(e)$ to $rgt(e)$, the current $r_e i_e = phi(e^-) - phi(e^+)$.
   Ohm's law holds with the resistance $1 slash r_e$.
   Kirchhoff's law at a face says that the differences of $phi$ along the edges of its boundary, other than $e_0$, add up to zero, or to $plus.minus (phi(s) - phi(t))$ for the two faces at $e_0$; this holds because the boundary is a closed walk.
@@ -2682,7 +2682,7 @@ That the three rectangles cannot be dissected into $n$ squares is reduced below 
   A square that has a segment in common with two sides of the unit square contains a corner or has side $1$, so $Q$ has a segment in common with at most one side, say not with the bottom, right or top side.
   Each of these three sides is then covered by its two corner squares, so that $a + b = b + c = c + d = 1$.
   Hence $c = a$ and $d = b$, so that $a + d = 1$, and the left side is covered by $A$ and $D$ as well.
-  The squares $A = [0, a]^2$ and $C = [1 - a, 1]^2$ have disjoint interiors, so $a <= 1 slash 2$; likewise $b <= 1 slash 2$.
+  The squares $A = [0, a]^2$ and $C = [1 - a, 1]^2$ have disjoint interiors, so $a <= 1 slash 2$; similarly $b <= 1 slash 2$.
   So $a = b = 1 slash 2$, the four corner squares fill the unit square, and there is no room for $Q$.
 ]
 
@@ -2938,7 +2938,7 @@ It first shows that a tiling can be recovered from its network, and conversely.
 #definition(name: [regular point])[
   Two plane networks are _isomorphic_ if there are bijections between their vertices and between their edges that preserve the ends of the edges, the poles, and the cyclic order of the edges of $G^+$ around each vertex, the edge $e_0$ of one corresponding to that of the other and its position in the cyclic orders at the poles being part of the data.
   A _pair_ with $n$ edges is a plane network with $n$ edges with an orientation vector, and two pairs are isomorphic if there is an isomorphism of their plane networks that preserves the orientations.
-  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of positive value, with real potential, in which no current vanishes; direct the edges so that the currents are positive, and let $rct(e)$ be the rectangles of @prop:bsst.
+  Let $frak(N)$ be a plane network with positive real resistances, and let $(phi, i)$ be a flow of positive value, with real potential, in which no current vanishes; direct the edges so that the currents are positive, and let $rct(e)$ be the rectangles of @prop:bsst.
   For a vertex $v$, let $S_v$ be the union of the top sides of the rectangles $rct(e)$ with $e^- = v$ and of the bottom sides of the rectangles $rct(e)$ with $e^+ = v$.
   The flow is _regular_ if the sets $S_v$ are pairwise disjoint.
   For a pair $(frak(N), epsilon)$, a number $x > 0$ is a _regular point_ if no current of the flow of value $1$ for the resistances $x^(epsilon_e)$ vanishes and that flow is regular.
@@ -2948,7 +2948,7 @@ The faces of a connected plane graph, with the faces to the left and to the righ
 An isomorphism of plane networks therefore maps a flow to a flow, the function $psi$ of @prop:face-potential to that of the image, and the rectangles $rct(e)$ to the same rectangles up to a translation; so regularity, and the tiling of @prop:bsst, depend only on the isomorphism class.
 
 #proposition[
-  Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current vanishes, with the edges directed so that the currents are positive.
+  Let $frak(N)$ be a plane network with positive real resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current vanishes, with the edges directed so that the currents are positive.
   + At every vertex other than the poles, the edges that leave it are consecutive in the cyclic order around it.
   + For every vertex $v$, the set $S_v$ is a horizontal segment at height $phi(v)$, and it is the union of the top sides of the rectangles of the edges that leave $v$, as well as the union of the bottom sides of the rectangles of the edges that enter $v$, when $v$ has edges of the kind considered. In counter-clockwise order around $v$, the edges that leave $v$ come in the order of their rectangles from left to right, and are followed by the edges that enter $v$ in the order of their rectangles from right to left. The sets $S_s$ and $S_t$ are the top and the bottom side of the main rectangle.
   + If $v != w$ and $S_v$ meets $S_w$, then they meet in a single point, which is a corner of four tiles.
@@ -2966,7 +2966,7 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
   For the second, let $v$ be a vertex other than the poles and let $e_1, dots, e_k$ be the edges that leave it, in counter-clockwise order, followed by the edges $e'_1, dots, e'_m$ that enter it.
   The face that follows a leaving edge $e$ counter-clockwise around its tail is $lft(e)$, and the one that precedes it is $rgt(e)$; for an entering edge the face that follows it around its head is $rgt(e)$ and the one that precedes it is $lft(e)$.
   Hence $lft(e_j) = rgt(e_(j + 1))$, so that the top sides $[psi(rgt(e_j)), psi(lft(e_j))] times {phi(v)}$ of the rectangles of the leaving edges follow one another from left to right and their union is $[psi(rgt(e_1)), psi(lft(e_k))] times {phi(v)}$.
-  Likewise $lft(e'_1) = lft(e_k)$, $rgt(e'_j) = lft(e'_(j + 1))$ and $rgt(e'_m) = rgt(e_1)$, so that the bottom sides of the rectangles of the entering edges follow one another from right to left and have the same union.
+  Similarly $lft(e'_1) = lft(e_k)$, $rgt(e'_j) = lft(e'_(j + 1))$ and $rgt(e'_m) = rgt(e_1)$, so that the bottom sides of the rectangles of the entering edges follow one another from right to left and have the same union.
   At $s$ the edge $e_0$ of $G^+$ is the only one that enters, with $lft(e_0) = f_R$ and $rgt(e_0) = f_L$, and the same computation shows that the top sides of the rectangles of the edges that leave $s$ cover $[psi(f_L), psi(f_R)] times {phi(s)}$; likewise at $t$.
 
   For the third, $S_v$ and $S_w$ are at the same height, so neither $v$ nor $w$ is a pole, the potential of every other vertex lying strictly between those of the poles.
@@ -2978,7 +2978,7 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
 ]
 
 #proposition[
-  + Let $frak(N)$ be a plane network with real positive resistances and a regular flow, and let $tau$ be the tiling of @prop:bsst. Then $e |-> rct(e)$ induces an isomorphism of plane networks from $frak(N)$ to $frak(N)(tau)$, under which the resistance of $e$ is that of the tile $rct(e)$.
+  + Let $frak(N)$ be a plane network with positive real resistances and a regular flow, and let $tau$ be the tiling of @prop:bsst. Then $e |-> rct(e)$ induces an isomorphism of plane networks from $frak(N)$ to $frak(N)(tau)$, under which the resistance of $e$ is that of the tile $rct(e)$.
   + Let $tau$ be a tiling of a rectangle. For the plane network $frak(N)(tau)$, with the resistances and the flow of @prop:tiling-network, the rectangles of @prop:bsst are the tiles of $tau$, up to a translation, and the flow is regular.
 ] <prop:reconstruction>
 
@@ -3140,7 +3140,7 @@ Whether the sequences have a rate of growth at all is not known.
 By @prop:deficit the limits, if they exist, are smaller than $27 slash 2$.
 The values computed do not show this.
 If $a(n)$ were a constant times $mu^n n^(-gamma)$, then $gamma$ would be $log(mu a(n) slash a(n + 1)) slash log((n + 1) slash n)$ for every $n$.
-For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and the quotient of $a(n)$ by $(27 slash 2)^n n^(-11 slash 2)$ takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$; likewise the quotient of $t(n)$ by $2^n M(n)$ increases slowly, to $0.2920$ for twelve tiles.
+For $mu = 27 slash 2$ this quantity takes the values $5.81$, $5.76$, $5.66$, $5.56$, $5.515$ and $5.514$ for $n = 7, dots, 12$, and the quotient of $a(n)$ by $(27 slash 2)^n n^(-11 slash 2)$ takes the values $0.6825$, $0.6783$, $0.6774$ and $0.6767$ for $n = 10, dots, 13$; similarly, the quotient of $t(n)$ by $2^n M(n)$ increases slowly, to $0.2920$ for twelve tiles.
 These fits, which @fig:sequences shows, describe only the terms computed: by @prop:deficit both quotients tend to zero.
 A deficit of the size proved, or of the size that the proportion of pairs without regular points suggests, cannot be detected in thirteen terms.
 
