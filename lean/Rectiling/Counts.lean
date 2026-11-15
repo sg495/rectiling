@@ -1,5 +1,6 @@
 -- SPDX-License-Identifier: LGPL-3.0-or-later
 import Rectiling.Persistence
+import Rectiling.Crossings
 
 /-!
 # Tilings, classes and bags
@@ -31,13 +32,6 @@ structure IsSimilarSetTiling (x : ℝ) (R : Rect) (T : Finset Rect) : Prop exten
   one_le : 1 ≤ x
   /-- Every tile has the given proportion. -/
   proportion : ∀ t ∈ T, t.HasProportion x
-
-/-- The tiles of a tiling given as a list are distinct. -/
-theorem IsTiling.nodup {R : Rect} {l : List Rect} (h : IsTiling R l) : l.Nodup := by
-  refine h.disjoint.imp_of_mem ?_
-  intro a b ha _ hab heq
-  rw [← heq] at hab
-  exact Rect.not_disjoint_inner_self (h.nondegenerate a ha) hab
 
 /-- The set of the tiles of a tiling given as a list is a tiling. -/
 theorem IsTiling.toSet {R : Rect} {l : List Rect} (h : IsTiling R l) : IsSetTiling R l.toFinset where
@@ -589,7 +583,7 @@ theorem ncard_similarTilings_mod_two (n : ℕ) (hfin : (SimilarTilings n).Finite
 /-! ## Tilings fixed by a quarter turn -/
 
 /-- A point at which four rectangles of a set meet: it is the bottom-left corner of one, the bottom-right corner of another, the top-right corner of a third and the top-left corner of a fourth. -/
-def IsCrossing (T : Finset Rect) (p : ℝ × ℝ) : Prop :=
+def IsSetCrossing (T : Finset Rect) (p : ℝ × ℝ) : Prop :=
   (∃ t ∈ T, (t.x, t.y) = p) ∧ (∃ t ∈ T, (t.x + t.w, t.y) = p) ∧
     (∃ t ∈ T, (t.x + t.w, t.y + t.h) = p) ∧ ∃ t ∈ T, (t.x, t.y + t.h) = p
 
@@ -688,8 +682,8 @@ theorem rot_rot_ne (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1 1) T)
   rcases (h.corner_of_rot hx hfix ht hc).1 with h3 | h3 <;> linarith [hnd.1]
 
 /-- **Crossing at the centre.** In a similar tiling of the unit square of proportion greater than one that is mapped into itself by the quarter turn, four tiles meet at the centre of the square. -/
-theorem isCrossing_of_rot (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1 1) T)
-    (hfix : ∀ t ∈ T, t.rot ∈ T) : IsCrossing T (1 / 2, 1 / 2) := by
+theorem isSetCrossing_of_rot (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1 1) T)
+    (hfix : ∀ t ∈ T, t.rot ∈ T) : IsSetCrossing T (1 / 2, 1 / 2) := by
   have hp : ((1 / 2 : ℝ), (1 / 2 : ℝ)) ∈ (Rect.main 1 1).closed := by
     rw [Rect.mem_closed]
     simp only [Rect.main]
@@ -742,7 +736,7 @@ theorem four_dvd_card_of_rot (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1
 /-- **Tilings fixed by a quarter turn.** A similar tiling of the unit square of proportion greater than one that is fixed by a quarter turn, in either direction, has four tiles meeting at the centre of the square, and its number of tiles is a multiple of four. -/
 theorem quarter_turn (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1 1) T)
     (hfix : T.image Rect.rot = T ∨ T.image Rect.rot^[3] = T) :
-    IsCrossing T (1 / 2, 1 / 2) ∧ 4 ∣ T.card := by
+    IsSetCrossing T (1 / 2, 1 / 2) ∧ 4 ∣ T.card := by
   have hfix' : ∀ t ∈ T, t.rot ∈ T := by
     rcases hfix with hfix | hfix
     · intro t ht
@@ -755,7 +749,7 @@ theorem quarter_turn (hx : 1 < x) (h : IsSimilarSetTiling x (Rect.main 1 1) T)
       intro t ht
       have := h3 _ (h3 _ (h3 _ ht))
       simpa using this
-  exact ⟨h.isCrossing_of_rot hx hfix', h.four_dvd_card_of_rot hx hfix'⟩
+  exact ⟨h.isSetCrossing_of_rot hx hfix', h.four_dvd_card_of_rot hx hfix'⟩
 
 end IsSimilarSetTiling
 
