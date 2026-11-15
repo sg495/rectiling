@@ -28,7 +28,7 @@ Dehn had shown that a rectangle can be cut into squares only if its sides are co
 Laczkovich and Szekeres @laczkovich1995, and independently Freiling and Rinne @freiling1994, proved that a square can be cut into rectangles of proportion $x$, for some number of pieces, exactly when $x$ is algebraic and all its conjugates have positive real part; Freiling, Laczkovich and Rinne characterised the rectangles that can be tiled by rectangles similar to a given one, in terms of odd rational functions that map the right half-plane into itself @flr1997, and the electrical point of view was developed further by Prasolov and Skopenkov @prasolov2011.
 
 The quantitative question dates from December 2022, when Baez asked on Mathstodon which proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
-The resulting sequence $a(n)$ is entry A359146 of the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
+The resulting sequence $a(n)$ is entry A359146 in the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
 The values for $n <= 4$ were found by hand, and those for $5 <= n <= 7$ by exhaustive searches of Henderson @henderson2023 and of Gerbet, reported in @baez2023, Henderson's value for $n = 7$ being corrected after Gerbet's search; Henderson also reported, tentatively, $a(8) = 8522$.
 Taams gave an argument that the proportion is algebraic of degree at most $n$ @taams2023.
 Einstein, using the correspondence with electrical networks, reported $a(9) = 58347$ and $a(10) = 433926$ @einstein2023; these two values have not, to our knowledge, been published elsewhere or reproduced.
@@ -163,7 +163,7 @@ For the square, no proportion with $n=2, 3, 4$ tiles persists at $n=3, 4, 5$ res
   caption: [Tilings whose proportions do not persist, according to the search: the proportion $2$ of the square with $n=2$ tiles, not achievable in the square with $n=3, 4$ tiles (counterexample for $k=1, 2$); the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with $n=1$ tile, not achievable in it with $n=5$ (counterexample for $k=4$); and the proportion $4$ of the rectangle of aspect ratio $2$ with $n=2$ tiles, not achievable in it with $n=6$ (counterexample for $k=4$).],
 ) <fig:steps>
 
-@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search of @sec:solving; the remaining ones are their transposes.
+@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search described in @sec:solving; the remaining ones are their transposes.
 
 #figure(
   image("figures/three-tiles.svg", width: 100%),
@@ -769,14 +769,14 @@ The smallest case in which the search has anything to decide is that of two tile
 
 All computations were carried out with the Rust implementation of the search, on an M4 Max 128 GB machine.
 All runs used the incremental search, except where stated.
-In every run the counters of the implementation for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the direct method were all zero.
+In every run the implementation's counters for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the direct method were all zero.
 In the incremental search these counters concern the records passed to the direct method, so that every unrestricted run of the incremental search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the direct search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
 The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @app:structure, are made by variants of the search that @sec:systems and @app:solving do not cover.
 
 == The square <sec:square>
 
 @tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic), the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search encountered.
-The last number depends on the method of search and is not an invariant of the problem.
+The last number depends on the search method and is not an invariant of the problem.
 
 #figure(
   kind: table,
@@ -833,7 +833,7 @@ Degree $n$ is attained for every $n$ in the table other than $4$.
 
 The proportions of degree one are explained in part by dissections into squares.
 If all tiles of a similar tiling of the square have the same orientation, stretching one axis by the proportion gives a dissection of a rectangle into $n$ squares, whose aspect ratio is the proportion.
-The number of aspect ratios of rectangles that can be dissected into $n$ squares is entry A210517 of the OEIS @oeisA210517, which lists $1, 1, 2, 5, 11, 28, 74, 211$.
+The number of aspect ratios of rectangles that can be dissected into $n$ squares is entry A210517 in the OEIS @oeisA210517, which lists $1, 1, 2, 5, 11, 28, 74, 211$.
 @tab:rational compares it with the number of rational proportions.
 
 #figure(
@@ -863,7 +863,7 @@ The sets of proportions do have some structure: proportions persist when tiles a
 These properties, and the conjectures that the computations suggest, are the subject of @app:structure.
 Here we bound the growth of $a(n)$.
 
-The bound rests on the electrical network of a tiling @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles $s$ and $t$ are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the difference of potential across it its height (@def:tiling-network).
+The bound rests on the electrical network of a tiling @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles $s$ and $t$ are the top and bottom sides of the main rectangle, and whose edges are the tiles, the current in a tile being its width and the potential difference across it its height (@def:tiling-network).
 The network $frak(N)(tau)$ of a tiling $tau$ is drawn in the plane with both poles on the outer face, and $G^+$ denotes its graph with an additional edge $e_0$ joining the poles (@def:plane-network).
 For an orientation vector $epsilon$, which labels each edge as tall or wide, the impedance $Z_(frak(N), epsilon)$ of a network $frak(N)$ between its poles, when every tall edge has resistance $x$ and every wide edge resistance $1 slash x$, is a rational function of $x$ (@def:impedance).
 A similar tiling $tau$ of $[0, W] times [0, H]$ of proportion $x$, with orientations $epsilon$, satisfies $H slash W = Z_(frak(N)(tau), epsilon) (x)$, by @prop:tiling-network.
@@ -938,7 +938,7 @@ The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, whic
   caption: [One tiling from each of the $16$ classes of tilings of the square by four similar rectangles, labelled by proportion, with the number of tilings of the class in brackets; the numbers add up to $t(4) = 89$.],
 ) <fig:classes>
 
-The search of @sec:solving counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
+The search described in @sec:solving counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
 A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
 A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
 A tiling is identified by its proportion, its orientations and the record described in @prop:representative, the solution of a reported record at a proportion being unique.
@@ -1099,9 +1099,9 @@ The tiling shown for a proportion is the first that one run of the search found,
 
 = Solving the linear systems <app:solving>
 
-This appendix defines the two forms of the search of @sec:solving and proves @prop:search.
-The direct search solves the system of each record separately; the incremental search eliminates along the tree of records and verifies its candidates numerically.
-The arithmetic of both is performed by routines that are not part of what is proved: the statements hold for any routines that meet the specifications of @def:primitives and @def:numerics.
+This appendix defines the two forms of the search described in @sec:solving and proves @prop:search.
+The direct search solves the system for each record separately; the incremental search eliminates along the tree of records and verifies its candidates numerically.
+The arithmetic in both is performed by routines that are not part of what is proved: the statements hold for any routines that meet the specifications of @def:primitives and @def:numerics.
 
 == Linear forms <sec:forms>
 
@@ -1148,7 +1148,7 @@ Its arithmetic is performed by three routines, which are not part of what is pro
 ] <def:primitives>
 
 Nothing is assumed of the elimination when it fails.
-In the implementation, the elimination is the fraction-free elimination of Bareiss @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
+In the implementation, the elimination is the fraction-free Bareiss elimination @bareiss1968 with back-substitution, for which $lambda = plus.minus 1$, and it fails when it finds no pivot.
 The roots are obtained by factorising $q$ into irreducible factors over $ZZ$ and isolating the real roots of each factor in $[1, infinity)$ by Descartes' rule of signs with bisection @collins1976, so that each root is identified by its minimal polynomial and its position among the roots of that polynomial; factorisation proceeds by reduction modulo a prime exceeding twice the Landau–Mignotte bound @mignotte1974 on the coefficients of the factors, using Berlekamp's method @berlekamp1970, followed by recombination of the modular factors by trial division.
 The sign of $q$ at a root $r$ is zero if and only if the minimal polynomial of $r$ divides $q$, and is otherwise found by evaluating $q$ on an isolating interval for $r$, refined until the value is separated from zero.
 
@@ -1208,7 +1208,7 @@ With routines that meet their specifications, the method reports solutions of th
   The elimination has succeeded, since otherwise a singular situation is counted.
   By the second fact, multiplied by $lambda(r)$, $D(r) z_i = N_i (r)$ for every $i$.
   In particular $F_rho (r) = b N_(k + 1) (r) - a D(r) = D(r) (b dot.op a slash b - a) = 0$.
-  The record is not flagged as constant, so $F_rho != 0$; the test of the third step fails, by @prop:noroot; hence the fourth step is reached and $r in "roots"(F_rho)$.
+  The record is not flagged as constant, so $F_rho != 0$; the test in the third step fails, by @prop:noroot; hence the fourth step is reached and $r in "roots"(F_rho)$.
   No singular situation is counted, so $"sign"(r, D) != 0$.
   Finally $Q_f (r) = D(r) nu_k (f)$ with $nu_k (f) > 0$, so $Q_f (r)$ has the sign of $D(r)$, and $r$ is reported.
 ]
@@ -1224,7 +1224,7 @@ The search verifies the hypothesis of the second statement.
   The direct search for $n$ tiles is _certified_ if all these records are regular for $(a, b)$.
 ] <def:regular>
 
-A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being vacuous when the test of the third step succeeds.
+A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$, the last condition being vacuous when the test in the third step succeeds.
 
 #proposition[
   Let $a, b >= 1$ and $n >= 0$ be integers.
@@ -1374,7 +1374,7 @@ The properties of elimination chains that are used below are the following; they
 ]
 
 The first two statements say that the recorded equations are obtained from the originals by a lower triangular matrix, and the third that they are upper triangular in the eliminated unknowns.
-Comparing determinants identifies the pivots, as in the elimination of Bareiss @bareiss1968.
+Comparing determinants identifies the pivots, as in Bareiss elimination @bareiss1968.
 
 #proposition[
   Let $epsilon_1, dots, epsilon_r$, with $epsilon_i = (E_i, m_i, pi_(i - 1))$, be an elimination chain over $psi$ with originals $e_1, dots, e_r$ and current pivot $pi_r$.
@@ -1457,7 +1457,7 @@ The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the d
   The statement follows from @prop:det.
 ]
 
-For the elimination of Bareiss, $lambda = plus.minus 1$, and the two polynomials have the same roots in $[1, infinity)$; in general the statement shows that every root of the final coefficient in $[1, infinity)$ is a root of $F_rho$, and that every root of $F_rho$ at which $lambda$ does not vanish is a root of the final coefficient.
+For Bareiss elimination, $lambda = plus.minus 1$, and the two polynomials have the same roots in $[1, infinity)$; in general the statement shows that every root of the final coefficient in $[1, infinity)$ is a root of $F_rho$, and that every root of $F_rho$ at which $lambda$ does not vanish is a root of the final coefficient.
 The correctness of the incremental search does not depend on this comparison, which is stated for completeness.
 
 The cost of an elimination is proportional to the square of the number of tiers, and most nodes of the search tree are close to the leaves, where staircases have one or two tiers.
@@ -1477,7 +1477,7 @@ Away from the zeros of the pivots, the recorded eliminations determine the solut
 ] <prop:back>
 
 #proof[
-  By @prop:trace with $psi = chi$, and by the count of @prop:det, the eliminations form a chain over $chi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $chi(pi) != 0$, and $chi(E_"fin") = Gamma_k (chi(e_(k + 1)))$.
+  By @prop:trace with $psi = chi$, and by the count in @prop:det, the eliminations form a chain over $chi$ with originals $e_1, dots, e_k$, the current pivot $pi := pi_k$ satisfies $chi(pi) != 0$, and $chi(E_"fin") = Gamma_k (chi(e_(k + 1)))$.
   By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
   In particular no replacement changes $v_0$, which proves the first statement.
 
@@ -1520,11 +1520,11 @@ As for the exact routines, the interval arithmetic is not part of what is proved
   + _Roots._ Every real number $r$ has a stored interval $I_r$.
     If $r >= 1$ and $q(r) = 0$ for some non-zero $q in ZZ[x]$, then $I_r$ encloses $r$ and is certainly away from zero.
   + _Minimal polynomials._ A real number $r$ may have a stored polynomial $mu_r in ZZ[x]$, and then $mu_r (r) = 0$.
-    There is a test of divisibility for pairs of polynomials of $ZZ[x]$; if it succeeds for $(f, q)$, then $f$ divides $q$ in $ZZ[x]$.
+    There is a divisibility test for pairs of polynomials of $ZZ[x]$; if it succeeds for $(f, q)$, then $f$ divides $q$ in $ZZ[x]$.
   + _Coefficients._ For every $c in ZZ[x, x^(-1)]$ there are polynomials $"key"(c)$ and $"coeffs"(c)$ in $ZZ[x]$ and integers $e$ and $e'$ such that $"key"(c) = plus.minus x^e c$ and $"coeffs"(c) = x^(e') c$.
 ] <def:numerics>
 
-Nothing is assumed of a test of divisibility that does not succeed, nor is the stored polynomial assumed to be irreducible.
+Nothing is assumed of a divisibility test that does not succeed, nor is the stored polynomial assumed to be irreducible.
 The intervals form an arithmetic of lengths for a given interval $I$ of the proportion, the product and the quotient by $x$ being the product and the quotient by $I$.
 
 #definition(name: [numerical check])[
@@ -1541,7 +1541,7 @@ The intervals form an arithmetic of lengths for a given interval $I$ of the prop
     Let $F$ be the resulting form.
     If $F_j != 0$ for some $j >= 1$, the examination ends.
     If $F_0 = 0$, there is a certificate.
-    Otherwise, if $r$ has no stored polynomial, the examination ends; if the test of divisibility succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
+    Otherwise, if $r$ has no stored polynomial, the examination ends; if the divisibility test succeeds for $(mu_r, "coeffs"(F_0))$, there is a certificate; and if it does not, the examination passes to the next placement.
 ] <def:check>
 
 An accepted root is a solution, and a rejected one is not, with or without a certificate.
@@ -1577,7 +1577,7 @@ An accepted root is a solution, and a rejected one is not, with or without a cer
 
 The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles of @fig:pinwheel, whose central tile degenerates to a point.
 Such cases are about one in a hundred, and the certificate settles them without recourse to the direct method.
-The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful test of divisibility is correct.
+The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful divisibility test is correct.
 When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which is not used in the correctness of the search.
 
 #proposition[
@@ -1948,7 +1948,7 @@ The statements of the paper and those of the development differ in the following
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
   The representation of a proportion by its minimal polynomial and an isolating interval belongs to the routines of @def:primitives, which are assumed.
 - *Indices.* The development numbers the inside placements, the free sides and the placements from zero, where the paper numbers them from one.
-  A linear form of the development has a coefficient for every natural number, with no condition of finiteness.
+  A linear form of the development has a coefficient for every natural number, with no finiteness condition.
 - *Records.* A record is a list of placements, and the free sides are given by a function on the natural numbers.
   In @prop:complete the development states the orientations as a relation between the list of placements and the list of tiles.
 - *Proofs by cases.* @prop:step is formalised in two parts, one on the region and one on positivity, and the description of the anchors after a placement is a separate statement.
@@ -1969,9 +1969,9 @@ The statements of the paper and those of the development differ in the following
 The formal development is about a model of the method, and the following lies outside it.
 
 - *The implementation.* The Rust code is not verified.
-  The model follows it closely, and the differences are listed in the documentation of the development; the main ones are that the model gives every inside placement its own unknown, where the code reuses a small number of slots, and that the caches are absent from the model.
+  The model follows it closely, and the differences are listed in the development's documentation; the main ones are that the model gives every inside placement its own unknown, where the code reuses a small number of slots, and that the caches are absent from the model.
 - *The arithmetic routines.* The routines of @def:primitives and @def:numerics are assumed to meet their specifications, and every statement on the two searches is quantified over them.
-  This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the test of divisibility.
+  This covers the fraction-free elimination, factorisation, the isolation of real roots, the determination of signs, the arithmetic of intervals with its rounding, the enclosure of polynomials, the minimal polynomials and the divisibility test.
   Both sets of specifications are shown to be consistent by exhibiting routines that meet them.
 - *Failures.* Nothing is assumed and nothing is proved about the occasions on which the symbolic pass fails for reasons of machine arithmetic or for lack of an unknown to eliminate.
   It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the direct method, or returns the verdict unsure, when the check fails.
@@ -1995,7 +1995,7 @@ This appendix collects properties of the sets of proportions, with their proofs,
 The proofs are complete, except that the following classical results are used without proof, each being named where it is used.
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
 Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
-A few remarks rest on computations made with the search of @sec:solving; they are marked as such, and no proof depends on them.
+A few remarks rest on computations made with the search described in @sec:solving; they are marked as such, and no proof depends on them.
 Nothing in this appendix has been formalised.
 @tab:structure collects the counts to which the appendix refers.
 
@@ -2063,9 +2063,9 @@ Networks are therefore defined with complex resistances.
   A family of _resistances_ is a function $r : E -> CC without {0}$, and the numbers $y_e := 1 slash r_e$ are the _conductances_.
   For a complex number $I$, a _flow of value $I$_ is a pair of functions $phi : V -> CC$, the _potential_, and $i : E -> CC$, the _current_, such that
   $ phi(e^-) - phi(e^+) = r_e i_e quad "for every edge" e, $
-  which is the _law of Ohm_, and
+  which is _Ohm's law_, and
   $ sum_(e : e^- = v) i_e - sum_(e : e^+ = v) i_e = I (delta_(v s) - delta_(v t)) quad "for every vertex" v, $
-  which is the _law of Kirchhoff_.
+  which is _Kirchhoff's law_.
   The _incidence matrix_ $B$ has rows indexed by $V$ and columns indexed by $E$, with $B_(v e) = 1$ if $v = e^-$, $B_(v e) = -1$ if $v = e^+$, and $B_(v e) = 0$ otherwise.
   With $Y$ the diagonal matrix of the conductances, the _Laplacian_ is $L := B Y B^top$.
   We write $L_t$ for $L$ with the row and the column of $t$ removed, and $L_(s t)$ for $L$ with the rows and the columns of $s$ and $t$ removed; the determinant of an empty matrix is $1$.
@@ -2115,12 +2115,12 @@ In such a network the matrix $L_t$ is real and invertible, so that a flow of rea
 #proof[
   For an edge $e$ with an end at a vertex $v$, write $v_e$ for its other end.
   Let $A$ be the set of vertices at which $phi$ is largest, and suppose that $s in.not A$.
-  At a vertex $v in A$ the law of Kirchhoff reads
+  At a vertex $v in A$ Kirchhoff's law reads
   $ sum_(e in.rev v) y_e (phi(v) - phi(v_e)) = -I delta_(v t) <= 0, $
   and every term is non-negative, so that every neighbour of $v$ lies in $A$.
   By connectedness $A = V$, which contradicts the fact that $phi$ is not constant, as $I > 0$.
   So $s in A$, and likewise $phi$ is smallest at $t$.
-  The law of Kirchhoff at $s$ then gives
+  Kirchhoff's law at $s$ then gives
   $ I = sum_(e in.rev s) y_e (phi(s) - phi(v_e)) <= (phi(s) - phi(t)) sum_(e in.rev s) y_e. $
 ]
 
@@ -2168,14 +2168,14 @@ The tiles of the tiling may have any shapes.
 ] <prop:tiling-network>
 
 #proof[
-  The law of Ohm holds by the choice of the resistances.
+  Ohm's law holds by the choice of the resistances.
   Let $C = [p, q] times {c}$ be a component with $c < H$, and let $(u, c)$ be a point of $C$ whose abscissa is not that of a corner of a tile.
   For small $eta > 0$ the point $(u, c + eta)$ is interior to a tile $T$, the same for all small $eta$.
   If $c$ were interior to the vertical extent of $T$, the point $(u, c)$ would be interior to $T$; but it lies on a side of some tile $T'$, so the interiors of $T$ and $T'$ would meet, and $T' = T$ is impossible.
   So the bottom side of $T$ is at height $c$; it meets $C$ and is connected, so it lies in $C$.
   The tiles whose bottom side lies in $C$ thus cover $C$ up to finitely many points, and their bottom sides do not overlap, so their widths add up to $q - p$.
   In the same way, if $c > 0$, the widths of the tiles whose top side lies in $C$ add up to $q - p$.
-  This is the law of Kirchhoff at a component other than the poles, and for $s$ and $t$ it gives the value $W$.
+  This is Kirchhoff's law at a component other than the poles, and for $s$ and $t$ it gives the value $W$.
 
   Every component at positive height carries the top side of some tile, whose bottom side lies on a lower component; descending, one reaches $t$, so the graph is connected.
   A tile joins components at different heights, so there are no loops, and $s != t$ because $H > 0$.
@@ -2273,7 +2273,7 @@ They are proved here from @prop:flow, since the proof is short.
   For $omega = 0$ this residue is $c_0$, which is taken to be zero if $0$ is not a pole.
   By the first statement the residue at $-upright(i) omega$ is the same as that at $upright(i) omega$, and
   $ kappa / (x - upright(i) omega) + kappa / (x + upright(i) omega) = (2 kappa x) / (x^2 + omega^2). $
-  The difference between $F$ and the right-hand side of the formula of the statement is a rational function without poles that is bounded at infinity, hence a constant, and it is odd, hence zero.
+  The difference between $F$ and the right-hand side of the formula in the statement is a rational function without poles that is bounded at infinity, hence a constant, and it is odd, hence zero.
   Finally
   $
     F(x) / x = c_infinity + c_0 / x^2 + sum_j (2 kappa_j) / (x^2 + omega_j^2), quad x F(x) = c_infinity x^2 + c_0 + sum_j (2 kappa_j x^2) / (x^2 + omega_j^2).
@@ -2329,11 +2329,11 @@ The derivative of an impedance function has a geometric meaning.
 ] <prop:slope>
 
 #proof[
-  Let $(phi, i)$ be the flow of value $1$ for real positive resistances $r$, and let $j$ be a real function on the edges that satisfies the law of Kirchhoff with value $c$.
-  Summing the law of Kirchhoff for $j$ against $phi$ gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
+  Let $(phi, i)$ be the flow of value $1$ for real positive resistances $r$, and let $j$ be a real function on the edges that satisfies Kirchhoff's law with value $c$.
+  Summing Kirchhoff's law for $j$ against $phi$ gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
   With $j = i$ this is $Z = sum_e r_e i_e^2$.
   The currents are rational functions of the resistances, by Cramer's rule and @prop:flow; let a dot denote the derivative along a differentiable family of resistances.
-  Then $dot(i)$ satisfies the law of Kirchhoff with value $0$, so that $sum_e r_e i_e dot(i)_e = 0$, and $dot(Z) = sum_e dot(r)_e i_e^2 + 2 sum_e r_e i_e dot(i)_e = sum_e dot(r)_e i_e^2$.
+  Then $dot(i)$ satisfies Kirchhoff's law with value $0$, so that $sum_e r_e i_e dot(i)_e = 0$, and $dot(Z) = sum_e dot(r)_e i_e^2 + 2 sum_e r_e i_e dot(i)_e = sum_e dot(r)_e i_e^2$.
   For $r_e = x^(epsilon_e)$ the derivative with respect to $x$ is $dot(r)_e = epsilon_e r_e slash x$.
   In the tiling the tile of $e$ has width $i_e W$ and height $r_e i_e W$, where $W$ is the width of the main rectangle, by @prop:tiling-network, so that its area is $r_e i_e^2 W^2$ and the area of the main rectangle is $F(x) W^2$.
 ]
@@ -2383,7 +2383,7 @@ It uses Euler's formula, by which a connected plane graph with $v$ vertices and 
 ] <prop:face-potential>
 
 #proof[
-  Put $j_e := i_e$ for the edges of $G$ and $j_(e_0) := I$; by the law of Kirchhoff $j$ is a circulation on $G^+$, that is, at every vertex the values of $j$ on the edges that leave it and on those that enter it have equal sums.
+  Put $j_e := i_e$ for the edges of $G$ and $j_(e_0) := I$; by Kirchhoff's law $j$ is a circulation on $G^+$, that is, at every vertex the values of $j$ on the edges that leave it and on those that enter it have equal sums.
   The map $partial$ that sends a function $psi$ on the faces to the function $e |-> psi(lft(e)) - psi(rgt(e))$ on the edges takes its values in the circulations, because around a vertex the contributions telescope.
   Its kernel consists of the constants, because the dual graph is connected.
   The space of circulations of the connected plane graph $G^+$, which has $n + 1$ edges if $G$ has $n$, has dimension $(n + 1) - abs(V) + 1$, which by Euler's formula is one less than the number of faces; so $partial$ maps onto it.
@@ -2403,9 +2403,9 @@ This follows from the unoriented statement, since the dual cycle separates the t
 ] <prop:bsst>
 
 #proof[
-  By the law of Ohm, $phi$ decreases strictly along every directed edge, so the directions are acyclic.
+  By Ohm's law, $phi$ decreases strictly along every directed edge, so the directions are acyclic.
   By @prop:maximum, $phi$ is largest at $s$ and smallest at $t$, so no edge enters $s$ or leaves $t$.
-  A vertex $v$ other than the poles has an edge, and by the law of Kirchhoff the currents entering it and those leaving it have equal sums, so it has both an entering and a leaving edge.
+  A vertex $v$ other than the poles has an edge, and by Kirchhoff's law the currents entering it and those leaving it have equal sums, so it has both an entering and a leaving edge.
   Following entering edges backwards from any vertex therefore leads to $s$, and following leaving edges leads to $t$.
 
   Let $c$ be a real number with $phi(t) < c < phi(s)$, different from every value of $phi$, let $U_c$ be the set of vertices at which $phi > c$, and let $D_c$ be its complement.
@@ -2424,12 +2424,12 @@ This follows from the unoriented statement, since the dual cycle separates the t
   Every rectangle meets such a line, so it lies in the main rectangle.
   Two rectangles whose interiors met would have overlapping sections on such a line.
   The union of the rectangles is closed and contains every point of the main rectangle at such a height, hence all of it.
-  The width of $rct(e)$ is $i_e$ by the choice of $psi$, and its height is $r_e i_e$ by the law of Ohm.
+  The width of $rct(e)$ is $i_e$ by the choice of $psi$, and its height is $r_e i_e$ by Ohm's law.
 ]
 
 The additive constants of $phi$ and $psi$ may be chosen so that the main rectangle is $[0, I] times [0, Z I]$, where $Z$ is the impedance.
 
-The third step is that the inverse of an impedance function of a plane network is the impedance function of the dual network, in which currents and differences of potential are exchanged.
+The third step is that the inverse of an impedance function of a plane network is the impedance function of the dual network, in which currents and potential differences are exchanged.
 For a tiling this is transposition.
 
 #proposition[
@@ -2444,9 +2444,9 @@ For a tiling this is transposition.
   It is connected, it has no loop because $G^+$ has no bridge, its poles are distinct because $e_0$ is not a bridge, and they lie on the face that corresponds to the vertex of $G^+ slash e_0$ made of $s$ and $t$.
   Let $(phi, i)$ be a flow of value $I != 0$ on $frak(N)$ for real positive resistances $r$, and let $psi$ be as in @prop:face-potential.
   On $frak(N)^*$ take the potential $psi$ and, in the edge $e^*$ directed from $lft(e)$ to $rgt(e)$, the current $r_e i_e = phi(e^-) - phi(e^+)$.
-  The law of Ohm holds with the resistance $1 slash r_e$.
-  The law of Kirchhoff at a face says that the differences of $phi$ along the edges of its boundary, other than $e_0$, add up to zero, or to $plus.minus (phi(s) - phi(t))$ for the two faces at $e_0$; this holds because the boundary is a closed walk.
-  So this is a flow of value $phi(s) - phi(t)$ on $frak(N)^*$ with difference of potential $I$ between the poles, and the impedance of $frak(N)^*$ is the inverse of that of $frak(N)$.
+  Ohm's law holds with the resistance $1 slash r_e$.
+  Kirchhoff's law at a face says that the differences of $phi$ along the edges of its boundary, other than $e_0$, add up to zero, or to $plus.minus (phi(s) - phi(t))$ for the two faces at $e_0$; this holds because the boundary is a closed walk.
+  So this is a flow of value $phi(s) - phi(t)$ on $frak(N)^*$ with potential difference $I$ between the poles, and the impedance of $frak(N)^*$ is the inverse of that of $frak(N)$.
   For the resistances $x^(epsilon_e)$ this holds for all $x > 0$, hence as an identity of rational functions.
   In the flow constructed, the current in $e^*$ is $r_e$ times the current in $e$; every flow of non-zero value on either network is a non-zero multiple of the one considered, up to an additive constant of the potential, by @prop:flow, which gives the second statement.
 ]
@@ -2472,7 +2472,7 @@ The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ til
 
 #proof[
   For the first statement, there are finitely many networks with $n$ edges up to isomorphism, and the function depends only on the isomorphism class of the network with its orientation vector.
-  A bridge of $G^+$ carries no current: its removal leaves both poles in one component, as they are joined by $e_0$, and the sum of the law of Kirchhoff over the vertices of the other component is, up to sign, the current in the bridge.
+  A bridge of $G^+$ carries no current: its removal leaves both poles in one component, as they are joined by $e_0$, and the sum of Kirchhoff's law over the vertices of the other component is, up to sign, the current in the bridge.
   The edge $e_0$ is not a bridge, since $G$ is connected.
   So $G^+$ has no bridge when the pair is proper, and @prop:dual applies; its second statement, applied at every $x > 0$, shows that the dual pair $(frak(N)^*, -epsilon)$ is proper, and its first statement that the impedance function of the dual pair is $1 slash F$.
   Finally $F = 1 slash F$ would give $F^2 = 1$, which is impossible for an odd function.
@@ -2627,7 +2627,7 @@ The number of functions at least triples with each tile.
   Let $frak(N)'$ be obtained from $frak(N)$ by adding a vertex $s'$ and an edge $e'$ from $s'$ to $s$, with poles $s'$ and $t$, and let $epsilon'$ extend $epsilon$ by $epsilon'_(e') := delta$.
   Drawing $s'$ and $e'$ in the outer face gives an embedding in which $s'$ and $t$ lie on the outer face, so that $frak(N)'$ is a plane network.
   Let $x > 0$, and let $(phi, i)$ be the flow of value $1$ of $frak(N)$ for the resistances $x^(epsilon_e)$.
-  Extending it by $phi(s') := phi(s) + x^delta$ and $i_(e') := 1$ gives a flow of value $1$ of $frak(N)'$: the law of Ohm holds on $e'$, and the law of Kirchhoff holds at $s$, where the current $1$ that enters by $e'$ replaces the value of the flow.
+  Extending it by $phi(s') := phi(s) + x^delta$ and $i_(e') := 1$ gives a flow of value $1$ of $frak(N)'$: Ohm's law holds on $e'$, and Kirchhoff's law holds at $s$, where the current $1$ that enters by $e'$ replaces the value of the flow.
   By @prop:flow it is the flow of value $1$ of $frak(N)'$, so that the impedance of $frak(N)'$ is $F(x) + x^delta$, and its currents are those of $frak(N)$ and the constant $1$.
   Hence $(frak(N)', epsilon')$ is proper, and its impedance function agrees with $F + x^delta$ at every $x > 0$, hence identically.
   So the sets $S_+ := {F + x : F in cal(F)_n}$ and $S_- := {F + 1 slash x : F in cal(F)_n}$ are contained in $cal(F)_(n + 1)$, and each has $2 E(n)$ elements.
@@ -3024,7 +3024,7 @@ By the third statement of @prop:segments, a flow is regular whenever no four til
   Choosing one regular full-side root for each class thus gives $g(n)$ distinct tilings.
 ]
 
-The first statement gives a way of counting the tilings that is independent of the search of @sec:solving: a plane network in which no current vanishes identically has a non-separable graph $G^+$, since a part of the network that is attached to the rest at a single vertex $u$ and contains no pole carries no current: making the potential equal to $phi(u)$ on that part gives a flow of the same value, which is the flow by the uniqueness in @prop:flow; and when a vertex $u$ of $G^+$ is removed some component contains no pole, the poles being joined by $e_0$ unless $u$ is one of them.
+The first statement gives a way of counting the tilings that is independent of the search described in @sec:solving: a plane network in which no current vanishes identically has a non-separable graph $G^+$, since a part of the network that is attached to the rest at a single vertex $u$ and contains no pole carries no current: making the potential equal to $phi(u)$ on that part gives a flow of the same value, which is the flow by the uniqueness in @prop:flow; and when a vertex $u$ of $G^+$ is removed some component contains no pole, the poles being joined by $e_0$ unless $u$ is one of them.
 So it suffices to go through the non-separable planar maps with $n + 1$ edges, rooted at $e_0$ directed from $t$ to $s$ with a fixed side, and for each of them and each orientation vector to find the regular points $x > 1$ with value $1$ among the roots of a polynomial; the tilings by squares are counted in the same way, as the plane networks with unit resistances, impedance $1$ and a regular flow.
 We carried this out in floating-point arithmetic for $n <= 9$, and it reproduces the values of $t(n)$ in @tab:tbc.
 The same computation gives $g(n)$.
@@ -3062,8 +3062,8 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 #proof[
   The vertex $v_1$ lies on $a$ and $b$ only, so it is not a pole, the poles being ends of $e_0$; likewise $v_2$.
   Let $x > 0$ be such that no current of the flow of value $1$ vanishes, and let $r := x^(epsilon_a)$ be the common resistance of the four edges.
-  By the law of Kirchhoff at $v_1$ the same current $j_1$ flows through $a$ and $b$ from $u$ to $w$, and likewise a current $j_2$ through $c$ and $d$.
-  By the law of Ohm, $phi(u) - phi(w) = 2 r j_1 = 2 r j_2$, so that $j_1 = j_2 =: j$ and $phi(v_1) = phi(u) - r j = phi(v_2)$.
+  By Kirchhoff's law at $v_1$ the same current $j_1$ flows through $a$ and $b$ from $u$ to $w$, and likewise a current $j_2$ through $c$ and $d$.
+  By Ohm's law, $phi(u) - phi(w) = 2 r j_1 = 2 r j_2$, so that $j_1 = j_2 =: j$ and $phi(v_1) = phi(u) - r j = phi(v_2)$.
   We may name the vertices so that $j > 0$; then $a$ and $c$ are directed from $u$, with heads $v_1$ and $v_2$.
   The face lies on one side of its boundary, along which $a$ and $c$ are traversed in opposite senses, so that it is $lft(a) = rgt(c)$ or $rgt(a) = lft(c)$.
   In either case its value under $psi$ is the abscissa of the right side of one of $rct(a)$, $rct(c)$ and of the left side of the other, and the bottom sides of the two rectangles are at the same height; so they have a common end, which lies in $S_(v_1)$ and in $S_(v_2)$, and the flow is not regular.
