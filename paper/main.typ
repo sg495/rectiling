@@ -1019,12 +1019,17 @@ Some features of the table can be proved.
 ] <prop:symmetric>
 
 #proof[
-  We prove the second statement first.
-  The reflection fixes two corners of the square, hence the tile that contains one of them, and a rectangle fixed by the reflection in a diagonal through one of its corners is a square.
-  For the first statement, transposition is an involution on the finite set of similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point among them, by the second statement.
-  For the third, the centre of the square cannot lie in the interior of a tile, since the tile would be mapped to itself by the quarter turn, which a rectangle of proportion $x > 1$ is not; nor can it lie in the relative interior of a side of a tile, since the quarter turn would map that side to a perpendicular segment through the centre, which meets the interior of a tile and is not contained in the sides of the tiles.
-  So the centre is a corner of every tile that contains it; there are four such tiles, and the centre is a crossing.
-  No tile is then fixed by the half turn, so the quarter turn permutes the tiles in orbits of four.
+  For the second statement, the reflection fixes the two ends of its diagonal.
+  It maps the tile that has its corner at one of them to a tile with the same corner; the two overlap, so they are equal, and a rectangle equal to its reflection in a diagonal through one of its corners is a square.
+  The proportion is therefore $1$, and every tile is a square.
+
+  For the first, transposition is an involution on the set of similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point, by the second statement.
+  This set is finite, so its number of elements is even.
+
+  For the third, a rectangle that contains the centre of the square, other than as one of its corners, overlaps its image under the quarter turn.
+  A tile that contained the centre in this way would therefore be equal to its image, and so be a square.
+  Hence the centre is a corner of every tile that contains it, and the four images of such a tile under the powers of the quarter turn are four tiles that meet there.
+  No tile is fixed by the half turn, since it would have the centre of the square as its own centre; so the quarter turn permutes the tiles in orbits of four.
 ]
 
 Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.
@@ -1038,7 +1043,8 @@ Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388
   Let $cal(T)$ be a similar tiling of the square with $n - 3$ tiles in which two tiles have different short sides $s != s'$.
   Cutting the first of these tiles into four, as in the proof of @prop:subdivision, gives a tiling with $n$ tiles whose bag is obtained from that of $cal(T)$ by replacing one copy of $s$ by four copies of $s slash 2$; cutting the second gives the bag in which one copy of $s'$ is replaced by four copies of $s' slash 2$.
   The two bags have the same proportion, and they differ: the sums of the short sides differ by $s - s'$.
-  Tilings with tiles of two sizes exist for every number of tiles from three onwards: for $m >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles.
+  Such a tiling $cal(T)$ exists: for $m := n - 4 >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles, of two different sizes.
+  Every proportion is that of some bag, and the sets are finite; so $c(n) > a(n)$.
 ]
 
 For $n <= 5$ every proportion has a single bag.
@@ -1895,6 +1901,15 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
         ..lean-row([@def:mosaic], [not formalised]),
         ..lean-row(
+          [@def:tbc],
+          [`Counts`: `IsSetTiling`, `IsSimilarSetTiling`, `isSimilarSetTiling_iff`, `SimilarTilings`, `Rect.sym`, `orbit`, `Classes`, `Bags`, `Proportions`, `mem_proportions_iff`, `image_fst_bags`],
+        ),
+        ..lean-row(
+          [@prop:symmetric],
+          [`Counts`: `ncard_similarTilings_mod_two`, `IsSimilarSetTiling.squares_of_reflection`, `IsSimilarSetTiling.quarter_turn`, `Rect.not_disjoint_rot`],
+        ),
+        ..lean-row([@prop:bags], [`Counts`: `exists_two_sizes`, `exists_bags_ne`, `exists_two_bags`, `ncard_proportions_lt_ncard_bags`]),
+        ..lean-row(
           [@def:forms],
           [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`],
         ),
@@ -2005,6 +2020,10 @@ The statements of the paper and those of the development differ in the following
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
 - *Proportions that are not positive.* The development states @prop:forms for every $x != 0$, and @prop:hom with no condition on the sign of $alpha$; its real arithmetic of lengths is defined for every real proportion.
+- *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, and takes their numbers of elements; it does not prove that these sets are finite.
+  The first statement of @prop:symmetric and @prop:bags are stated in it under the hypothesis that the set concerned is finite, and without that hypothesis as the statements that transposition is an involution without fixed points on the tilings of proportion larger than $1$, and that two bags with $n$ tiles have the same proportion.
+  The second and third statements of @prop:symmetric are stated for both diagonals and both senses of the quarter turn, where a crossing is a point that is a corner of four tiles, one of each of the four kinds.
+  The development does not prove that the square has exactly eight symmetries, nor the inequalities $a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n)$.
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
   The representation of a proportion by its minimal polynomial and an isolating interval belongs to the routines of @def:primitives, which are assumed.
 - *Indices.* The development numbers the inside placements, the free sides and the placements from zero, where the paper numbers them from one.
