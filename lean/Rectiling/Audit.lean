@@ -9,6 +9,7 @@ import Rectiling.Multiplicity
 import Rectiling.ProportionBound
 import Rectiling.TilingCount
 import Rectiling.CombinatorialMap
+import Rectiling.UpperBound
 
 /-!
 # Axioms of the main theorems
@@ -120,3 +121,18 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.tutteM_le
 #print axioms Rectiling.limsup_le_of_le_tutteM
 #print axioms Rectiling.TutteEnumeration.card_eq_tutteM
+#print axioms Rectiling.Network.pairPoly_reverse
+#print axioms Rectiling.Network.UIso.pairPoly_eq
+#print axioms Rectiling.RootedMap.Isomorphic.poly_eq
+#print axioms Rectiling.RootedMap.Isomorphic.rootSet_eq
+#print axioms Rectiling.tilingMap_isTilingMap
+#print axioms Rectiling.IsTilingMap.tilingNet_isFlow
+#print axioms Rectiling.IsSimilarTiling.aeval_tilingNet
+#print axioms Rectiling.IsTilingMap.connected
+#print axioms Rectiling.IsTilingMap.loopless
+#print axioms Rectiling.IsTilingMap.noCutVertex
+#print axioms Rectiling.IsTilingMap.tilingNet_proper
+#print axioms Rectiling.IsTilingMap.planar
+#print axioms Rectiling.Achievable.exists_rootedMapClass
+#print axioms Rectiling.ncard_achievable_le_tutte
+#print axioms Rectiling.limsup_achievable_le
