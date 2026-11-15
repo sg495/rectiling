@@ -26,5 +26,13 @@ import Rectiling.Enumeration
 import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
+import Rectiling.Network
+import Rectiling.NetworkPolynomial
+import Rectiling.CrossSection
+import Rectiling.TilingNetwork
+import Rectiling.ProportionBound
+import Rectiling.TilingCount
+import Rectiling.Growth
+import Rectiling.CombinatorialMap
 import Rectiling.Audit
 import Rectiling.Check

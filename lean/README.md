@@ -61,6 +61,17 @@ Structure of the sequence:
 - `Rectiling/Persistence.lean` — the predicates `TilesWith` and `Achievable`, the cuts of a rectangle into four, six and eight rectangles similar to it, the pinwheel, and the theorem `persistence`.
 - `Rectiling/Counts.lean` — tilings as finite sets of rectangles (`IsSetTiling`, `isTiling_iff_isSetTiling`), the symmetries of the unit square (`Rect.rot`, `Rect.sym`), the sets counted by the numbers of tilings, classes, bags and proportions (`SimilarTilings`, `Classes`, `Bags`, `Proportions`), the parity of the number of tilings (`ncard_similarTilings_mod_two`), the tilings fixed by a reflection in a diagonal or by a quarter turn (`IsSimilarSetTiling.squares_of_reflection`, `IsSimilarSetTiling.quarter_turn`), and two bags with the same proportion for six or more tiles (`exists_two_bags`, `ncard_proportions_lt_ncard_bags`); the statements on cardinalities take the finiteness of the sets as a hypothesis.
 
+Networks and the number of proportions:
+
+- `Rectiling/Network.lean` — networks with two poles `Network`, flows `Network.IsFlow` for real resistances, the square system of the laws of Ohm and Kirchhoff `Network.system`, existence and uniqueness of flows for positive resistances, and the impedance.
+- `Rectiling/NetworkPolynomial.lean` — the polynomial `Network.pairPoly` of a network with an orientation vector: not zero, of degree at most the number of edges, and zero where the impedance is one.
+- `Rectiling/CrossSection.lean` — the widths of the tiles that meet a horizontal line add up to the width of the main rectangle (`IsTiling.sum_generic`, `IsTiling.sum_bottom_eq_sum_top`).
+- `Rectiling/TilingNetwork.lean` — the network of the heights of a tiling `heightNetwork`, the flow that the tiling gives on it, and the proportion as a root of its polynomial.
+- `Rectiling/ProportionBound.lean` — isomorphisms of networks, the classes `PairClass` of networks with an orientation vector, and the theorems `finite_achievable` and `ncard_achievable_le`.
+- `Rectiling/TilingCount.lean` — the theorems `finite_similarTilings` and `finite_similarTilingSets`.
+- `Rectiling/Growth.lean` — the number `tutteM` and the theorem `limsup_le_of_le_tutteM`.
+- `Rectiling/CombinatorialMap.lean` — combinatorial maps `CMap`, rooted non-separable planar maps `RootedMap` up to isomorphism, and the statement `TutteEnumeration` of the theorem of Tutte, which is not proved; `tools/tutte_check.py` counts the maps of these definitions with at most five edges.
+
 ## Main theorems
 
 Staircase and reference method:
@@ -101,6 +112,16 @@ Default method:
 - `achievable_one`. The unit square can be cut into n squares for every n ≥ 6.
 - `tilesWith_main_inv`. The main rectangles of aspect ratios w and 1/w can be cut into n rectangles of the same proportions.
 - `persistence`. If the unit square can be cut into n ≥ 2 rectangles of proportion x, it can be cut into n + k, for every k ≥ 3; `persistence_of_one_lt` drops the hypothesis on n when x > 1.
+
+Networks and the number of proportions:
+
+- `Network.Proper.exists_isFlow`, `Network.IsFlow.unique`. A connected network with positive resistances has a flow of every value, and two flows of the same value have the same currents and potentials that differ by a constant.
+- `IsTiling.impedance_heightNetwork`. For a tiling of the W × H rectangle, H / W is the impedance of the network of its heights, each tile having as resistance its height over its width.
+- `IsSimilarTiling.aeval_pairPoly`. The proportion of a similar tiling of the unit square is a root of the polynomial of the network of its heights with its orientation vector, which is not zero and has degree at most the number of tiles (`Network.Proper.pairPoly_ne_zero`, `Network.natDegree_pairPoly_le`).
+- `finite_achievable`, `ncard_achievable_le`. The set of proportions with which the unit square can be cut into n similar rectangles is finite, and has at most n times as many elements as there are classes of networks with n edges and an orientation vector.
+- `finite_similarTilings`. The unit square has finitely many similar tilings with n tiles.
+- `limsup_le_of_le_tutteM`. A sequence a with a(n) ≤ n 2^(n−1) M(n) for n ≥ 1, where M(n) = 2 (3n)! / ((2n+1)! (n+1)!), has limsup a(n)^(1/n) ≤ 27/2.
+- Not yet proved: that a(n) ≤ n 2^(n−1) M(n) under the hypothesis `TutteEnumeration`; this needs the planar map of a tiling.
 
 ## How the proofs go
 

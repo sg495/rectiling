@@ -6,6 +6,9 @@ import Rectiling.Target
 import Rectiling.Persistence
 import Rectiling.Counts
 import Rectiling.Multiplicity
+import Rectiling.ProportionBound
+import Rectiling.TilingCount
+import Rectiling.CombinatorialMap
 
 /-!
 # Axioms of the main theorems
@@ -94,3 +97,26 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.multiplicity
 #print axioms Rectiling.bijOn_upperFirstSet
 #print axioms Rectiling.ncard_records
+
+#print axioms Rectiling.Network.Proper.exists_isFlow
+#print axioms Rectiling.Network.IsFlow.unique
+#print axioms Rectiling.Network.IsFlow.impedance_eq
+#print axioms Rectiling.Network.Proper.impedance_pos
+#print axioms Rectiling.Network.Proper.pairPoly_ne_zero
+#print axioms Rectiling.Network.natDegree_pairPoly_le
+#print axioms Rectiling.Network.IsFlow.aeval_pairPoly
+#print axioms Rectiling.IsTiling.sum_bottom_eq_sum_top
+#print axioms Rectiling.IsTiling.heightNetwork_isFlow
+#print axioms Rectiling.IsTiling.heightNetwork_proper
+#print axioms Rectiling.IsTiling.impedance_heightNetwork
+#print axioms Rectiling.IsSimilarTiling.aeval_pairPoly
+#print axioms Rectiling.Network.Iso.pairPoly_eq
+#print axioms Rectiling.Achievable.exists_class
+#print axioms Rectiling.finite_achievable
+#print axioms Rectiling.ncard_achievable_le
+#print axioms Rectiling.IsSimilarTiling.eq_of_heightPair_eq
+#print axioms Rectiling.finite_similarTilings
+#print axioms Rectiling.finite_similarTilingSets
+#print axioms Rectiling.tutteM_le
+#print axioms Rectiling.limsup_le_of_le_tutteM
+#print axioms Rectiling.TutteEnumeration.card_eq_tutteM
