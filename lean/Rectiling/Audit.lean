@@ -5,6 +5,7 @@ import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
 import Rectiling.ProportionBound
+import Rectiling.TilingCount
 
 /-!
 # Axioms of the main theorems
@@ -82,3 +83,6 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.Achievable.exists_class
 #print axioms Rectiling.finite_achievable
 #print axioms Rectiling.ncard_achievable_le
+#print axioms Rectiling.IsSimilarTiling.eq_of_heightPair_eq
+#print axioms Rectiling.finite_similarTilings
+#print axioms Rectiling.finite_similarTilingSets
