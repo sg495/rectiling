@@ -178,7 +178,7 @@ The search places tiles one at a time, starting at the bottom-left corner of the
 The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile always sits in one of its concave corners.
 
 In the search the lengths of the steps of the staircase are expressions in unknown quantities, and need not take positive values.
-The staircase is therefore defined first as a combinatorial object carrying lengths of an arbitrary kind, and its geometric reading is defined afterwards.
+The staircase is therefore defined first as a combinatorial object with lengths of an arbitrary kind, and its geometric reading is defined afterwards.
 
 #definition(name: [staircase])[
   An _arithmetic of lengths_ is a set $cal(L)$ with two binary operations, written $ell + ell'$ and $ell - ell'$, and two unary operations, written $x ell$ and $ell slash x$.
@@ -191,7 +191,7 @@ The staircase is therefore defined first as a combinatorial object carrying leng
 No law is assumed of these operations, such as associativity or the existence of a neutral element: the statements made for an arbitrary arithmetic of lengths use only that homomorphisms preserve the operations, and two of the arithmetics used below, the linear forms and the intervals, do not satisfy the laws of a module.
 Several arithmetics of lengths occur.
 The first is the set of real numbers with the usual operations, for a fixed real number $x > 0$; a staircase over it is a _real staircase_.
-The second has a single element, so that a staircase over it, a _bare staircase_, carries only the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
+The second has a single element, so that a staircase over it, a _bare staircase_, is determined by the number of its tiers and their flags; every arithmetic of lengths has exactly one map to it, which is a homomorphism.
 The others consist of linear forms in unknown lengths, introduced in @sec:forms and @sec:eager, and of intervals, used in @sec:numeric.
 
 A real staircase is read geometrically inside a main rectangle $[0, W] times [0, H]$: the floors are laid end to end leftwards from the right side, and the walls downwards from the top side.
@@ -318,7 +318,7 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
 The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened.
-The second concerns a horizontal segment that carries the tops of some tiles and the bottoms of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
+The second concerns a horizontal segment that contains the top sides of some tiles and the bottom sides of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
 
 A record is thus subject to two conditions, which serve different purposes.
 To obey the rules is the condition used in the proofs: soundness and completeness are established in @sec:systems for the records that obey the rules.
@@ -542,7 +542,7 @@ The following notion gives one that does.
   The floor of a tier of $S$, with anchor $(a, b)$ and floor $L$, _extends_ in the tiling if some tile $(a', b', w', h')$ satisfies $b' + h' = b$ and $a' <= a + L < a' + w'$.
 ] <def:extends>
 
-The floor extends when the segment that carries it continues to the right beyond its end $(a + L, b)$, as the top side of a tile lying below it.
+The floor extends when the segment on which it lies continues to the right beyond its end $(a + L, b)$, as the top side of a tile lying below it.
 A tile of full height placed at the next tier will then lengthen the floor.
 The construction relies on finding the tiles that lie next to a given point.
 
@@ -703,7 +703,7 @@ The search exists in two forms, which are defined and proved correct in @app:sol
 The _direct search_ treats each record on its own, by a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots (@def:reference).
 The _incremental search_, which is the one used for the results of @sec:results, explores the records depth first, as paths in the tree of admissible sequences of placements, and uses each equation as soon as its full placement is made to eliminate one unknown from every floor and wall of the current staircase (@def:explore).
 The work done for a sequence of placements is thus shared by all the records that begin with it, and most of the nodes of the tree are close to its leaves, where staircases have one or two tiers.
-The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot settle in this way to the direct method, which for ten tiles happens to one record in ten thousand.
+The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot decide in this way to the direct method, which for ten tiles happens to one record in ten thousand.
 Its cost is about $0.6$ microseconds of processor time per record.
 
 #proposition[
@@ -727,7 +727,7 @@ Three features of the problem make the incremental search efficient.
 First, records share their beginnings, and the elimination made for a beginning serves every record that continues it.
 Secondly, different records often lead to the same polynomial: for a square and thirteen tiles, $2.8 times 10^11$ records lead to $2.6 times 10^8$ polynomials with a root in $[1, infinity)$, each of which is factorised once.
 Thirdly, when the sign of a positivity constraint at a root cannot be decided numerically, it is almost always because the constraint is exactly zero there: the solution is then a tiling with fewer tiles, one tile of the record having degenerated, as in @fig:pinwheel.
-About one root in a hundred is of this kind, and an exact test of divisibility by the minimal polynomial of the root settles these cases without recourse to the direct method (@def:check).
+About one root in a hundred is of this kind, and an exact test of divisibility by the minimal polynomial of the root decides these cases without recourse to the direct method (@def:check).
 
 #figure(
   image("figures/pinwheel.svg", width: 100%),
@@ -962,7 +962,7 @@ This, and the count of bags, assume that the polynomial stored for a proportion 
   Its left side is therefore at the abscissa of $Q$; let $U$ be this tile, whose top left corner is $Q$.
   If the tile placed at $T_i$ is narrower than the floor, the remainder of the floor is started, and it remains so until a tile $V$ is placed whose bottom side ends at $Q$; if it is as wide as the floor, it is itself such a tile $V$.
   As long as the floor is started, $U$ cannot be placed, since it would lengthen the floor.
-  Hence $V$ is placed before $U$, and $Q$ is a crossing with $V$ to its upper left and $U$ to its lower right, against the hypothesis.
+  Hence $V$ is placed before $U$, and $Q$ is a crossing with $V$ to its upper left and $U$ to its lower right, contrary to the hypothesis.
   So the floor of $T_i$ does not extend, and $T_i$ is the first tier with that property.
   The record is thus determined by $cal(T)$ and the orientations.
 ]
@@ -985,7 +985,7 @@ The record constructed in the proof of @prop:complete is of this kind, and the s
 
   For the existence, we repeat the construction of @prop:complete with the first tier whose floor does not $X$-extend, and with the fourth condition of @def:state replaced by the condition that the floor of every stale tier $X$-extends and the floor of no started tier does.
   The proof of @prop:extension applies with the following changes.
-  If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, against the choice of $T_i$.
+  If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, contrary to the choice of $T_i$.
   The proof that $h <= M$ uses only that the floor of $T_(i - 1)$ extends.
   The placement is allowed, since the floor of a stale tier $X$-extends, and the floor of $T_(i - 1)$ $X$-extends while that of a started tier does not.
   The orientation is the one chosen for $Q$; when $Q$ is a square, the sizes and the equations of the two orientations coincide.
@@ -1245,7 +1245,7 @@ A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $
 
 The direct search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
 The incremental search shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
-A record that it cannot settle is passed to the direct method, so that its correctness rests on that of the direct method only for such records.
+A record that it cannot decide is passed to the direct method, so that its correctness rests on that of the direct method only for such records.
 
 
 Records are explored depth first, as paths in the tree of admissible sequences, and the linear forms for floors and walls are maintained along the current path.
@@ -1556,7 +1556,7 @@ An accepted root is a solution, and a rejected one is not, with or without a cer
   Let $chi$ be the evaluation of Laurent polynomials at $alpha$.
   In both cases the verdict is not unsure, so the back-substitution on intervals has succeeded.
   For each $i$, the interval $(E_i)_(m_i) (I)$ encloses $chi((E_i)_(m_i))$ and is certainly away from zero, so that $chi((E_i)_(m_i)) != 0$, and @prop:back applies; let $v$ be the vector defined there.
-  The interval $V_j$ encloses $v_j$ at every moment of the two back-substitutions, carried out side by side: this holds at the start, and each replacement preserves it by the specifications of the arithmetic and of the enclosures; the terms omitted from the sum of intervals are those whose coefficient is zero.
+  The interval $V_j$ encloses $v_j$ at every step of the two back-substitutions, carried out in parallel: this holds at the start, and each replacement preserves it by the specifications of the arithmetic and of the enclosures; the terms omitted from the sum of intervals are those whose coefficient is zero.
 
   The pairs $(xi, J)$ of a real number and an interval that encloses it form an arithmetic of lengths, with the operations of the real numbers for the proportion $alpha$ on the first component and those of the intervals for the interval $I$ on the second; the specifications say that these operations lead from pairs to pairs; the quotient by $I$ is allowed because $I$ is certainly away from zero.
   The two projections are homomorphisms.
@@ -1576,7 +1576,7 @@ An accepted root is a solution, and a rejected one is not, with or without a cer
 ]
 
 The case in which the interval for some tile size contains zero arises almost always because the size is exactly zero: the solution is then a tiling with fewer tiles, as for the pinwheel arrangement of five tiles of @fig:pinwheel, whose central tile degenerates to a point.
-Such cases are about one in a hundred, and the certificate settles them without recourse to the direct method.
+Such cases are about one in a hundred, and the certificate decides them without recourse to the direct method.
 The rejection that it justifies uses only that the stored polynomial vanishes at the root and that a successful divisibility test is correct.
 When the stored polynomial is the minimal polynomial of the root, the certificate is moreover complete, by the following statement, which is not used in the correctness of the search.
 
@@ -1603,14 +1603,14 @@ The formal development does not prove that the exact eliminations applied to $si
   + Otherwise, with $E_"fin"$ the final equation, if $(E_"fin")_0 = 0$ or $(E_"fin")_j != 0$ for some $j >= 1$, the record is passed to the direct method.
   + Otherwise let $q := "key"((E_"fin")_0)$.
     If the coefficients of $q(x + 1)$ are non-negative and its constant coefficient is positive, the method reports no proportion.
-  + Otherwise it makes the numerical check of every $r in "roots"(q)$.
+  + Otherwise it performs the numerical check of every $r in "roots"(q)$.
     If some verdict is unsure, the record is passed to the direct method; otherwise the method reports the numbers $r$ whose verdict is accept.
   For a record passed to the direct method, the incremental method reports the set $"Ref"_(a, b) (rho)$.
   We write $"Fast"_(a, b) (rho)$ for the finite set of numbers reported.
 ] <def:fastsolve>
 
 For ten tiles, one record in ten thousand is passed to the direct method.
-Whenever the incremental method settles a record itself, it reports exactly the solutions of its system, unconditionally.
+Whenever the incremental method decides a record itself, it reports exactly the solutions of its system, unconditionally.
 
 #proposition[
   Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
@@ -1640,7 +1640,7 @@ Whenever the incremental method settles a record itself, it reports exactly the 
 == The search <sec:tree>
 
 It remains to relate the depth-first search, which never forms the list of records, to the treatment of the records one at a time.
-The search is split into tasks by the first few placements, and a failure of the symbolic pass hands a whole subtree to the direct method.
+The search is split into tasks by the first few placements, and a failure of the symbolic pass passes a whole subtree to the direct method.
 
 #definition(name: [enumeration])[
   Fix a truth value, _square_.
@@ -1738,7 +1738,7 @@ This is what the two counts of the direct method establish in a run of the incre
 ]
 
 The first statement is unconditional: every number that the incremental search reports is the proportion of a tiling.
-The two searches can differ only at a record that the incremental method settles itself and that is not regular for the direct method, because a singular situation is counted or the record is flagged as constant; there the incremental method reports every solution and the direct method may report nothing.
+The two searches can differ only at a record that the incremental method decides itself and that is not regular for the direct method, because a singular situation is counted or the record is flagged as constant; there the incremental method reports every solution and the direct method may report nothing.
 No such record is known.
 Completeness of the incremental search needs less than that of the direct search, namely the regularity of the records passed to the direct method only.
 
@@ -2177,7 +2177,7 @@ The tiles of the tiling may have any shapes.
   In the same way, if $c > 0$, the widths of the tiles whose top side lies in $C$ add up to $q - p$.
   This is Kirchhoff's law at a component other than the poles, and for $s$ and $t$ it gives the value $W$.
 
-  Every component at positive height carries the top side of some tile, whose bottom side lies on a lower component; descending, one reaches $t$, so the graph is connected.
+  Every component at positive height contains the top side of some tile, whose bottom side lies on a lower component; descending, one reaches $t$, so the graph is connected.
   A tile joins components at different heights, so there are no loops, and $s != t$ because $H > 0$.
   For the embedding, represent each tile by the vertical segment through its centre, between its top and bottom sides, and contract each component to a point.
   The poles are joined by a curve outside the main rectangle, so they lie on a common face, which may be taken as the outer one.
@@ -2330,7 +2330,7 @@ The derivative of an impedance function has a geometric meaning.
 
 #proof[
   Let $(phi, i)$ be the flow of value $1$ for real positive resistances $r$, and let $j$ be a real function on the edges that satisfies Kirchhoff's law with value $c$.
-  Summing Kirchhoff's law for $j$ against $phi$ gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
+  Multiplying Kirchhoff's law for $j$ at each vertex $v$ by $phi(v)$ and summing gives $sum_e (phi(e^-) - phi(e^+)) j_e = c (phi(s) - phi(t))$, that is, $sum_e r_e i_e j_e = c Z$, where $Z$ is the impedance.
   With $j = i$ this is $Z = sum_e r_e i_e^2$.
   The currents are rational functions of the resistances, by Cramer's rule and @prop:flow; let a dot denote the derivative along a differentiable family of resistances.
   Then $dot(i)$ satisfies Kirchhoff's law with value $0$, so that $sum_e r_e i_e dot(i)_e = 0$, and $dot(Z) = sum_e dot(r)_e i_e^2 + 2 sum_e r_e i_e dot(i)_e = sum_e dot(r)_e i_e^2$.
@@ -2364,8 +2364,8 @@ The graph $G^+$ of the network of a tiling is a non-separable planar map, in the
 
 #proof[
   Direct each edge from the top of its tile to the bottom.
-  The height decreases along the edges, every component other than $s$ carries the bottom side of a tile, and every component other than $t$ the top side of one, by the proof of @prop:tiling-network.
-  So from every vertex $v$ a directed path leads down to $t$, and one leads up from $v$ to $s$ against the directions; the first passes only through vertices lower than $v$ and the second only through higher ones.
+  The height decreases along the edges, every component other than $s$ contains the bottom side of a tile, and every component other than $t$ the top side of one, by the proof of @prop:tiling-network.
+  So from every vertex $v$ a directed path leads down to $t$, and one leads up from $v$ to $s$ following the edges backwards; the first passes only through vertices lower than $v$ and the second only through higher ones.
   Remove a vertex $u$.
   If $u = s$, every other vertex still reaches $t$; similarly if $u = t$.
   Otherwise each remaining vertex $v$ still has its path to $t$ or its path to $s$, since $u$ is not both lower and higher than $v$, and $s$ and $t$ are joined by $e_0$.
@@ -2945,7 +2945,7 @@ It first shows that a tiling can be recovered from its network, and conversely.
 ] <def:regular-point>
 
 The faces of a connected plane graph, with the faces to the left and to the right of each edge, are determined by the cyclic orders of the edges around its vertices.
-An isomorphism of plane networks therefore carries a flow to a flow, the function $psi$ of @prop:face-potential to that of the image, and the rectangles $rct(e)$ to the same rectangles up to a translation; so regularity, and the tiling of @prop:bsst, depend only on the isomorphism class.
+An isomorphism of plane networks therefore maps a flow to a flow, the function $psi$ of @prop:face-potential to that of the image, and the rectangles $rct(e)$ to the same rectangles up to a translation; so regularity, and the tiling of @prop:bsst, depend only on the isomorphism class.
 
 #proposition[
   Let $frak(N)$ be a plane network with real positive resistances, and let $(phi, i)$ be a flow of value $I > 0$, with real potential, in which no current vanishes, with the edges directed so that the currents are positive.
@@ -2955,13 +2955,13 @@ An isomorphism of plane networks therefore carries a flow to a flow, the functio
 ] <prop:segments>
 
 #proof[
-  By the proof of @prop:bsst, the potential decreases strictly along every edge, every vertex other than the poles has an edge that enters it and one that leaves it, from every vertex a directed path leads to $t$, and a path against the directions leads to $s$.
+  By the proof of @prop:bsst, the potential decreases strictly along every edge, every vertex other than the poles has an edge that enters it and one that leaves it, from every vertex a directed path leads to $t$, and a path that follows the edges backwards leads to $s$.
 
   For the first statement, suppose that edges $a$, $b$, $c$, $d$ occur in this cyclic order around a vertex $v$ other than the poles, with $a$ and $c$ leaving $v$ and $b$ and $d$ entering it.
   Take directed paths from $v$ to $t$ that begin with $a$ and with $c$, and let $z$ be the first vertex after $v$ on the first path that lies on the second.
   The parts of the two paths from $v$ to $z$ form a closed curve $C$ all of whose vertices other than $v$ have potential smaller than $phi(v)$.
   Since $a$ and $c$ separate $b$ from $d$ in the cyclic order around $v$, the edges $b$ and $d$ begin in different components of the complement of $C$, by the Jordan curve theorem.
-  The paths from $v$ against the directions that begin with $b$ and with $d$ lead to $s$ through vertices of potential larger than $phi(v)$, so they meet $C$ only at $v$; hence $s$, which is not on $C$, lies in both components, which is absurd.
+  The paths from $v$ that follow the edges backwards and begin with $b$ and with $d$ lead to $s$ through vertices of potential larger than $phi(v)$, so they meet $C$ only at $v$; hence $s$, which is not on $C$, lies in both components, which is absurd.
 
   For the second, let $v$ be a vertex other than the poles and let $e_1, dots, e_k$ be the edges that leave it, in counter-clockwise order, followed by the edges $e'_1, dots, e'_m$ that enter it.
   The face that follows a leaving edge $e$ counter-clockwise around its tail is $lft(e)$, and the one that precedes it is $rgt(e)$; for an entering edge the face that follows it around its head is $rgt(e)$ and the one that precedes it is $lft(e)$.
@@ -3047,7 +3047,7 @@ For $n <= 9$, on the other hand, no network has more such tilings than it has or
 == The rate of growth <sec:growth-rate>
 
 By @prop:upper the numbers $a(n)$ grow at most like $(27 slash 2)^n$, and the values computed are compatible with that rate.
-It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a certain local pattern has no regular point, hence carries no tiling by @prop:full-side, and the pairs that avoid a local pattern grow at a smaller rate than all pairs.
+It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a certain local pattern has no regular point, hence gives no tiling by @prop:full-side, and the pairs that avoid a local pattern grow at a smaller rate than all pairs.
 
 #definition(name: [square block])[
   A _square block_ of a pair $(frak(N), epsilon)$ is a face of $G^+$ whose boundary is a cycle of four edges $a$, $b$, $d$, $c$ of $G$, where $a$ joins a vertex $u$ to a vertex $v_1$, $b$ joins $v_1$ to a vertex $w$, $c$ joins $u$ to a vertex $v_2$ and $d$ joins $v_2$ to $w$, such that $v_1$ and $v_2$ have degree two in $G^+$ and the four edges have the same orientation.
@@ -3086,13 +3086,13 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
   The degree of an old vertex increases by three for every replaced edge at it, and the ends of a replaced edge have degree at least four.
   Let a face be a square block of the result, with vertices $v'_1$ and $v'_2$ of degree two.
   If $v'_1$ is new, the two faces at it are a triangle and the quadrilateral of its edge, so the face is that quadrilateral.
-  If both are old, no edge at them has been replaced; the four edges of the face are the edges at $v'_1$ and $v'_2$, so they are old, and the face is a face of the original with the same boundary, degrees and orientations, hence a square block of the original, against the hypothesis.
+  If both are old, no edge at them has been replaced; the four edges of the face are the edges at $v'_1$ and $v'_2$, so they are old, and the face is a face of the original with the same boundary, degrees and orientations, hence a square block of the original, contrary to the hypothesis.
   Conversely each of the $k$ quadrilaterals is a square block.
 
-  For the third, an isomorphism between two results carries square blocks to square blocks.
+  For the third, an isomorphism between two results maps square blocks to square blocks.
   For each square block, the two edges that join its vertices $u$ and $w$ are determined as a pair: they are the third sides of the two triangles across its paths.
   Deleting the two vertices of degree two and one of these two edges at every square block gives a pair that does not depend on the choice, up to the name of the edge kept, and that is the original pair with the kept edges forming $S$.
-  So the isomorphism induces one of the original pairs that carries $S$ to $S$; and a plane network has no isomorphism with itself other than the identity, since such an isomorphism fixes $e_0$ and its ends and then, by the cyclic orders, every edge in turn.
+  So the isomorphism induces one of the original pairs that maps $S$ to $S$; and a plane network has no isomorphism with itself other than the identity, since such an isomorphism fixes $e_0$ and its ends and then, by the cyclic orders, every edge in turn.
 ]
 
 #proposition[
@@ -3151,7 +3151,7 @@ This section records that point of view, which motivates the placement rules; no
 
 #definition(name: [mosaic class])[
   A _segment_ of a tiling is a maximal line segment contained in the union of the boundaries of the tiles and not contained in the boundary of the main rectangle, or one of the four sides of the main rectangle.
-  Two tilings with $n$ tiles are _mosaic equivalent_ if their tiles can be numbered so that, for each side of each tile, the tiles whose opposite side lies on the same segment are the same in both, and the segments carrying the four sides of the main rectangle correspond.
+  Two tilings with $n$ tiles are _mosaic equivalent_ if their tiles can be numbered so that, for each side of each tile, the tiles whose opposite side lies on the same segment are the same in both, and the segments containing the four sides of the main rectangle correspond.
 ] <def:mosaic>
 
 @fig:mosaic shows two tilings of the same mosaic class.
@@ -3167,7 +3167,7 @@ For every $n <= 13$ the number of complete admissible records for $n$ tiles, dis
 This agreement is an observation, made by computation.
 That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
 
-In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that carries its top side to the one that carries its bottom side, the width of a tile is the current through it and its height the potential difference across it.
+In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that contains its top side to the one that contains its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
 The equations of a record express Kirchhoff's laws for this network, which is determined by the mosaic class, and for positive resistances these laws determine the currents @kirchhoff1847 @bsst1940.
 One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
