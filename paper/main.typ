@@ -540,19 +540,22 @@ The following notion gives one that does.
 The floor extends when the segment on which it lies continues to the right beyond its end $(a + L, b)$, as the top side of a tile lying below it.
 A tile of full height placed at the next tier will then lengthen the floor.
 The construction relies on finding the tiles that lie next to a given point.
+For a point $(c, d)$ and a tile $(a', b', w', h')$, the conditions $a' <= c < a' + w'$ and $b' <= d < b' + h'$ hold exactly if the tile contains the points _just above and to the right_ of $(c, d)$, that is, the points $(c + s, d + t)$ for all sufficiently small $s, t > 0$.
+The conditions $a' <= c < a' + w'$ and $b' < d <= b' + h'$ hold exactly if it contains the points _just below and to the right_ of $(c, d)$, that is, the points $(c + s, d - t)$ for all sufficiently small $s, t > 0$.
 
 #proposition[
   Let $R_1, dots, R_n$ be a tiling of $[0, W] times [0, H]$, and let $0 <= c < W$.
-  If $0 <= d < H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' <= d < b' + h'$.
-  If $0 < d <= H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' < d <= b' + h'$.
+  + If $0 <= d < H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' <= d < b' + h'$.
+  + If $0 < d <= H$, some tile $(a', b', w', h')$ satisfies $a' <= c < a' + w'$ and $b' < d <= b' + h'$.
 ] <prop:near>
 
 #proof[
-  Since there are finitely many tiles, there is $epsilon$ with $0 < epsilon < W - c$ such that no tile has the abscissa of its corner in $(c, c + epsilon]$, and there is $eta$ with $0 < eta < H - d$ such that no tile has the ordinate of its corner in $(d, d + eta]$.
+  The tile is one that contains a point above $(c, d)$, or below it, and to its right, so near to $(c, d)$ that no tile has a vertical side whose abscissa, or a horizontal side whose ordinate, lies between those of the two points.
+  Since there are finitely many tiles, there are $epsilon$ with $0 < epsilon < W - c$ and $eta$ with $0 < eta < H - d$ such that no tile has a vertical side with abscissa in $(c, c + epsilon]$ or a horizontal side with ordinate in $(d, d + eta]$.
   The point $(c + epsilon, d + eta)$ lies in the main rectangle, hence in some tile $(a', b', w', h')$.
   Then $a' <= c + epsilon$, so that $a' <= c$ by the choice of $epsilon$, and $c < c + epsilon <= a' + w'$; similarly $b' <= d < b' + h'$.
-  For the second statement, choose $epsilon$ as before and $eta$ with $0 < eta < d$ such that no tile has the ordinate $b' + h'$ of its top side in $[d - eta, d)$.
-  The point $(c + epsilon, d - eta)$ lies in some tile $(a', b', w', h')$, for which $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
+  For the second statement, choose $eta$ with $0 < eta < d$ such that no tile has a horizontal side with ordinate in $[d - eta, d)$, and a tile $(a', b', w', h')$ that contains the point $(c + epsilon, d - eta)$.
+  Then $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
 ]
 
 The record is built one placement at a time, and the following conditions are maintained.
@@ -573,25 +576,27 @@ In a state, the tile at each anchor is still to be placed.
 ] <prop:anchor>
 
 #proof[
+  The tile that contains the points just above and to the right of the anchor has interior points in the strip of the tier, so it is a remaining tile whose interior lies in the region; and the region has no point just to the left of the anchor or just below it, so the corner of the tile is the anchor.
+
   Let $(a, b)$, $L$ and $M_i$ be the anchor, the floor and the wall of the tier $T_i$.
-  By @obs:strips, a point $(u, v)$ with $v < b + M_i$ and $u < a + L$, and with $u < a$ or $v < b$, does not belong to $U(S)$.
-  The points $(a, b)$ and $(a, b + M_i)$ belong to the strip of $T_i$, hence to the main rectangle, so that $0 <= a < a + L <= W$ and $0 <= b < b + M_i <= H$.
-  By @prop:near some tile $T = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
-  Let $u_0$ be the mean of $a$ and $min(a' + w', a + L)$, and $v_0$ the mean of $b$ and $min(b' + h', b + M_i)$.
-  The point $(u_0, v_0)$ lies in the interior of $T$ and in the strip of $T_i$, so $T$ is not placed, and its interior is contained in $U(S)$.
-  If $a' < a$, the point with abscissa the mean of $a'$ and $a$ and with ordinate $v_0$ lies in the interior of $T$, but not in $U(S)$, as was just noted; hence $a' = a$.
-  If $b' < b$, the point with abscissa $u_0$ and with ordinate the mean of $b'$ and $b$ lies in the interior of $T$, but not in $U(S)$; hence $b' = b$.
+  The anchor lies in the main rectangle, by the third condition of @def:state, and $a < a + L <= W$ and $b < b + M_i <= H$ by @obs:strips.
+  By the first statement of @prop:near, some tile $T = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
+  The set of points $(u, v)$ with $a < u < min(a' + w', a + L)$ and $b < v < min(b' + h', b + M_i)$ is not empty, and it lies in the interior of $T$ and in the strip of $T_i$; so $T$ is not placed, and its interior is contained in $U(S)$.
+  If $a' < a$, the points $(u, v)$ with $a' < u < a$ and $v$ as before lie in the interior of $T$, but not in $U(S)$, by the last statement of @obs:strips.
+  If $b' < b$, the same holds of the points with $u$ as before and $b' < v < b$.
+  Hence $(a', b') = (a, b)$.
 ]
 
 The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
 
 #proposition[
   Let $x >= 1$, let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and consider a state whose staircase $S$ is not empty.
-  Then some tier of $S$ has a floor that does not extend.
-  Let $T_i$ be the first such tier, with floor $L$ and wall $M$, and let $Q = (a, b, w, h)$ be the remaining tile at its anchor.
-  Then $w <= L$ and $h <= M$.
-  Let $p = (i, phi, o)$, where $phi$ is narrow exactly if $w < L$ and low exactly if $h < M$, and $o$ is wide if $w = x h$ and tall otherwise, and let the free side be $h$ if $o$ is wide and $w$ if $o$ is tall.
-  Then $p$ is allowed at $S$, its tile is $Q$, its positive quantity is positive, its equation, if it has one, is zero, and the staircase after $p$, with $Q$ counted as placed, is a state.
+  + Some tier of $S$ has a floor that does not extend.
+    Let $T_i$ be the first such tier, with floor $L$ and wall $M$, and let $Q = (a, b, w, h)$ be the remaining tile at its anchor, given by @prop:anchor.
+  + The tile $Q$ is at most as wide as the floor and at most as high as the wall: $w <= L$ and $h <= M$.
+    Let $p = (i, phi, o)$, where $phi$ is narrow exactly if $w < L$ and low exactly if $h < M$, and $o$ is wide if $w = x h$ and tall otherwise, and let the free side be $h$ if $o$ is wide and $w$ if $o$ is tall.
+  + The placement $p$ is allowed at $S$, its tile is $Q$, its positive quantity is positive, and its equation, if it has one, is zero.
+  + The staircase after $p$, with $Q$ counted as placed, is a state.
 ] <prop:extension>
 
 #figure(
@@ -600,46 +605,40 @@ The placement made in a state is that of the tile at the anchor of the first tie
 ) <fig:construction>
 
 #proof[
-  The floor of the last tier ends at abscissa $W$, and no tile $(a', b', w', h')$ has $a' <= W < a' + w'$, since the tiles lie in the main rectangle; hence the floor of the last tier does not extend, and $T_i$ exists.
-  Recall from the proof of @prop:anchor that $0 <= a < a + L <= W$ and $0 <= b < b + M <= H$.
+  By the choice of $T_i$, its floor does not extend and the floor of every tier before it does.
+  The first fact bounds the width of $Q$ and the second its height; with the fourth condition of @def:state, they make $p$ allowed and give that condition after the placement, and @prop:step gives the other three.
 
+  _The tier._
+  The floor of the last tier ends at abscissa $W$, by @obs:strips, and no tile $(a', b', w', h')$ has $W < a' + w'$; so this floor does not extend, and $T_i$ exists.
+
+  _The tile fits._
   Suppose that $w > L$.
-  Then $T_i$ is not the last tier, as otherwise $a + L = W$ while $a + w <= W$.
-  The anchor of $T_(i + 1)$ is $(a + L, b - M_(i + 1))$ and lies in the main rectangle, so that $b >= M_(i + 1) > 0$.
-  By @prop:near, applied to the point $(a + L, b)$, with $0 <= a + L < a + w <= W$ and $0 < b <= H$, some tile $T = (a', b', w', h')$ satisfies $a' <= a + L < a' + w'$ and $b' < b <= b' + h'$.
-  If $b < b' + h'$, the interiors of $T$ and $Q$ meet, since the open intervals $(a', a' + w')$ and $(a, a + w)$ both contain the points just to the right of $a + L$, and the open intervals $(b', b' + h')$ and $(b, b + h)$ both contain the points just above $b$; then $T = Q$, which contradicts $b' < b$.
-  Hence $b' + h' = b$, and the floor of $T_i$ extends, contrary to the choice of $T_i$.
-  This proves that $w <= L$.
+  The points just above and to the right of the end $(a + L, b)$ of the floor of $T_i$ are then interior points of $Q$.
+  By the second statement of @prop:near, some tile $T$ contains the points just below and to the right of this end.
+  It is not $Q$, which has no point below the level $b$, so it contains no interior point of $Q$.
+  Hence the top side of $T$ is at the level $b$, and the floor of $T_i$ extends, contrary to the choice of $T_i$.
 
   Suppose that $h > M$.
-  If $i = 0$ then $b + M = H$, while $b + h <= H$.
-  If $i > 0$, the floor of $T_(i - 1)$ extends, by the choice of $T_i$; it ends at the point $(a, b + M)$, so some tile $T = (a', b', w', h')$ satisfies $b' + h' = b + M$ and $a' <= a < a' + w'$.
-  The interiors of $T$ and $Q$ meet, since the open intervals $(a', a' + w')$ and $(a, a + w)$ both contain the points just to the right of $a$, and the open intervals $(b', b + M)$ and $(b, b + h)$ both contain the points just below $b + M$; then $T = Q$, which contradicts $b + h > b + M$.
-  This proves that $h <= M$.
+  Then $i > 0$, since the wall of $T_0$ ends on the top side of the main rectangle, which contains $Q$.
+  The floor of $T_(i - 1)$ ends at $(a, b + M)$ and extends: some tile has its top side at the level $b + M$ and contains the points just below and to the right of $(a, b + M)$.
+  These are interior points of $Q$, so that tile is $Q$, whose top side is above the level $b + M$.
 
-  The placement $p$ is allowed.
-  The tier $T_i$ is not stale, since the floor of a stale tier extends.
-  If $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started, since its floor extends and the floor of a started tier does not.
+  _The placement._
+  The tier $T_i$ is not stale, since the floor of a stale tier extends, and if $i > 0$ the tier $T_(i - 1)$ is not started, since its floor extends; so $p$ is allowed at $S$.
+  By the choice of $phi$ and $o$, $w = L$ if $phi$ is not narrow, $h = M$ if $phi$ is not low, and $w = x h$ or $h = x w$ according as $o$ is wide or tall.
+  With the free side chosen, the size given by @def:placement is therefore $(w, h)$, so the tile of $p$ is $Q$; its positive quantity is a side of $Q$; and its equation, if $phi$ is full, is $w - x h$ or $h - x w$, which is zero.
 
-  The tile $Q$ has proportion $x$, so $h = x w$ if $o$ is tall.
-  The size of the tile of $p$ is then $(w, h)$, by inspection of the seven cases of @def:placement.
-  For an inside placement it is $(x h, h)$ or $(w, x w)$.
-  For a placement of full height $h = M$, and the size is $(x M, M) = (x h, h)$ or $(M slash x, M) = (h slash x, h)$.
-  For a placement of full width $w = L$, and the size is $(L, L slash x) = (w, w slash x)$ or $(L, x L) = (w, x w)$.
-  For a full placement it is $(L, M) = (w, h)$.
-  Hence the tile of $p$ is $Q$.
-  Its positive quantity is the free side, which is a side of $Q$, or it is $L$ or $M$, and $S$ is positive.
-  If $phi$ is full, the equation is $L - x M = w - x h = 0$ if $o$ is wide, and $M - x L = h - x w = 0$ if $o$ is tall.
-
+  _The new state._
   Let $S'$ be the staircase after $p$.
-  By the choice of $phi$, @prop:step applies: $S'$ is positive, $U(S') subset.eq U(S)$, $U(S) subset.eq Q union U(S')$, and the interior of $Q$ is disjoint from $U(S')$.
-  The interiors of the tiles placed before, and that of $Q$, are therefore disjoint from $U(S')$, and $U(S')$ is contained in the main rectangle.
-  A remaining tile other than $Q$ has its interior in $U(S)$ and disjoint from that of $Q$, hence disjoint from $Q$ itself, so its interior is contained in $U(S')$.
-  It remains to examine the flags of $S'$; by the first statement of @prop:step, the tiers of $S$ other than $T_i$ keep their anchors.
-  The tiers before $T_i$ have floors that extend in $S$.
-  Those that are stale in $S'$ have the same floor as in $S$, so their floors extend; none of them is started in $S$, hence none is started in $S'$, where the started flags of these tiers are the same.
-  The tiers that replace $T_i$ are not stale, and the only one that is started is the last one in the case of a narrow fit; its anchor is $(a + w, b)$ and its floor is $L - w$, so its floor ends at $(a + L, b)$, as that of $T_i$ does, and does not extend.
-  The tiers after $T_i$ have the same anchors, floors and flags as in $S$.
+  By the choice of $phi$, @prop:step applies to $p$: $S'$ is positive, and $U(S')$ is contained in $U(S)$, is disjoint from the interior of $Q$, and contains the part of $U(S)$ outside $Q$.
+  The first three conditions of @def:state follow, since the interior of a remaining tile other than $Q$ is disjoint from $Q$.
+
+  Whether a floor extends depends only on the point at which it ends.
+  A tier of $S$ other than $T_i$ keeps its anchor, by the first statement of @prop:step, its started flag, and its floor, unless it is $T_(i - 1)$ and its floor is lengthened, in which case it is not stale in $S'$.
+  The tiers before $T_i$ have floors that extend in $S$ and are not started, and the tiers after $T_i$ also keep their stale flags; so the fourth condition holds in $S'$ for all of them.
+  Of the tiers that replace $T_i$ none is stale, and the only one that is started is the one to the right of $Q$, if $phi$ is narrow; its floor ends at $(a + L, b)$, as that of $T_i$ does, and so does not extend.
+
+  Two verifications are left to the formal proof (@app:formal): that $b > 0$ when $w > L$, which @prop:near requires and which holds because $T_i$ is then not the last tier, and the size in each of the seven cases of @def:placement.
 ]
 
 Repeating the step until no tile remains gives the record.
@@ -656,7 +655,7 @@ Repeating the step until no tile remains gives the record.
   If $r > 0$ then $S$ is not empty, since the interior of a remaining tile is contained in $U(S)$.
   Then @prop:extension gives a placement $p$, with a free side, whose tile is a remaining tile $Q$ and after which there is a state with $r - 1$ remaining tiles, namely those other than $Q$.
   By induction that state has a record $rho''$ with free sides as stated, and $rho'$ is $p$ followed by $rho''$; the free side of $p$, if $p$ is inside, precedes those of $rho''$.
-  Applied to the initial state this gives a record $rho$ of $n$ placements that obeys the rules from the initial staircase, which is complete admissible for $n$ tiles by @prop:bound.
+  Applied to the initial state this gives a record $rho$ of $n$ placements that obeys the rules from the initial staircase of $W$ and $H$, hence from the bare initial staircase, since the rules depend only on the flags; so $rho$ is complete admissible for $n$ tiles by @prop:bound.
 ]
 
 A square tile is both wide and tall, so that a tiling with square tiles arises from several records; this does not affect the count of proportions.
@@ -979,6 +978,7 @@ The record constructed in the proof of @prop:complete is of this kind, and the s
 
   For the existence, we repeat the construction of @prop:complete with the first tier whose floor does not $X$-extend, and with the fourth condition of @def:state replaced by the condition that the floor of every stale tier $X$-extends and the floor of no started tier does.
   The proof of @prop:extension applies with the following changes.
+  The two verifications that the proof of @prop:extension leaves to the formal proof do not involve the notion of extending, and are unchanged.
   If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, contrary to the choice of $T_i$.
   The proof that $h <= M$ uses only the fact that the floor of $T_(i - 1)$ extends.
   The placement is allowed, since the floor of a stale tier $X$-extends, and the floor of $T_(i - 1)$ $X$-extends while that of a started tier does not.
@@ -1835,10 +1835,10 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@prop:anchor], [`Extension`: `Around.not_mem`, `GInv.anchor_tile`]),
         ..lean-row(
           [@prop:extension],
-          [`Extension`: `GInv.step`],
+          [`Extension`: `GInv.step`, `flagsOK_gpreAfter`, `flagsOK_gmidAfter`, `flagsOK_gpostAfter`],
           [`Completeness`: `exists_first_tier`, `tileSize_of_tile`, `CInv.step`],
         ),
-        ..lean-row([@prop:complete], [`Completeness`: `complete_from`, `completeness`]),
+        ..lean-row([@prop:complete], [`Staircase`: `allowed_map`], [`Completeness`: `complete_from`, `completeness`]),
         ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
         ..lean-row([@def:mosaic], [not formalised]),
         ..lean-row(
@@ -1951,6 +1951,7 @@ The statements of the paper and those of the development differ in the following
 - *Records.* A record is a list of placements, and the free sides are given by a function on the natural numbers.
   In @prop:complete the development states the orientations as a relation between the list of placements and the list of tiles.
 - *Proofs by cases.* The three statements of @prop:step are separate statements of the development, on the anchors, on positivity and on the region; the hypotheses that the last one uses are those of @obs:strips, which the development collects in one structure.
+  The four statements of @prop:extension are divided in the development between three theorems: the existence of the tier, the fit of the tile together with the new state in terms of anchors, and the placement with its constraints.
   @prop:fit combines two statements of the development.
   The state of @def:state is formalised with the placed and remaining tiles as two lists whose concatenation is a rearrangement of the tiling.
 - *Rings.* The statements on elimination chains are formalised over an arbitrary commutative ring with a homomorphism to a field, and @prop:det over an integral domain; the paper assumes an integral domain throughout.
