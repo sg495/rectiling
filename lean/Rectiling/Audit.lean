@@ -5,6 +5,7 @@ import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
 import Rectiling.Counts
+import Rectiling.Multiplicity
 
 /-!
 # Axioms of the main theorems
@@ -83,3 +84,13 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.exists_two_bags
 #print axioms Rectiling.not_injOn_fst_bags
 #print axioms Rectiling.ncard_proportions_lt_ncard_bags
+#print axioms Rectiling.isCrossing_iff
+#print axioms Rectiling.YieldsWith.chooses
+#print axioms Rectiling.YieldsWith.tiles_eq
+#print axioms Rectiling.representative
+#print axioms Rectiling.yieldsWith_unique
+#print axioms Rectiling.yields_unique_of_no_crossing
+#print axioms Rectiling.exists_record
+#print axioms Rectiling.multiplicity
+#print axioms Rectiling.bijOn_upperFirstSet
+#print axioms Rectiling.ncard_records

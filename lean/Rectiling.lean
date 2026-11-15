@@ -10,6 +10,9 @@ import Rectiling.Region
 import Rectiling.Soundness
 import Rectiling.Extension
 import Rectiling.Completeness
+import Rectiling.Crossings
+import Rectiling.Records
+import Rectiling.Multiplicity
 import Rectiling.Forms
 import Rectiling.Solver
 import Rectiling.Main
