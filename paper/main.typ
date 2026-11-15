@@ -396,14 +396,14 @@ The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be giv
 The positivity constraints say that tiles have positive size, but not that a tile is narrower than its floor or lower than its wall, although its fit presupposes it.
 For records that obey the rules this follows from the rules themselves, so that the rules, which were introduced to avoid repetitions, are also needed for every solution to be a tiling.
 The argument has two parts.
-The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers (@def:region).
+The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers.
 The second is combinatorial (@prop:doom, @prop:fit): along a record that obeys the rules and empties the staircase, these strict inequalities always hold, because a floor or a wall that is not positive in certain positions can never be removed from the staircase.
 We begin with the first part.
 
 #proposition[
   Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with floor $L$ and wall $M$, whose tile has size $(w, h)$ with $w, h > 0$.
   Suppose that $w < L$ if $phi$ is narrow, and that $h < M$ if $phi$ is low.
-  Let $S'$ be the staircase after the placement, let $T$ be the tile of $p$, and let $U(S)$ and $U(S')$ be the regions of the two staircases (@def:region).
+  Let $S'$ be the staircase after the placement, let $T$ be the tile of $p$, and let $U(S)$ and $U(S')$ be the regions of the two staircases according to @def:region.
   Then $S'$ is positive, and
   $ T subset.eq U(S), quad U(S') subset.eq U(S), quad U(S) subset.eq T union U(S'), $
   and the interior of $T$ is disjoint from $U(S')$.
@@ -1027,7 +1027,7 @@ Some features of the table can be proved.
 #proof[
   We prove the second statement first.
   The reflection fixes two corners of the square, hence the tile that contains one of them, and a rectangle fixed by the reflection in a diagonal through one of its corners is a square.
-  For the first statement, transposition is an involution on the finite set of the similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point among them, by the second statement.
+  For the first statement, transposition is an involution on the finite set of similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point among them, by the second statement.
   For the third, the centre of the square cannot lie in the interior of a tile, since the tile would be mapped to itself by the quarter turn, which a rectangle of proportion $x > 1$ is not; nor can it lie in the relative interior of a side of a tile, since the quarter turn would map that side to a perpendicular segment through the centre, which meets the interior of a tile and is not contained in the sides of the tiles.
   So the centre is a corner of every tile that contains it; there are four such tiles, and the centre is a crossing.
   No tile is then fixed by the half turn, so the quarter turn permutes the tiles in orbits of four.
@@ -1142,7 +1142,7 @@ Its arithmetic is performed by three routines, which are not part of what is pro
   + _Elimination._ Given a square matrix $A$ over $ZZ[x]$, of size $m$, and a vector $c in ZZ[x]^m$, the routine either fails or returns a polynomial $D$ and polynomials $N_1, dots, N_m$.
     In the second case there is $lambda in ZZ[x]$ such that $D = lambda det A$ and $N_i = lambda det A_i$ for every $i$, where $A_i$ is the matrix $A$ with its $i$-th column replaced by $c$.
   + _Roots._ Given a polynomial $q in ZZ[x]$, the routine returns a finite set $"roots"(q)$ of real numbers.
-    If $q != 0$, this is the set of the real numbers $r >= 1$ with $q(r) = 0$.
+    If $q != 0$, this is the set of real numbers $r >= 1$ with $q(r) = 0$.
   + _Signs._ Given a real number $r$ and a polynomial $q in ZZ[x]$, the routine returns a sign $"sign"(r, q)$, which is $-1$, $0$ or $1$.
     If $r$ belongs to $"roots"(q')$ for some polynomial $q'$, this is the sign of the real number $q(r)$.
 ] <def:primitives>
@@ -1615,7 +1615,7 @@ Whenever the incremental method settles a record itself, it reports exactly the 
 #proposition[
   Let $a$ and $b >= 1$ be integers and let $rho$ be a complete admissible record.
   Call _solution_ of $rho$ a real number $r >= 1$ for which there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $r$.
-  + If $rho$ is not passed to the direct method, $"Fast"_(a, b) (rho)$ is the set of the solutions of $rho$.
+  + If $rho$ is not passed to the direct method, $"Fast"_(a, b) (rho)$ is the set of solutions of $rho$.
   + Every element of $"Fast"_(a, b) (rho)$ is a solution of $rho$.
   + If $rho$ is not passed to the direct method, or if it is regular for $(a, b)$, every solution of $rho$ belongs to $"Fast"_(a, b) (rho)$.
   + $"Ref"_(a, b) (rho) subset.eq "Fast"_(a, b) (rho)$, with equality if $rho$ is regular for $(a, b)$.
@@ -1639,12 +1639,12 @@ Whenever the incremental method settles a record itself, it reports exactly the 
 
 == The search <sec:tree>
 
-It remains to relate the depth-first search, which never forms the list of the records, to the treatment of the records one at a time.
+It remains to relate the depth-first search, which never forms the list of records, to the treatment of the records one at a time.
 The search is split into tasks by the first few placements, and a failure of the symbolic pass hands a whole subtree to the direct method.
 
 #definition(name: [enumeration])[
   Fix a truth value, _square_.
-  For a bare staircase $S$, an integer $r >= 0$ and a truth value _first_, let $"moves"(S, r, "first")$ be the set of the placements that are admissible at $S$ with $r$ tiles remaining, the tall ones being excluded when both _square_ and _first_ hold.
+  For a bare staircase $S$, an integer $r >= 0$ and a truth value _first_, let $"moves"(S, r, "first")$ be the set of placements that are admissible at $S$ with $r$ tiles remaining, the tall ones being excluded when both _square_ and _first_ hold.
   The set $cal(C)(r, "first", S)$ of the _completions_ of $S$ consists of the empty record alone if $S$ is empty; it is empty if $S$ is not empty and $r = 0$; and otherwise it consists of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(C)(r - 1, "false", S')$, where $S'$ is the staircase after $p$.
   For an integer $d >= 0$, the set $cal(P)_d (r, "first", S)$ of the _prefixes_ consists of the empty record alone if $d = 0$ or $S$ is empty, and otherwise of the records formed by a placement $p in "moves"(S, r, "first")$ followed by a record of $cal(P)_(d - 1) (r - 1, "false", S')$.
 ] <def:enumeration>
@@ -2089,8 +2089,8 @@ When the real parts of the resistances have one sign, its real part is definite 
   For $phi in CC^V$,
   $ overline(phi)^top L phi = sum_e y_e abs(phi(e^-) - phi(e^+))^2. $
   If $L phi = 0$, the real part of this identity shows that $phi$ takes equal values at the two ends of every edge, hence is constant, as $G$ is connected.
-  So the kernel of $L$ is the line of the constants, and $L$ has rank $abs(V) - 1$.
-  The image of $L$ lies in the hyperplane of the vectors with zero sum, because $bold(1)^top L = 0$, where $bold(1)$ is the vector with all entries $1$, and so equals it.
+  So the kernel of $L$ is the line of constant functions, and $L$ has rank $abs(V) - 1$.
+  The image of $L$ lies in the hyperplane of vectors with zero sum, because $bold(1)^top L = 0$, where $bold(1)$ is the vector with all entries $1$, and so equals it.
   This gives the first statement.
 
   If $L_t phi' = 0$, extend $phi'$ to $phi$ by $phi(t) := 0$; then $(L phi)_v = 0$ for $v != t$, so that $overline(phi)^top L phi = overline(phi(t)) (L phi)_t = 0$, whence $phi$ is constant and $phi' = 0$.
@@ -2114,7 +2114,7 @@ In such a network the matrix $L_t$ is real and invertible, so that a flow of rea
 
 #proof[
   For an edge $e$ with an end at a vertex $v$, write $v_e$ for its other end.
-  Let $A$ be the set of the vertices at which $phi$ is largest, and suppose that $s in.not A$.
+  Let $A$ be the set of vertices at which $phi$ is largest, and suppose that $s in.not A$.
   At a vertex $v in A$ the law of Kirchhoff reads
   $ sum_(e in.rev v) y_e (phi(v) - phi(v_e)) = -I delta_(v t) <= 0, $
   and every term is non-negative, so that every neighbour of $v$ lies in $A$.
@@ -2386,7 +2386,7 @@ It uses Euler's formula, by which a connected plane graph with $v$ vertices and 
   Put $j_e := i_e$ for the edges of $G$ and $j_(e_0) := I$; by the law of Kirchhoff $j$ is a circulation on $G^+$, that is, at every vertex the values of $j$ on the edges that leave it and on those that enter it have equal sums.
   The map $partial$ that sends a function $psi$ on the faces to the function $e |-> psi(lft(e)) - psi(rgt(e))$ on the edges takes its values in the circulations, because around a vertex the contributions telescope.
   Its kernel consists of the constants, because the dual graph is connected.
-  The space of the circulations of the connected plane graph $G^+$, which has $n + 1$ edges if $G$ has $n$, has dimension $(n + 1) - abs(V) + 1$, which by Euler's formula is one less than the number of faces; so $partial$ maps onto it.
+  The space of circulations of the connected plane graph $G^+$, which has $n + 1$ edges if $G$ has $n$, has dimension $(n + 1) - abs(V) + 1$, which by Euler's formula is one less than the number of faces; so $partial$ maps onto it.
 ]
 
 The second step is the construction of the tiling.
@@ -2408,9 +2408,9 @@ This follows from the unoriented statement, since the dual cycle separates the t
   A vertex $v$ other than the poles has an edge, and by the law of Kirchhoff the currents entering it and those leaving it have equal sums, so it has both an entering and a leaving edge.
   Following entering edges backwards from any vertex therefore leads to $s$, and following leaving edges leads to $t$.
 
-  Let $c$ be a real number with $phi(t) < c < phi(s)$, different from every value of $phi$, let $U_c$ be the set of the vertices at which $phi > c$, and let $D_c$ be its complement.
+  Let $c$ be a real number with $phi(t) < c < phi(s)$, different from every value of $phi$, let $U_c$ be the set of vertices at which $phi > c$, and let $D_c$ be its complement.
   A directed path from $s$ to a vertex of $U_c$ stays in $U_c$, so $U_c$ induces a connected subgraph; so does $D_c$.
-  Let $E_c$ be the set of the edges of $G$ between the two; every one of them is directed from $U_c$ to $D_c$, and $E_c$ is the set of the edges $e$ with $phi(e^+) < c < phi(e^-)$.
+  Let $E_c$ be the set of edges of $G$ between the two; every one of them is directed from $U_c$ to $D_c$, and $E_c$ is the set of edges $e$ with $phi(e^+) < c < phi(e^-)$.
   In $G^+$ the set $E_c union {e_0}$ is a cut both of whose sides are connected, hence a minimal cut.
   By duality there is a closed curve $gamma$ that passes through distinct faces $f_0, f_1, dots, f_(m - 1)$ of $G^+$ in cyclic order, meets $G^+$ only in one interior point of each edge of the cut, and crosses these edges one at a time.
   By the Jordan curve theorem $gamma$ separates the plane into two regions; the connected sets $U_c$ and $D_c$ lie in different ones, since an edge of the cut crosses $gamma$ once.
@@ -2458,7 +2458,7 @@ It may vanish identically, and the pair then has no tile for that edge at any pr
 
 #definition(name: [proper pair])[
   A pair $(frak(N), epsilon)$ of a plane network with $n$ edges and an orientation vector for its edges is _proper_ if no current $i_e$ of the flow of value $1$ for the resistances $x^(epsilon_e)$ vanishes identically as a function of $x$.
-  We write $cal(F)_n$ for the set of the impedance functions $Z_(frak(N), epsilon)$ of the proper pairs with $n$ edges, and $cal(F)_n^infinity$ for the set of those $F in cal(F)_n$ that tend to $infinity$ at infinity.
+  We write $cal(F)_n$ for the set of impedance functions $Z_(frak(N), epsilon)$ of the proper pairs with $n$ edges, and $cal(F)_n^infinity$ for the set of those $F in cal(F)_n$ that tend to $infinity$ at infinity.
 ] <def:proper>
 
 The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ tiles realise, in the following sense.
@@ -2483,7 +2483,7 @@ The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ til
 ]
 
 In the third statement, the tiling is similar of proportion $x$ if $x >= 1$.
-By the second and third statements, $cal(F)_n$ is also the set of the functions $Z_(frak(N)(tau), epsilon)$ over all similar tilings $tau$ with $n$ tiles, of any proportion and of any main rectangle, and their orientation vectors $epsilon$.
+By the second and third statements, $cal(F)_n$ is also the set of functions $Z_(frak(N)(tau), epsilon)$ over all similar tilings $tau$ with $n$ tiles, of any proportion and of any main rectangle, and their orientation vectors $epsilon$.
 Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tiling $tau_x$ for all but finitely many $x >= 1$; the networks $frak(N)(tau_x)$, with their edges labelled by those of $frak(N)$, take finitely many values up to isomorphism, so one of them occurs for infinitely many $x$, and by the second statement its function agrees with $Z_(frak(N), epsilon)$ at these $x$, hence everywhere.
 
 #example[
@@ -2878,9 +2878,9 @@ For guillotine tilings the functions can be described directly, and are those of
 
 #definition(name: [guillotine tilings and their functions])[
   A tiling is _guillotine_ if it consists of a single tile, or of two guillotine tilings of the two rectangles into which a segment, parallel to a side and joining two opposite sides, divides its main rectangle.
-  Let $cal(G)_1 := {x, 1 slash x}$, and for $n >= 2$ let $cal(G)_n$ be the set of the rational functions $A + B$ and $(A^(-1) + B^(-1))^(-1)$ with $A in cal(G)_j$, $B in cal(G)_(n - j)$ and $1 <= j < n$.
+  Let $cal(G)_1 := {x, 1 slash x}$, and for $n >= 2$ let $cal(G)_n$ be the set of rational functions $A + B$ and $(A^(-1) + B^(-1))^(-1)$ with $A in cal(G)_j$, $B in cal(G)_(n - j)$ and $1 <= j < n$.
   Let $g(n)$ be the number of those $x in P_n (1)$ for which the unit square has a similar guillotine tiling of proportion $x$ with $n$ tiles.
-  Let $sigma_n$ be the number of the expressions that define the elements of $cal(G)_n$, considered up to the commutativity and the associativity of the two operations; these are the series–parallel networks with $n$ edges of two kinds.
+  Let $sigma_n$ be the number of expressions that define the elements of $cal(G)_n$, considered up to the commutativity and the associativity of the two operations; these are the series–parallel networks with $n$ edges of two kinds.
 ] <def:guillotine>
 
 By induction on $n$, the ratio of the width to the height of the main rectangle of a similar guillotine tiling of proportion $x$ with $n$ tiles, with an orientation vector, is $F(x)$ for some $F in cal(G)_n$: the function is $x$ for a wide tile and $1 slash x$ for a tall one, two tilings side by side give the sum, and two tilings one above the other give the other operation.
@@ -2909,7 +2909,7 @@ In particular the resistances of the first statement come in pairs, exchanged by
 A comment in the entry A338781 presents this as unproved, but the entry also links a note by Einstein with a proof that the largest number of resistances is even, so the pairing is not new.
 
 The proof of @prop:wide-full applies to guillotine tilings, with $cal(F)_n$ replaced by $cal(G)_n$; its fourth step is then immediate, since a guillotine tiling exists for every $x > 0$.
-So, for $w$ large enough, the number of the proportions of the similar guillotine tilings of $[0, w] times [0, 1]$ with $n$ tiles is $abs(cal(G)_n) slash 2$.
+So, for $w$ large enough, the number of proportions of similar guillotine tilings of $[0, w] times [0, 1]$ with $n$ tiles is $abs(cal(G)_n) slash 2$.
 
 A series–parallel network is a single edge, or a multiset of at least two networks joined in series, none of them itself a series composition, or the same in parallel.
 So the numbers $sigma_n$ satisfy
@@ -3040,7 +3040,7 @@ A second computation, in integer arithmetic, certifies regular full-side roots b
 
 The inequality does not hold for each network separately.
 Let $frak(N)$ be ten blocks in series, each of nine edges in parallel, with $90$ edges in all.
-Its impedance function for an orientation vector with $a_j$ tall edges in the $j$-th block is $sum_j x slash (a_j + (9 - a_j) x^2)$, every point is regular, and the number of the pairs of an orientation vector and a solution $x > 1$ of $F(x) = 1$, counted in exact arithmetic by the changes of sign of $N - D$ at rational points, is at least $1.008 dot.op 2^(90)$.
+Its impedance function for an orientation vector with $a_j$ tall edges in the $j$-th block is $sum_j x slash (a_j + (9 - a_j) x^2)$, every point is regular, and the number of pairs of an orientation vector and a solution $x > 1$ of $F(x) = 1$, counted in exact arithmetic by the changes of sign of $N - D$ at rational points, is at least $1.008 dot.op 2^(90)$.
 Distinct orientation vectors give pairs that are not isomorphic, since an isomorphism of this plane network with itself fixes the poles and $e_0$, and then every edge in turn; so this network has more tilings of the square of proportion larger than $1$ than orientation vectors.
 For $n <= 9$, on the other hand, no network has more such tilings than it has orientation vectors with a regular full-side root.
 
@@ -3116,7 +3116,7 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 
   A pair with a regular point is isomorphic to the pair of a tiling, by the first statement of @prop:reconstruction, so that its graph $G^+$ is non-separable by @prop:nonseparable, and it has no square block by @prop:square-block.
   Hence $g(n) <= A(n)$.
-  By the first statement of @prop:full-side, $t(n) - s(n)$ is the number of the triples of such a pair and of a regular point $x > 1$ at which its impedance function is $1$; a pair has at most $n$ such points, by the fifth statement of @prop:reactance, so that $t(n) - s(n) <= n A(n)$.
+  By the first statement of @prop:full-side, $t(n) - s(n)$ is the number of triples of such a pair and a regular point $x > 1$ at which its impedance function is $1$; a pair has at most $n$ such points, by the fifth statement of @prop:reactance, so that $t(n) - s(n) <= n A(n)$.
   A tiling $sigma$ of the unit square by squares gives the pair of $frak(N)(sigma)$ with all edges wide, whose impedance function is $1 slash x$ and whose flows are those of unit resistances with the potential divided by $x$, so that every point is regular by the second statement of @prop:reconstruction; distinct tilings give pairs that are not isomorphic, so that $s(n) <= A(n)$.
   Finally $a(n) <= t(n)$, every proportion being that of a tiling.
 ]
