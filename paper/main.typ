@@ -285,7 +285,7 @@ The search therefore restricts the sequences of placements by two rules, which a
 
   + $i < m$;
   + the tier $T_i$ is not stale;
-  + in case $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
+  + if $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
 
   A placement $p$ is _admissible_ at $S$ with $r$ tiles remaining if the following three conditions hold:
 
@@ -308,7 +308,7 @@ The search therefore restricts the sequences of placements by two rules, which a
 @fig:rules shows the flags along the record of the tiling of @fig:staircase.
 After the first placement, which is inside, the tier $T_1$ to the right of the tile has a started floor.
 The third placement is made at $T_1$ and makes $T_0$ stale: no tile can be placed there until its floor is lengthened.
-The fourth placement, of full height at $T_1$, does lengthen the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ with a started floor, so that a tile of full height or a full tile at $T_2$, which would lengthen that floor, is excluded.
+The fourth placement, of full height at $T_1$, lengthens the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ with a started floor, so that a tile of full height or a full tile at $T_2$, which would lengthen that floor, is excluded.
 The fifth placement, a full tile at $T_1$, removes that tier, and the tier that was $T_2$ becomes $T_1$, its floor still started.
 
 #figure(
@@ -427,7 +427,7 @@ We begin with the first part.
   The staircase $S'$ is positive: the floor of $T_(i - 1)$ and the wall of $T_(i + 1)$ can only grow, and the new tiers have floors $w$, $L - w$ with $phi$ narrow, or $L$, and walls $M - h$ with $phi$ low, $h$, or $M$.
   The tile $T = [a, a + w] times [b, b + h]$ lies in the strip of $T_i$, because $w <= L$, $a + L <= W$ and $h <= M$.
   Each strip of $S'$ lies in $U(S)$: this is clear for the unchanged ones and for those that replace the strip of $T_i$, which are parts of it, and a point of the enlarged strip of $T_(i + 1)$ lies in the old one if its ordinate is at most $b$, and in the strip of $T_i$ otherwise, since $a + L >= a$ and $h <= M$.
-  Let now $(u, v)$ be a point of $U(S)$.
+  Now let $(u, v)$ be a point of $U(S)$.
   If it lies in a strip of $S$ other than that of $T_i$, it lies in the corresponding strip of $S'$, which is the same or larger.
   Suppose that it lies in the strip of $T_i$.
   If $phi$ is low and $v >= b + h$, it lies in the strip $[a, W] times [b + h, b + M]$ of $S'$.
@@ -520,7 +520,7 @@ Soundness follows by removing the tiles from the region one at a time.
   By @prop:fit the staircase $S_0$ is not defective.
   Its only tier is the last one and has no tier before it, so its floor $W$ and its wall $H$ are positive, and $S_0$ is positive.
 
-  We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that they are as many as the placements of $rho'$.
+  We show, by induction on the length of a record $rho'$ that obeys the rules from a positive real staircase $S$ and whose constraints on $S$ hold, that the tiles of $rho'$ on $S$ are rectangles of proportion $x$ contained in $U(S)$, that their interiors are pairwise disjoint, that they cover $U(S)$, and that their number is the number of placements of $rho'$.
   If $rho'$ is empty then $S$ is empty and so is $U(S)$.
   Otherwise let $p$ be the first placement of $rho'$, let $T$ be its tile and $S'$ the staircase after it.
   By @prop:size the tile $T$ is a rectangle of proportion $x$, and by @prop:fit it fits its tier strictly where its fit says so and $S'$ is positive, so that @prop:step applies.
@@ -553,7 +553,7 @@ The construction relies on finding the tiles that lie next to a given point.
 ] <prop:near>
 
 #proof[
-  Since the tiles are finitely many, there is $epsilon$ with $0 < epsilon < W - c$ such that no tile has the abscissa of its corner in $(c, c + epsilon]$, and there is $eta$ with $0 < eta < H - d$ such that no tile has the ordinate of its corner in $(d, d + eta]$.
+  Since there are finitely many tiles, there is $epsilon$ with $0 < epsilon < W - c$ such that no tile has the abscissa of its corner in $(c, c + epsilon]$, and there is $eta$ with $0 < eta < H - d$ such that no tile has the ordinate of its corner in $(d, d + eta]$.
   The point $(c + epsilon, d + eta)$ lies in the main rectangle, hence in some tile $(a', b', w', h')$.
   Then $a' <= c + epsilon$, so that $a' <= c$ by the choice of $epsilon$, and $c < c + epsilon <= a' + w'$; likewise $b' <= d < b' + h'$.
   For the second statement, choose $epsilon$ as before and $eta$ with $0 < eta < d$ such that no tile has the ordinate $b' + h'$ of its top side in $[d - eta, d)$.
@@ -652,12 +652,12 @@ Repeating the step until no tile remains gives the record.
 
 #proposition[
   Let $x >= 1$, let $W, H > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$.
-  Then there are a complete admissible record $rho$ for $n$ tiles and real numbers $s = (s_1, s_2, dots)$ such that $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are $R_1, dots, R_n$ in some order, and each placement of $rho$ is wide exactly if its tile $(a, b, w, h)$ satisfies $w = x h$.
+  Then there exist a complete admissible record $rho$ for $n$ tiles and real numbers $s = (s_1, s_2, dots)$ such that $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are $R_1, dots, R_n$ in some order, and each placement of $rho$ is wide exactly if its tile $(a, b, w, h)$ satisfies $w = x h$.
 ] <prop:complete>
 
 #proof[
   The initial staircase of $W$ and $H$, with every tile remaining, is a state: the staircase is positive, its region is the main rectangle, which contains every tile, and its only tier is neither stale nor started.
-  We show, by induction on the number $r$ of remaining tiles of a state with staircase $S$, that there are a record $rho'$ of $r$ placements and free sides such that $rho'$ obeys the rules from $S$, its constraints on $S$ hold, its tiles on $S$ are the remaining tiles in some order, and each of its placements is wide exactly if its tile satisfies $w = x h$.
+  We show, by induction on the number $r$ of remaining tiles of a state with staircase $S$, that there exist a record $rho'$ of $r$ placements and free sides such that $rho'$ obeys the rules from $S$, its constraints on $S$ hold, its tiles on $S$ are the remaining tiles in some order, and each of its placements is wide exactly if its tile satisfies $w = x h$.
   If $r = 0$ then $S$ is empty, since otherwise there would be a remaining tile by @prop:anchor, and the empty record suffices.
   If $r > 0$ then $S$ is not empty, since the interior of a remaining tile is contained in $U(S)$.
   Then @prop:extension gives a placement $p$, with a free side, whose tile is a remaining tile $Q$ and after which there is a state with $r - 1$ remaining tiles, namely those other than $Q$.
@@ -670,7 +670,7 @@ For a square main rectangle, transposition allows the first tile to be taken wid
 
 #proposition[
   Let $x >= 1$, let $W > 0$, and let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, W]$ of proportion $x$.
-  Then there are a complete admissible record $rho$ for $n$ tiles in which the first tile is wide, and real numbers $s$, such that $(W, W, s)$ satisfy the constraints of $rho$ at $x$ and the tiles of $rho$ are, in some order, either $R_1, dots, R_n$ or their transposes.
+  Then there exist a complete admissible record $rho$ for $n$ tiles in which the first tile is wide, and real numbers $s$, such that $(W, W, s)$ satisfy the constraints of $rho$ at $x$ and the tiles of $rho$ are, in some order, either $R_1, dots, R_n$ or their transposes.
 ] <prop:square>
 
 #proof[
@@ -858,8 +858,8 @@ For instance, a rectangle of sides $2$ and $1$ cannot be dissected into six squa
 == Growth <sec:growth>
 
 We found no closed form, recurrence or generating function for $a(n)$.
-The sequence satisfies no linear recurrence with constant coefficients of order at most five, and none with polynomial coefficients of the orders and degrees that thirteen terms allow one to test, a test which does recover the recurrence of the Baxter numbers; the usual transforms of the sequence match no entry of the OEIS, and its residues modulo small integers show no pattern.
-The sets of proportions do have some structure: proportions persist when tiles are added, the aspect ratio of the main rectangle is a rational function of the proportion of a restricted kind, these functions are counted by the proportions for wide main rectangles, and all but three of the rational proportions for ten tiles or more are explained by dissections into squares.
+The sequence satisfies no linear recurrence with constant coefficients of order at most five, and none with polynomial coefficients of the orders and degrees that thirteen terms allow one to test, a test which recovers the recurrence of the Baxter numbers; the usual transforms of the sequence match no entry of the OEIS, and its residues modulo small integers show no pattern.
+The sets of proportions have some structure: proportions persist when tiles are added, the aspect ratio of the main rectangle is a rational function of the proportion of a restricted kind, these functions are counted by the proportions for wide main rectangles, and all but three of the rational proportions for ten or more tiles are explained by dissections into squares.
 These properties, and the conjectures that the computations suggest, are the subject of @app:structure.
 Here we bound the growth of $a(n)$.
 
@@ -916,7 +916,7 @@ We now count the tilings themselves, in three ways.
 
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
 The number $t(n)$ is finite.
-Indeed the proportions are finitely many, by @prop:upper, as are the records, and a record has at most one solution at a given proportion: since the constraints are linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
+Indeed there are finitely many proportions, by @prop:upper, and finitely many records, and a record has at most one solution at a given proportion: since the constraints are linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
 A tiling determines its bag, and symmetric tilings have the same bag, so that
 $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
 The sequence $b(n)$ is the one asked for in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
@@ -956,7 +956,7 @@ This, and the count of bags, assume that the polynomial stored for a proportion 
   Consider a placement of the record at a tier $T_i$ of the current staircase.
   Every tier $T_j$ with $j < i$ has a floor that extends.
   This is so if $j = i - 1$ and the tile placed is as high as the wall of $T_i$, since the top side of that tile continues the floor to the right.
-  Otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile as high as the wall at the next tier, whose top side then continues the floor to the right, so that the floor does extend; and a stale tier is never removed, so that the record could not be complete.
+  Otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile as high as the wall at the next tier, whose top side then continues the floor to the right, so that the floor extends; and a stale tier is never removed, so that the record could not be complete.
   Suppose that the floor of $T_i$ extends, and let $Q$ be its right end.
   The tile that makes it extend is still to be placed, since points of its interior lie in the strip of the next tier; so its interior lies in the region of the staircase, which contains no point to the left of $Q$ and below the floor, by the remark made in the proof of @prop:anchor.
   Its left side is therefore at the abscissa of $Q$; let $U$ be this tile, whose top left corner is $Q$.
@@ -1481,7 +1481,7 @@ Away from the zeros of the pivots, the recorded eliminations determine the solut
   By @prop:chain and the definition of a pass, $m_1, dots, m_k$ are pairwise distinct and lie between $1$ and $k$, so they are all the indices from $1$ to $k$, and $chi((E_i)_(m_l)) = 0$ for $l < i$.
   In particular no replacement changes $v_0$, which proves the first statement.
 
-  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ comes to hold; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
+  When $v_(m_i)$ is replaced, the equation $chi(E_i)[v] = 0$ becomes true; the later replacements change the coordinates $v_(m_l)$ with $l < i$ only, whose coefficients in $E_i$ have image zero, so the equation still holds at the end.
   Hence $chi(E_i)[v] = 0$ for every $i <= k$, and $e_i [v] = 0$ for every $i <= k$ by the fifth statement of @prop:chain.
   The fourth statement of @prop:chain then gives $chi(E_"fin")[v] = Gamma_k (chi(e_(k + 1)))[v] = chi(pi) e_(k + 1) [v]$.
   Under the hypothesis of the second statement, $chi(E_"fin")[v] = chi((E_"fin")_0) v_0 = chi((E_"fin")_0)$, and the statement follows because $chi(pi) != 0$.
@@ -1593,7 +1593,7 @@ When the stored polynomial is the minimal polynomial of the root, the certificat
 ]
 
 With the notation of @def:check, when the form $F$ is obtained and involves the scale only, the positive quantity of $p_q$ is zero in the solution $v$ of @prop:back at the root $r$ exactly if $F_0 (r) = 0$, by the fourth statement of that proposition, hence exactly if the minimal polynomial of $r$ divides $"coeffs"(F_0)$.
-The formal development does not prove that the exact eliminations applied to $sigma_q$ always divide exactly, nor that the resulting form involves the scale only; in either event the check returns the verdict unsure.
+The formal development does not prove that the exact eliminations applied to $sigma_q$ always divide exactly, nor that the resulting form involves the scale only; in either case the check returns the verdict unsure.
 
 #definition(name: [incremental method])[
   Let $a$ and $b$ be integers.
@@ -1652,7 +1652,7 @@ The search is split into tasks by the first few placements, and a failure of the
 The completions are the records of @def:record, and the prefixes cut them at a given depth.
 
 #proposition[
-  + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide in case both _square_ and _first_ hold.
+  + A record $(p_1, dots, p_ell)$ belongs to $cal(C)(r, "first", S)$ if and only if each $p_j$ is admissible, with $r - j + 1$ tiles remaining, at the staircase on which it is placed when the record is placed on $S$, the staircase left by the last one is empty, and the first tile is wide if both _square_ and _first_ hold.
     In particular, for the bare initial staircase $S_0$, the set $cal(C)(n, "true", S_0)$ consists of the complete admissible records for $n$ tiles, with the first tile wide if _square_ holds.
   + For every $d >= 0$, a record belongs to $cal(C)(r, "first", S)$ if and only if it consists of a record $rho_1 in cal(P)_d (r, "first", S)$ followed by a record of $cal(C)(r - ell_1, "first"_1, S_1)$, where $ell_1$ is the length of $rho_1$, $S_1$ is the staircase after $rho_1$, and $"first"_1$ holds exactly if _first_ holds and $rho_1$ is empty.
 ] <prop:enumeration>
@@ -1731,7 +1731,7 @@ This is what the two counts of the direct method establish in a run of the incre
 ] <prop:fast>
 
 #proof[
-  The first two statements are proved as @prop:reference, with @prop:fastsolve in the place of @prop:solve.
+  The first two statements are proved as @prop:reference, with @prop:fastsolve in place of @prop:solve.
   An element of $"Fast"_(a, b) (rho)$ is a solution of $rho$, and gives a tiling by @prop:sound and @prop:scaling.
   Conversely, an element of $P_n (a, b) = P_n (a slash b, 1)$ is a solution of a complete admissible record $rho$ for $n$ tiles, with the first tile wide if $a = b$, by @prop:complete and @prop:square; if the search is certified, $rho$ is not passed to the direct method or is regular, and the solution belongs to $"Fast"_(a, b) (rho)$.
   The third statement follows record by record from the last statement of @prop:fastsolve, since a certified direct search is one in which every record considered is regular.
@@ -2011,12 +2011,12 @@ For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector is on
 
 == Persistence <sec:persistence>
 
-By @prop:subdivision, proportions persist when three tiles, or five or more, are added, and for the square also when four are added.
+By @prop:subdivision, proportions persist when three tiles, or five or more, are added, and, for the square, also when four are added.
 The steps of one and two fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
 Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
 
 The step of four can fail when the main rectangle is not a square, as the examples after @prop:subdivision show.
-According to the search, for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four tiles more.
+According to the search, for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four more tiles.
 
 The same constructions, applied to the tile at a corner, are injective on tilings, and give inequalities for the numbers $t(n)$ of @def:tbc.
 They are much weaker than the growth observed in @tab:tbc.
@@ -2075,7 +2075,7 @@ A pair $(phi, i)$ is a flow of value $I$ exactly when $i = Y B^top phi$ and $L p
 Reversing the reference direction of an edge changes the sign of a column of $B$, hence leaves $L$ unchanged, and turns flows into flows when the sign of the current in that edge is changed as well; nothing below depends on the reference directions, except where they are fixed explicitly.
 
 The quadratic form of the Laplacian is the power dissipated in the network.
-When the real parts of the resistances have one sign, its real part is definite on the potentials that are not constant, and this gives the existence and the uniqueness of flows.
+When the real parts of the resistances all have the same sign, its real part is definite on the potentials that are not constant, and this gives the existence and the uniqueness of flows.
 
 #proposition[
   Let $frak(N)$ be a network with resistances such that $re r_e > 0$ for every edge $e$, or such that $re r_e < 0$ for every edge $e$.
@@ -2140,7 +2140,7 @@ The two determinants are polynomials of low degree in the conductances.
 == The network of a tiling <sec:tiling-network>
 
 The vertices of the network of a tiling are the horizontal lines of the tiling, and its edges are the tiles; the current in a tile is its width, and the potential of a line is its height.
-The lines are taken to be the connected components of the union of the horizontal sides, so that the network is defined also when four tiles meet at a point.
+The lines are taken to be the connected components of the union of the horizontal sides, so that the network is also defined when four tiles meet at a point.
 @fig:network shows an example.
 
 #definition(name: [network of a tiling])[
@@ -2157,7 +2157,7 @@ The lines are taken to be the connected components of the union of the horizonta
 Each component is a horizontal segment of positive length.
 A point of the top side of the main rectangle whose abscissa is not that of a corner of a tile lies on the top side of the tile that contains the points just below it; the top side of the main rectangle is the closure of the set of these points, so it is contained in $U$, and it is a component of $U$ because no other point of $U$ has ordinate $H$.
 The same holds for the bottom side.
-The tiles of the tiling may have any shapes.
+The tiles of the tiling may have any shape.
 
 #proposition[
   Let $tau$ be a tiling of $[0, W] times [0, H]$.
@@ -2557,7 +2557,7 @@ The following formulas of Kirchhoff, for a network with conductances $y$, are as
   Write $tilde(P) = g N$ and $tilde(Q) = g D$.
   Then $g in ZZ[x]$: write $g = (a slash b) g_0$ with $g_0 in ZZ[x]$ primitive and $a slash b$ a fraction in lowest terms; by Gauss's lemma $b$ divides the content of $N$ and that of $D$, which have no common factor since $N slash D$ is in lowest terms, so that $b = 1$.
   The roots of $g$ are roots of $tilde(Q)$, which lie on the imaginary axis: $tilde(Q)$ has no root with positive real part by @prop:flow, and none with negative real part because $tilde(Q)(-x) = plus.minus tilde(Q)(x)$ by @prop:multilinear.
-  So $g$ is a real multiple of a product of factors $x$ and $x^2 + omega^2$, its coefficients have one sign, and $abs(g(1)) >= 1$.
+  So $g$ is a real multiple of a product of factors $x$ and $x^2 + omega^2$, its coefficients all have the same sign, and $abs(g(1)) >= 1$.
   Hence $N(1) <= 2^(n - 1)$ and $D(1) <= 2^(n - 1)$, and these numbers bound every coefficient of $N$ and of $D$.
   We use Cauchy's bound: a root $z$ of a polynomial with integer coefficients $a_0, dots, a_d$, where $a_d != 0$, satisfies $abs(z) < 1 + max_j abs(a_j)$.
   By @prop:maximum, every $F in cal(F)_n$ satisfies $F(x) <= n x$ for $x >= 1$, because $1 slash F in cal(F)_n$ is an impedance function, and the conductances are at most $x$.
@@ -2811,7 +2811,7 @@ The third finite statement needs a longer analysis, by the number of squares tha
   In the cases (ii) to (iv) the block has at least four squares, as was used above.
 ]
 
-Independently of this proof, the search finds that a rectangle of sides $5$ and $3$ cannot be dissected into eight squares of any sides: restricted to tiles of a single orientation, it does not report the proportion $1$ for eight tiles in that rectangle, and the run is certified.
+Independently of this proof, the search finds that a rectangle of sides $5$ and $3$ cannot be dissected into eight squares of any side lengths: restricted to tiles of a single orientation, it does not report the proportion $1$ for eight tiles in that rectangle, and the run is certified.
 
 The three finite statements give the three impossibilities for every $n$.
 
@@ -2855,7 +2855,7 @@ The last column of @tab:structure extends the eight known terms of A210517 @oeis
 There are further exceptions for small $n$.
 For $6 <= n <= 9$, the rational proportions in $P_n (1)$ that are not achieved by $n$ tiles of a single orientation are, according to the search, $5 slash 3$ and $2$ for six tiles; $3 slash 2$ and $3$ for seven; $5 slash 3$, $5 slash 2$ and $4$ for eight; and $8 slash 3$, $16 slash 5$, $7 slash 2$ and $5$ for nine; the first three lists are those of @tab:rational.
 @prop:three-occur and @prop:no-squares account for all of them except two, since $n - 11 slash 2 > 1$ requires $n >= 7$ and $n - 19 slash 3 > 1$ requires $n >= 8$.
-The two others are sporadic, and come from pinwheels whose central rectangle is not a square.
+The other two are sporadic, and come from pinwheels whose central rectangle is not a square.
 
 #example[
   @fig:sporadic shows the two sporadic tilings.
@@ -2983,7 +2983,7 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
 ] <prop:reconstruction>
 
 #proof[
-  For the first statement, every top side and every bottom side of a tile lies in one of the sets $S_v$, which are finitely many pairwise disjoint segments; so these sets are the connected components of the union of the top and bottom sides of the tiles, that is, the vertices of $frak(N)(tau)$.
+  For the first statement, every top side and every bottom side of a tile lies in one of the sets $S_v$, which form a finite family of pairwise disjoint segments; so these sets are the connected components of the union of the top and bottom sides of the tiles, that is, the vertices of $frak(N)(tau)$.
   The tile $rct(e)$ has its top side in $S_(e^-)$ and its bottom side in $S_(e^+)$, and $S_s$ and $S_t$ are the top and bottom sides of the main rectangle, by @prop:segments.
   In the embedding of $frak(N)(tau)$ given in the proof of @prop:tiling-network, the edges around a component are, counter-clockwise, the tiles below it from left to right followed by the tiles above it from right to left; at each pole the edge added between the poles occupies the only gap, between the last and the first edge of the network. This is the order given by @prop:segments.
 
@@ -3035,7 +3035,7 @@ The same computation gives $g(n)$.
 
 By the third statement of @prop:full-side, @conj:full-side implies that $t(n + 1) >= t(n)$ for every $n$.
 It holds for $n <= 10$. For $n <= 9$, according to this computation in floating-point arithmetic, $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $2852$, $25380$, $240608$, $2382684$ and $24415502$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
-The quotient $t(n) slash g(n)$ is $0.257$, $0.291$, $0.287$, $0.293$, $0.295$ and $0.298$ for $n = 4, dots, 9$; it increases slowly from six tiles on, and the values do not show whether it remains below $1$.
+The quotient $t(n) slash g(n)$ is $0.257$, $0.291$, $0.287$, $0.293$, $0.295$ and $0.298$ for $n = 4, dots, 9$; it increases slowly from six tiles onwards, and the values do not show whether it remains below $1$.
 A second computation, in integer arithmetic, certifies regular full-side roots by an exact change of sign on a small interval on which the potentials of the vertices are shown to be pairwise distinct; it certifies $24202856$ pairs for nine tiles, and for ten tiles $77189138$ pairs among the first $80445440$ examined, which exceeds $t(10) = 77188146$.
 
 The inequality does not hold for each network separately.
@@ -3053,7 +3053,7 @@ It is nevertheless not attained, by $a(n)$ or by $t(n)$: a pair that contains a 
   A _square block_ of a pair $(frak(N), epsilon)$ is a face of $G^+$ whose boundary is a cycle of four edges $a$, $b$, $d$, $c$ of $G$, where $a$ joins a vertex $u$ to a vertex $v_1$, $b$ joins $v_1$ to a vertex $w$, $c$ joins $u$ to a vertex $v_2$ and $d$ joins $v_2$ to $w$, such that $v_1$ and $v_2$ have degree two in $G^+$ and the four edges have the same orientation.
 ] <def:square-block>
 
-In a tiling, two tiles of the same orientation stacked between the same two segments are congruent, and two such stacks side by side form four congruent tiles that meet at a point; the two vertices of degree two would then be one.
+In a tiling, two tiles of the same orientation stacked between the same two segments are congruent, and two such stacks side by side form four congruent tiles that meet at a point; the two vertices of degree two would then coincide.
 
 #proposition[
   A pair with a square block has no regular point.
