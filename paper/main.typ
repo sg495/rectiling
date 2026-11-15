@@ -933,72 +933,91 @@ The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, whic
 
 The search described in @sec:solving counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
 A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
-A tiling in which four tiles meet at a point arises from several records, as the following proposition makes precise; we call such a point a _crossing_.
+A tiling in which four tiles meet at a point arises from several records, as the following propositions make precise.
 A tiling is identified by its proportion, its orientations and the record described in @prop:representative, since the solution of a reported record at a proportion is unique.
 The order of the coordinates of the sides of its tiles, which determines that record, the crossings and the symmetries, is computed exactly: the coordinates are elements of the number field of the proportion, floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
 Both this and the count of bags assume that the polynomial stored for a proportion is its minimal polynomial, which the search for proportions does not need.
 
+#definition(name: [crossing])[
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$.
+  A tile $(a, b, w, h)$ of $cal(T)$ lies _to the lower right_ of a point $q$ if $q$ is its top-left corner $(a, b + h)$, and _to the upper left_ of $q$ if $q$ is its bottom-right corner $(a + w, b)$.
+  A _crossing_ of $cal(T)$ is a point that is one of the four corners $(a, b)$, $(a + w, b)$, $(a, b + h)$, $(a + w, b + h)$ of each of four distinct tiles $(a, b, w, h)$ of $cal(T)$.
+] <def:crossing>
+
+#definition(name: [records that yield a tiling])[
+  Let $x >= 1$, let $cal(T)$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and let an orientation, wide or tall, be chosen for each tile of $cal(T)$.
+  A complete admissible record $rho$ _yields $cal(T)$ with the free sides_ $s$ if $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are the tiles of $cal(T)$ in some order, and each placement of $rho$ has the orientation chosen for its tile; it _yields_ $cal(T)$ if it does so with some free sides.
+  It then _places_ a tile _before_ another if the first is the tile of an earlier placement than the second.
+  For a set $X$ of points, the floor of a tier of a real staircase, with anchor $(a, b)$ and floor $L$, _$X$-extends_ if it extends in $cal(T)$ and its _end_ $(a + L, b)$ is not in $X$.
+] <def:yields>
+
+#observation[
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$.
+  + At most one tile of $cal(T)$ lies to the lower right of a given point, and at most one to its upper left.
+  + A point is a crossing of $cal(T)$ exactly if a tile lies to its lower right and a tile lies to its upper left; consequently $cal(T)$ has finitely many crossings.
+  + If $cal(T)$ is similar, with an orientation chosen for each tile, the tiles of a record that yields $cal(T)$, taken in the order of its placements, are the same for all the free sides with which it yields $cal(T)$.
+] <obs:crossing>
+
+By the third statement, whether a record that yields $cal(T)$ places a tile before another does not depend on the free sides.
+The tier of each placement is determined by the crossings at which the record places the tile to the upper left first, and so is the record.
+
 #proposition[
-  Let $cal(T)$ be a similar tiling, with a choice of orientation for each tile.
-  A complete admissible record _yields_ $cal(T)$ if, for some free sides, the constraints of the record hold at the proportion of $cal(T)$, its tiles are those of $cal(T)$, and each of its placements has the orientation chosen for its tile.
-  A complete admissible record that yields $cal(T)$ places at every stage the tile at the anchor of the first tier whose floor does not extend in $cal(T)$, provided that at every crossing of $cal(T)$ the tile to the lower right of the crossing is placed before the tile to its upper left.
-  In particular a tiling without crossings is yielded by at most one complete admissible record for each choice of orientations.
+  Let $x >= 1$, let $cal(T)$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, with an orientation chosen for each tile, and let $rho$ be a complete admissible record that yields $cal(T)$.
+  Let $X$ be the set of the crossings of $cal(T)$ at which $rho$ places the tile to the upper left before the tile to the lower right.
+  + Each placement of $rho$ is made at the first tier, of the staircase on which it is placed, whose floor does not $X$-extend.
+    In particular, if $rho$ places the tile to the lower right first at every crossing, each placement is made at the first tier whose floor does not extend in $cal(T)$.
+  + A complete admissible record that yields $cal(T)$, and that places the tile to the upper left before the tile to the lower right exactly at the crossings of $X$, is equal to $rho$.
+  + In particular, if $cal(T)$ has no crossing, $rho$ is the only complete admissible record that yields $cal(T)$.
 ] <prop:representative>
 
 #proof[
-  Consider a placement of the record at a tier $T_i$ of the current staircase.
-  Every tier $T_j$ with $j < i$ has a floor that extends.
-  This is so if $j = i - 1$ and the tile placed is as high as the wall of $T_i$, since the top side of that tile continues the floor to the right.
-  Otherwise $T_j$ becomes stale by this placement, and can cease to be stale only if its floor is lengthened by a tile as high as the wall at the next tier, whose top side then continues the floor to the right, so that the floor extends; and a stale tier is never removed, so that the record could not be complete.
-  Suppose that the floor of $T_i$ extends, and let $Q$ be its right end.
-  The tile that makes it extend is still to be placed, since points of its interior lie in the strip of the next tier; so its interior lies in the region of the staircase, which contains no point to the left of $Q$ and below the floor, by @obs:strips.
-  Its left side is therefore at the abscissa of $Q$; let $U$ be this tile, whose top left corner is $Q$.
-  If the tile placed at $T_i$ is narrower than the floor, the remainder of the floor is started, and it remains so until a tile $V$ is placed whose bottom side ends at $Q$; if it is as wide as the floor, it is itself such a tile $V$.
-  As long as the floor is started, $U$ cannot be placed, since it would lengthen the floor.
-  Hence $V$ is placed before $U$, and $Q$ is a crossing with $V$ to its upper left and $U$ to its lower right, contrary to the hypothesis.
-  So the floor of $T_i$ does not extend, and $T_i$ is the first tier with that property.
-  The record is thus determined by $cal(T)$ and the orientations.
+  Let $rho$ place a tile $Q$ at a tier $T_i$.
+
+  A tier before $T_i$ keeps its anchor and its floor until a tile $U$ as high as the wall is placed at the next tier: it is stale once $Q$ is placed, unless $U = Q$, and the staircase cannot be emptied while it is stale.
+  So $U$ lies to the lower right of the end $q$ of that floor, which therefore extends.
+  A tile to the upper left of $q$ has interior points in the strip of the tier, so it is placed after $U$, by @prop:fit and @prop:step; hence $q in.not X$.
+
+  If a tile $U$ makes the floor of $T_i$ extend, with end $q$, then $T_i$ is not the last tier and $U$ has interior points in the strip of $T_(i + 1)$; so $U$ is still to be placed, lies in the region and, by @obs:strips, lies to the lower right of $q$.
+  Unless $Q$ is as wide as the floor, a started floor then ends at $q$ until a tile as wide as it is placed at its tier, and until then the second rule excludes $U$, which would lengthen it, since the abscissas of the anchors increase strictly and a low tile is strictly lower than its wall.
+  So $Q$ or a later tile lies to the upper left of $q$ and is placed before $U$; hence $q in X$, by @obs:crossing.
+
+  Thus $T_i$ is the first tier whose floor does not $X$-extend.
+  On the same staircase, a record as in the second statement therefore places at the same tier the same tile, whose corner is the anchor, with the same fit, by @prop:fit, and the same orientation.
+
+  The inductions, on the placements still to be made and along the two records, are in the formal proof (@app:formal).
 ]
 
-The record constructed in the proof of @prop:complete is of this kind, and the same construction gives one record for each choice, at each crossing, of which of the two tiles is placed first.
+The record constructed in the proof of @prop:complete places the tile to the lower right first at every crossing, and the same construction gives one record for each choice, at each crossing, of which of the two tiles is placed first.
 
 #proposition[
-  Let $cal(T)$ be a similar tiling with $k$ crossings, with a choice of orientation for each tile, a tile that is not a square having the orientation of its shape.
-  For every set $X$ of crossings of $cal(T)$ there is exactly one complete admissible record that yields $cal(T)$ and in which the tile to the upper left of a crossing is placed before the tile to its lower right exactly at the crossings of $X$.
-  Hence exactly $2^k$ complete admissible records yield $cal(T)$.
+  Let $x >= 1$ and $W, H > 0$, and let $cal(T)$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $k$ crossings, with an orientation chosen for each tile $(a, b, w, h)$ that is wide only if $w = x h$ and tall only if $h = x w$.
+  + For every set $X$ of crossings of $cal(T)$, exactly one complete admissible record yields $cal(T)$ and places the tile to the upper left of a crossing before the tile to its lower right exactly at the crossings of $X$.
+  + Exactly $2^k$ complete admissible records yield $cal(T)$.
 ] <prop:multiplicity>
 
 #proof[
-  Say that a floor _$X$-extends_ if it extends in $cal(T)$ and its right end is not a crossing in $X$.
-  We show that a record as in the statement places, at every stage, the tile at the anchor of the first tier whose floor does not $X$-extend, which determines it.
-  Consider a placement at a tier $T_i$.
-  By the proof of @prop:representative, the floor of every tier $T_j$ with $j < i$ extends, and from this placement on $T_j$ is stale, or the tile placed is as high as the wall and $j = i - 1$; in either case no tile is placed at $T_j$ before the tile $U_j$ whose top left corner is the end $Q_j$ of the floor.
-  If $Q_j$ is a crossing, the tile to its upper left has points of its interior in the strip of $T_j$ and of no other tier, so that it is placed at $T_j$ or at a tier that replaces it, after $U_j$, and $Q_j$ is not in $X$; hence the floor of $T_j$ $X$-extends.
-  If the floor of $T_i$ extends, the proof of @prop:representative shows that its end is a crossing at which the tile to the upper left is placed first, hence a crossing in $X$; so the floor of $T_i$ does not $X$-extend.
+  _Existence._
+  The construction of @prop:complete is repeated with "$X$-extends" in place of "extends", in the choice of the tier and in the fourth condition of @def:state, and each placement is given the orientation chosen for its tile, which the hypothesis permits.
+  Otherwise the proof of @prop:extension changes only where $w > L$: the floor of $T_i$ extends, as shown there, so its end is in $X$, and by @obs:crossing a tile lies to the upper left of it; that tile overlaps $Q$, hence is $Q$, and $w = L$, a contradiction.
+  The initial staircase is a state since $W, H > 0$.
+  This gives a record $rho_X$ that yields $cal(T)$ and places at the first tier whose floor does not $X$-extend.
 
-  For the existence, we repeat the construction of @prop:complete with the first tier whose floor does not $X$-extend, and with the fourth condition of @def:state replaced by the condition that the floor of every stale tier $X$-extends and the floor of no started tier does.
-  The proof of @prop:extension applies with the following changes.
-  The two verifications that the proof of @prop:extension leaves to the formal proof do not involve the notion of extending, and are unchanged.
-  If $w > L$, the floor of $T_i$ extends, as shown there, and its end lies in the interior of the bottom side of the tile $Q$ at the anchor, so that it is not a crossing; the floor then $X$-extends, contrary to the choice of $T_i$.
-  The proof that $h <= M$ uses only the fact that the floor of $T_(i - 1)$ extends.
-  The placement is allowed, since the floor of a stale tier $X$-extends, and the floor of $T_(i - 1)$ $X$-extends while that of a started tier does not.
-  The orientation is the one chosen for $Q$; when $Q$ is a square, the sizes and the equations of the two orientations coincide.
-  After the placement, the started tier, if any, has a floor that ends where the floor of $T_i$ did, and so does not $X$-extend.
-  This gives a complete admissible record $rho_X$ that yields $cal(T)$.
+  _The order at a crossing._
+  Let $U$ and $V$ lie to the lower right and to the upper left of a crossing $q$, and let $rho_X$ place the first of the two at a tier $T_i$ of a staircase, in whose region the other lies.
+  By @obs:strips, the region has no point to the left of the anchor and below the top of the wall, and none below the floor and to the left of its end.
+  So if $U$ is the first, it is as high as the wall; then $i > 0$, since $V$ lies above $q$, and the floor of $T_(i - 1)$ ends at $q$ and $X$-extends, so that $q in.not X$.
+  If $V$ is the first, it is as wide as the floor, which ends at $q$, extends, and does not $X$-extend, so that $q in X$.
+  Hence $rho_X$ is as in the first statement.
 
-  Let $Q$ be a crossing, $V$ the tile to its upper left and $U$ the tile to its lower right.
-  Suppose that $U$ is placed before $V$ in $rho_X$, at a tier $T_i$.
-  The interior of $V$ lies in the region of the staircase, which, by @obs:strips, contains no point to the left of the anchor of $T_i$ and below the top of its wall; so $U$ is as high as the wall. Then $i > 0$, since $Q$ is not on the boundary of the square, the floor of $T_(i - 1)$ ends at $Q$, and it extends.
-  As $T_(i - 1)$ comes before the tier chosen, its floor $X$-extends, and $Q$ is not in $X$.
-  Suppose that $V$ is placed before $U$, at a tier $T_i$.
-  The interior of $U$ lies in the region of the staircase, which contains no point below the floor of $T_i$ and to the left of its end; so $V$ is as wide as the floor, which ends at $Q$ and extends.
-  By the choice of the tier the floor does not $X$-extend, and $Q$ is in $X$.
-  So $rho_X$ is as in the statement.
-  The records $rho_X$ are distinct, since the order in which a record that yields $cal(T)$ places the tiles is determined by the record and $cal(T)$, since each tile is the one at the anchor of its placement.
+  _The count._
+  By the second statement of @prop:representative, $rho_X$ is the only record as in the first statement.
+  The records that yield $cal(T)$ thus correspond to the $2^k$ sets of crossings, a record to the set of crossings at which it places the tile to the upper left first.
+
+  That the other steps of the proofs of @prop:extension and @prop:complete hold for the modified state is verified in the formal proof (@app:formal).
 ]
 
-Neither proposition has been formalised.
-For $X$ empty the record of @prop:multiplicity is that of @prop:complete, so that a tiling without crossings has exactly one record for each choice of orientations, and for a tiling by squares the choice of orientations is free.
+For $X$ empty, and with a tile chosen to be wide exactly if $w = x h$, the record of @prop:multiplicity is the one constructed in the proof of @prop:complete.
+A tiling of a rectangle with positive sides that has no crossing is thus yielded by exactly one complete admissible record for each choice of orientations that @prop:multiplicity admits: one choice if its proportion is larger than $1$, and $2^n$ for a tiling by $n$ squares.
 This is one half of what the agreement of the number of placement sequences with the Baxter numbers, observed in @sec:mosaic, would require; the other half, that every complete admissible sequence is that of a tiling by rectangles without crossings, and that two such tilings have the same sequence exactly when they are mosaic equivalent, is not proved.
 The computation agrees with @prop:multiplicity: for $n <= 12$ and each $k$, the records of the tilings with $k$ crossings are $2^k$ times as many as these tilings.
 The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the sequence from the exact order of the coordinates.
@@ -1797,7 +1816,7 @@ Completeness of the incremental search needs less than that of the direct search
 
 = Formalisation <app:formal>
 
-The statements of @sec:tilings, @sec:staircases, @sec:systems and @app:solving have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
+The statements of @sec:tilings, @sec:staircases, @sec:systems, @sec:tilings-counts and @app:solving have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
 The development contains no unproved statement and no axiom of its own; its main theorems depend only on the three axioms `propext`, `Classical.choice` and `Quot.sound` of Lean and Mathlib.
 @tab:formal lists, for each definition and proposition of those sections, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
 The proofs given in this paper follow those of the development, statement by statement.
@@ -1906,6 +1925,24 @@ The proofs given in this paper follow those of the development, statement by sta
           [`TilingCount`: `finite_similarTilings`],
           [`CountsFinite`: `finite_similarTilingFinsets`, `finite_classes`, `finite_bags`, `finite_proportions`, `ncard_chain`],
         ),
+        ..lean-row([@def:crossing], [`Crossings`: `Rect.LowerRightOf`, `Rect.UpperLeftOf`, `Rect.HasCorner`, `IsCrossing`]),
+        ..lean-row(
+          [@def:yields],
+          [`Records`: `YieldsWith`, `Yields`, `LowerFirst`, `UpperFirst`, `GTier.tip`, `XExt`, `FirstNot`, `Chooses`],
+        ),
+        ..lean-row(
+          [@obs:crossing],
+          [`Crossings`: `IsTiling.eq_of_corner`, `isCrossing_iff`, `finite_crossings`],
+          [`Records`: `YieldsWith.tiles_eq`],
+        ),
+        ..lean-row(
+          [@prop:representative],
+          [`Records`: `Placing`, `Head`, `Placing.stale`, `Placing.started`, `Placing.stage`, `Placing.eq_of_chooses`, `YieldsWith.chooses`, `representative`, `yieldsWith_unique`, `yields_unique_of_no_crossing`],
+        ),
+        ..lean-row(
+          [@prop:multiplicity],
+          [`Multiplicity`: `SInv`, `SInv.step`, `XState`, `XState.step`, `exists_chooses`, `Placing.order`, `exists_record`, `multiplicity`, `bijOn_upperFirstSet`, `ncard_records`],
+        ),
         ..lean-row(
           [@prop:symmetric],
           [`Counts`: `IsSimilarSetTiling.squares_of_reflection`, `image_transpose_ne`, `Rect.not_disjoint_rot`],
@@ -2005,7 +2042,7 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
       )
     }),
-    caption: [The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems and @app:solving, and the Lean declarations that formalise them.],
+    caption: [The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems, @sec:tilings-counts and @app:solving, and the Lean declarations that formalise them.],
   ) <tab:formal>
 ]
 
@@ -2026,6 +2063,12 @@ The statements of the paper and those of the development differ in the following
 - *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, proves that they are finite, and takes their numbers of elements; the inequalities $a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n)$ are the theorem `ncard_chain`.
   The second and third statements of @prop:symmetric are stated for both diagonals and both senses of the quarter turn.
   The development shows that a tiling has at most eight images under the symmetries of the square, which is what the last inequality uses, and does not show that the eight symmetries are distinct.
+- *Records of a tiling.* The crossing of @def:crossing is the predicate `IsCrossing`, and the second statement of @obs:crossing is `isCrossing_iff`.
+  The order in which a record places two tiles is expressed by the sublist relation on the list of its tiles, the choice of orientations is a function on all rectangles, and the set $X$ of @prop:representative is a set of points that agrees with the predicate `UpperFirst`.
+  The three statements of @prop:representative are `YieldsWith.chooses`, with `representative` for its particular case, `yieldsWith_unique` and `yields_unique_of_no_crossing`.
+  The two statements of @prop:multiplicity are `multiplicity`, with `exists_record` for the existence, and `ncard_records`, which follows from the bijection `bijOn_upperFirstSet`; the number of records is the number of elements of a set, as for the counts of tilings.
+  These statements are made for the main rectangle $[0, W] times [0, H]$, not only for the square, and those on the existence and on the number of records assume $W, H > 0$, as in the paper.
+  The module `Counts` states the crossing at the centre in the third statement of @prop:symmetric with a second predicate, `IsSetCrossing`, which is shown to agree with `IsCrossing` (`IsTiling.isCrossing_iff_isSetCrossing`).
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
   The representation of a proportion by its minimal polynomial and an isolating interval belongs to the routines of @def:primitives, which are assumed.
 - *Indices.* The development numbers the inside placements, the free sides and the placements from zero, where the paper numbers them from one.
@@ -2062,7 +2105,7 @@ The formal development is about a model of the method, and the following lies ou
   It is not proved that the final equation of a pass involves the scale only, nor that the exact eliminations of the certificate of @def:check divide exactly; the method checks both and passes the record to the direct method, or returns the verdict unsure, when the check fails.
 - *Regularity.* It is not proved that every record is regular in the sense of @def:regular.
   The searches count the exceptions, and the completeness statements of @prop:reference and @prop:fast take their absence as a hypothesis.
-- *Uniqueness.* It is not proved that a tiling, or a mosaic class, arises from a single record.
+- *Mosaic classes.* It is not proved that a mosaic class arises from a single record; that a tiling without crossings is yielded by a single record, for given orientations, is @prop:representative.
   The agreement of the number of records with the Baxter numbers is checked by computation, and within the development for at most seven tiles.
 - *Counts and statistics.* The development is about the set of proportions reported.
   Nothing is proved about the number of records that realise a proportion, the number of polynomials, or any other count or statistic of @sec:results.
@@ -3250,7 +3293,7 @@ Mosaic classes of tilings in which no four tiles meet at a point are the mosaic 
 The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
 For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
 This agreement is an observation, made by computation.
-That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative, though not formally; the correctness of the search does not depend on it.
+That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative; the correctness of the search does not depend on it.
 
 In terms of electrical networks @bsst1940, each horizontal segment is a node, each tile is a resistor joining the segment that contains its top side to the one that contains its bottom side, the width of a tile is the current through it and its height the potential difference across it.
 A wide tile has resistance $1 slash x$ and a tall one resistance $x$.
