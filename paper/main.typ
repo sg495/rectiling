@@ -1903,12 +1903,15 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row(
           [@def:tbc],
           [`Counts`: `IsSetTiling`, `IsSimilarSetTiling`, `isSimilarSetTiling_iff`, `SimilarTilings`, `Rect.sym`, `orbit`, `Classes`, `Bags`, `Proportions`, `mem_proportions_iff`, `image_fst_bags`],
+          [`TilingCount`: `finite_similarTilings`],
+          [`CountsFinite`: `finite_similarTilingFinsets`, `finite_classes`, `finite_bags`, `finite_proportions`, `ncard_chain`],
         ),
         ..lean-row(
           [@prop:symmetric],
-          [`Counts`: `ncard_similarTilings_mod_two`, `IsSimilarSetTiling.squares_of_reflection`, `IsSimilarSetTiling.quarter_turn`, `Rect.not_disjoint_rot`],
+          [`Counts`: `IsSimilarSetTiling.squares_of_reflection`, `image_transpose_ne`, `Rect.not_disjoint_rot`],
+          [`CountsFinite`: `parity_ncard_similarTilings`, `IsSimilarSetTiling.quarter_turn_isCrossing`],
         ),
-        ..lean-row([@prop:bags], [`Counts`: `exists_two_sizes`, `exists_bags_ne`, `exists_two_bags`, `ncard_proportions_lt_ncard_bags`]),
+        ..lean-row([@prop:bags], [`Counts`: `exists_two_sizes`, `exists_bags_ne`, `exists_two_bags`], [`CountsFinite`: `ncard_proportions_lt_ncard_bags'`]),
         ..lean-row(
           [@def:forms],
           [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`],
@@ -2020,10 +2023,9 @@ The statements of the paper and those of the development differ in the following
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
 - *Proportions that are not positive.* The development states @prop:forms for every $x != 0$, and @prop:hom with no condition on the sign of $alpha$; its real arithmetic of lengths is defined for every real proportion.
-- *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, and takes their numbers of elements; it does not prove that these sets are finite.
-  The first statement of @prop:symmetric and @prop:bags are stated in it under the hypothesis that the set concerned is finite, and without that hypothesis as the statements that transposition is an involution without fixed points on the tilings of proportion larger than $1$, and that two bags with $n$ tiles have the same proportion.
-  The second and third statements of @prop:symmetric are stated for both diagonals and both senses of the quarter turn, where a crossing is a point that is a corner of four tiles, one of each of the four kinds.
-  The development does not prove that the square has exactly eight symmetries, nor the inequalities $a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n)$.
+- *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, proves that they are finite, and takes their numbers of elements; the inequalities $a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n)$ are the theorem `ncard_chain`.
+  The second and third statements of @prop:symmetric are stated for both diagonals and both senses of the quarter turn.
+  The development shows that a tiling has at most eight images under the symmetries of the square, which is what the last inequality uses, and does not show that the eight symmetries are distinct.
 - *Real numbers and algebraic numbers.* A reported proportion is a real number in the development, and the sets reported are finite sets of real numbers.
   The representation of a proportion by its minimal polynomial and an isolating interval belongs to the routines of @def:primitives, which are assumed.
 - *Indices.* The development numbers the inside placements, the free sides and the placements from zero, where the paper numbers them from one.
