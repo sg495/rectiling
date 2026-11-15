@@ -1115,11 +1115,11 @@ The three statements are independent of one another as far as we know.
 #heading(numbering: none)[Use of AI Systems]
 
 This project was carried out with responsible use of AI systems.
-The author formulated, implemented and proved an initial version of Sections 1-4, which AI systems optimised and improved upon.
-The results of Section 5 were found by computation, and the propositions/conjectures of Section 5 were formulated and proved by AI systems on individual request by the author.
-An initial version of the solution methods for linear systems in Appendix B were proposed by the author, and were then autonomously improved by AI systems with the objective of optimising various aspects of the search algorithm.
+The author formulated, implemented and proved an initial version of Sections #ref(<sec:intro>, supplement: none)-#ref(<sec:systems>, supplement: none), which AI systems optimised and improved upon.
+The results of @sec:results were found by computation, and the propositions/conjectures of @sec:results were formulated and proved by AI systems on individual request by the author.
+An initial version of the solution methods for linear systems in @app:solving were proposed by the author, and were then autonomously improved by AI systems with the objective of optimising various aspects of the search algorithm.
 Lean formalisation was carried out by AI systems on general request by the author.
-Properties and conjectures in Appendix D were autonomously formulated by AI systems, on request by the author for each theme of investigation.
+Properties and conjectures in @app:structure and @app:maps were autonomously formulated by AI systems, on request by the author for each theme of investigation.
 The paper was written and reviewed by AI systems --- under the author's own direction, supervision, and revision --- based on the fullness of project data: development transcripts, source code, documentation, version history, test suites, and benchmarking results.
 
 #bibliography("refs.bib", style: "ieee")
@@ -1708,7 +1708,7 @@ Whenever the incremental method decides a record itself, it reports exactly the 
 ] <prop:fastsolve>
 
 #proof[
-Every solution of $rho$ is a root of the polynomial $q$ of the third step, by the second statement of @prop:det, and the numerical check decides each root correctly, by @prop:numeric; a record passed to the direct method is treated by @prop:solve.
+  Every solution of $rho$ is a root of the polynomial $q$ of the third step, by the second statement of @prop:det, and the numerical check decides each root correctly, by @prop:numeric; a record passed to the direct method is treated by @prop:solve.
 
   Suppose that $rho$ is not passed to the direct method.
   Then the pass is successful, $c := (E_"fin")_0$ is not zero, the other coefficients of $E_"fin"$ are zero, and $q = "key"(c)$ is a non-zero polynomial with the same zeros as $c$ among the non-zero real numbers.
@@ -1945,7 +1945,10 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@prop:complete], [`Staircase`: `allowed_map`], [`Completeness`: `complete_from`, `completeness`]),
         ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
         ..lean-row([@def:mosaic], [not formalised]),
-        ..lean-row([@def:flow], [`Network`: `Network`, `Network.Adj`, `Network.Proper`, `Network.div`, `Network.IsFlow`]),
+        ..lean-row(
+          [@def:flow],
+          [`Network`: `Network`, `Network.Adj`, `Network.Proper`, `Network.div`, `Network.IsFlow`],
+        ),
         ..lean-row(
           [@def:network-polynomial],
           [`Network`: `Network.system`],
@@ -2008,7 +2011,10 @@ The proofs given in this paper follow those of the development, statement by sta
           [`TilingCount`: `Network.Iso.isFlow`, `heightPair`, `IsSimilarTiling.eq_of_isFlow`, `IsSimilarTiling.eq_of_heightPair_eq`, `finite_similarTilings_of`, `finite_similarTilings`],
           [`CountsFinite`: `finite_similarTilingFinsets`, `finite_classes`, `finite_bags`, `finite_proportions`, `ncard_chain`],
         ),
-        ..lean-row([@def:crossing], [`Crossings`: `Rect.LowerRightOf`, `Rect.UpperLeftOf`, `Rect.HasCorner`, `IsCrossing`]),
+        ..lean-row(
+          [@def:crossing],
+          [`Crossings`: `Rect.LowerRightOf`, `Rect.UpperLeftOf`, `Rect.HasCorner`, `IsCrossing`],
+        ),
         ..lean-row(
           [@def:yields],
           [`Records`: `YieldsWith`, `Yields`, `LowerFirst`, `UpperFirst`, `GTier.tip`, `XExt`, `FirstNot`, `Chooses`],
@@ -2031,7 +2037,11 @@ The proofs given in this paper follow those of the development, statement by sta
           [`Counts`: `IsSimilarSetTiling.squares_of_reflection`, `image_transpose_ne`, `Rect.not_disjoint_rot`],
           [`CountsFinite`: `parity_ncard_similarTilings`, `IsSimilarSetTiling.quarter_turn_isCrossing`],
         ),
-        ..lean-row([@prop:bags], [`Counts`: `exists_two_sizes`, `exists_bags_ne`, `exists_two_bags`], [`CountsFinite`: `ncard_proportions_lt_ncard_bags'`]),
+        ..lean-row(
+          [@prop:bags],
+          [`Counts`: `exists_two_sizes`, `exists_bags_ne`, `exists_two_bags`],
+          [`CountsFinite`: `ncard_proportions_lt_ncard_bags'`],
+        ),
         ..lean-row(
           [@def:forms],
           [`Forms`: `Form`, `formAlgebra`, `Form.num`, `Form.value`, `symInitial`, `symFresh`, `symEquations`, `symPositives`],
@@ -2057,7 +2067,11 @@ The proofs given in this paper follow those of the development, statement by sta
           [`Reduced`: `homInitial`, `homEquations`, `homPositives`, `val`],
           [`Certified`: `Coeff`, `propX`, `evalL`],
         ),
-        ..lean-row([@prop:hom], [`Reduced`: `positives_hom`, `equations_hom`, `satisfies_iff_hom`, `satisfies_scale`], [`Fast`: `solvable_iff`]),
+        ..lean-row(
+          [@prop:hom],
+          [`Reduced`: `positives_hom`, `equations_hom`, `satisfies_iff_hom`, `satisfies_scale`],
+          [`Fast`: `solvable_iff`],
+        ),
         ..lean-row(
           [@def:elimination],
           [`Elimination`: `Stage`, `Stage.side`, `Elim`, `Step`, `Divisible`, `elimForm`, `Run`, `Run.pivots`],
