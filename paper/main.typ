@@ -76,6 +76,7 @@ Both remarks are used repeatedly below.
 ] <def:counts>
 
 The sets $P_n (w)$ are finite in every case treated in this paper, as a by-product of the computation; see @sec:solving.
+For the square, $P_n (1)$ is finite for every $n$ (@prop:upper).
 A statement labelled Observation is given without proof; its proof is in the formal development (@app:formal).
 Scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
 
@@ -856,34 +857,43 @@ The sets of proportions have some structure: proportions persist when tiles are 
 These properties, and the conjectures that the computations suggest, are the subject of @app:structure.
 Here we bound the growth of $a(n)$.
 
-The bound rests on the electrical network of a tiling @bsst1940, whose vertices are the horizontal lines of the tiling, whose poles $s$ and $t$ are the top and bottom sides of the main rectangle, and whose edges are the tiles; the current in a tile is its width and the potential difference across it is its height (@def:tiling-network).
-The network $frak(N)(tau)$ of a tiling $tau$ is drawn in the plane with both poles on the outer face, and $G^+$ denotes its graph with an additional edge $e_0$ joining the poles (@def:plane-network).
-For an orientation vector $epsilon$, which labels each edge as tall or wide, the impedance $Z_(frak(N), epsilon)$ of a network $frak(N)$ between its poles, when every tall edge has resistance $x$ and every wide edge resistance $1 slash x$, is a rational function of $x$ (@def:impedance).
-A similar tiling $tau$ of $[0, W] times [0, H]$ of proportion $x$, with orientations $epsilon$, satisfies $H slash W = Z_(frak(N)(tau), epsilon) (x)$, by @prop:tiling-network.
+The bound rests on the electrical network of a tiling @bsst1940, in which each tile is a resistor: the current in a tile is its width, the potential difference across it is its height, and its resistance is therefore $x$ if the tile is tall and $1 slash x$ if it is wide.
+For the unit square the total current equals the potential difference between the top side and the bottom side, which makes $x$ a root of a determinant that depends only on the network and on the orientations of the tiles; and the networks of tilings are among the planar maps that Tutte counted.
+The definitions and the statements on which the bound rests are in @app:maps.
+In brief, a tiling $tau$ of a rectangle has a rooted map $cal(M)(tau)$, whose edges are the tiles and one additional edge $e_0$ between the top side and the bottom side (@def:tiling-map); this map is non-separable and planar, and it has a network on which the tiling is a flow (@prop:tiling-map).
+A rooted map $cal(M)$ with a network has a finite set $X(cal(M))$ of real numbers, the real roots of the polynomials of that network for the orientation vectors that are $-1$ at the edge before the root (@def:map-network), and isomorphic rooted maps have the same set (@obs:map-polynomial).
+The statements of this section and of @app:maps are those of the formal development (@app:formal), in which the enumeration of Tutte is a hypothesis; further properties of these networks, which are not formalised, are in @app:structure.
 
-A _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere.
-It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
-A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
-The following result of Tutte @tutte1963 is used without proof: the number of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
+Tutte @tutte1963 counted the graphs embedded in the sphere without loops and without a vertex whose removal disconnects them, rooted by the choice of an edge, of a direction of that edge and of one of its sides, up to the homeomorphisms of the sphere.
+That those with $m >= 2$ edges correspond to the isomorphism classes of rooted non-separable planar maps with $m$ edges in the sense of @def:map is classical; it is not formalised (@sec:unformalised).
+The result of Tutte is used without proof, in the following form, in the second statement of @prop:upper and in its consequence, and nowhere else in this section or in @app:maps: the number of isomorphism classes of rooted non-separable planar maps with $m >= 2$ edges is $2 (3 m - 3)! slash (m! thin (2 m - 1)!)$.
 For $m = n + 1$ this is
 $ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
 
 #proposition[
-  The number of proportions for the square satisfies
+  Let $n >= 1$.
+  + The set $P_n (1)$ is finite.
+  + $a(n) <= n 2^(n - 1) M(n)$.
+  Consequently
   $ limsup_(n -> infinity) a(n)^(1 slash n) <= 27 / 2. $
-  More precisely, $a(n) <= n 2^(n - 1) M(n)$ for every $n >= 1$.
 ] <prop:upper>
 
 #proof[
   Let $x in P_n (1)$, and let $tau$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
-  Transposing if necessary, by @prop:transposition, the tile at the bottom-left corner is wide; let $epsilon$ be an orientation vector of $tau$ for which that tile has orientation $-1$; if $x = 1$, all orientations are taken to be $-1$.
-  Root the map $G^+$ of $frak(N)(tau)$ at $e_0$; the edge of the bottom-left tile is then the first edge after $e_0$ in the rotation at $t$, on a side fixed once and for all.
-  By @prop:tiling-network, $Z_(frak(N)(tau), epsilon) (x) = 1$, so that $x$ is a root of $N - D$, where $N slash D$ is this function in lowest terms.
-  By @prop:reactance, $N - D$ is not zero and has degree at most $n$, and it depends only on the isomorphism class of the rooted map with its orientation vector.
-  By @prop:nonseparable and the result of Tutte there are at most $M(n)$ rooted maps, each with at most $2^(n - 1)$ orientation vectors in which the distinguished edge has orientation $-1$, and each pair contributes at most $n$ roots.
-  This gives the bound on $a(n)$, and the limit follows by Stirling's formula, by which $M(n)$ is asymptotic to a constant times $(27 slash 4)^n n^(-5 slash 2)$.
-]
+  Replacing $tau$ by its transpose if necessary, the tile with corner $(0, 0)$ is wide for $x$.
+  Let $epsilon_T := -1$ if the tile $T$ is wide for $x$, and $epsilon_T := +1$ otherwise, so that $h_T slash w_T = x^(epsilon_T)$.
+  By the first statement of @prop:tiling-map and the third of @obs:network, $x$ is a root of $P_(cal(M)(tau), epsilon)$, and $epsilon$ is $-1$ at the edge before the root, by the second statement of @prop:tiling-map; so $x in X(cal(M)(tau))$.
+  This set has at most $n 2^(n - 1)$ elements, since there are $2^(n - 1)$ such orientation vectors and each polynomial is not zero and has degree at most $n$, by @obs:network.
+  By @obs:map-polynomial it is the same for two tilings whose maps are isomorphic, and these maps are rooted non-separable planar maps with $n + 1$ edges by @prop:tiling-map.
+  So $P_n (1)$ is contained in a union of sets of at most $n 2^(n - 1)$ elements, at most one for each isomorphism class of such maps.
+  The classes are finitely many, since every rooted map with $n + 1$ edges is isomorphic to one with the darts $1, dots, 2 n + 2$; this gives the first statement.
+  By the result of Tutte they are $M(n)$, which gives the second.
 
+  For the limit,
+  $ M(n) = 2 / ((2 n + 1) (n + 1)) binom(3 n, n) <= binom(3 n, n) <= (27 / 4)^n, $
+  because $binom(3 n, n) n^n (2 n)^(2 n)$ is one term of the binomial expansion of $(n + 2 n)^(3 n)$.
+  Hence $a(n) <= n (27 slash 2)^n$, and $n^(1 slash n)$ tends to $1$.
+]
 
 The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:mosaic.
 The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$.
@@ -908,10 +918,25 @@ We now count the tilings themselves, in three ways.
 ] <def:tbc>
 
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
-The number $t(n)$ is finite.
-Indeed there are finitely many proportions, by @prop:upper, and finitely many records, and a record has at most one solution at a given proportion: since the constraints are linear equations and strict linear inequalities in the free sides, two solutions would be joined by a segment of solutions, which give infinitely many tilings with the same record; two of these would have the same network, with the same edge for each placement, hence the same flow by @prop:flow and the same tiles.
-A tiling determines its bag, and symmetric tilings have the same bag, so that
-$ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
+These numbers are finite.
+The proof uses the network of the levels of a tiling (@def:height-network), whose vertices are the ordinates of the horizontal sides of the tiles.
+
+#proposition[
+  For every $n >= 1$, the unit square has finitely many similar tilings with $n$ tiles, and
+  $ a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n). $
+] <prop:tilings-finite>
+
+#proof[
+  There are finitely many proportions, by @prop:upper; let $x$ be one of them.
+  For a similar tiling $cal(T)$ of the unit square of proportion $x$ with tiles $R_1, dots, R_n$, number the vertices of its network of the levels from $1$ to their number, which is at most $n + 1$, and let $epsilon_j := +1$ if $R_j$ is tall for $x$ and $epsilon_j := -1$ otherwise, so that $R_j$ has resistance $x^(epsilon_j)$.
+  By @obs:height-network the ordinates and the widths form a flow of value $1$ for these resistances, with potential $0$ at $t$, and by the first statement of @obs:network it is the only such flow.
+  So the numbered network and $epsilon$ determine, for each tile, its width, which is the current, its height, which is the resistance times the current, and the ordinate of its bottom side, which is the potential of its head.
+  The same data for the transpose of $cal(T)$ determine the abscissa of the left side of each tile.
+  There are finitely many networks with the vertices $1, dots, k$, for some $k <= n + 1$, and the edges $1, dots, n$, and finitely many orientation vectors; so there are finitely many such tilings, as sequences and hence as sets of rectangles.
+
+  For the inequalities, every proportion is that of a bag, the tilings of an orbit have the same bag, and an orbit has at least one and at most eight tilings.
+]
+
 The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
 @tab:tbc gives the values that we computed, @fig:sequences plots the four sequences, and @fig:classes shows the sixteen classes for four tiles.
 
@@ -1816,10 +1841,11 @@ Completeness of the incremental search needs less than that of the direct search
 
 = Formalisation <app:formal>
 
-The statements of @sec:tilings, @sec:staircases, @sec:systems, @sec:tilings-counts and @app:solving have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
+The statements of @sec:tilings, @sec:staircases, @sec:systems, @sec:growth, @sec:tilings-counts, @app:solving and @app:maps have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
 The development contains no unproved statement and no axiom of its own; its main theorems depend only on the three axioms `propext`, `Classical.choice` and `Quot.sound` of Lean and Mathlib.
+The result of Tutte quoted in @sec:growth is not proved: it is a hypothesis of the two theorems that formalise the second statement of @prop:upper and its consequence.
 @tab:formal lists, for each definition and proposition of those sections, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
-The proofs given in this paper follow those of the development, statement by statement.
+The proofs given in this paper follow those of the development, statement by statement, except where @sec:differences says otherwise.
 
 #let lean-row(statement, ..declarations) = (statement, declarations.pos().join(linebreak()))
 
@@ -1919,10 +1945,67 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row([@prop:complete], [`Staircase`: `allowed_map`], [`Completeness`: `complete_from`, `completeness`]),
         ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
         ..lean-row([@def:mosaic], [not formalised]),
+        ..lean-row([@def:flow], [`Network`: `Network`, `Network.Adj`, `Network.Proper`, `Network.div`, `Network.IsFlow`]),
+        ..lean-row(
+          [@def:network-polynomial],
+          [`Network`: `Network.system`],
+          [`NetworkPolynomial`: `Network.pairMatrix`, `Network.pairPoly`],
+        ),
+        ..lean-row(
+          [@obs:network],
+          [`Network`: `Network.IsFlow.energy`, `Network.IsFlow.unique`],
+          [`NetworkPolynomial`: `Network.natDegree_pairPoly_le`, `Network.Proper.pairPoly_ne_zero`, `Network.IsFlow.aeval_pairPoly`],
+          [`ProportionBound`: `Network.Iso`, `Network.Iso.pairPoly_eq`],
+          [`MapNetwork`: `Network.reverse`, `Network.pairPoly_reverse`, `Network.UIso`, `Network.UIso.pairPoly_eq`],
+        ),
+        ..lean-row(
+          [@def:map],
+          [`CombinatorialMap`: `CMap`, `CMap.face`, `CMap.Vertex`, `CMap.Edge`, `CMap.Face`, `CMap.Connected`, `CMap.Planar`, `CMap.Loopless`, `CMap.NoCutVertex`, `RootedMap`, `RootedMap.Isomorphic`, `RootedMapClass`, `TutteEnumeration`, `TutteEnumeration.card_eq_tutteM`],
+          [`Growth`: `tutteM`],
+        ),
+        ..lean-row(
+          [@def:map-network],
+          [`MapNetwork`: `CMap.Tile`, `CMap.net`, `CMap.rootSet`, `RootedMap.net`, `RootedMap.poly`, `RootedMap.rootSet`, `RootedMapClass.rootSet`],
+        ),
+        ..lean-row(
+          [@obs:map-polynomial],
+          [`MapNetwork`: `CMap.Iso`, `CMap.Iso.netUIso`, `CMap.Iso.rootSet_subset`, `RootedMap.Isomorphic.poly_eq`, `RootedMap.Isomorphic.rootSet_eq`],
+        ),
+        ..lean-row(
+          [@def:tiling-map],
+          [`TilingMap`: `Dart`, `dartHeight`, `dartStart`, `dartStop`, `nextDart`, `flipDart`, `tilingMap`],
+        ),
+        ..lean-row(
+          [@obs:tiling-map],
+          [`TilingMap`: `IsTiling.eq_of_overlap`, `IsTiling.exists_nw`, `IsTiling.exists_se`, `IsTiling.exists_top_left`, `IsTiling.exists_bottom_right`, `IsRotation`, `IsRotation.height`, `IsRotation.start`, `nextDart_isRotation`, `nextDart_injective`, `IsTilingMap`, `tilingMap_isTilingMap`],
+          [`TilingMapFlow`: `IsTilingMap.height_eq`, `IsTilingMap.vertexHeight`],
+        ),
+        ..lean-row(
+          [@prop:tiling-map],
+          [`TilingMapFlow`: `tilingNet`, `IsTilingMap.sum_stop_sub_start`, `IsTilingMap.tilingNet_isFlow`],
+          [`TilingMapNonseparable`: `IsTilingMap.exists_top_or_poleBot`, `IsTilingMap.exists_bot_or_poleTop`, `IsTilingMap.reach_poleBot`, `IsTilingMap.reach_poleTop`, `IsTilingMap.connected`, `IsTilingMap.loopless`, `IsTilingMap.noCutVertex`, `IsTilingMap.tilingNet_proper`],
+          [`TilingMapPlanar`: `vertexMark`, `faceMark`, `IsTilingMap.exists_vertexMark`, `IsTilingMap.vertex_closure`, `IsTilingMap.vertexMark_unique`, `IsTilingMap.exists_faceMark`, `IsTilingMap.face_closure`, `IsTilingMap.faceMark_unique`, `IsTilingMap.card_vertex`, `IsTilingMap.card_face`, `IsTilingMap.card_edge`, `IsTilingMap.planar`],
+          [`UpperBound`: `IsTilingMap.netUIso`, `IsTilingMap.corner_edge`],
+        ),
+        ..lean-row(
+          [@prop:upper],
+          [`ProportionBound`: `finite_achievable`, `ncard_achievable_le`],
+          [`Growth`: `tutteM_le`, `limsup_le_of_le_tutteM`],
+          [`UpperBound`: `Achievable.exists_wide_corner`, `IsTilingMap.mem_rootSet`, `IsTilingMap.rootSet_finite_and_ncard_le`, `IsTilingMap.rooted`, `Achievable.exists_rootedMapClass`, `ncard_achievable_le_tutte`, `limsup_achievable_le`],
+        ),
         ..lean-row(
           [@def:tbc],
           [`Counts`: `IsSetTiling`, `IsSimilarSetTiling`, `isSimilarSetTiling_iff`, `SimilarTilings`, `Rect.sym`, `orbit`, `Classes`, `Bags`, `Proportions`, `mem_proportions_iff`, `image_fst_bags`],
-          [`TilingCount`: `finite_similarTilings`],
+        ),
+        ..lean-row([@def:height-network], [`TilingNetwork`: `levels`, `heightNetwork`]),
+        ..lean-row(
+          [@obs:height-network],
+          [`CrossSection`: `IsTiling.sum_generic`, `IsTiling.sum_bottom_eq_sum_top`],
+          [`TilingNetwork`: `IsTiling.heightNetwork_proper`, `IsTiling.heightNetwork_isFlow`],
+        ),
+        ..lean-row(
+          [@prop:tilings-finite],
+          [`TilingCount`: `Network.Iso.isFlow`, `heightPair`, `IsSimilarTiling.eq_of_isFlow`, `IsSimilarTiling.eq_of_heightPair_eq`, `finite_similarTilings_of`, `finite_similarTilings`],
           [`CountsFinite`: `finite_similarTilingFinsets`, `finite_classes`, `finite_bags`, `finite_proportions`, `ncard_chain`],
         ),
         ..lean-row([@def:crossing], [`Crossings`: `Rect.LowerRightOf`, `Rect.UpperLeftOf`, `Rect.HasCorner`, `IsCrossing`]),
@@ -2042,7 +2125,7 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
       )
     }),
-    caption: [The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems, @sec:tilings-counts and @app:solving, and the Lean declarations that formalise them.],
+    caption: [The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems, @sec:growth, @sec:tilings-counts, @app:solving and @app:maps, and the Lean declarations that formalise them.],
   ) <tab:formal>
 ]
 
@@ -2060,9 +2143,38 @@ The statements of the paper and those of the development differ in the following
 - *The main rectangle.* In the statements on the two searches the development takes the main rectangle with integer sides $a$ and $b$, as @prop:reference and @prop:fast do, and the systems are those of the rectangle of sides $a slash b$ and $1$.
   The soundness statements of the development assume only $b > 0$; the positivity of $W$ and $H$ in @prop:sound is established within the formal proof and is not part of the formal statement.
 - *Proportions that are not positive.* The development states @prop:forms for every $x != 0$, and @prop:hom with no condition on the sign of $alpha$; its real arithmetic of lengths is defined for every real proportion.
-- *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, proves that they are finite, and takes their numbers of elements; the inequalities $a(n) <= c(n) <= b(n) <= t(n) <= 8 b(n)$ are the theorem `ncard_chain`.
+- *Counts of tilings.* The development defines the sets of tilings, classes, bags and proportions of @def:tbc, with a tiling as a finite set of rectangles, proves that they are finite, and takes their numbers of elements; the inequalities of @prop:tilings-finite are the theorem `ncard_chain`.
+  The finiteness of @prop:tilings-finite is proved for tilings as lists of $n$ rectangles (`finite_similarTilings`), from which that of the sets of tilings, of classes and of bags follows; the vertices of the network of the levels are numbered by an arbitrary bijection, and the network of @def:height-network has as its vertices the ordinates of the top sides and zero, which for a tiling are the ordinates of all the horizontal sides.
   The second and third statements of @prop:symmetric are stated for both diagonals and both senses of the quarter turn.
   The development shows that a tiling has at most eight images under the symmetries of the square, which is what the last inequality uses, and does not show that the eight symmetries are distinct.
+- *Networks and their polynomials.* A network of the development (`Network`) consists of the tails, the heads and the two poles, with no condition; the three conditions of @def:flow form a predicate (`Network.Proper`), which the theorems assume where they need it, and the polynomial of @def:network-polynomial is defined without it.
+  An orientation vector is a Boolean function, which is true for $+1$.
+  The fourth statement of @obs:network is `Network.UIso.pairPoly_eq`, which combines the invariance under bijections that respect the tails and the heads (`Network.Iso.pairPoly_eq`) with the invariance under the exchange of the tail and the head of some edges (`Network.pairPoly_reverse`).
+  The polynomial is the determinant of the equations of Ohm's law and Kirchhoff's law; it is not the polynomial $N - D$ of the impedance function of @def:impedance in lowest terms, which the development does not define.
+  No relation between the two polynomials is proved, and the statements of @app:structure about $N - D$, such as @prop:difference, are not claimed for the determinant.
+  The development also proves, for positive resistances, that a network has a flow of every value and that its impedance is positive (`Network.Proper.exists_isFlow`, `Network.Proper.impedance_pos`), and that the height of the main rectangle over its width is the impedance of the network of the levels (`IsTiling.impedance_heightNetwork`); the paper states these only in @prop:flow and @prop:tiling-network.
+- *Maps.* The maps of @def:map are those of the development (`CMap`), in which no surface and no embedding occurs: the vertices, the edges and the faces are the quotients of the set of darts by the relation of lying in the same cycle of a permutation, and planarity is the equation between their numbers.
+  The rooted non-separable planar maps with $m$ edges of the development (`RootedMap`) have the darts $0, dots, 2 m - 1$, and their classes (`RootedMapClass`) are the quotient by the equivalence that the relation of isomorphism generates.
+  The development defines the network of a rooted map for every map, with the tail of each edge at a chosen dart and with no condition, and defines $X(cal(M))$ (`CMap.rootSet`) as the set of the real roots of those polynomials that are not zero, which for a map with a network are all of them; @obs:map-polynomial is `CMap.Iso.rootSet_subset`, applied to an isomorphism and to its inverse, which holds without the hypothesis that the two maps have networks; `RootedMap.Isomorphic.rootSet_eq` is its case for the rooted maps of the development.
+  The condition of non-separability of @def:map is the conjunction of two predicates (`CMap.Loopless`, `CMap.NoCutVertex`), and an isomorphism of rooted maps on arbitrary sets of darts is `CMap.Iso` with the condition on the roots.
+- *The map of a tiling.* A dart is a pair of a tile, or of nothing for the edge $e_0$, and a Boolean value, which is true for the upper darts.
+  The development proves the three statements of @prop:tiling-map for every map on the darts of a tiling that satisfies a predicate (`IsTilingMap`), which states the alternatives of the rule of @def:tiling-map for each dart, with the equalities of coordinates that they entail and without their order of precedence; the map of @def:tiling-map (`tilingMap`) satisfies it.
+  The network of the first statement of @prop:tiling-map is `tilingNet`, which `IsTilingMap.netUIso` identifies with the network of the rooted map up to the exchange of tails and heads.
+  The tile $T'$ of each clause of @def:tiling-map is taken by choice, and its uniqueness, which the paper remarks after the definition, is not used.
+  It is not proved that the vertices of the map of a tiling are the components of @def:tiling-network, nor that the rule lists the darts around a segment as described before @def:tiling-map.
+- *The enumeration of Tutte.* The result of Tutte is the proposition `TutteEnumeration`, an equality between the number of elements of `RootedMapClass m` and the number of Tutte, for every $m >= 2$.
+  It is not an axiom of the development but a hypothesis of the theorems `ncard_achievable_le_tutte` and `limsup_achievable_le`, which formalise the second statement of @prop:upper and its consequence.
+  Were the classes of the development not those that Tutte counted, the hypothesis would be false and these two theorems would say nothing.
+  As a check, the script `tools/tutte_check.py` of the repository enumerates the pairs of permutations that satisfy the definitions of the development and finds $1$, $2$, $6$ and $22$ classes for $2, dots, 5$ edges; a transcription of it into C, which is not in the repository, finds $91$ for $6$ edges.
+  These are the numbers of Tutte.
+  These programs transcribe the definitions, and the check is not made inside Lean.
+- *The upper bound.* The first statement of @prop:upper is `finite_achievable`, which the development states for every $n >= 0$ and proves by another route than the paper.
+  The number $a(n)$ is the number of elements of a set, which is meaningful because that set is finite.
+  By @obs:height-network and @obs:network, a proportion with $n$ tiles is a root of the polynomial of the network of the levels of a tiling, which has $n$ edges and at most $n + 1$ vertices, and the networks of this size with an orientation vector form finitely many classes up to the bijections that respect the tails and the heads (`PairClass`).
+  This gives `ncard_achievable_le`, the bound of $a(n)$ by $n$ times the number of these classes, with neither maps nor the result of Tutte.
+  The argument of the paper for the first statement is the theorem `Achievable.exists_rootedMapClass` together with the finiteness of `RootedMapClass`.
+  The development proves the bound $n 2^(n - 1)$ on the number of elements of $X(cal(M))$ for the maps of tilings only (`IsTilingMap.rootSet_finite_and_ncard_le`); the other classes contribute nothing to the union.
+  The orientation vector of the proof of @prop:upper is `narrowVector`, and that of the proof of @prop:tilings-finite is `tallVector`; they differ only for tilings by squares.
 - *Records of a tiling.* The crossing of @def:crossing is the predicate `IsCrossing`, and the second statement of @obs:crossing is `isCrossing_iff`.
   The order in which a record places two tiles is expressed by the sublist relation on the list of its tiles, the choice of orientations is a function on all rectangles, and the set $X$ of @prop:representative is a set of points that agrees with the predicate `UpperFirst`.
   The three statements of @prop:representative are `YieldsWith.chooses`, with `representative` for its particular case, `yieldsWith_unique` and `yields_unique_of_no_crossing`.
@@ -2110,6 +2222,9 @@ The formal development is about a model of the method, and the following lies ou
 - *Counts and statistics.* The development is about the set of proportions reported.
   Nothing is proved about the number of records that realise a proportion, the number of polynomials, or any other count or statistic of @sec:results.
 - *Degrees and minimal polynomials.* The algebraic degree of a proportion and its minimal polynomial are produced by the assumed routines and are not the subject of any formal statement.
+- *Planar maps and the result of Tutte.* The enumeration of Tutte is not proved in the development, which takes it as a hypothesis (@sec:differences).
+  The correspondence between the graphs embedded in the sphere and the maps of @def:map is not formalised, and neither is the agreement of the classes of the development with the maps that Tutte counted, which was checked by enumeration up to six edges, outside Lean.
+- *Properties and conjectures.* Apart from the counterparts listed at the beginning of @app:structure, nothing in that appendix is formalised: in particular the impedance function, its properties, the converse construction of a tiling from a network, and the bounds that rest on them.
 
 #let re = math.op("Re")
 #let lft = math.op("left")
@@ -2124,7 +2239,9 @@ The proofs are complete, except that the following classical results are used wi
 Euler's formula for connected plane graphs, the Jordan curve theorem, and the duality between the minimal cuts of a connected plane graph and the cycles of its dual, in its oriented form, are used in @prop:face-potential and @prop:bsst, on which the count for wide rectangles rests.
 Kirchhoff's formulas, which express the determinants and the currents of a network as sums over spanning trees, are used in @prop:threshold, for the explicit threshold, and in @ex:improper.
 A few remarks rest on computations made with the search described in @sec:solving; they are marked as such, and no proof depends on them.
-Nothing in this appendix has been formalised.
+The enumeration of Tutte quoted in @sec:growth is used in @prop:deficit.
+Of the statements of this appendix, the formal development has counterparts only of the following: for positive real resistances, the uniqueness of flows of @prop:flow, with their existence and the positivity of the impedance (@sec:differences); the flow that a tiling gives by @prop:tiling-network, for the network of the map of the tiling (@prop:tiling-map) and for the network of its levels (@obs:height-network), but not for the network of @def:tiling-network, and without the embedding; and @prop:nonseparable, for the map of @def:tiling-map (@prop:tiling-map).
+Nothing else in this appendix has been formalised.
 @tab:structure collects the counts to which the appendix refers.
 
 #figure(
@@ -2133,7 +2250,7 @@ Nothing in this appendix has been formalised.
   caption: [For $n$ tiles in a square: the number of proportions; the number of those not achievable with fewer tiles; the number achievable by guillotine tilings; the number $E(n)$ of aspect-ratio functions up to inversion; and the number of rational proportions achievable with a single orientation.],
 ) <tab:structure>
 
-Throughout, an _orientation vector_ for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
+As in @def:network-polynomial, an orientation vector for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
 An orientation vector $epsilon$ on the tiles of a similar tiling of proportion $x$ is _an orientation vector of the tiling_ if every tile $T$ is tall for $x$ when $epsilon_T = +1$ and wide for $x$ when $epsilon_T = -1$.
 For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector is one, since the tiles are squares.
 
@@ -2184,6 +2301,7 @@ They are much weaker than the growth observed in @tab:tbc.
 Brooks, Smith, Stone and Tutte associate an electrical network with a tiling of a rectangle, in which the tiles are resistors @bsst1940 @prasolov2011.
 For a similar tiling the resistances are $x$ and $1 slash x$, and the properties of the aspect ratio as a function of $x$ come from letting $x$ be a complex number.
 Networks are therefore defined with complex resistances.
+The definition repeats @def:flow, with complex numbers in place of real ones, and adds the matrices of a network.
 
 #definition(name: [network and flow])[
   A _network_ $frak(N) = (G, s, t)$ consists of a finite connected graph $G$, with set of vertices $V$ and set of edges $E$, possibly with multiple edges but without loops, and of two distinct vertices $s$ and $t$ of $G$, its _poles_.
@@ -2483,7 +2601,11 @@ The abscissas of the tiling are given by a potential on the faces of the network
 Embeddings are taken to be piecewise linear, so that the two sides of a closed curve are well defined, and the dual of a plane graph is a multigraph, in which a minimal cut of two edges gives a cycle of length two.
 By @prop:tiling-network the network of a tiling is a plane network, for the embedding constructed there, and it is always considered with that embedding.
 
-The graph $G^+$ of the network of a tiling is a non-separable planar map, in the sense of @sec:growth; this is used there for the upper bound on $a(n)$.
+In this appendix a _planar map_ is a connected graph, possibly with multiple edges, embedded in the sphere, and considered up to the homeomorphisms of the sphere.
+It is _non-separable_ if it has no loop and no vertex whose removal disconnects it; the map with two vertices and two parallel edges is included.
+A map is _rooted_ by the choice of an edge, of a direction of that edge and of one of its sides.
+These are the maps that Tutte counted (@sec:growth).
+The graph $G^+$ of the network of a tiling is a non-separable planar map; the upper bound on $a(n)$ uses the counterpart of this statement for the map of @def:tiling-map, which is part of @prop:tiling-map.
 
 #proposition[
   Let $tau$ be a tiling of a rectangle with $n >= 1$ tiles.
@@ -3233,13 +3355,13 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ] <prop:deficit>
 
 #proof[
-  The isomorphism classes of pairs with $m$ edges and $G^+$ non-separable are at most $2^m M(m)$, as in the proof of @prop:upper: the plane network is a non-separable planar map rooted at $e_0$, and it has $2^m$ orientation vectors.
+  The isomorphism classes of pairs with $m$ edges and $G^+$ non-separable are at most $2^m M(m)$, by the enumeration of Tutte @tutte1963, as in the proof of @prop:upper: the plane network is a non-separable planar map rooted at $e_0$, and it has $2^m$ orientation vectors.
   By @prop:substitution, a class counted by $A(n)$ and a set of $k$ of its edges give a class with $n + 5 k$ edges and exactly $k$ square blocks, and different data give different classes; hence
   $ sum_(n + 5 k = m) binom(n, k) A(n) <= 2^m M(m) quad "for every" m. $
   Let $rho := 2 slash 27$.
   Multiplying by $rho^m$ and summing over $m$, which is permitted since all terms are non-negative,
   $ sum_n A(n) (rho + rho^6)^n = sum_m rho^m sum_(n + 5 k = m) binom(n, k) A(n) <= sum_m M(m) (4 slash 27)^m =: C, $
-  which is finite because $M(m)$ is asymptotic to a constant times $(27 slash 4)^m m^(-5 slash 2)$.
+  which is finite because $M(m)$ is asymptotic to a constant times $(27 slash 4)^m m^(-5 slash 2)$, by Stirling's formula.
   Each term of the sum on the left is at most $C$, and $1 slash (rho + rho^6) = lambda$; so $A(n) <= C lambda^n$.
 
   A pair with a regular point is isomorphic to the pair of a tiling, by the first statement of @prop:reconstruction, so that its graph $G^+$ is non-separable by @prop:nonseparable, and it has no square block by @prop:square-block.
@@ -3311,3 +3433,144 @@ The first condition is the agreement with the Baxter numbers observed above, whi
 The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
 So the number of realisations with $n$ tiles is at most $n 2^(n - 1) M(n)$ if the three conditions hold, and we do not claim the bound otherwise.
 The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
+
+= Networks and maps <app:maps>
+
+This appendix contains the definitions and the statements on which @prop:upper and @prop:tilings-finite rest.
+All of them are statements of the formal development (@app:formal).
+
+== Networks and their polynomials <sec:maps-networks>
+
+#definition(name: [network and flow])[
+  A _network_ $frak(N)$ consists of finite sets $V$ of _vertices_ and $E$ of _edges_, of a _tail_ $e^- in V$ and a _head_ $e^+ != e^-$ in $V$ for every edge $e$, and of two distinct vertices $s$ and $t$, its _poles_, such that every vertex is joined to $t$ by a sequence of edges, each taken in either direction.
+  For _resistances_ $r : E -> RR$ and a real number $I$, a _flow of value $I$_ is a pair of functions $phi : V -> RR$, the _potential_, and $i : E -> RR$, the _current_, such that
+  $ phi(e^-) - phi(e^+) = r_e i_e quad "for every edge" e, $
+  which is _Ohm's law_, and
+  $ sum_(e : e^- = v) i_e - sum_(e : e^+ = v) i_e = I (delta_(v s) - delta_(v t)) quad "for every vertex" v, $
+  which is _Kirchhoff's law_.
+] <def:flow>
+
+#definition(name: [polynomial of a network])[
+  An _orientation vector_ for a set $E$ is an element $epsilon$ of ${+1, -1}^E$.
+  Let $frak(N)$ be a network and $epsilon$ an orientation vector for its edges, and consider the following equations in the unknowns $i_e$, for the edges $e$, and $phi_v$, for the vertices $v$:
+  + for every edge $e$, the equation $phi_(e^-) - phi_(e^+) - x i_e = 0$ if $epsilon_e = +1$, and the equation $x (phi_(e^-) - phi_(e^+)) - i_e = 0$ if $epsilon_e = -1$;
+  + for every vertex $v != t$, the equation $sum_(e : e^- = v) i_e - sum_(e : e^+ = v) i_e - delta_(v s) phi_s = 0$;
+  + for the pole $t$, the equation $phi_t = 0$.
+  The _polynomial_ $P_(frak(N), epsilon) in ZZ[x]$ of $frak(N)$ and $epsilon$ is the determinant of the matrix of the coefficients of these equations, in which the equation of an edge $e$ and the unknown $i_e$ have the same index, and so have the equation of a vertex $v$ and the unknown $phi_v$.
+] <def:network-polynomial>
+
+#observation[
+  Let $frak(N)$ be a network with $n$ edges, and let $epsilon$ be an orientation vector for its edges.
+  + For positive resistances, two flows of the same value have the same current, and their potentials differ by a constant.
+  + The polynomial $P_(frak(N), epsilon)$ is not zero, and its degree is at most $n$.
+  + If, for a real number $x > 0$ and the resistances $x^(epsilon_e)$, there is a flow $(phi, i)$ of a value $I != 0$ with $phi(s) - phi(t) = I$, then $P_(frak(N), epsilon) (x) = 0$.
+  + Let $frak(N)'$ be a network, and let a bijection between the vertices and a bijection between the edges of $frak(N)$ and of $frak(N)'$ map $s$ to $s'$, $t$ to $t'$ and, for every edge, its tail and its head to the tail and the head of its image, in this order or in the other.
+    Then $P_(frak(N)', epsilon') = P_(frak(N), epsilon)$, where $epsilon'$ is the orientation vector that corresponds to $epsilon$.
+] <obs:network>
+
+In the second statement, only the $n$ equations of the edges contain $x$, each to the first degree.
+At $x = -1$ a solution of the equations is a flow for resistances all equal to $-1$, of value $phi_s$ and with $phi_t = 0$; multiplying Kirchhoff's law at each vertex by the potential and summing gives $-sum_e i_e^2 = phi_s^2$, so that the solution is zero and the determinant does not vanish at $-1$.
+In the third statement, $(phi - phi(t), i)$ is a solution of the equations at $x$ that is not zero.
+
+The networks of tilings are counted as maps, in the combinatorial form in which a map is a pair of permutations.
+
+#definition(name: [map])[
+  A _map_ $cal(M)$ consists of a finite set $D$ of _darts_ and of two permutations $sigma$ and $alpha$ of $D$ such that $alpha(alpha(d)) = d != alpha(d)$ for every dart $d$.
+  Its _vertices_, _edges_ and _faces_ are the orbits of $sigma$, of $alpha$ and of $sigma compose alpha$ respectively, and a dart is _at_ the vertex that contains it, which is _its_ vertex.
+  The map is _connected_ if every dart is obtained from every other by applying $sigma$ and $alpha$ repeatedly; it is _planar_ if it is connected and the numbers of its vertices, edges and faces satisfy $abs(V) + abs(F) = abs(E) + 2$.
+  It is _non-separable_ if the two darts of every edge are at different vertices and if, for every vertex $u$, every dart that is not at $u$ is obtained from every other such dart by applying $sigma$ and $alpha$ repeatedly, where $alpha$ is applied only to darts $d$ with $alpha(d)$ not at $u$.
+  A _rooted map_ is a map with a distinguished dart $r$, its _root_, and its _edge before the root_ is the edge that contains $sigma^(-1) (r)$.
+  Two rooted maps are _isomorphic_ if a bijection between their sets of darts carries $sigma$, $alpha$ and the root of the one to those of the other.
+] <def:map>
+
+A connected graph embedded in the sphere gives a map: the darts are the two halves of each edge, which $alpha$ exchanges, $sigma$ sends each dart to the next one around its vertex in the positive sense, the faces are those of the embedding, and the equation that defines planarity is Euler's formula.
+
+== The map of a tiling <sec:maps-tiling>
+
+#definition(name: [network of a rooted map])[
+  Let $cal(M)$ be a rooted map with root $r$.
+  A _network of_ $cal(M)$ is a network whose vertices are the vertices of $cal(M)$, whose edges are the edges of $cal(M)$ other than that of $r$, in which the tail and the head of each edge are the vertices of its two darts, in either order, and whose poles are $s$, the vertex of $alpha(r)$, and $t$, the vertex of $r$.
+  If $cal(M)$ has a network $frak(N)$, then $P_(cal(M), epsilon) := P_(frak(N), epsilon)$ for every orientation vector $epsilon$ for the edges of $frak(N)$, which does not depend on $frak(N)$ by the fourth statement of @obs:network, and $X(cal(M))$ is the set of the real roots of the polynomials $P_(cal(M), epsilon)$, over the orientation vectors $epsilon$ that are $-1$ at the edge before the root, when this is not the edge of $r$.
+] <def:map-network>
+
+#observation[
+  Let $cal(M)$ and $cal(M)'$ be isomorphic rooted maps, each with a network.
+  Then $X(cal(M)') = X(cal(M))$.
+] <obs:map-polynomial>
+
+The map of a tiling has two darts for each tile, at its top side and at its bottom side, and two for an additional edge $e_0$ between the top side and the bottom side of the main rectangle.
+Around each maximal segment of the union of the top sides and of the bottom sides of the tiles, its permutation $sigma$ lists the tiles below the segment from left to right and then the tiles above it from right to left (@fig:network); this description is not used below.
+
+#definition(name: [map of a tiling])[
+  Let $tau$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  Its _darts_ are an _upper dart_ $overline(T)$ and a _lower dart_ $underline(T)$ for each tile $T$, and two further darts $overline(e)_0$ and $underline(e)_0$.
+  The _level_ of $overline(T)$ is the ordinate of the top side of $T$, that of $underline(T)$ is the ordinate of its bottom side, and those of $overline(e)_0$ and $underline(e)_0$ are $H$ and $0$.
+  The dart $overline(T)$ _runs_ from the abscissa of the left side of $T$ to that of its right side, $underline(T)$ from the abscissa of the right side of $T$ to that of its left side, $overline(e)_0$ from $W$ to $0$, and $underline(e)_0$ from $0$ to $W$.
+  The permutation $alpha$ exchanges $overline(T)$ with $underline(T)$, the darts of the _edge of_ $T$, for each tile $T$, and $overline(e)_0$ with $underline(e)_0$, and $sigma$ is given by the following rule.
+  + $sigma(overline(T))$ is $overline(T')$ if a tile $T'$ has its top-left corner at the top-right corner of $T$; otherwise, it is $underline(T')$ if a tile $T'$ has its bottom-right corner at the top-right corner of $T$; otherwise, it is $overline(e)_0$.
+  + $sigma(underline(T))$ is $underline(T')$ if a tile $T'$ has its bottom-right corner at the corner of $T$; otherwise, it is $overline(T')$ if a tile $T'$ has its top-left corner at the corner of $T$; otherwise, it is $underline(e)_0$.
+  + $sigma(overline(e)_0)$ is $overline(T')$ for the tile $T'$ whose top-left corner is $(0, H)$, and $sigma(underline(e)_0)$ is $underline(T')$ for the tile $T'$ whose bottom-right corner is $(W, 0)$.
+  The _map_ $cal(M)(tau)$ of the tiling consists of these darts with $sigma$ and $alpha$, and its root is $underline(e)_0$.
+] <def:tiling-map>
+
+Two tiles with the same top-left corner, or with the same bottom-right corner, have interiors that meet, so the tile $T'$ is unique in each case.
+
+#observation[
+  Let $tau$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  + The two tiles of the third clause of @def:tiling-map exist, and $sigma$ is a permutation of the darts, so that $cal(M)(tau)$ is a rooted map.
+  + For every dart $d$, the dart $sigma(d)$ has the level of $d$, and it runs from the abscissa to which $d$ runs.
+    Consequently the darts at a vertex of $cal(M)(tau)$ have the same level, the _level_ of the vertex.
+] <obs:tiling-map>
+
+#proposition[
+  Let $tau$ be a tiling of $[0, W] times [0, H]$ with $n$ tiles, where $W, H > 0$.
+  + The vertices of $cal(M)(tau)$, with one edge for each tile $T$, whose tail is the vertex of $overline(T)$ and whose head is the vertex of $underline(T)$, and with the poles $s$, the vertex of $overline(e)_0$, and $t$, the vertex of $underline(e)_0$, form a network of $cal(M)(tau)$.
+    With $phi(v)$ the level of the vertex $v$, and with $i_T := w_T$ and $r_T := h_T slash w_T$ for a tile $T$ of width $w_T$ and height $h_T$, the pair $(phi, i)$ is a flow of value $W$ of this network for the resistances $r$, and $phi(s) - phi(t) = H$.
+  + The map $cal(M)(tau)$ is connected and non-separable, it has $n + 1$ edges, and its edge before the root is the edge of the tile with corner $(0, 0)$.
+  + The map $cal(M)(tau)$ is planar.
+] <prop:tiling-map>
+
+#proof[
+  _The flow._
+  Ohm's law holds by the choice of the resistances, since the tail and the head of the edge of $T$ are at the levels of the top side and of the bottom side of $T$.
+  Since $sigma(d)$ runs from the abscissa to which $d$ runs, and $sigma$ permutes the darts at a vertex $v$, the abscissas to which these darts run and those from which they run have the same sum.
+  The difference of the two abscissas is $w_T$ for $overline(T)$, $-w_T$ for $underline(T)$, $-W$ for $overline(e)_0$ and $W$ for $underline(e)_0$, so this is Kirchhoff's law at $v$, for the currents $w_T$ and the value $W$.
+  The poles are at the levels $H$ and $0$, and the tail of an edge is at a higher level than its head; so the poles are distinct, and no edge has its head at its tail.
+
+  _Non-separability._
+  A vertex does not consist of lower darts only: the abscissa from which its darts run would decrease strictly along the orbit of $sigma$, which is impossible.
+  A vertex without an upper dart does not contain $overline(e)_0$, which is followed by an upper dart; so it contains $underline(e)_0$.
+  Hence every vertex other than $t$ is the tail of an edge, and likewise every vertex other than $s$ is the head of one.
+  So from every vertex $v$ a sequence of edges descends to $t$ through vertices of lower level, and one ascends to $s$ through vertices of higher level; in particular every vertex is joined to $t$, which completes the first statement, and the map is connected.
+  For vertices $u != v$, one of the two sequences from $v$ avoids $u$, whose level is not both lower and higher than that of $v$, and the poles are joined by $e_0$; so the vertices other than $u$ remain joined to one another.
+  The two darts of an edge are at different levels, the edges are those of the $n$ tiles and $e_0$, and $sigma(underline(T)) = underline(e)_0$ for the tile $T$ with corner $(0, 0)$, at which no tile has its bottom-right corner or its top-left corner.
+
+  _Planarity._
+  A _vertex marker_ is one of $overline(e)_0$, $underline(e)_0$ and the upper darts $overline(T)$ for which $sigma(overline(T))$ is a lower dart; a _face marker_ is one of $overline(e)_0$, $underline(e)_0$ and the lower darts $underline(T)$ for which $sigma(overline(T))$ is an upper dart.
+  Every vertex contains a vertex marker: otherwise it consists of upper darts only or of lower darts only, and the abscissa from which its darts run would be strictly monotone along the orbit of $sigma$.
+  Let $overline(T)$ be a vertex marker, at the level $c$ and running to $b$.
+  Then $0 < c < H$, since $T$ has its top side and another tile its bottom side at the level $c$, so the vertex of $overline(T)$ contains neither $overline(e)_0$ nor $underline(e)_0$.
+  From $overline(T)$ on, no dart of the orbit runs from or to an abscissa greater than $b$: the first to run to one would be an upper dart $overline(U)$ that runs from some $a <= b$; if $a < b$, the interiors of $U$ and $T$ meet, and if $a = b$, the dart before it runs to $b$ and not from beyond $b$, so it is the upper dart of the tile with top-right corner $(b, c)$, which is $overline(T)$, whereas $sigma(overline(T))$ is a lower dart.
+  So two vertex markers at one vertex that are upper darts belong to tiles with the same top-right corner, and are equal; and $overline(e)_0$ and $underline(e)_0$ are at different levels.
+
+  The same holds for the faces and the face markers, with the levels in place of the abscissas: the darts of a face run from the same abscissa, the dart $sigma(alpha(d))$ has the level of $alpha(d)$, and for no dart $d$ in the face of a face marker $underline(T)$ is the level of $alpha(d)$ higher than that of $overline(T)$.
+  So the vertices are as many as the vertex markers and the faces as many as the face markers.
+  For each tile $T$ the dart $sigma(overline(T))$ is a lower dart, an upper dart or $overline(e)_0$, the last for exactly one tile, since $sigma$ is a permutation and only the first clause of the rule gives $overline(e)_0$; so $abs(V) + abs(F) = 4 + (n - 1) = abs(E) + 2$.
+
+  The inductions along the orbits of $sigma$ and of $sigma compose alpha$ and on the levels, the passage from sequences of edges to the sequences of darts of @def:map, and the argument for the faces are in the formal proof (@app:formal).
+]
+
+== The network of the levels <sec:maps-levels>
+
+A second network of a tiling, which does not involve its map, is used for @prop:tilings-finite.
+
+#definition(name: [network of the levels])[
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  The _network of the levels_ of $cal(T)$ has as its vertices the ordinates of the top sides and of the bottom sides of the tiles, as its poles $s := H$ and $t := 0$, and one edge for each tile, whose tail is the ordinate of its top side and whose head is the ordinate of its bottom side.
+] <def:height-network>
+
+#observation[
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  The network of the levels of $cal(T)$ is a network in the sense of @def:flow.
+  With $phi(v) := v$ for every vertex $v$, and with $i_T := w_T$ and $r_T := h_T slash w_T$ for a tile $T$ of width $w_T$ and height $h_T$, the pair $(phi, i)$ is a flow of value $W$ for the resistances $r$.
+] <obs:height-network>
