@@ -33,6 +33,9 @@ Staircase:
 - `Rectiling/Soundness.lean` — the theorem `soundness`.
 - `Rectiling/Extension.lean` — one step of the construction of a placement sequence from a tiling, in terms of the anchors (`GInv.step`).
 - `Rectiling/Completeness.lean` — the theorems `completeness` and `completeness_square`.
+- `Rectiling/Crossings.lean` — crossings of a tiling, points that are a corner of four tiles (`IsCrossing`), and their characterisation by the tile to the lower right and the tile to the upper left (`isCrossing_iff`).
+- `Rectiling/Records.lean` — records that yield a tiling with given orientations (`YieldsWith`, `Yields`), the tier of each of their placements (`YieldsWith.chooses`, `representative`), and their uniqueness given the order of placement at the crossings (`yieldsWith_unique`, `yields_unique_of_no_crossing`).
+- `Rectiling/Multiplicity.lean` — the record of each set of crossings (`exists_record`, `multiplicity`) and the number of records of a tiling (`bijOn_upperFirstSet`, `ncard_records`).
 - `Rectiling/Check.lean` — an executable count of the admissible sequences of the model, compared with the Baxter numbers 1, 2, 6, 22, 92, 422, 2074 that the library reports.
 - `Rectiling/Enumeration.lean` — the enumerations of `src/search.rs` and `src/fast.rs`: the placements tried at a staircase (`moves`), the complete sequences below a staircase (`completions`), the prefixes of bounded length (`prefixes`), the complete sequences that follow forced placements (`forcedCompletions`), and the theorems `mem_completions`, `mem_completions_iff_prefix`, `nodup_completions`, `mem_forcedCompletions` and `flatMap_forcedCompletions`.
 

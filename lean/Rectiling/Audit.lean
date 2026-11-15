@@ -4,6 +4,7 @@ import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
+import Rectiling.Multiplicity
 
 /-!
 # Axioms of the main theorems
@@ -64,3 +65,13 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.achievable_one
 #print axioms Rectiling.persistence
 #print axioms Rectiling.persistence_of_one_lt
+#print axioms Rectiling.isCrossing_iff
+#print axioms Rectiling.YieldsWith.chooses
+#print axioms Rectiling.YieldsWith.tiles_eq
+#print axioms Rectiling.representative
+#print axioms Rectiling.yieldsWith_unique
+#print axioms Rectiling.yields_unique_of_no_crossing
+#print axioms Rectiling.exists_record
+#print axioms Rectiling.multiplicity
+#print axioms Rectiling.bijOn_upperFirstSet
+#print axioms Rectiling.ncard_records

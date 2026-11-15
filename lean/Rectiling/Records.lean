@@ -565,6 +565,9 @@ theorem Placing.stage (hx : 0 < x) (htl : IsTiling (Rect.main W H) tl) {fresh : 
 def XExt (tl : List Rect) (X : Set (ℝ × ℝ)) (q : ℝ × ℝ) : Prop :=
   Ext tl q.1 q.2 ∧ q ∉ X
 
+theorem xExt_empty {q : ℝ × ℝ} : XExt tl ∅ q ↔ Ext tl q.1 q.2 := by
+  simp [XExt]
+
 /-- The index of the first tier that does not have the given property. -/
 def FirstNot (P : GTier → Prop) (G : List GTier) (i : ℕ) : Prop :=
   (∃ g, G[i]? = some g ∧ ¬P g) ∧ ∀ j < i, ∀ g, G[j]? = some g → P g
