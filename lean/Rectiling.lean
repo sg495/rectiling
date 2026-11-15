@@ -22,5 +22,9 @@ import Rectiling.Enumeration
 import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
+import Rectiling.Network
+import Rectiling.NetworkPolynomial
+import Rectiling.CrossSection
+import Rectiling.TilingNetwork
 import Rectiling.Audit
 import Rectiling.Check
