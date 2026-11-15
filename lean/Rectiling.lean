@@ -36,5 +36,7 @@ import Rectiling.Growth
 import Rectiling.CombinatorialMap
 import Rectiling.MapNetwork
 import Rectiling.TilingMap
+import Rectiling.TilingMapFlow
+import Rectiling.TilingMapNonseparable
 import Rectiling.Audit
 import Rectiling.Check
