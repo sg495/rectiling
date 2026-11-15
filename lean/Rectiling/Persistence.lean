@@ -266,6 +266,27 @@ theorem TilesWith.add_five {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
 theorem nondegenerate_main_one : (Rect.main 1 1).Nondegenerate :=
   ⟨one_pos, one_pos⟩
 
+/-- **Seven more tiles.** A tile is cut into eight rectangles similar to it and with its orientation. -/
+theorem TilesWith.add_seven {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
+    (h : TilesWith x R n) : TilesWith x R (n + 7) := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  obtain ⟨t, rest, rfl⟩ := htil.toIsTiling.exists_cons hR
+  have ht := htil.nondegenerate t (List.mem_cons_self ..)
+  have hp := htil.proportion t (List.mem_cons_self ..)
+  refine ⟨t.eight ++ rest, ?_, htil.refine (Rect.isTiling_eight ht) (Rect.hasProportion_eight hp)⟩
+  rw [List.length_cons] at hlen
+  simp only [List.length_append, Rect.eight, List.length_cons, List.length_nil]
+  omega
+
+/-- **Five or more tiles.** A rectangle that can be cut into `n` rectangles of proportion `x` can be cut into `n + k`, for every `k ≥ 5`. -/
+theorem TilesWith.add_of_five_le {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
+    (h : TilesWith x R n) : ∀ k : ℕ, 5 ≤ k → TilesWith x R (n + k)
+  | 0, hk | 1, hk | 2, hk | 3, hk | 4, hk => by omega
+  | 5, _ => h.add_five hR
+  | 6, _ => (h.add_three hR).add_three hR
+  | 7, _ => h.add_seven hR
+  | k + 8, _ => (TilesWith.add_of_five_le hR h (k + 5) (by omega)).add_three hR
+
 /-- **Four more tiles.** For a proportion greater than one, a pinwheel of four tiles surrounds a reduced copy of the tiling. -/
 theorem Achievable.add_four {x : ℝ} {n : ℕ} (hx : 1 < x) (h : Achievable n x) :
     Achievable (n + 4) x := by
