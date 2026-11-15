@@ -38,5 +38,6 @@ import Rectiling.MapNetwork
 import Rectiling.TilingMap
 import Rectiling.TilingMapFlow
 import Rectiling.TilingMapNonseparable
+import Rectiling.TilingMapPlanar
 import Rectiling.Audit
 import Rectiling.Check
