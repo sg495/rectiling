@@ -440,14 +440,14 @@ It rests on the position of the strips of a positive staircase relative to one a
 
 #figure(
   image("figures/region.svg", width: 100%),
-  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile and of the part $B$ to its right. The tiles placed before are grey, the dashed lines separate the strips of the staircase after the placement, and its anchors are circled. For the tile of full width, $B$ is not the strip of a new tier: it is added to the strip of the next tier, which is outlined with dots.],
+  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile and of the part $B$ to its right. The tiles are coloured as in @fig:fits, the dashed lines separate the strips of the staircase after the placement, and its anchors are circled. For the tile of full width, $B$ is not the strip of a new tier: it is added to the strip of the next tier, which is outlined with dots.],
 ) <fig:region>
 
 @fig:misfit shows a tile of full height that is wider than its floor, and a tile of full width that is higher than its wall, contrary to the hypothesis of @prop:step.
 
 #figure(
   image("figures/misfit.svg", width: 62%),
-  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The tiles placed before are grey, the thick lines are the floors and the walls before the placement, the region of the staircase after the placement is tinted, and its anchors are marked as in @fig:rules. Left: a wide tile of full height is wider than the floor; the tier that replaces $T_1$ has a negative floor, and its anchor is to the right of the anchor of $T_2$. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
+  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The thick lines are the floors and the walls before the placement, the dashed lines separate the strips of the staircase after the placement, and its anchors are marked as in @fig:rules. Left: a wide tile of full height is wider than the floor; the tier that replaces $T_1$ has a negative floor, and its anchor is to the right of the anchor of $T_2$. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
 ) <fig:misfit>
 
 For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
@@ -554,7 +554,7 @@ Soundness follows by removing the tiles from the region one at a time.
 
 #figure(
   image("figures/regions.svg", width: 100%),
-  caption: [The regions $U(S_0), dots, U(S_6)$, hatched, of the staircases along the record of the tiling of @fig:construction. Each placement removes its tile from the region, as in the proof of @prop:sound.],
+  caption: [The regions $U(S_0), dots, U(S_6)$, outlined thick, of the staircases along the record of the tiling of @fig:construction. Each placement removes its tile from the region, as in the proof of @prop:sound.],
 ) <fig:regions>
 
 == Completeness <sec:complete>
@@ -625,7 +625,7 @@ In a state, the tile at each anchor is still to be placed.
 
 #figure(
   image("figures/anchor.svg", width: 40%),
-  caption: [The state after three placements in the construction of the record of the tiling of @fig:staircase, and its tier $T_1$, whose strip is outlined thick. The region is tinted grey, and the remaining tiles are outlined. The tile $T$ that contains the points just above and to the right of the anchor of $T_1$ is hatched. The parts of the plane just to the left of the anchor and just below the floor, which are cross-hatched, are outside the region, so $T$ does not reach into them.],
+  caption: [The state after three placements in the construction of the record of the tiling of @fig:staircase, and its tier $T_1$, whose strip is outlined thick. The placed tiles are coloured, and the rectangle spanned by the floor and the wall of $T_1$ is hatched, as in @fig:staircase. The tile $T$ that contains the points just above and to the right of the anchor of $T_1$ has a dashed outline. The parts of the plane just to the left of the anchor and just below the floor, which have dotted outlines, are outside the region, so $T$ does not reach into them.],
 ) <fig:anchor>
 
 The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
@@ -685,7 +685,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/impossible.svg", width: 62%),
-  caption: [The state after two placements in @fig:construction, with the tile $Q$ at the anchor of the chosen tier $T_1$ replaced by a rectangle that does not fit, hatched with a dashed outline. Left: a rectangle wider than the floor meets the tile that contains the points just below and to the right of the end of the floor, marked by a diamond; the top side of that tile is above the floor, since the floor does not extend. Right: a rectangle higher than the wall meets the tile whose top side continues the floor of $T_0$ beyond its end, marked by a diamond; that floor extends, as the dotted segment shows.],
+  caption: [The state after two placements in @fig:construction, with the tile $Q$ at the anchor of the chosen tier $T_1$ replaced by a rectangle that does not fit, drawn with a dashed outline. Left: a rectangle wider than the floor meets the tile that contains the points just below and to the right of the end of the floor, marked by a diamond; the top side of that tile is above the floor, since the floor does not extend. Right: a rectangle higher than the wall meets the tile whose top side continues the floor of $T_0$ beyond its end, marked by a diamond; that floor extends, as the dotted segment shows.],
 ) <fig:impossible>
 
 Repeating the step until no tile remains gives the record.
@@ -1155,7 +1155,7 @@ Some features of the table can be proved.
 
 #figure(
   image("figures/symmetric.svg", width: 100%),
-  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; the tile at a corner on the diagonal with its image under the reflection in the diagonal, hatched with a dashed outline, which it overlaps without being equal to it; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
+  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; the tile at a corner on the diagonal with its image under the reflection in the diagonal, drawn with a dashed outline, which it overlaps without being equal to it; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
 ) <fig:symmetric>
 
 Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.

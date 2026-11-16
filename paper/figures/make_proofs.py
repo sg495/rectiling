@@ -15,8 +15,6 @@ from matplotlib.path import Path as MplPath
 from make_diagrams import CODES, DATA, EPS, FIT_NAMES, OUT, base_tiling, classes, construction_choice, extends, listing, mark_anchors, moves_of, outline_rest, stages
 from make_figures import COLOURS, Tier, draw, witness_tiles
 
-TINT_A = "#cfe8f7"
-TINT_B = "#fde3b0"
 LETTERS = {v: k for k, v in CODES.items()}
 
 
@@ -142,10 +140,7 @@ def region_figure(path, value, wit):
         i = moves[k][0]
         t = sts[k][i]
         x, y, w, h = tiles[k]
-        coloured(ax, tiles[:k], ["0.9"] * k)
-        ax.add_patch(Rectangle((x, y + h), 1 - x, t.wall - h, fc=TINT_A, ec="none", zorder=1))
-        ax.add_patch(Rectangle((x + w, y), 1 - x - w, h, fc=TINT_B, ec="none", zorder=1))
-        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0.5, zorder=3))
+        draw(ax, tiles[: k + 1])
         for u in sts[k + 1]:
             ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.35", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.2, zorder=4))
@@ -181,9 +176,10 @@ def misfit_figure(path, value, wit, k, i):
         a, b, w, h = tile
         t = tiers[i]
         assert (w > t.floor + 0.02) if fit == "full-height" else (h > t.wall + 0.02)
-        coloured(ax, tiles[:k], ["0.82"] * k)
-        strips(ax, after, fc=TINT_A, ec="none", zorder=1)
-        ax.add_patch(Rectangle((a, b), w, h, fc=COLOURS[0], ec="k", lw=0.5, hatch="///", alpha=0.8, zorder=3))
+        draw(ax, tiles[:k])
+        ax.add_patch(Rectangle((a, b), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0.5, zorder=3))
+        for u in after:
+            ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.35", lw=0.5, ls=(0, (3, 2)), zorder=4)
         for u in tiers:
             ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             ax.plot([u.ax, u.ax], [u.ay, u.ay + u.wall], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
@@ -289,9 +285,13 @@ def regions_figure(path, value, wit):
     fig, axes = plt.subplots(1, len(sts), figsize=(6.9, 1.4))
     for k, (ax, tiers) in enumerate(zip(axes, sts)):
         draw(ax, tiles[:k])
-        strips(ax, tiers, fc="0.86", ec="none", hatch="////", zorder=1)
-        for t in tiers:
-            ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="0.55", lw=0, hatch="////", zorder=1))
+        if tiers:
+            top = tiers[0].ay + tiers[0].wall
+            points = [(tiers[0].ax, top)]
+            for j, t in enumerate(tiers):
+                points += [(t.ax, t.ay), (tiers[j + 1].ax if j + 1 < len(tiers) else 1.0, t.ay)]
+            points.append((1.0, top))
+            ax.add_patch(Polygon(points, closed=True, fc="none", ec="k", lw=1.5, joinstyle="miter", zorder=6))
         ax.set_title(f"$U(S_{k})$" + (r"$ = \emptyset$" if k == len(sts) - 1 else ""), fontsize=6.5, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
     fig.savefig(path)
@@ -336,15 +336,14 @@ def anchor_figure(path, value, wit, k, i):
     q = next(r for r in tiles[k:] if abs(r[0] - t.ax) < EPS and abs(r[1] - t.ay) < EPS)
     fig, ax = plt.subplots(figsize=(2.9, 2.9))
     draw(ax, tiles[:k])
-    strips(ax, tiers, fc="0.93", ec="none", zorder=1)
     outline_rest(ax, tiles[k:])
     ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.1, zorder=4))
     w, h = min(q[2], t.floor), min(q[3], t.wall)
-    ax.add_patch(Rectangle((t.ax, t.ay), w, h, fc="none", ec="k", lw=0, hatch="////", zorder=3))
-    ax.add_patch(Rectangle((q[0], q[1]), q[2], q[3], fc="none", ec="k", lw=0.8, zorder=4))
+    ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="0.45", zorder=3))
+    ax.add_patch(Rectangle((q[0], q[1]), q[2], q[3], fc="none", ec="k", lw=1.1, ls=(0, (3, 1.5)), zorder=5))
     reach = 0.09
-    ax.add_patch(Rectangle((t.ax - reach, t.ay), reach, t.wall, fc="none", ec="k", lw=0, hatch="xxxx", zorder=3))
-    ax.add_patch(Rectangle((t.ax, t.ay - reach), t.floor, reach, fc="none", ec="k", lw=0, hatch="xxxx", zorder=3))
+    ax.add_patch(Rectangle((t.ax - reach, t.ay), reach, t.wall, fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
+    ax.add_patch(Rectangle((t.ax, t.ay - reach), t.floor, reach, fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
     ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
     ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
     mark_anchors(ax, tiers, size=4.6, flags=True)
@@ -379,7 +378,7 @@ def impossible_figure(path, value, wit, k):
         coloured(ax, tiles, ["w"] * len(tiles))
         x, y, w, h = tiles[other]
         ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[other], ec="k", lw=0.6, zorder=2))
-        ax.add_patch(Rectangle(ghost[:2], ghost[2], ghost[3], fc="none", ec="k", lw=1.0, ls=(0, (3, 1.5)), hatch="////", zorder=3))
+        ax.add_patch(Rectangle(ghost[:2], ghost[2], ghost[3], fc="none", ec="k", lw=1.0, ls=(0, (3, 1.5)), zorder=3))
         for j, u in enumerate(tiers):
             ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="k", lw=1.5, solid_capstyle="butt", zorder=4)
             if extends(tiles, u.ax + u.floor, u.ay):
@@ -740,7 +739,7 @@ def symmetric_figure(path, value, wit):
     coloured(axes[2], tiles, ["w"] * len(tiles))
     x, y, w, h = corner
     axes[2].add_patch(Rectangle((x, y), w, h, fc=COLOURS[0], ec="k", lw=0.6, zorder=2))
-    axes[2].add_patch(Rectangle((y, x), h, w, fc="none", ec="k", lw=0.9, ls=(0, (3, 1.5)), hatch="////", zorder=3))
+    axes[2].add_patch(Rectangle((y, x), h, w, fc="none", ec="k", lw=0.9, ls=(0, (3, 1.5)), zorder=3))
     axes[2].plot([0, 1], [0, 1], color="k", lw=0.5, ls=(0, (1, 1.5)), zorder=4)
     frame(axes[2])
     orbit = [turned[0]]
