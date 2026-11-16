@@ -418,7 +418,7 @@ It rests on the position of the strips of a positive staircase relative to one a
 ] <prop:step>
 
 #proof[
-  A placement changes the region only inside the strip $R := [a, W] times [b, b + M]$ of its own tier: it removes the tile from the bottom-left corner of $R$, and the two parts of $R$ that are left, above the tile and to its right, become the strips of the new tiers or are absorbed by the strip of the next tier.
+  A placement changes the region only inside the strip $R := [a, W] times [b, b + M]$ of its own tier: it removes the tile from the bottom-left corner of $R$, and the two parts of $R$ that are left, above the tile and to its right, become the strips of the new tiers or are absorbed by the strip of the next tier (@fig:region).
 
   _The anchors._
   In @def:placing, what the tiers that replace $T_i$ lack of the floor $L$ is added to the floor of $T_(i - 1)$, and what they lack of the wall $M$ is added to the wall of $T_(i + 1)$.
@@ -437,6 +437,18 @@ It rests on the position of the strips of a positive staircase relative to one a
 
   The verification that the tiers of @def:placing have these anchors for each of the four fits, and the cases in which $A$ or $B$ is a segment, are in the formal proof (@app:formal).
 ]
+
+#figure(
+  image("figures/region.svg", width: 100%),
+  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile and of the part $B$ to its right. The tiles placed before are grey, the dashed lines separate the strips of the staircase after the placement, and its anchors are circled. For the tile of full width, $B$ is not the strip of a new tier: it is added to the strip of the next tier, which is outlined with dots.],
+) <fig:region>
+
+@fig:misfit shows a tile of full height that is wider than its floor, and a tile of full width that is higher than its wall, contrary to the hypothesis of @prop:step.
+
+#figure(
+  image("figures/misfit.svg", width: 62%),
+  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The tiles placed before are grey, the thick lines are the floors and the walls before the placement, the region of the staircase after the placement is tinted, and its anchors are marked as in @fig:rules. Left: a wide tile of full height is wider than the floor; the tier that replaces $T_1$ has a negative floor, and its anchor is to the right of the anchor of $T_2$. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
+) <fig:misfit>
 
 For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
 
@@ -460,6 +472,7 @@ The next statement records what the constraints of a single placement give.
 ]
 
 A defective staircase stays defective under every allowed placement whose constraints hold, because the floor or the wall that is not positive could be made positive only by a placement that one of the two rules forbids.
+@fig:defect shows a staircase of each kind, with allowed placements made on it.
 
 #proposition[
   Let $x > 0$, let $S$ be a real staircase, and let $p$ be a placement that is allowed at $S$, made with a free side for which its positive quantity is positive and its equation, if it has one, is zero.
@@ -487,6 +500,11 @@ A defective staircase stays defective under every allowed placement whose constr
   The identification of the tiers of $S'$ with those of $S$ and those that replace $T_i$, for each of the four fits, is in the formal proof (@app:formal).
 ]
 
+#figure(
+  image("figures/defect.svg", width: 100%),
+  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the anchors are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn thick and dashed from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn thick and dashed from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
+) <fig:defect>
+
 It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
 
 #proposition[
@@ -507,6 +525,13 @@ It follows that no staircase is defective along a record that empties the stairc
   The induction on the record and the numbering of the free sides in the rest of $rho$ are in the formal proof (@app:formal).
 ]
 
+@fig:unfit shows the record of @ex:plastic with a width for which the second tile does not fit: the positivity constraints of the first two placements hold, and that of the third does not.
+
+#figure(
+  image("figures/unfit.svg", width: 62%),
+  caption: [The record of @ex:plastic at the proportion $x = 1.7548...$ of that example, with $W = 0.36$ and $H = 1$. The second tile, of full height, has the positive height $1 - W slash x$ and is wider than its floor $L = W$. The tier that it leaves is started and has the negative floor $L - w$, drawn thick and dashed, so the staircase is floor-defective; the third placement, which is full, has this floor as its positive quantity.],
+) <fig:unfit>
+
 Soundness follows by removing the tiles from the region one at a time.
 
 #proposition[
@@ -526,6 +551,11 @@ Soundness follows by removing the tiles from the region one at a time.
 
   The formal proof (@app:formal) obtains these properties by one induction on the record, from an arbitrary positive real staircase, and keeps account of the numbering of the free sides.
 ]
+
+#figure(
+  image("figures/regions.svg", width: 100%),
+  caption: [The regions $U(S_0), dots, U(S_6)$, hatched, of the staircases along the record of the tiling of @fig:construction. Each placement removes its tile from the region, as in the proof of @prop:sound.],
+) <fig:regions>
 
 == Completeness <sec:complete>
 
@@ -559,6 +589,11 @@ The conditions $a' <= c < a' + w'$ and $b' < d <= b' + h'$ hold exactly if it co
   Then $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
 ]
 
+#figure(
+  image("figures/near.svg", width: 58%),
+  caption: [The two statements of @prop:near at a point $(c, d)$ of the tiling of @fig:construction. The tile found, which is coloured, is the one that contains the point marked by a cross, $(c + epsilon, d + eta)$ on the left and $(c + epsilon, d - eta)$ on the right; no side of a tile crosses the interior of the dotted rectangle.],
+) <fig:near>
+
 The record is built one placement at a time, and the following conditions are maintained.
 
 #definition(name: [state of the construction])[
@@ -588,6 +623,11 @@ In a state, the tile at each anchor is still to be placed.
   Hence $(a', b') = (a, b)$.
 ]
 
+#figure(
+  image("figures/anchor.svg", width: 40%),
+  caption: [The state after three placements in the construction of the record of the tiling of @fig:staircase, and its tier $T_1$, whose strip is outlined thick. The region is tinted grey, and the remaining tiles are outlined. The tile $T$ that contains the points just above and to the right of the anchor of $T_1$ is hatched. The parts of the plane just to the left of the anchor and just below the floor, which are cross-hatched, are outside the region, so $T$ does not reach into them.],
+) <fig:anchor>
+
 The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
 
 #proposition[
@@ -613,6 +653,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
   The floor of the last tier ends at abscissa $W$, by @obs:strips, and no tile $(a', b', w', h')$ has $W < a' + w'$; so this floor does not extend, and $T_i$ exists.
 
   _The tile fits._
+  @fig:impossible shows the two cases that are excluded.
   Suppose that $w > L$.
   The points just above and to the right of the end $(a + L, b)$ of the floor of $T_i$ are then interior points of $Q$.
   By the second statement of @prop:near, some tile $T$ contains the points just below and to the right of this end.
@@ -641,6 +682,11 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
   Two verifications are left to the formal proof (@app:formal): that $b > 0$ when $w > L$, which @prop:near requires and which holds because $T_i$ is then not the last tier, and the size in each of the seven cases of @def:placement.
 ]
+
+#figure(
+  image("figures/impossible.svg", width: 62%),
+  caption: [The state after two placements in @fig:construction, with the tile $Q$ at the anchor of the chosen tier $T_1$ replaced by a rectangle that does not fit, hatched with a dashed outline. Left: a rectangle wider than the floor meets the tile that contains the points just below and to the right of the end of the floor, marked by a diamond; the top side of that tile is above the floor, since the floor does not extend. Right: a rectangle higher than the wall meets the tile whose top side continues the floor of $T_0$ beyond its end, marked by a diamond; that floor extends, as the dotted segment shows.],
+) <fig:impossible>
 
 Repeating the step until no tile remains gives the record.
 
@@ -860,6 +906,12 @@ Here we bound the growth of $a(n)$.
 The bound rests on the electrical network of a tiling @bsst1940, in which each tile is a resistor: the current in a tile is its width, the potential difference across it is its height, and its resistance is therefore $x$ if the tile is tall and $1 slash x$ if it is wide.
 For the unit square the total current equals the potential difference between the top side and the bottom side, which makes $x$ a root of a determinant that depends only on the network and on the orientations of the tiles; and the networks of tilings are among the planar maps that Tutte counted.
 The definitions and the statements on which the bound rests are in @app:maps.
+@fig:tiling-map shows the map of a tiling, and the network of its levels, which is used in @sec:tilings-counts.
+
+#figure(
+  image("figures/tiling-map.svg", width: 100%),
+  caption: [Left: a tiling by seven tiles, of proportion $2.3414...$, each tile with its resistance, $1 slash x$ if it is wide and $x$ if it is tall; the thick segments are the maximal segments of the union of the horizontal sides, which correspond to the vertices of the map. Centre: the map of the tiling (@def:tiling-map), with one edge for each tile, drawn from the segment of its top side to that of its bottom side, the additional edge $e_0$, dashed, and the root $r$, which is the dart of $e_0$ at $t$; the thick edge is the edge before the root, that of the tile with corner $(0, 0)$. Right: the network of the levels (@def:height-network), whose vertices are the ordinates of the horizontal sides; the vertices $v_2$ and $v_3$ of the map are at the same level, and are one vertex of this network.],
+) <fig:tiling-map>
 In brief, a tiling $tau$ of a rectangle has a rooted map $cal(M)(tau)$, whose edges are the tiles and one additional edge $e_0$ between the top side and the bottom side (@def:tiling-map); this map is non-separable and planar, and it has a network on which the tiling is a flow (@prop:tiling-map).
 A rooted map $cal(M)$ with a network has a finite set $X(cal(M))$ of real numbers, the real roots of the polynomials of that network for the orientation vectors that are $-1$ at the edge before the root (@def:map-network), and isomorphic rooted maps have the same set (@obs:map-polynomial).
 The statements of this section and of @app:maps are those of the formal development (@app:formal), in which the enumeration of Tutte is a hypothesis; further properties of these networks, which are not formalised, are in @app:structure.
@@ -895,6 +947,13 @@ $ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
   Hence $a(n) <= n (27 slash 2)^n$, and $n^(1 slash n)$ tends to $1$.
 ]
 
+A map is counted once for all the tilings that have it, whatever their proportions and the orientations of their tiles (@fig:isomorphic).
+
+#figure(
+  image("figures/isomorphic.svg", width: 44%),
+  caption: [Two tilings of the square by three tiles whose rooted maps are isomorphic, with the resistances of their tiles. Their orientation vectors differ at one tile, and their proportions, $3 slash 2$ and $1.7548...$, are roots of the polynomials of the same map for the two orientation vectors.],
+) <fig:isomorphic>
+
 The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:mosaic.
 The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$.
 
@@ -918,6 +977,7 @@ We now count the tilings themselves, in three ways.
 ] <def:tbc>
 
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
+@fig:same-bag shows two tilings with the same bag that are not in the same orbit.
 These numbers are finite.
 The proof uses the network of the levels of a tiling (@def:height-network), whose vertices are the ordinates of the horizontal sides of the tiles.
 
@@ -936,6 +996,11 @@ The proof uses the network of the levels of a tiling (@def:height-network), whos
 
   For the inequalities, every proportion is that of a bag, the tilings of an orbit have the same bag, and an orbit has at least one and at most eight tilings.
 ]
+
+#figure(
+  image("figures/same-bag.svg", width: 44%),
+  caption: [Tilings by four tiles, of proportion $1.3981...$, from two classes that have the same bag; tiles with the same short side have the same colour.],
+) <fig:same-bag>
 
 The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
 @tab:tbc gives the values that we computed, @fig:sequences plots the four sequences, and @fig:classes shows the sixteen classes for four tiles.
@@ -1041,6 +1106,18 @@ The record constructed in the proof of @prop:complete places the tile to the low
   That the other steps of the proofs of @prop:extension and @prop:complete hold for the modified state is verified in the formal proof (@app:formal).
 ]
 
+@fig:crossing shows the two records of a tiling with one crossing, and @fig:crossing-subsets the four records of a tiling with two.
+
+#figure(
+  image("figures/crossing.svg", width: 92%),
+  caption: [The two records of a tiling by five tiles, of proportion $2$, with one crossing $q$, marked by a diamond. Each row shows the staircases of one record, with the tiles numbered in the order of placement and the anchors marked as in @fig:rules. In the top row, where $X$ is empty, the tile to the lower right of $q$ is placed second and the tile to its upper left third; in the bottom row, where $X = {q}$, the tile to the upper left is placed second and the tile to the lower right third.],
+) <fig:crossing>
+
+#figure(
+  image("figures/crossing-subsets.svg", width: 84%),
+  caption: [The four records of the tiling of the square by six rectangles of proportion $3 slash 2$, which has two crossings, with the tiles numbered in the order of placement. A crossing in $X$, at which the tile to the upper left is placed before the tile to the lower right, is marked by a filled diamond.],
+) <fig:crossing-subsets>
+
 For $X$ empty, and with a tile chosen to be wide exactly if $w = x h$, the record of @prop:multiplicity is the one constructed in the proof of @prop:complete.
 A tiling of a rectangle with positive sides that has no crossing is thus yielded by exactly one complete admissible record for each choice of orientations that @prop:multiplicity admits: one choice if its proportion is larger than $1$, and $2^n$ for a tiling by $n$ squares.
 This is one half of what the agreement of the number of placement sequences with the Baxter numbers, observed in @sec:mosaic, would require; the other half, that every complete admissible sequence is that of a tiling by rectangles without crossings, and that two such tilings have the same sequence exactly when they are mosaic equivalent, is not proved.
@@ -1076,6 +1153,11 @@ Some features of the table can be proved.
   No tile is fixed by the half turn, since it would have the centre of the square as its own centre; so the quarter turn permutes the tiles in orbits of four.
 ]
 
+#figure(
+  image("figures/symmetric.svg", width: 100%),
+  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; the tile at a corner on the diagonal with its image under the reflection in the diagonal, hatched with a dashed outline, which it overlaps without being equal to it; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
+) <fig:symmetric>
+
 Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.
 Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388789$ tilings with twelve tiles, and $8 b(12) slash t(12) = 1.0003$.
 
@@ -1090,6 +1172,11 @@ Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388
   Such a tiling $cal(T)$ exists: for $m := n - 4 >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles, of two different sizes.
   Every proportion is that of some bag, and the sets are finite; so $c(n) > a(n)$.
 ]
+
+#figure(
+  image("figures/bags.svg", width: 70%),
+  caption: [The proof of @prop:bags for $n = 6$. Left: the tiling $cal(T)$ by three tiles, of proportion $3 slash 2$. Centre and right: the tilings by six tiles obtained by cutting the large tile, and one of the small tiles, into four. The short sides of the tiles are given above each tiling, and tiles with the same short side have the same colour; the two tilings by six tiles have the same proportion and different bags.],
+) <fig:bags>
 
 For $n <= 5$ every proportion has a single bag.
 For larger $n$ nearly every proportion still has a single bag: the quotient $c(n) slash a(n)$ rises only from $1.020$ for six tiles to $1.056$ for twelve.
