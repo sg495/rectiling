@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-16T15:16:20.538809</dc:date>
+    <dc:date>2026-11-16T16:32:35.493694</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -35,7 +35,7 @@ L 108.070909 116.389815
 L 108.070909 66.298906 
 L 7.889091 66.298906 
 z
-" clip-path="url(#pd344413af3)" style="fill: #e69f00; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
+" clip-path="url(#p913e89a841)" style="fill: #e69f00; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
    </g>
    <g id="patch_3">
     <path d="M 7.889091 116.389815 
@@ -44,7 +44,7 @@ L 108.070909 16.207997
 L 7.889091 16.207997 
 L 7.889091 116.389815 
 z
-" clip-path="url(#pd344413af3)" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+" clip-path="url(#p913e89a841)" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_1">
     <!-- after placement 1 -->
@@ -307,9 +307,9 @@ z
    </g>
    <g id="line2d_1">
     <path d="M 7.889091 66.298906 
-" clip-path="url(#pd344413af3)" style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p913e89a841)" style="fill: none; stroke: #1f77b4; stroke-width: 1.5; stroke-linecap: square"/>
     <defs>
-     <path id="m4b83e21027" d="M 0 2 
+     <path id="m1ec9845323" d="M 0 2 
 C 0.530406 2 1.03916 1.789267 1.414214 1.414214 
 C 1.789267 1.03916 2 0.530406 2 0 
 C 2 -0.530406 1.789267 -1.03916 1.414214 -1.414214 
@@ -321,8 +321,8 @@ C -1.03916 1.789267 -0.530406 2 0 2
 z
 " style="stroke: #000000"/>
     </defs>
-    <g clip-path="url(#pd344413af3)">
-     <use xlink:href="#m4b83e21027" x="7.889091" y="66.298906" style="fill: #ffffff; stroke: #000000"/>
+    <g clip-path="url(#p913e89a841)">
+     <use xlink:href="#m1ec9845323" x="7.889091" y="66.298906" style="fill: #ffffff; stroke: #000000"/>
     </g>
    </g>
   </g>
@@ -333,7 +333,7 @@ L 224.270909 116.389815
 L 224.270909 66.298906 
 L 124.089091 66.298906 
 z
-" clip-path="url(#p1d741ef4c4)" style="fill: #e69f00; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
+" clip-path="url(#p7e5a26aed8)" style="fill: #e69f00; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
    </g>
    <g id="patch_5">
     <path d="M 124.089091 66.298906 
@@ -341,7 +341,7 @@ L 224.270909 66.298906
 L 224.270909 16.207997 
 L 124.089091 16.207997 
 z
-" clip-path="url(#p1d741ef4c4)" style="fill: #56b4e9; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
+" clip-path="url(#p7e5a26aed8)" style="fill: #56b4e9; stroke: #000000; stroke-width: 0.35; stroke-linejoin: miter"/>
    </g>
    <g id="patch_6">
     <path d="M 124.089091 116.389815 
@@ -350,7 +350,7 @@ L 224.270909 16.207997
 L 124.089091 16.207997 
 L 124.089091 116.389815 
 z
-" clip-path="url(#p1d741ef4c4)" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
+" clip-path="url(#p7e5a26aed8)" style="fill: none; stroke: #000000; stroke-width: 0.6; stroke-linejoin: miter"/>
    </g>
    <g id="text_2">
     <!-- after placement 2 -->
@@ -403,10 +403,10 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="pd344413af3">
+  <clipPath id="p913e89a841">
    <rect x="2.88" y="11.198906" width="110.2" height="110.2"/>
   </clipPath>
-  <clipPath id="p1d741ef4c4">
+  <clipPath id="p7e5a26aed8">
    <rect x="119.08" y="11.198906" width="110.2" height="110.2"/>
   </clipPath>
  </defs>

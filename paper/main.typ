@@ -314,7 +314,7 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 
 #figure(
   image("figures/rules.svg", width: 100%),
-  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The anchor of a tier is a circle and its floor is drawn thick. A red cross on the anchor marks a stale tier. Two dots beyond the right end of a floor mark a tier that is not started, whose floor may be lengthened; the floor of the last tier, which is never lengthened, has none.],
+  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The floors are drawn thick. The anchor of a tier that is not stale, at which a tile may be placed, is a circle; the anchor of a stale tier is not marked. Two dots beyond the right end of a floor mark a tier that is not started, whose floor may be lengthened; the floor of the last tier, which is never lengthened, has none.],
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
@@ -632,7 +632,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/construction.svg", width: 100%),
-  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, a floor that extends in the tiling is continued by two dots beyond its right end. A stale tier is marked by a red cross on its anchor, as in @fig:rules; the dots here mark the floors that extend, not the tiers that are not started. The tile placed next is the one at the anchor of the first tier whose floor does not extend, which is filled black.],
+  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, a floor that extends in the tiling is continued by two dots beyond its right end. The anchor of a stale tier is not marked, as in @fig:rules; the dots here mark the floors that extend, not the tiers that are not started. The tile placed next is the one at the anchor of the first tier whose floor does not extend, which is filled black.],
 ) <fig:construction>
 
 #proof[

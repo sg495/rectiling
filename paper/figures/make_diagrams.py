@@ -68,13 +68,12 @@ def continue_floor(ax, x, y, width=1.1):
 
 
 def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False, open_floors=True):
-    """Marks the anchors of a staircase, in black for a chosen one; with flags, the floors are drawn thick, a red cross is drawn on the anchor of a stale tier and, unless disabled, the floor of a tier that is neither started nor last is continued by two dots."""
+    """Marks the anchors of a staircase, in black for a chosen one; with flags, the floors are drawn thick, the anchor of a stale tier is not marked and, unless disabled, the floor of a tier that is neither started nor last is continued by two dots."""
     for j, t in enumerate(tiers):
-        ax.plot([t.ax], [t.ay], marker="o", mfc="k" if t is chosen else "w", mec="k", ms=size, zorder=6)
+        if not (flags and t.stale):
+            ax.plot([t.ax], [t.ay], marker="o", mfc="k" if t is chosen else "w", mec="k", ms=size, zorder=6)
         if flags:
             ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
-        if flags and t.stale:
-            ax.plot([t.ax], [t.ay], marker="x", color="red", ms=1.2 * size, mew=0.9, zorder=7)
         if flags and open_floors and not t.started and j < len(tiers) - 1:
             continue_floor(ax, t.ax + t.floor, t.ay)
 
