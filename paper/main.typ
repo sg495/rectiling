@@ -440,14 +440,14 @@ It rests on the position of the strips of a positive staircase relative to one a
 
 #figure(
   image("figures/region.svg", width: 100%),
-  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile, filled with dots, and of the part $B$ to its right, filled with plus signs. The tiles are coloured as in @fig:fits, the dashed lines separate the strips of the staircase after the placement, and its anchors are circled. For the tile of full width, $B$ is not the strip of a new tier: it is added to the strip of the next tier, which is outlined with dots.],
+  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile and of the part $B$ to its right. The dashed lines separate the strips of the staircase after the placement, and its anchors are circled. The strip that contains $A$ after the placement is filled with dots, and the strip that contains $B$ is filled with plus signs. For the tile of full width, $B$ is not a strip of its own: it is the part inside $R$ of the strip of the next tier.],
 ) <fig:region>
 
-@fig:misfit shows a tile of full height that is wider than its floor, and a tile of full width that is higher than its wall, contrary to the hypothesis of @prop:step.
+@fig:misfit shows a tile placed inside that is wider than its floor, and a tile of full width that is higher than its wall, contrary to the hypothesis of @prop:step.
 
 #figure(
   image("figures/misfit.svg", width: 62%),
-  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The thick lines are the floors and the walls before the placement, the dashed lines separate the strips of the staircase after the placement, and its anchors are marked as in @fig:rules. Left: a wide tile of full height is wider than the floor; the tier that replaces $T_1$ has a negative floor, and its anchor is to the right of the anchor of $T_2$. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
+  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The thick lines are the floors and the walls before the placement, the dashed lines separate the strips of the staircase after the placement, and its anchors are marked as in @fig:rules, with the names of its tiers. Left: a wide tile placed inside is wider than the floor; the second of the tiers that replace $T_1$ has a negative floor, and its anchor is to the right of the anchor of the next tier. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
 ) <fig:misfit>
 
 For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
@@ -502,7 +502,7 @@ A defective staircase stays defective under every allowed placement whose constr
 
 #figure(
   image("figures/defect.svg", width: 100%),
-  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the anchors are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn thick and dashed from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn thick and dashed from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
+  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the anchors are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn in red, thick and dashed, from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn in red, thick and dashed, from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
 ) <fig:defect>
 
 It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
@@ -525,11 +525,11 @@ It follows that no staircase is defective along a record that empties the stairc
   The induction on the record and the numbering of the free sides in the rest of $rho$ are in the formal proof (@app:formal).
 ]
 
-@fig:unfit shows the record of @ex:plastic with a width for which the second tile does not fit: the positivity constraints of the first two placements hold, and that of the third does not.
+@fig:unfit shows two placements whose positivity constraints hold and of which the second tile does not fit: by the first statement of @prop:fit, no record that begins with them obeys the rules with all its constraints satisfied.
 
 #figure(
-  image("figures/unfit.svg", width: 62%),
-  caption: [The record of @ex:plastic at the proportion $x = 1.7548...$ of that example, with $W = 0.36$ and $H = 1$. The second tile, of full height, has the positive height $1 - W slash x$ and is wider than its floor $L = W$. The tier that it leaves is started and has the negative floor $L - w$, drawn thick and dashed, so the staircase is floor-defective; the third placement, which is full, has this floor as its positive quantity.],
+  image("figures/unfit.svg", width: 46%),
+  caption: [Two placements on the initial staircase of the unit square for $x = 3 slash 2$, with the anchors marked as in @fig:rules. The first tile is wide and placed inside, with free side $1 slash 2$. The second, tall and of full height at $T_1$, has the positive height $1 slash 2$ and is wider than its floor: it leaves a started tier, the last, with the negative floor $L - w = -1 slash 12$, drawn in red, thick and dashed, so the staircase is floor-defective.],
 ) <fig:unfit>
 
 Soundness follows by removing the tiles from the region one at a time.
@@ -554,7 +554,7 @@ Soundness follows by removing the tiles from the region one at a time.
 
 #figure(
   image("figures/regions.svg", width: 100%),
-  caption: [The regions $U(S_0), dots, U(S_6)$, outlined thick and filled with dots, of the staircases along the record of the tiling of @fig:construction. Each placement removes its tile from the region, as in the proof of @prop:sound.],
+  caption: [The regions $U(S_0), dots, U(S_6)$, outlined thick, of the staircases along the record of the tiling of @fig:construction. Each placement removes its tile from the region, as in the proof of @prop:sound.],
 ) <fig:regions>
 
 == Completeness <sec:complete>
@@ -589,11 +589,6 @@ The conditions $a' <= c < a' + w'$ and $b' < d <= b' + h'$ hold exactly if it co
   Then $a' <= c < a' + w'$ as before, $b' <= d - eta < d$, and $d - eta <= b' + h'$, so that $d <= b' + h'$ by the choice of $eta$.
 ]
 
-#figure(
-  image("figures/near.svg", width: 58%),
-  caption: [The two statements of @prop:near at a point $(c, d)$ of the tiling of @fig:construction. The tile found, which is coloured, is the one that contains the point marked by a cross, $(c + epsilon, d + eta)$ on the left and $(c + epsilon, d - eta)$ on the right; no side of a tile crosses the interior of the dotted rectangle.],
-) <fig:near>
-
 The record is built one placement at a time, and the following conditions are maintained.
 
 #definition(name: [state of the construction])[
@@ -623,11 +618,6 @@ In a state, the tile at each anchor is still to be placed.
   Hence $(a', b') = (a, b)$.
 ]
 
-#figure(
-  image("figures/anchor.svg", width: 40%),
-  caption: [The state after three placements in the construction of the record of the tiling of @fig:staircase, and its tier $T_1$, whose strip is outlined thick. The placed tiles are coloured, and the rectangle spanned by the floor and the wall of $T_1$ is hatched, as in @fig:staircase. The tile $T$ that contains the points just above and to the right of the anchor of $T_1$ has a dashed outline. The parts of the plane just to the left of the anchor and just below the floor, which are filled with plus signs, are outside the region, so $T$ does not reach into them.],
-) <fig:anchor>
-
 The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
 
 #proposition[
@@ -653,7 +643,6 @@ The placement made in a state is that of the tile at the anchor of the first tie
   The floor of the last tier ends at abscissa $W$, by @obs:strips, and no tile $(a', b', w', h')$ has $W < a' + w'$; so this floor does not extend, and $T_i$ exists.
 
   _The tile fits._
-  @fig:impossible shows the two cases that are excluded.
   Suppose that $w > L$.
   The points just above and to the right of the end $(a + L, b)$ of the floor of $T_i$ are then interior points of $Q$.
   By the second statement of @prop:near, some tile $T$ contains the points just below and to the right of this end.
@@ -682,11 +671,6 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
   Two verifications are left to the formal proof (@app:formal): that $b > 0$ when $w > L$, which @prop:near requires and which holds because $T_i$ is then not the last tier, and the size in each of the seven cases of @def:placement.
 ]
-
-#figure(
-  image("figures/impossible.svg", width: 62%),
-  caption: [The state after two placements in @fig:construction, with the tile $Q$ at the anchor of the chosen tier $T_1$ replaced by a rectangle that does not fit, drawn with a dashed outline and filled with dots. Left: a rectangle wider than the floor meets the tile that contains the points just below and to the right of the end of the floor, marked by a diamond; the top side of that tile is above the floor, since the floor does not extend. Right: a rectangle higher than the wall meets the tile whose top side continues the floor of $T_0$ beyond its end, marked by a diamond; that floor extends, as the dotted segment shows.],
-) <fig:impossible>
 
 Repeating the step until no tile remains gives the record.
 
@@ -910,7 +894,7 @@ The definitions and the statements on which the bound rests are in @app:maps.
 
 #figure(
   image("figures/tiling-map.svg", width: 100%),
-  caption: [Left: a tiling by seven tiles, of proportion $2.3414...$, each tile with its resistance, $1 slash x$ if it is wide and $x$ if it is tall; the thick segments are the maximal segments of the union of the horizontal sides, which correspond to the vertices of the map. Centre: the map of the tiling (@def:tiling-map), with one edge for each tile, drawn from the segment of its top side to that of its bottom side, the additional edge $e_0$, dashed, and the root $r$, which is the dart of $e_0$ at $t$; the thick edge is the edge before the root, that of the tile with corner $(0, 0)$. Right: the network of the levels (@def:height-network), whose vertices are the ordinates of the horizontal sides; the vertices $v_2$ and $v_3$ of the map are at the same level, and are one vertex of this network.],
+  caption: [Left: a tiling by seven tiles, of proportion $2.3414...$, each tile with its resistance, $1 slash x$ if it is wide and $x$ if it is tall; the thick segments are the maximal segments of the union of the horizontal sides, which correspond to the vertices of the map. Centre: the map of the tiling (@def:tiling-map), with one edge for each tile, directed from the vertex of its top side to that of its bottom side, and the additional edge $e_0$, dashed; the vertices $v_1$, $v_2$ and $v_3$ are drawn at one height. The root is the dart of $e_0$ at $t$, and the thick edge is the edge before the root, that of the tile with corner $(0, 0)$. Right: the network of the levels (@def:height-network), whose vertices are the ordinates of the horizontal sides; the vertices $v_2$ and $v_3$ of the map are at the same level, and are one vertex of this network.],
 ) <fig:tiling-map>
 In brief, a tiling $tau$ of a rectangle has a rooted map $cal(M)(tau)$, whose edges are the tiles and one additional edge $e_0$ between the top side and the bottom side (@def:tiling-map); this map is non-separable and planar, and it has a network on which the tiling is a flow (@prop:tiling-map).
 A rooted map $cal(M)$ with a network has a finite set $X(cal(M))$ of real numbers, the real roots of the polynomials of that network for the orientation vectors that are $-1$ at the edge before the root (@def:map-network), and isomorphic rooted maps have the same set (@obs:map-polynomial).
@@ -998,8 +982,8 @@ The proof uses the network of the levels of a tiling (@def:height-network), whos
 ]
 
 #figure(
-  image("figures/same-bag.svg", width: 44%),
-  caption: [Tilings by four tiles, of proportion $1.3981...$, from two classes that have the same bag; tiles with the same short side have the same colour.],
+  image("figures/same-bag.svg", width: 84%),
+  caption: [The tilings by four tiles, of proportion $1.3981...$, of two classes that have the same bag: the eight tilings of one class in the top row, and the four of the other in the bottom row. Tiles with the same short side have the same colour.],
 ) <fig:same-bag>
 
 The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, which records $b(1) = 1$, $b(2) = 1$, $b(3) = 3$ and $b(4) > 11$.
@@ -1154,8 +1138,8 @@ Some features of the table can be proved.
 ]
 
 #figure(
-  image("figures/symmetric.svg", width: 100%),
-  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; the tile at a corner on the diagonal with its image under the reflection in the diagonal, drawn with a dashed outline and filled with dots, which it overlaps without being equal to it; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
+  image("figures/symmetric.svg", width: 76%),
+  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
 ) <fig:symmetric>
 
 Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.

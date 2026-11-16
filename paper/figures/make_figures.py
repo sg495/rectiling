@@ -172,7 +172,7 @@ def grid(items, columns, path, labels=None):
         if labels is not None:
             ax.set_title(labels[k], fontsize=7, pad=2)
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -209,7 +209,7 @@ def catalogue(n, columns, path, size, labels=True):
         if labels:
             ax.set_title(f"{float(value):.4f}", fontsize=5.5, pad=1.5)
     fig.tight_layout(pad=0.15, h_pad=0.25, w_pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -247,7 +247,7 @@ def sequences_plot(path):
         ax.spines[side].set_linewidth(0.4)
     ax.legend(fontsize=6.5, frameon=False, loc="upper left")
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 

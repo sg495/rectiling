@@ -170,7 +170,9 @@ def region_figure(path, value, wit):
         x, y, w, h = tiles[k]
         draw(ax, tiles[: k + 1])
         marks(ax, box(x, y + h, 1 - x, t.wall - h), "dot")
-        marks(ax, box(x + w, y, 1 - x - w, h), "plus")
+        if 1 - x - w > EPS:
+            u = next(v for v in sts[k + 1] if v.ax <= x + w + EPS and v.ay <= y + EPS and y + h <= v.ay + v.wall + EPS and v.ax >= x + w - EPS)
+            marks(ax, box(u.ax, u.ay, 1 - u.ax, u.wall), "plus")
         for u in sts[k + 1]:
             ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.35", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.2, zorder=4))
@@ -180,15 +182,12 @@ def region_figure(path, value, wit):
         if 1 - x - w > 0.05:
             ax.text((x + w + 1) / 2, y + h / 2, "$B$", fontsize=7, ha="center", va="center", zorder=6, bbox=dict(fc="w", ec="none", pad=1))
         merged = fit in ("full-width", "full") and i + 1 < len(sts[k])
-        if merged:
-            u = sts[k + 1][i + (fit == "full-width")]
-            ax.add_patch(Rectangle((u.ax, u.ay), 1 - u.ax, u.wall, fc="none", ec="k", lw=0.9, ls=(0, (1, 1.2)), zorder=5))
         mark_anchors(ax, [Tier(u.ax, u.ay, u.floor, u.wall) for u in sts[k + 1]], size=3.6)
         frame(ax)
         ax.set_title(f"placement {k + 1}: {FIT_NAMES[fit]}", fontsize=7, pad=3)
         notes.append((k + 1, fit, i, merged))
     fig.tight_layout(pad=0.2, w_pad=0.5)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return notes
 
@@ -198,14 +197,14 @@ def misfit_figure(path, value, wit, k, i):
     tiles, sts = stages(value, wit)
     tiers = sts[k]
     x = float(value)
-    cases = (("full-height", False, "full height, wider than the floor"), ("full-width", True, "full width, higher than the wall"))
+    cases = (("inside", False, "inside, wider than the floor"), ("full-width", True, "full width, higher than the wall"))
     fig, axes = plt.subplots(1, 2, figsize=(4.4, 2.3))
     notes = []
     for ax, (fit, tall, title) in zip(axes, cases):
-        after, tile = fplace(tiers, i, fit, tall, None, x)
-        a, b, w, h = tile
         t = tiers[i]
-        assert (w > t.floor + 0.02) if fit == "full-height" else (h > t.wall + 0.02)
+        after, tile = fplace(tiers, i, fit, tall, (t.floor + 0.5 * (1 - t.ax - t.floor)) / x, x)
+        a, b, w, h = tile
+        assert (w > t.floor + 0.02 and h < t.wall - 0.02) if fit == "inside" else (h > t.wall + 0.02)
         draw(ax, tiles[:k])
         ax.add_patch(Rectangle((a, b), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0.5, zorder=3))
         for u in after:
@@ -220,7 +219,7 @@ def misfit_figure(path, value, wit, k, i):
         ax.set_title(title, fontsize=7, pad=3)
         notes.append((fit, [(round(u.floor, 4), round(u.wall, 4)) for u in after]))
     fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return notes
 
@@ -230,7 +229,7 @@ def skeleton(ax, tiers, defect=None, kind=None):
     for j, t in enumerate(tiers):
         for part, (xs, ys) in (("floor", ([t.ax, t.ax + t.floor], [t.ay, t.ay])), ("wall", ([t.ax, t.ax], [t.ay, t.ay + t.wall]))):
             bad = j == defect and part == kind
-            ax.plot(xs, ys, color="k", lw=2.2 if bad else 0.9, ls=(0, (1.6, 1)) if bad else "-", solid_capstyle="butt", zorder=5 if bad else 4)
+            ax.plot(xs, ys, color="red" if bad else "k", lw=2.2 if bad else 0.9, ls=(0, (1.6, 1)) if bad else "-", solid_capstyle="butt", zorder=5 if bad else 4)
 
 
 def defect_tier(tiers, kind):
@@ -276,37 +275,33 @@ def defect_figure(path):
             ax.set_title(title, fontsize=5.6, pad=2)
             notes.append((kind, title, [(round(t.floor, 3), round(t.wall, 3), t.stale, t.started) for t in tiers]))
     fig.tight_layout(pad=0.2, w_pad=0.4, h_pad=0.8)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return notes
 
 
 def unfit_figure(path):
-    """Draws the record of the worked example with a width of the main rectangle for which the second tile is wider than its floor."""
-    x = float(sp.real_roots(sp.Poly(sp.Symbol("x") ** 3 - 2 * sp.Symbol("x") ** 2 + sp.Symbol("x") - 1))[-1])
-    width = 0.36
-    s0 = [Tier(0.0, 0.0, width, 1.0)]
-    s1, a = fplace(s0, 0, "full-width", False, None, x)
-    s2, b = fplace(s1, 0, "full-height", True, None, x)
-    assert b[2] > s1[0].floor and s2[0].floor < 0 and s2[0].started
-    fig, axes = plt.subplots(1, 3, figsize=(4.6, 2.5))
-    for ax, tiles, tiers, title in zip(axes, ([a], [a, b], [a, b]), (s1, s2, s2), ("full width, wide", "full height, tall", "full: its floor is negative")):
+    """Draws a record on the unit square in which the positivity constraints of the first two placements hold and the second tile is wider than its floor."""
+    x = 1.5
+    s0 = [Tier(0.0, 0.0, 1.0, 1.0)]
+    s1, a = fplace(s0, 0, "inside", False, 0.5, x)
+    assert not s1[0].started
+    s2, b = fplace(s1, 1, "full-height", True, None, x)
+    assert b[2] > s1[1].floor and b[3] > 0 and s2[1].floor < 0 and s2[1].started
+    fig, axes = plt.subplots(1, 2, figsize=(3.4, 1.75))
+    for ax, tiles, tiers, title in zip(axes, ([a], [a, b]), (s1, s2), ("inside, wide", "full height, tall, at $T_1$")):
         coloured(ax, tiles, COLOURS, zorder=2)
-        skeleton(ax, tiers, 0 if tiers is s2 else None, "floor")
+        skeleton(ax, tiers, defect_tier(tiers, "floor"), "floor")
         mark_anchors(ax, tiers, size=4.2, flags=True)
-        ax.add_patch(Rectangle((0, 0), width, 1, fc="none", ec="k", lw=0.6, zorder=5))
-        ax.set_xlim(-0.08, 0.62)
-        ax.set_ylim(-0.05, 1.05)
-        ax.set_aspect("equal")
-        ax.axis("off")
-        ax.set_title(title, fontsize=6.5, pad=3)
-    t = s2[0]
-    axes[2].annotate("$L - w < 0$", (t.ax + t.floor / 2, t.ay), (0.52, 0.12), fontsize=6.5, ha="center", arrowprops=dict(arrowstyle="-", lw=0.4))
-    axes[1].text(b[0] + b[2] / 2, b[1] + b[3] / 2, "$w > L$", fontsize=6.5, ha="center", va="center", rotation=90)
-    fig.tight_layout(pad=0.2, w_pad=0.4)
-    fig.savefig(path)
+        for m, t in enumerate(tiers):
+            ax.text(t.ax + 0.02, t.ay + 0.02, f"$T_{m}$", fontsize=6.5, ha="left", va="bottom", zorder=7)
+        frame(ax)
+        ax.set_xlim(-0.05, 1.15)
+        ax.set_title(title, fontsize=7, pad=3)
+    fig.tight_layout(pad=0.2, w_pad=0.6)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
-    return x, width, a, b, s2[0].floor
+    return a, b, s2[1].floor
 
 
 def regions_figure(path, value, wit):
@@ -322,109 +317,10 @@ def regions_figure(path, value, wit):
                 points += [(t.ax, t.ay), (tiers[j + 1].ax if j + 1 < len(tiers) else 1.0, t.ay)]
             points.append((1.0, top))
             ax.add_patch(Polygon(points, closed=True, fc="none", ec="k", lw=1.5, joinstyle="miter", zorder=6))
-            marks(ax, points, "dot", step=0.085)
         ax.set_title(f"$U(S_{k})$" + (r"$ = \emptyset$" if k == len(sts) - 1 else ""), fontsize=6.5, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
-
-
-def near_figure(path, value, wit, c, d):
-    """Draws, for a point of a listed tiling, the tile that contains the points just above and to its right, and the tile that contains those just below and to its right."""
-    tiles, _ = stages(value, wit)
-    xs = sorted({round(v, 9) for x, _, w, _ in tiles for v in (x, x + w)})
-    ys = sorted({round(v, 9) for _, y, _, h in tiles for v in (y, y + h)})
-    eps = 0.45 * (min(v for v in xs if v > c + EPS) - c)
-    up = 0.45 * (min(v for v in ys if v > d + EPS) - d)
-    down = 0.45 * (d - max(v for v in ys if v < d - EPS))
-    fig, axes = plt.subplots(1, 2, figsize=(4.2, 2.2))
-    found = []
-    for ax, (eta, title) in zip(axes, ((up, "just above and to the right"), (-down, "just below and to the right"))):
-        p = (c + eps, d + eta)
-        k = next(j for j, (x, y, w, h) in enumerate(tiles) if x < p[0] < x + w and y < p[1] < y + h)
-        x, y, w, h = tiles[k]
-        assert x <= c + EPS and c < x + w and ((y <= d + EPS and d < y + h) if eta > 0 else (y < d and d <= y + h + EPS))
-        coloured(ax, tiles, ["w"] * len(tiles))
-        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k], ec="k", lw=0.9, zorder=2))
-        ax.add_patch(Rectangle((c, min(d, d + eta)), eps, abs(eta), fc="none", ec="k", lw=0.5, ls=(0, (1, 1)), zorder=5))
-        ax.plot([c], [d], marker="o", mfc="k", mec="k", ms=3.2, zorder=6)
-        ax.plot([p[0]], [p[1]], marker="x", color="k", ms=3.5, mew=0.7, zorder=6)
-        ax.text(c - 0.02, d + (0.02 if eta > 0 else -0.02), "$(c, d)$", fontsize=6.5, ha="right", va="bottom" if eta > 0 else "top", zorder=7)
-        frame(ax)
-        ax.set_title(title, fontsize=7, pad=3)
-        found.append(k)
-    fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
-    plt.close(fig)
-    return found
-
-
-def anchor_figure(path, value, wit, k, i):
-    """Draws a state of the construction of a listed tiling, with the tile at the anchor of a tier and the parts of the plane next to the anchor that lie outside the region."""
-    tiles, sts = stages(value, wit)
-    tiers = sts[k]
-    t = tiers[i]
-    q = next(r for r in tiles[k:] if abs(r[0] - t.ax) < EPS and abs(r[1] - t.ay) < EPS)
-    fig, ax = plt.subplots(figsize=(2.9, 2.9))
-    draw(ax, tiles[:k])
-    outline_rest(ax, tiles[k:])
-    ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.1, zorder=4))
-    w, h = min(q[2], t.floor), min(q[3], t.wall)
-    ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="0.45", zorder=3))
-    ax.add_patch(Rectangle((q[0], q[1]), q[2], q[3], fc="none", ec="k", lw=1.1, ls=(0, (3, 1.5)), zorder=5))
-    reach = 0.09
-    for zone in ((t.ax - reach, t.ay, reach, t.wall), (t.ax, t.ay - reach, t.floor, reach)):
-        marks(ax, box(*zone), "plus", step=0.027)
-        ax.add_patch(Rectangle(zone[:2], zone[2], zone[3], fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
-    ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
-    ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
-    mark_anchors(ax, tiers, size=4.6, flags=True)
-    ax.text(t.ax + w / 2, t.ay + h / 2, "$T$", fontsize=8, ha="center", va="center", zorder=7, bbox=dict(fc="w", ec="none", pad=1))
-    frame(ax)
-    fig.tight_layout(pad=0.2)
-    fig.savefig(path)
-    plt.close(fig)
-    return k, i, q
-
-
-def impossible_figure(path, value, wit, k):
-    """Draws, on a state of the construction of a listed tiling, the tile at the chosen anchor made wider than its floor and made higher than its wall, with the tile of the tiling that it would then meet."""
-    tiles, sts = stages(value, wit)
-    tiers = sts[k]
-    i = next(j for j, t in enumerate(tiers) if not extends(tiles, t.ax + t.floor, t.ay))
-    assert i == moves_of(wit)[k][0] and 0 < i < len(tiers) - 1
-    t = tiers[i]
-    q = tiles[k]
-    extra = 0.1
-    end = (t.ax + t.floor, t.ay)
-    below = next(j for j, (x, y, w, h) in enumerate(tiles) if x <= end[0] + EPS and end[0] < x + w - EPS and y < end[1] - EPS and end[1] <= y + h + EPS)
-    corner = (t.ax, t.ay + t.wall)
-    above = next(j for j, (x, y, w, h) in enumerate(tiles) if abs(y + h - corner[1]) < EPS and x <= corner[0] + EPS and corner[0] < x + w - EPS)
-    assert tiles[below][1] + tiles[below][3] > end[1] + EPS and above != k and q[3] < t.wall - EPS
-    cases = (
-        ((q[0], q[1], t.floor + extra, q[3]), below, end, "wider than the floor"),
-        ((q[0], q[1], q[2], t.wall + extra), above, corner, "higher than the wall"),
-    )
-    fig, axes = plt.subplots(1, 2, figsize=(4.6, 2.4))
-    for ax, (ghost, other, point, title) in zip(axes, cases):
-        coloured(ax, tiles, ["w"] * len(tiles))
-        x, y, w, h = tiles[other]
-        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[other], ec="k", lw=0.6, zorder=2))
-        ax.add_patch(Rectangle(ghost[:2], ghost[2], ghost[3], fc="none", ec="k", lw=1.0, ls=(0, (3, 1.5)), zorder=3))
-        marks(ax, box(*ghost), "dot", step=0.036)
-        for j, u in enumerate(tiers):
-            ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="k", lw=1.5, solid_capstyle="butt", zorder=4)
-            if extends(tiles, u.ax + u.floor, u.ay):
-                ax.plot([u.ax + u.floor, u.ax + u.floor + 0.09], [u.ay, u.ay], color="k", lw=1.5, ls=(0, (1, 1.2)), zorder=4)
-        mark_anchors(ax, tiers, size=4.2, chosen=t, flags=True)
-        ax.plot([point[0]], [point[1]], marker="D", mfc="w", mec="k", ms=3.6, zorder=7)
-        ax.text(ghost[0] + ghost[2] / 2, ghost[1] + ghost[3] / 2, "$Q$", fontsize=8, ha="center", va="center", zorder=7, bbox=dict(fc="w", ec="none", pad=1))
-        frame(ax)
-        ax.set_title(title, fontsize=7, pad=3)
-    fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
-    plt.close(fig)
-    return k, i, below, above
 
 
 def tiling_map(tiles):
@@ -560,25 +456,35 @@ def map_figure(path, value, wit):
     for k, (x, y, w, h) in enumerate(tiles):
         left.text(x + w / 2, y + h / 2, "$x$" if h > w else "$1/x$", fontsize=6.5, ha="center", va="center")
     left.set_xlim(-0.16, 1.16)
+    row = [s for s in inner if s[2] < max(v[2] for v in inner) - EPS]
+    spot = dict(node)
+    if row and all(where[("l", k)] in row or where[("u", k)] in row or where[("u", k)] not in inner or where[("l", k)] not in inner for k in range(n)):
+        height = max(s[2] for s in row)
+        for j, s in enumerate(sorted(row, key=lambda s: s[0] + s[1])):
+            spot[s] = (0.12 + 0.86 * j / max(len(row) - 1, 1), height)
+    pairs = [(where[("u", k)], where[("l", k)]) for k in range(n)]
     for k, (x, y, w, h) in enumerate(tiles):
-        a, b = node[where[("u", k)]], node[where[("l", k)]]
-        through(mid, a, b, (x + w / 2, y + h / 2), color=COLOURS[k % len(COLOURS)], lw=2.4 if k == first else 1.2)
-    (sx, sy), (tx, ty), reach = node[where[("u", None)]], node[where[root]], 0.85
+        a, b = spot[pairs[k][0]], spot[pairs[k][1]]
+        if pairs.count(pairs[k]) == 1:
+            arc(mid, a, b, 0.0, color=COLOURS[k % len(COLOURS)], lw=2.4 if k == first else 1.2)
+        else:
+            through(mid, a, b, (x + w / 2, y + h / 2), color=COLOURS[k % len(COLOURS)], lw=2.4 if k == first else 1.2)
+    (sx, sy), (tx, ty), reach = spot[where[("u", None)]], spot[where[root]], 1.15
     curve = MplPath([(sx + 0.03, sy), (sx + reach, sy), (tx + reach, ty), (tx + 0.03, ty)], [MplPath.MOVETO, MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4])
     mid.add_patch(FancyArrowPatch(path=curve, arrowstyle="-", color="k", lw=0.7, ls="--"))
     mid.text(sx + 0.75 * reach + 0.03, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
-    mid.annotate("", xy=(tx + 0.2, ty - 0.012), xytext=(tx + 0.03, ty), arrowprops=dict(arrowstyle="-|>", color="k", lw=1.6, mutation_scale=6, shrinkA=0, shrinkB=0))
-    mid.text(tx + 0.13, ty - 0.035, "$r$", fontsize=7, ha="center", va="top")
+    node = spot
     for s, (x, y) in node.items():
         mid.plot([x], [y], marker="o", mfc="w", mec="k", ms=4, zorder=3)
         mid.text(x - 0.06, y, f"${names[s]}$", fontsize=7, va="center", ha="right")
-    mid.set_xlim(-0.2, 1.5)
+    mid.set_xlim(-0.2, 1.6)
     mid.set_ylim(-0.1, 1.07)
     mid.set_aspect("equal")
     mid.axis("off")
     levels = sorted({s[2] for s in segs})
     for k, (x, y, w, h) in enumerate(tiles):
-        bend = -1.3 * (x + w / 2 - 0.5) / max(h, 0.3)
+        ends = [(round(t[1] + t[3], 9), round(t[1], 9)) for t in tiles]
+        bend = 0.0 if ends.count(ends[k]) == 1 and not any(ends[k][1] < v < ends[k][0] for v in {c for e in ends for c in e}) else -1.3 * (x + w / 2 - 0.5) / max(h, 0.3)
         arc(right, (0.5, y + h), (0.5, y), bend, color=COLOURS[k % len(COLOURS)], lw=1.2)
     for v in levels:
         right.plot([0.5], [v], marker="o", mfc="w", mec="k", ms=4, zorder=3)
@@ -589,10 +495,10 @@ def map_figure(path, value, wit):
     right.set_ylim(-0.1, 1.07)
     right.set_aspect("equal")
     right.axis("off")
-    for ax, title in zip((left, mid, right), ("the tiling", "its map, with $e_0$ and the root $r$", "its network of the levels")):
+    for ax, title in zip((left, mid, right), ("the tiling", "its map, with the edge $e_0$", "its network of the levels")):
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return len(vertices), len(faces), len(levels), first
 
@@ -638,7 +544,7 @@ def isomorphic_figure(path, choice):
             ax.text(x + w / 2, y + h / 2, "$x$" if h > w else "$1/x$", fontsize=6.5, ha="center", va="center")
         ax.set_title(f"$x = {float(value):.4f}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -656,21 +562,42 @@ def bag_choice():
             seen.setdefault(bag, (value, size, wit))
 
 
+def orbit_of(tiles):
+    """Returns the distinct images of a tiling of the unit square under the eight symmetries of the square."""
+    out = []
+    current = list(tiles)
+    for flip in range(2):
+        for _ in range(4):
+            current = [(1 - y - h, x, h, w) for x, y, w, h in current]
+            if not any(all(any(same(t, g) for g in other) for t in current) for other in out):
+                out.append(current)
+        current = [(y, x, h, w) for x, y, w, h in current]
+    return out
+
+
 def same_bag_figure(path, choice):
-    """Draws tilings of two classes that have the same bag, the tiles of equal short side having the same colour."""
-    fig, axes = plt.subplots(1, 2, figsize=(3.5, 1.85))
-    sides = None
-    for ax, (value, size, wit) in zip(axes, choice):
-        tiles = witness_tiles(value, wit)
-        if sides is None:
-            sides = sorted({round(min(w, h), 7) for _, _, w, h in tiles})
-        coloured(ax, tiles, [COLOURS[sides.index(round(min(w, h), 7))] for _, _, w, h in tiles])
-        frame(ax)
-        ax.set_title(f"a class of {size} tilings", fontsize=7, pad=3)
-    fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
+    """Draws all the tilings of two classes that have the same bag, each from its record, the tiles of equal short side having the same colour."""
+    orbits_ = [orbit_of(witness_tiles(value, wit)) for value, _, wit in choice]
+    assert [len(o) for o in orbits_] == [size for _, size, _ in choice]
+    sides = sorted({round(min(w, h), 7) for _, _, w, h in orbits_[0][0]})
+    columns = max(len(o) for o in orbits_)
+    fig, axes = plt.subplots(2, columns, figsize=(0.82 * columns, 1.75), squeeze=False)
+    records = []
+    for row, orbit, (value, size, _) in zip(axes, orbits_, choice):
+        for ax in row:
+            ax.axis("off")
+        for ax, image in zip(row, orbit):
+            record = witness(build(image)[1])
+            tiles = witness_tiles(value, record)
+            assert len(tiles) == len(image) and all(any(same(t, g) for g in image) for t in tiles)
+            coloured(ax, tiles, [COLOURS[sides.index(round(min(w, h), 7))] for _, _, w, h in tiles])
+            frame(ax)
+            records.append(record)
+    assert len(set(records)) == len(records)
+    fig.tight_layout(pad=0.2, w_pad=0.3, h_pad=0.5)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
-    return sides
+    return sides, records
 
 
 def crossing_choice():
@@ -710,7 +637,7 @@ def crossing_figure(path, value, wit):
             ax.plot([q[0]], [q[1]], marker="D", mfc="w", mec="k", ms=3.4, zorder=8)
         row[0].text(-0.12, 0.5, label, fontsize=7, rotation=90, ha="right", va="center")
     fig.tight_layout(pad=0.2, w_pad=0.3, h_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     lower = next(j for j, t in enumerate(base) if abs(t[0] - q[0]) < EPS and abs(t[1] + t[3] - q[1]) < EPS)
     upper = next(j for j, t in enumerate(base) if abs(t[0] + t[2] - q[0]) < EPS and abs(t[1] - q[1]) < EPS)
@@ -740,7 +667,7 @@ def subsets_figure(path):
         records.append(witness(moves))
     assert len(set(records)) == 4
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return qs, records
 
@@ -764,29 +691,21 @@ def symmetric_figure(path, value, wit):
     ids = [next(j for j, (x, y, w, h) in enumerate(tiles) if same(t, (y, x, h, w))) for t in transposed]
     turned, _, _ = regenerate(quarter_turn_tiling(), 2)
     assert all(any(same(t, (1 - y - h, x, h, w)) for x, y, w, h in turned) for t in turned)
-    fig, axes = plt.subplots(1, 4, figsize=(6.6, 1.85))
+    fig, axes = plt.subplots(1, 3, figsize=(5.0, 1.85))
     draw(axes[0], tiles)
     coloured(axes[1], transposed, [COLOURS[j] for j in ids])
     frame(axes[1])
-    corner = next(t for t in tiles if abs(t[0]) < EPS and abs(t[1]) < EPS)
-    coloured(axes[2], tiles, ["w"] * len(tiles))
-    x, y, w, h = corner
-    axes[2].add_patch(Rectangle((x, y), w, h, fc=COLOURS[0], ec="k", lw=0.6, zorder=2))
-    axes[2].add_patch(Rectangle((y, x), h, w, fc="none", ec="k", lw=0.9, ls=(0, (3, 1.5)), zorder=3))
-    marks(axes[2], box(y, x, h, w), "dot")
-    axes[2].plot([0, 1], [0, 1], color="k", lw=0.5, ls=(0, (1, 1.5)), zorder=4)
-    frame(axes[2])
     orbit = [turned[0]]
     for _ in range(3):
         x, y, w, h = orbit[-1]
         orbit.append(next(t for t in turned if same(t, (1 - y - h, x, h, w))))
-    coloured(axes[3], turned, [COLOURS[1] if any(same(t, g) for g in orbit) else "w" for t in turned])
-    axes[3].plot([0.5], [0.5], marker="D", mfc="w", mec="k", ms=3.8, zorder=8)
-    frame(axes[3])
-    for ax, title in zip(axes, ("a tiling", "its transpose", "a corner tile and its reflection", "fixed by a quarter turn")):
+    coloured(axes[2], turned, [COLOURS[1] if any(same(t, g) for g in orbit) else "w" for t in turned])
+    axes[2].plot([0.5], [0.5], marker="D", mfc="w", mec="k", ms=3.8, zorder=8)
+    frame(axes[2])
+    for ax, title in zip(axes, ("a tiling", "its transpose", "fixed by a quarter turn")):
         ax.set_title(title, fontsize=6.5, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return flipped, len(crossings(turned))
 
@@ -809,7 +728,7 @@ def bags_figure(path):
         bags.append(tuple(sides))
     assert bags[1] != bags[2] and len(bags[1]) == len(bags[2]) == 6
     fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return bags
 
@@ -824,11 +743,6 @@ def main():
     print("unfit:", unfit_figure(OUT / "unfit.svg"))
     cvalue, cwit = construction_choice()
     regions_figure(OUT / "regions.svg", cvalue, cwit)
-    ctiles, csts = stages(cvalue, cwit)
-    t = csts[2][0]
-    print("near:", near_figure(OUT / "near.svg", cvalue, cwit, t.ax + t.floor, csts[3][1].ay))
-    print("anchor:", anchor_figure(OUT / "anchor.svg", value, wit, 3, 1))
-    print("impossible:", impossible_figure(OUT / "impossible.svg", cvalue, cwit, 2))
     mvalue, mwit = map_choice()
     print("map:", mvalue, mwit, map_figure(OUT / "tiling-map.svg", mvalue, mwit))
     choice = isomorphic_choice()

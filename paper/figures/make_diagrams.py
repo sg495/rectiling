@@ -121,7 +121,7 @@ def staircase_figure(path, value, witness, k):
         ax.text(1.03, t.ay + t.wall / 2, f"$T_{j}$", fontsize=9, ha="left", va="center", color="0.3", zorder=7)
     mark_anchors(ax, [Tier(t.ax, t.ay, t.floor, t.wall) for t in tiers], size=5.5)
     fig.tight_layout(pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -150,7 +150,7 @@ def fits_figure(path, value, witness):
         ax.set_title(f"placement {k + 1}: {FIT_NAMES[fit]}", fontsize=7, pad=3)
         chosen.append((fit, k + 1, i, len(sts[k]), len(sts[k + 1])))
     fig.tight_layout(pad=0.2, w_pad=0.5)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return chosen
 
@@ -171,7 +171,7 @@ def rules_figure(path, value, witness):
         ax.set_title(f"after {k} placement{'' if k == 1 else 's'}", fontsize=7, pad=3)
         notes.append((k, [(j, t.stale, t.started) for j, t in enumerate(sts[k])], excluded(sts[k]), moves_of(witness)[k]))
     fig.tight_layout(pad=0.2, w_pad=0.5)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return notes
 
@@ -195,7 +195,7 @@ def example_figure(path):
         ax.text(side - 0.02 if k < 2 else side + 0.02, y + h / 2, labels[k][1], fontsize=7, ha="right" if k < 2 else "left", va="center", rotation=90)
         ax.set_title(("full width, wide", "full height, tall", "full, wide")[k], fontsize=7, pad=3)
     fig.tight_layout(pad=0.6, w_pad=0.4)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -243,7 +243,7 @@ def construction_figure(path, value, witness):
         mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first], flags=True)
         ax.set_title("no placement" if k == 0 else f"after {k} placement{'' if k == 1 else 's'}", fontsize=6, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -321,7 +321,7 @@ def sporadic_figure(path):
         ax.set_title(label, fontsize=7, pad=2)
         out.append(witness)
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return out
 
@@ -362,7 +362,7 @@ def classes_figure(path, n, columns, size):
         ax.set_title(f"{float(value):.4f} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
         total += count
     fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return len(items), total
 
@@ -416,7 +416,7 @@ def network_figure(path, tiles):
     right.set_aspect("equal")
     right.axis("off")
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return len(comps)
 
@@ -450,7 +450,7 @@ def mosaic_figure(path, choice):
         draw(ax, witness_tiles(value, witness))
         ax.set_title(f"$x = {float(value):.4f}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -488,7 +488,7 @@ def persistence_figure(path, value, witness):
     for ax, title in zip(axes, ("a tiling", "three more tiles", "four more tiles (square)", "five more tiles", "seven more tiles")):
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return records
 
@@ -503,7 +503,7 @@ def steps_figure(path):
         ax.set_ylim(-0.05, 1.05)
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.8)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -533,7 +533,7 @@ def pinwheel_figure(path):
         draw(ax, concrete_tiles, width=w, height=1.0)
         ax.set_title(f"$x = {float(x):.1f}$, width ${w:.3f}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return width, centre
 
@@ -548,7 +548,7 @@ def two_tiles_figure(path):
         mark_anchors(ax, sts[k + 1], size=4)
         ax.set_title(f"after placement {k + 1}", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return value, witness
 
