@@ -485,6 +485,8 @@ def map_figure(path, value, wit):
     for k, (x, y, w, h) in enumerate(tiles):
         ends = [(round(t[1] + t[3], 9), round(t[1], 9)) for t in tiles]
         bend = 0.0 if ends.count(ends[k]) == 1 and not any(ends[k][1] < v < ends[k][0] for v in {c for e in ends for c in e}) else -1.3 * (x + w / 2 - 0.5) / max(h, 0.3)
+        if bend == 0.0 and h < 0.15:
+            bend = -1.8
         arc(right, (0.5, y + h), (0.5, y), bend, color=COLOURS[k % len(COLOURS)], lw=1.2)
     for v in levels:
         right.plot([0.5], [v], marker="o", mfc="w", mec="k", ms=4, zorder=3)
