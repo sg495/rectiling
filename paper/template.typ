@@ -254,7 +254,7 @@
     it
   }
 
-  show raw: set text(font: ("New Computer Modern Mono", "DejaVu Sans Mono"), size: 1.15em, features: (calt: 0))
+  show raw: set text(font: ("New Computer Modern Mono", "DejaVu Sans Mono"), size: 1.05em, features: (calt: 0))
   show link: set text(fill: link-colour)
   show ref: set text(fill: link-colour)
   show cite: set text(fill: link-colour)
