@@ -314,7 +314,7 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 
 #figure(
   image("figures/rules.svg", width: 100%),
-  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The floors are drawn thick. The anchor of a tier that is not stale, at which a tile may be placed, is a circle; the anchor of a stale tier is not marked. Two dots beyond the right end of a floor mark a tier that is not started, whose floor may be lengthened; the floor of the last tier, which is never lengthened, has none.],
+  caption: [The staircases after one, three, four and five placements of the record of the tiling of @fig:staircase. The floors are drawn thick, and each mark shows an action that the rules permit at a tier. A circle at the anchor shows that a tile may be placed at the tier, that is, the tier is not stale. Two dots beyond the right end of the floor show that the floor may be lengthened, that is, the tier is neither started nor the last.],
 ) <fig:rules>
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
