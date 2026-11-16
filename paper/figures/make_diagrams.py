@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import sympy as sp
 from matplotlib.patches import FancyArrowPatch, Rectangle
 from matplotlib.path import Path as MplPath
+from matplotlib.transforms import offset_copy
 
 from make_figures import COLOURS, Tier, X, draw, place, replay, witness_tiles
 
@@ -59,11 +60,23 @@ def outline_rest(ax, tiles):
         ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="0.72", lw=0.35, zorder=2))
 
 
-def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False):
-    """Marks the anchors of a staircase, in black for a chosen one; with flags, the mark of a stale tier is grey and that of a started tier is a square."""
-    for t in tiers:
-        colour = "k" if t is chosen else ("0.7" if flags and t.stale else "w")
-        ax.plot([t.ax], [t.ay], marker="s" if flags and t.started else "o", mfc=colour, mec="k", ms=size, zorder=6)
+def continue_floor(ax, x, y, width=1.1):
+    """Continues a floor beyond its right end by two dots as thick as the floor."""
+    for k in (1, 2):
+        shift = offset_copy(ax.transData, fig=ax.figure, x=2.2 * width * k, y=0, units="points")
+        ax.plot([x], [y], marker="s", ms=width, mfc="k", mec="k", mew=0, transform=shift, zorder=4, clip_on=False)
+
+
+def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False, open_floors=True):
+    """Marks the anchors of a staircase, in black for a chosen one; with flags, the floors are drawn thick, a red cross is drawn on the anchor of a stale tier and, unless disabled, the floor of a tier that is neither started nor last is continued by two dots."""
+    for j, t in enumerate(tiers):
+        ax.plot([t.ax], [t.ay], marker="o", mfc="k" if t is chosen else "w", mec="k", ms=size, zorder=6)
+        if flags:
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+        if flags and t.stale:
+            ax.plot([t.ax], [t.ay], marker="x", color="red", ms=1.2 * size, mew=0.9, zorder=7)
+        if flags and open_floors and not t.started and j < len(tiers) - 1:
+            continue_floor(ax, t.ax + t.floor, t.ay)
 
 
 def excluded(tiers):
@@ -236,11 +249,11 @@ def construction_figure(path, value, witness):
             ext = extends(tiles, t.ax + t.floor, t.ay)
             ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             if ext:
-                ax.plot([t.ax + t.floor, t.ax + t.floor + 0.09], [t.ay, t.ay], color="k", lw=1.1, ls=(0, (1, 1.2)), solid_capstyle="butt", zorder=4)
+                continue_floor(ax, t.ax + t.floor, t.ay)
             if not ext and first is None:
                 first = j
         assert first == moves[k][0], (k, first, moves[k])
-        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first], flags=True)
+        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first], flags=True, open_floors=False)
         ax.set_title("no placement" if k == 0 else f"after {k} placement{'' if k == 1 else 's'}", fontsize=6, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)

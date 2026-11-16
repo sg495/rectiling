@@ -482,17 +482,19 @@ def map_figure(path, value, wit):
     mid.set_aspect("equal")
     mid.axis("off")
     levels = sorted({s[2] for s in segs})
+    height = {round(v, 9): j / (len(levels) - 1) for j, v in enumerate(levels)}
+    ends = [(round(t[1] + t[3], 9), round(t[1], 9)) for t in tiles]
     for k, (x, y, w, h) in enumerate(tiles):
-        ends = [(round(t[1] + t[3], 9), round(t[1], 9)) for t in tiles]
-        bend = 0.0 if ends.count(ends[k]) == 1 and not any(ends[k][1] < v < ends[k][0] for v in {c for e in ends for c in e}) else -1.3 * (x + w / 2 - 0.5) / max(h, 0.3)
-        if bend == 0.0 and h < 0.15:
-            bend = -1.8
-        arc(right, (0.5, y + h), (0.5, y), bend, color=COLOURS[k % len(COLOURS)], lw=1.2)
+        top, bottom = height[ends[k][0]], height[ends[k][1]]
+        alone = ends.count(ends[k]) == 1 and not any(bottom < v < top for v in height.values())
+        bend = 0.0 if alone else -1.3 * (x + w / 2 - 0.5) / max(top - bottom, 0.3)
+        arc(right, (0.5, top), (0.5, bottom), bend, color=COLOURS[k % len(COLOURS)], lw=1.2)
     for v in levels:
-        right.plot([0.5], [v], marker="o", mfc="w", mec="k", ms=4, zorder=3)
+        z = height[round(v, 9)]
+        right.plot([0.5], [z], marker="o", mfc="w", mec="k", ms=4, zorder=3)
         label = "s = 1" if v > 1 - EPS else "t = 0" if v < EPS else f"{v:.3f}"
-        right.text(-0.05, v, f"${label}$", fontsize=6.5, va="center", ha="right")
-        right.plot([-0.03, 0.47], [v, v], color="0.6", lw=0.4, ls=(0, (1, 2)), zorder=1)
+        right.text(-0.05, z, f"${label}$", fontsize=6.5, va="center", ha="right")
+        right.plot([-0.03, 0.47], [z, z], color="0.6", lw=0.4, ls=(0, (1, 2)), zorder=1)
     right.set_xlim(-0.35, 1.05)
     right.set_ylim(-0.1, 1.07)
     right.set_aspect("equal")
