@@ -466,9 +466,9 @@ def map_figure(path, value, wit):
     for k, (x, y, w, h) in enumerate(tiles):
         a, b = spot[pairs[k][0]], spot[pairs[k][1]]
         if pairs.count(pairs[k]) == 1:
-            arc(mid, a, b, 0.0, color=COLOURS[k % len(COLOURS)], lw=2.4 if k == first else 1.2)
+            arc(mid, a, b, 0.0, color=COLOURS[k % len(COLOURS)], lw=1.2)
         else:
-            through(mid, a, b, (x + w / 2, y + h / 2), color=COLOURS[k % len(COLOURS)], lw=2.4 if k == first else 1.2)
+            through(mid, a, b, (x + w / 2, y + h / 2), color=COLOURS[k % len(COLOURS)], lw=1.2)
     (sx, sy), (tx, ty), reach = spot[where[("u", None)]], spot[where[root]], 1.15
     curve = MplPath([(sx + 0.03, sy), (sx + reach, sy), (tx + reach, ty), (tx + 0.03, ty)], [MplPath.MOVETO, MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4])
     mid.add_patch(FancyArrowPatch(path=curve, arrowstyle="-", color="k", lw=0.7, ls="--"))
