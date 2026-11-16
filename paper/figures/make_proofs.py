@@ -225,11 +225,11 @@ def misfit_figure(path, value, wit, k, i):
 
 
 def skeleton(ax, tiers, defect=None, kind=None):
-    """Draws the floors and the walls of a real staircase, a defective floor or wall being thick and dashed."""
+    """Draws the floors and the walls of a real staircase, a defective floor or wall being thick and red."""
     for j, t in enumerate(tiers):
         for part, (xs, ys) in (("floor", ([t.ax, t.ax + t.floor], [t.ay, t.ay])), ("wall", ([t.ax, t.ax], [t.ay, t.ay + t.wall]))):
             bad = j == defect and part == kind
-            ax.plot(xs, ys, color="red" if bad else "k", lw=2.2 if bad else 0.9, ls=(0, (1.6, 1)) if bad else "-", solid_capstyle="butt", zorder=5 if bad else 4)
+            ax.plot(xs, ys, color="red" if bad else "k", lw=2.2 if bad else 0.9, solid_capstyle="butt", zorder=5 if bad else 4)
 
 
 def defect_tier(tiers, kind):

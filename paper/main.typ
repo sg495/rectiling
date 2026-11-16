@@ -502,7 +502,7 @@ A defective staircase stays defective under every allowed placement whose constr
 
 #figure(
   image("figures/defect.svg", width: 100%),
-  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the anchors are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn in red, thick and dashed, from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn in red, thick and dashed, from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
+  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the anchors are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn thick and red, from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn thick and red, from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
 ) <fig:defect>
 
 It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
@@ -529,7 +529,7 @@ It follows that no staircase is defective along a record that empties the stairc
 
 #figure(
   image("figures/unfit.svg", width: 46%),
-  caption: [Two placements on the initial staircase of the unit square for $x = 3 slash 2$, with the anchors marked as in @fig:rules. The first tile is wide and placed inside, with free side $1 slash 2$. The second, tall and of full height at $T_1$, has the positive height $1 slash 2$ and is wider than its floor: it leaves a started tier, the last, with the negative floor $L - w = -1 slash 12$, drawn in red, thick and dashed, so the staircase is floor-defective.],
+  caption: [Two placements on the initial staircase of the unit square for $x = 3 slash 2$, with the anchors marked as in @fig:rules. The first tile is wide and placed inside, with free side $1 slash 2$. The second, tall and of full height at $T_1$, has the positive height $1 slash 2$ and is wider than its floor: it leaves a started tier, the last, with the negative floor $L - w = -1 slash 12$, drawn thick and red, so the staircase is floor-defective.],
 ) <fig:unfit>
 
 Soundness follows by removing the tiles from the region one at a time.
