@@ -107,6 +107,34 @@ def regenerate(tiles, proportion, chosen=()):
     return drawn, moves, sts
 
 
+def box(x, y, w, h):
+    """Returns the corners of a rectangle."""
+    return [(x, y), (x + w, y), (x + w, y + h), (x, y + h)]
+
+
+MARKS = {
+    "dot": dict(marker="o", ms=0.9, mew=0),
+    "plus": dict(marker="+", ms=2.4, mew=0.35),
+    "cross": dict(marker="x", ms=2.0, mew=0.35),
+    "dagger": dict(marker="$\\dagger$", ms=3.0, mew=0),
+    "asterisk": dict(marker=(6, 2, 0), ms=2.4, mew=0.3),
+    "tri": dict(marker="1", ms=2.6, mew=0.35),
+}
+
+
+def marks(ax, points, kind, step=0.05):
+    """Fills a polygon with a grid of small black marks of a given kind."""
+    xs, ys = [p[0] for p in points], [p[1] for p in points]
+    if max(xs) - min(xs) < EPS or max(ys) - min(ys) < EPS:
+        return
+    clip = Polygon(points, closed=True, fc="none", ec="none")
+    ax.add_patch(clip)
+    grid = [(step * (u + 0.5 * (v % 2)), step * v * 0.866) for u in range(-2, 40) for v in range(-2, 40)]
+    inside = [g for g in grid if min(xs) < g[0] < max(xs) and min(ys) < g[1] < max(ys)]
+    (line,) = ax.plot([g[0] for g in inside], [g[1] for g in inside], ls="none", color="k", zorder=3.5, **MARKS[kind])
+    line.set_clip_path(clip)
+
+
 def frame(ax, width=1.0, height=1.0, pad=0.05):
     """Prepares axes for a main rectangle."""
     ax.add_patch(Rectangle((0, 0), width, height, fc="none", ec="k", lw=0.6, zorder=5))
@@ -141,14 +169,16 @@ def region_figure(path, value, wit):
         t = sts[k][i]
         x, y, w, h = tiles[k]
         draw(ax, tiles[: k + 1])
+        marks(ax, box(x, y + h, 1 - x, t.wall - h), "dot")
+        marks(ax, box(x + w, y, 1 - x - w, h), "plus")
         for u in sts[k + 1]:
             ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.35", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.2, zorder=4))
         ax.text(x + w / 2, y + h / 2, "$T$", fontsize=7, ha="center", va="center", zorder=6)
         if t.wall - h > 0.05:
-            ax.text((x + 1) / 2, y + h + (t.wall - h) / 2, "$A$", fontsize=7, ha="center", va="center", zorder=6)
+            ax.text((x + 1) / 2, y + h + (t.wall - h) / 2, "$A$", fontsize=7, ha="center", va="center", zorder=6, bbox=dict(fc="w", ec="none", pad=1))
         if 1 - x - w > 0.05:
-            ax.text((x + w + 1) / 2, y + h / 2, "$B$", fontsize=7, ha="center", va="center", zorder=6)
+            ax.text((x + w + 1) / 2, y + h / 2, "$B$", fontsize=7, ha="center", va="center", zorder=6, bbox=dict(fc="w", ec="none", pad=1))
         merged = fit in ("full-width", "full") and i + 1 < len(sts[k])
         if merged:
             u = sts[k + 1][i + (fit == "full-width")]
@@ -292,6 +322,7 @@ def regions_figure(path, value, wit):
                 points += [(t.ax, t.ay), (tiers[j + 1].ax if j + 1 < len(tiers) else 1.0, t.ay)]
             points.append((1.0, top))
             ax.add_patch(Polygon(points, closed=True, fc="none", ec="k", lw=1.5, joinstyle="miter", zorder=6))
+            marks(ax, points, "dot", step=0.085)
         ax.set_title(f"$U(S_{k})$" + (r"$ = \emptyset$" if k == len(sts) - 1 else ""), fontsize=6.5, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
     fig.savefig(path)
@@ -342,8 +373,9 @@ def anchor_figure(path, value, wit, k, i):
     ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="0.45", zorder=3))
     ax.add_patch(Rectangle((q[0], q[1]), q[2], q[3], fc="none", ec="k", lw=1.1, ls=(0, (3, 1.5)), zorder=5))
     reach = 0.09
-    ax.add_patch(Rectangle((t.ax - reach, t.ay), reach, t.wall, fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
-    ax.add_patch(Rectangle((t.ax, t.ay - reach), t.floor, reach, fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
+    for zone in ((t.ax - reach, t.ay, reach, t.wall), (t.ax, t.ay - reach, t.floor, reach)):
+        marks(ax, box(*zone), "plus", step=0.027)
+        ax.add_patch(Rectangle(zone[:2], zone[2], zone[3], fc="none", ec="k", lw=0.7, ls=(0, (1, 1.2)), zorder=5))
     ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
     ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.6, solid_capstyle="butt", zorder=5)
     mark_anchors(ax, tiers, size=4.6, flags=True)
@@ -379,6 +411,7 @@ def impossible_figure(path, value, wit, k):
         x, y, w, h = tiles[other]
         ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[other], ec="k", lw=0.6, zorder=2))
         ax.add_patch(Rectangle(ghost[:2], ghost[2], ghost[3], fc="none", ec="k", lw=1.0, ls=(0, (3, 1.5)), zorder=3))
+        marks(ax, box(*ghost), "dot", step=0.036)
         for j, u in enumerate(tiers):
             ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="k", lw=1.5, solid_capstyle="butt", zorder=4)
             if extends(tiles, u.ax + u.floor, u.ay):
@@ -740,6 +773,7 @@ def symmetric_figure(path, value, wit):
     x, y, w, h = corner
     axes[2].add_patch(Rectangle((x, y), w, h, fc=COLOURS[0], ec="k", lw=0.6, zorder=2))
     axes[2].add_patch(Rectangle((y, x), h, w, fc="none", ec="k", lw=0.9, ls=(0, (3, 1.5)), zorder=3))
+    marks(axes[2], box(y, x, h, w), "dot")
     axes[2].plot([0, 1], [0, 1], color="k", lw=0.5, ls=(0, (1, 1.5)), zorder=4)
     frame(axes[2])
     orbit = [turned[0]]
