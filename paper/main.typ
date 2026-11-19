@@ -3,15 +3,25 @@
 #import "tables.typ": datatable
 
 #let todo(body) = text(fill: rgb("#b00020"))[[To do: #body]]
+#let num(n) = {
+  let digits = str(n)
+  let groups = ()
+  while digits.len() > 3 {
+    groups.insert(0, digits.slice(digits.len() - 3))
+    digits = digits.slice(0, digits.len() - 3)
+  }
+  groups.insert(0, digits)
+  groups.join(",")
+}
 
 #show: template.with(
   title: [Rectangular Dissections into Similar Rectangles],
-  authors: ((name: "Stefano Gogioso", affil: "Hashberg Ltd"),),
+  authors: ((name: "Stefano Gogioso", affil: "Hashberg"),),
   abstract: [
     We describe an exact procedure which, for a given $n$ and a main rectangle of rational aspect ratio, finds every proportion $x >= 1$ such that the main rectangle can be cut into $n$ rectangles of proportion $x$, and identifies each as a real algebraic number by its minimal polynomial.
     The procedure places tiles one at a time on a staircase, and solves exactly, for each sequence of placements, a linear system whose coefficients are polynomials in the proportion.
     // We prove that it is sound and complete; the proofs have been formalised in Lean 4, given specifications of the arithmetic routines.
-    For the special case of a square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = 3446981$, $a(12) = 28799493$ and $a(13) = 250056983$.
+    For the special case of a square, we confirm the known numbers $a(n)$ of proportions for $n <= 10$ and obtain $a(11) = #num(3446981)$, $a(12) = #num(28799493)$ and $a(13) = #num(250056983)$.
     For $n <= 12$ we also count the tilings themselves, their classes under the symmetries of the square, and the multisets of tiles that occur.
     // We prove that a proportion achievable with $n >= 2$ tiles is achievable with $n + k$ tiles for every $k >= 3$, and that $a(n)$ grows at most like $(27 slash 2)^n$.
   ],
@@ -21,7 +31,7 @@
 
 A rectangle can be cut into finitely many rectangles that are all similar to one another, each in either orientation; the question is which proportions the pieces can have.
 For a square cut into two pieces the only possibility is a pair of halves, of proportion $2$.
-For three pieces there are three: thirds, of proportion $3$; a half-height slab above two quarter-size pieces, of proportion $3 slash 2$; and a third arrangement, in which no two pieces are congruent, whose proportion $1.7548...$ is the real root of $x^3 - 2 x^2 + x - 1$, the square of the plastic ratio.
+For three pieces there are three: thirds, of proportion $3$; a piece of two thirds of the height above two pieces of half its width, of proportion $3 slash 2$; and a third arrangement, in which no two pieces are congruent, whose proportion $1.7548...$ is the real root of $x^3 - 2 x^2 + x - 1$, the square of the plastic ratio.
 
 The qualitative question was settled in the 1990s.
 Dehn had shown that a rectangle can be cut into squares only if its sides are commensurable @dehn1903, and Brooks, Smith, Stone and Tutte had recast dissections of rectangles as planar electrical networks @bsst1940.
@@ -29,15 +39,15 @@ Laczkovich and Szekeres @laczkovich1995, and independently Freiling and Rinne @f
 
 The quantitative question dates from December 2022, when Baez asked on Mathstodon which proportions are possible when the number $n$ of pieces is fixed @baez2022; a collaborative effort followed, reported in @baez2022 @baez2023 and in the press @roberts2023.
 The resulting sequence $a(n)$ is entry A359146 in the OEIS @oeisA359146, which lists $1, 1, 3, 11, 51, 245, 1372$ for $n <= 7$.
-The values for $n <= 4$ were found by hand, and those for $5 <= n <= 7$ by exhaustive searches by Henderson @henderson2023 and by Gerbet, reported in @baez2023; Henderson's value for $n = 7$ was corrected after Gerbet's search, and Henderson also reported, tentatively, $a(8) = 8522$.
+The values for $n <= 4$ were found by hand, and those for $5 <= n <= 7$ by exhaustive searches by Henderson @henderson2023 and by Gerbet, reported in @baez2023; Henderson's value for $n = 7$ was corrected after Gerbet's search, and Henderson also reported, tentatively, $a(8) = #num(8522)$.
 Taams gave an argument that the proportion is algebraic of degree at most $n$ @taams2023.
-Einstein, using the correspondence with electrical networks, reported $a(9) = 58347$ and $a(10) = 433926$ @einstein2023; these two values have not, to our knowledge, been published elsewhere or reproduced.
+Einstein, using the correspondence with electrical networks, reported $a(9) = #num(58347)$ and $a(10) = #num(433926)$ @einstein2023; these two values have not, to our knowledge, been published elsewhere or reproduced.
 No formula, recurrence or asymptotic estimate for $a(n)$ is known.
 
 This paper describes an exact search procedure for the problem, for a main rectangle of arbitrary rational aspect ratio, and the results obtained with it.
 The procedure builds tilings one tile at a time over a staircase-shaped frontier, turns each combinatorial arrangement into a linear system whose coefficients are polynomials in the proportion, and solves that system exactly, so that every proportion is identified as a real algebraic number by its minimal polynomial.
-We reproduce all the values above, by a method independent of both earlier ones, and extend the sequence by three terms:
-$ a(11) = 3446981, quad a(12) = 28799493, quad a(13) = 250056983. $
+We reproduce all the values above, by a method independent of the earlier ones, and extend the sequence by three terms:
+$ a(11) = #num(3446981), quad a(12) = #num(28799493), quad a(13) = #num(250056983). $
 
 // @sec:tilings fixes definitions.
 // @sec:staircases presents the staircases on which tilings are built and the rules that restrict the sequences of placements.
@@ -62,13 +72,20 @@ Since the sides are positive and $x >= 1$, a rectangle has proportion $x$ exactl
 A tiling is a dissection in the usual sense: the tiles cover the main rectangle and overlap only along their boundaries.
 
 #definition(name: [tiling])[
-  A _tiling_ of a rectangle $M$ is a finite sequence $R_1, dots, R_n$ of rectangles, its _tiles_, whose union is $M$ and whose interiors are pairwise disjoint.
+  A _tiling_ of a rectangle $R$ is a finite sequence $R_1, dots, R_n$ of rectangles, its _tiles_, whose union is $R$ and whose interiors are pairwise disjoint.
   For $x >= 1$, a tiling is _similar of proportion $x$_ if every tile has proportion $x$.
 ] <def:tiling>
 
 The order of the tiles is immaterial: every rearrangement of a tiling is a tiling.
-Two rectangles with disjoint interiors are separated by a horizontal or a vertical line, so that the interior of each is disjoint from the closure of the other; conversely, two tiles of a tiling whose interiors meet are equal.
+Two rectangles with disjoint interiors are separated by a horizontal or a vertical line, so that the interior of each is disjoint from the closure of the other; in particular, two tiles of a tiling whose interiors meet are equal.
 Both remarks are used repeatedly below.
+
+@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search described in @sec:solving; the remaining ones are their transposes.
+
+#figure(
+  image("figures/three-tiles.svg", width: 100%),
+  caption: [The similar tilings of the unit square with three tiles in which the bottom-left tile is wide, labelled by proportion, truncated to four decimals. Tiles are coloured in the order in which the search places them.],
+) <fig:three>
 
 #definition(name: [achievable proportions])[
   For real numbers $W, H > 0$ and an integer $n >= 0$, let $P_n (W, H)$ be the set of those $x >= 1$ for which the rectangle $[0, W] times [0, H]$ has a similar tiling of proportion $x$ with exactly $n$ tiles.
@@ -77,7 +94,10 @@ Both remarks are used repeatedly below.
 
 The sets $P_n (w)$ are finite in every case treated in this paper, as a by-product of the computation; see @sec:solving.
 For the square, $P_n (1)$ is finite for every $n$ (@prop:upper).
-A statement labelled Observation is given without proof; its proof is in the formal development (@app:formal).
+
+The definitions and propositions of @sec:tilings, @sec:staircases, @sec:systems, @sec:growth, @sec:tilings-counts, @app:solving and @app:maps have been formalised in Lean 4 with Mathlib (@app:formal).
+A statement labelled Observation is given without proof; its proof is in that formal development.
+
 Scaling the plane preserves proportions, so that only the aspect ratio of the main rectangle matters.
 
 #observation[
@@ -120,11 +140,11 @@ The step of three was observed by Einstein @einstein2023.
 ] <prop:subdivision>
 
 #proof[
-  The $P_n (W, H) subset.eq P_(n + 3) (W, H)$ inclusion is shown by subdividing one rectangle into 4 rectangles, all scaled by 1/2.
-  The $P_n (1) subset.eq P_(n + 4) (1)$ inclusion is shown by embedding a square tiling as a subdivision of the central tile of a 5-tile pinwheel tiling, where $n >= 2$ is necessary to make the two tilings distinct; as later remarked, this is not true for general rectangles.
-  The $P_n (W, H) subset.eq P_(n + k) (W, H)$ inclusion for all $k >=5$ follows from the $k=3$ (shown above), $k=5$ and $k=7$ cases (shown later), by the following observation: every $k >= 5$ can be written as $3a + 5b + 7c$ for non-negative $a, b, c$, because $5 = 2 "mod" 3$ and $7 = 1 "mod" 3$.
-  The $P_n (W, H) subset.eq P_(n + 5) (W, H)$ inclusion is shown by subdividing one rectangle into 6 rectangles, one scaled by 2/3 and five scaled by 1/3.
-  The $P_n (W, H) subset.eq P_(n + 7) (W, H)$ inclusion is shown by subdividing one rectangle into 8 rectangles, one scaled by 3/4 and seven scaled by 1/4.
+  The $P_n (W, H) subset.eq P_(n + 3) (W, H)$ inclusion is shown by subdividing one rectangle into four rectangles, all scaled by $1 slash 2$.
+  The $P_n (1) subset.eq P_(n + 4) (1)$ inclusion is shown, for $x > 1$, by embedding the tiling of the square as a subdivision of the central tile of a pinwheel tiling by five tiles, and, for $x = 1$, by a dissection of the square into $n + 4$ squares, which exists because $n + 4 >= 6$; this is where $n >= 2$ is needed. As later remarked, the inclusion is not true for general rectangles.
+  The $P_n (W, H) subset.eq P_(n + k) (W, H)$ inclusion for all $k >=5$ follows from the $k=3$ (shown above), $k=5$ and $k=7$ cases (shown later), by the following observation: every $k >= 5$ can be written as $3a + 5b + 7c$ for non-negative $a, b, c$, because $5 equiv 2$ and $7 equiv 1 med (mod 3)$.
+  The $P_n (W, H) subset.eq P_(n + 5) (W, H)$ inclusion is shown by subdividing one rectangle into six rectangles, one scaled by $2 slash 3$ and five scaled by $1 slash 3$.
+  The $P_n (W, H) subset.eq P_(n + 7) (W, H)$ inclusion is shown by subdividing one rectangle into eight rectangles, one scaled by $3 slash 4$ and seven scaled by $1 slash 4$.
   @fig:persistence illustrates all four constructions.
   // Let $R_1, dots, R_n$ be a similar tiling of $M = [0, W] times [0, H]$ of proportion $x$.
   // The corner of $M$ lies in some tile, so $n >= 1$.
@@ -146,10 +166,10 @@ The step of three was observed by Einstein @einstein2023.
 
 #figure(
   image("figures/persistence.svg", width: 100%),
-  caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four, five and seven more tiles given by @prop:subdivision: one tile cut into four; a reduced copy of the tiling at the centre of a pinwheel of four tiles, which requires the main rectangle to be a square; one tile cut into six; and one tile cut into eight. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record.],
+  caption: [A similar tiling of the square by five tiles, of proportion $2.7692...$, and the tilings of the same proportion with three, four, five and seven more tiles given by @prop:subdivision: one tile cut into four; a reduced copy of the tiling at the centre of a pinwheel of four tiles, which requires the main rectangle to be a square; one tile cut into six; and one tile cut into eight. The tiles of the original tiling keep their colours, the new tiles are grey, and each tiling is drawn from its record (@def:record).],
 ) <fig:persistence>
 
-Steps of $k=1$ and $k=2$ fail to persist in general, and so does the step of $k=4$ for some main rectangles that are not squares.
+Proportions need not persist under steps of one or two, nor under the step of four for some main rectangles that are not squares.
 As counterexamples:
 
 - $2 in P_2 (1)$, while $2 in.not P_3 (1)$ and $2 in.not P_4 (1)$;
@@ -157,37 +177,38 @@ As counterexamples:
 - $4 in P_2 (2)$, while $4 in.not P_6 (2)$.
 
 @fig:steps shows the three tilings.
-For the square, no proportion with $n=2, 3, 4$ tiles persists at $n=3, 4, 5$ respectively (counterexamples for $k=1$), while five out of the eleven proportions with $n=4$ tiles do not persist at $n=6$ (counterexample for $k=2$); further counts are in @sec:persistence.
+For the square, no proportion with $n = 2, 3, 4$ tiles persists at $n = 3, 4, 5$ respectively (counterexamples for the step of one), while five of the eleven proportions with $n = 4$ tiles do not persist at $n = 6$ (counterexamples for the step of two); further counts are in @sec:persistence.
 
 #figure(
   image("figures/steps.svg", width: 64%),
-  caption: [Tilings whose proportions do not persist, according to the search: the proportion $2$ of the square with $n=2$ tiles, not achievable in the square with $n=3, 4$ tiles (counterexample for $k=1, 2$); the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with $n=1$ tile, not achievable in it with $n=5$ (counterexample for $k=4$); and the proportion $4$ of the rectangle of aspect ratio $2$ with $n=2$ tiles, not achievable in it with $n=6$ (counterexample for $k=4$).],
+  caption: [Tilings whose proportions do not persist, according to the search: the proportion $2$ of the square with $n=2$ tiles, not achievable in the square with $n = 3, 4$ tiles (counterexample for the steps of one and two); the proportion $3 slash 2$ of the rectangle of aspect ratio $3 slash 2$ with $n = 1$ tile, not achievable in it with $n = 5$ (counterexample for the step of four); and the proportion $4$ of the rectangle of aspect ratio $2$ with $n = 2$ tiles, not achievable in it with $n = 6$ (counterexample for the step of four).],
 ) <fig:steps>
-
-@fig:three shows every similar tiling of the unit square with three tiles whose bottom-left tile is wide, as found by the search described in @sec:solving; the remaining ones are their transposes.
-
-#figure(
-  image("figures/three-tiles.svg", width: 100%),
-  caption: [The similar tilings of a square with three tiles in which the bottom-left tile is wide, labelled by proportion. Tiles are coloured in the order in which the search places them.],
-) <fig:three>
 
 = Staircases <sec:staircases>
 
-== Staircases <sec:staircase>
+== Tiers and anchors <sec:staircase>
 
 The search places tiles one at a time, starting at the bottom-left corner of the main rectangle, in such a way that the region already covered is always closed under moving left and down.
-The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile always sits in one of its concave corners.
+The boundary between the covered and the uncovered region is then a staircase descending from left to right, and the next tile is always placed in one of its concave corners.
 
 In the search the lengths of the steps of the staircase are expressions in unknown quantities, and need not take positive values.
 The staircase is therefore defined first as a combinatorial object with lengths of an arbitrary kind, and its geometric reading is defined afterwards.
 
-#definition(name: [staircase])[
+#definition(name: [arithmetic of lengths])[
   An _arithmetic of lengths_ is a set $cal(L)$ with two binary operations, written $ell + ell'$ and $ell - ell'$, and two unary operations, written $x ell$ and $ell slash x$.
+] <def:arithmetic>
+
+#definition(name: [staircase])[
+  Let $cal(L)$ be an arithmetic of lengths.
   A _tier_ over $cal(L)$ consists of a _floor_ $L in cal(L)$, a _wall_ $M in cal(L)$ and two flags, _stale_ and _started_, each of which is set or clear.
   A _staircase_ over $cal(L)$ is a finite sequence $T_0, dots, T_(m - 1)$ of tiers over $cal(L)$, with $m >= 0$.
   The _initial staircase_ of $W, H in cal(L)$ consists of a single tier with floor $W$, wall $H$ and both flags clear.
-  A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations; the _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
 ] <def:staircase>
+
+#definition(name: [homomorphism])[
+  A map $f$ from an arithmetic of lengths to another is a _homomorphism_ if it commutes with the four operations.
+  The _image_ of a staircase under $f$ is obtained by applying $f$ to every floor and wall, keeping the flags.
+] <def:homomorphism>
 
 No law is assumed of these operations, such as associativity or the existence of a neutral element: the statements made for an arbitrary arithmetic of lengths use only the fact that homomorphisms preserve the operations, and two of the arithmetics used below, the linear forms and the intervals, do not satisfy the laws of a module.
 Several arithmetics of lengths occur.
@@ -211,9 +232,8 @@ The region of the initial staircase of $W$ and $H$ is the main rectangle $[0, W]
 This and the other figures of this section are drawn from tilings found by the search, at their exact proportions.
 
 #figure(
-  placement: auto,
   image("figures/staircase.svg", width: 55%),
-  caption: [A staircase of proportion $\~1.8695$ after three placements. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that extend to the right and above, respectively, of the anchor. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
+  caption: [A staircase with three tiers, after four placements (@def:placing) in a tiling of proportion $1.8695...$. The anchors $(a_i, b_i)$ are circled; the floor $L_i$ and the wall $M_i$ of the tier $T_i$ are the thick segments that extend to the right and above, respectively, of the anchor. Dashed lines separate the strips of the tiers, which extend to the right side of the main rectangle, and the hatched part of each strip is the rectangle spanned by the floor and the wall, within which a tile placed at the anchor must fit.],
 ) <fig:staircase>
 
 == Placements <sec:placements>
@@ -262,16 +282,16 @@ A placement and a free side determine a tile; placing it changes the staircase a
   By convention, placing a placement with $i >= m$ gives $S' := S$, so that placing is defined for every placement; such a placement is never allowed (@def:admissible).
 ] <def:placing>
 
-@fig:fits shows one placement of each fit, taken from the record of the tiling of @fig:staircase.
+@fig:fits shows one placement of each fit, taken from the placements that build the tiling of @fig:staircase.
 
 #figure(
   image("figures/fits.svg", width: 100%),
-  caption: [Four placements in the building of a 7-tile tiling, exemplifying the four kinds of fit. In each panel, the tile just placed is the one sitting in the hatched area, with the floor and wall of its tier before the placement drawn thick.],
+  caption: [Four placements in the building of the tiling by seven tiles of @fig:staircase, one of each fit. In each panel, the tile just placed lies in the hatched rectangle spanned by the floor and the wall of its tier before the placement, which are drawn thick, and the dashed lines separate the strips of the staircase before the placement. The anchors of the staircase after the placement are circled, except those of stale tiers.],
 ) <fig:fits>
 
 Only an inside placement makes use of the free side.
 If $phi$ is not narrow then $w = L$, and if $phi$ is not low then $h = M$, by the definition of the size.
-In geometric terms, an inside placement replaces the anchor by two, one above the tile and one to its right; a full-height placement moves the anchor to the right and lengthens the floor of the previous tier by $w$; a full-width placement moves the anchor up and heightens the wall of the next tier by $h$; and a full placement removes the anchor, lengthening the floor of the previous tier by $L$ and heightening the wall of the next by $M$.
+In geometric terms, an inside placement replaces the anchor by two, one above the tile and one to its right; a full-height placement moves the anchor to the right and lengthens the floor of the previous tier by $w$; a full-width placement moves the anchor up and increases the wall of the next tier by $h$; and a full placement removes the anchor, lengthening the floor of the previous tier by $L$ and increasing the wall of the next by $M$.
 The number of tiers increases by one with an inside placement, decreases by one with a full placement, and is unchanged otherwise.
 Placing commutes with homomorphisms: if $f$ is a homomorphism, the image under $f$ of the staircase obtained by placing $p$ on $S$ with free side $s$ is obtained by placing $p$ on the image of $S$ with free side $f(s)$, and the positive quantity and the equation of $p$ on the image of $S$ are the images of those on $S$.
 In particular, the number of tiers and the flags of the staircases obtained by successive placements do not depend on the arithmetic of lengths or on the free sides: they are those of the bare staircases obtained by the same placements.
@@ -288,6 +308,7 @@ The search therefore restricts the sequences of placements by two rules, which a
   + the tier $T_i$ is not stale;
   + if $phi$ is not low and $i > 0$, the tier $T_(i - 1)$ is not started.
 
+  The second and the third conditions are the _first rule_ and the _second rule_.
   A placement $p$ is _admissible_ at $S$ with $r$ tiles remaining if the following three conditions hold:
 
   + $p$ is allowed at $S$;
@@ -307,10 +328,10 @@ The search therefore restricts the sequences of placements by two rules, which a
 ] <def:record>
 
 @fig:rules shows the flags along the record of the tiling of @fig:staircase.
-After the first placement, which is inside, the tier $T_1$ to the right of the tile has a started floor.
+After the first placement, which is inside, the tier $T_1$ to the right of the tile is started.
 The third placement is made at $T_1$ and makes $T_0$ stale: no tile can be placed there until its floor is lengthened.
-The fourth placement, of full height at $T_1$, lengthens the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ with a started floor, so that a tile of full height or a full tile at $T_2$, which would lengthen that floor, is excluded.
-The fifth placement, a full tile at $T_1$, removes that tier, and the tier that was $T_2$ becomes $T_1$, its floor still started.
+The fourth placement, of full height at $T_1$, lengthens the floor of $T_0$, which ceases to be stale, and it leaves $T_1$ started, so that a tile of full height or a full tile at $T_2$, which would lengthen the floor of $T_1$, is excluded.
+The fifth placement, a full tile at $T_1$, removes that tier, and the tier that was $T_2$ becomes $T_1$, still started.
 
 #figure(
   image("figures/rules.svg", width: 100%),
@@ -319,13 +340,13 @@ The fifth placement, a full tile at $T_1$, removes that tier, and the tier that 
 
 Whether a record obeys the rules from a staircase depends only on the flags, hence only on the bare staircase underlying it.
 The first rule fixes the order in which tiles at different tiers are placed: a tier becomes stale when a tile is placed at a tier of larger index, and ceases to be stale when its floor is lengthened.
-The second concerns a horizontal segment that contains the top sides of some tiles and the bottom sides of others: a floor is started when a tile already stands on its segment to the left, and the rule forbids lengthening such a floor from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
+The second concerns a horizontal segment that contains the top sides of some tiles and the bottom sides of others: a tier is started when a tile already stands on the segment of its floor, to the left of the floor, and the rule forbids lengthening the floor of such a tier from below, so that the tiles standing on a segment are placed only after all the tiles hanging below it.
 
 A record is thus subject to two conditions, which serve different purposes.
 To obey the rules is the condition used in the proofs: soundness and completeness are established in @sec:systems for the records that obey the rules.
 To be complete and admissible for $n$ tiles is the condition used by the search: it requires in addition that, after each placement, the staircase has no more tiers than there are tiles still to be placed, and that it becomes empty only with the last tile.
 A placement removes at most one tier, so a staircase with more tiers than remaining tiles can no longer be emptied, and the search may abandon such a sequence at once.
-The next proposition says that nothing is lost in doing so: for records of $n$ placements the two conditions coincide.
+The next proposition shows that the search discards no record that obeys the rules in this way: for records of $n$ placements the two conditions coincide.
 
 #proposition[
   A record is complete admissible for $n$ tiles if and only if it consists of $n$ placements and obeys the rules from the bare initial staircase.
@@ -360,7 +381,7 @@ The short side of each tile placed inside its tier is a free unknown, and every 
 ] <def:system>
 
 The constraints depend only on those free sides that are used, namely $s_1, dots, s_k$ if $rho$ has $k$ inside placements.
-The unknowns are $W$, $H$ and $s_1, dots, s_k$, of which $W$ and $H$ will be given up to a common factor, and a complete record has as many equations as unknowns that remain.
+The unknowns are $W$, $H$ and $s_1, dots, s_k$; the ratio $W slash H$ is given, which leaves $k + 1$ unknowns up to a common factor, and a complete admissible record has $k + 1$ equations, by the next proposition.
 
 #proposition[
   A record with $k$ inside placements that obeys the rules from a staircase with $m$ tiers has $k + m$ full placements.
@@ -397,7 +418,7 @@ The argument has two parts.
 The first is geometric (@prop:step): on a positive staircase, if a tile is strictly narrower than its floor when its fit is narrow, and strictly lower than its wall when its fit is low, then placing it removes exactly that tile from the region $U(S)$ of the staircase, the union of the strips of its tiers.
 The second is combinatorial (@prop:doom, @prop:fit): along a record that obeys the rules and empties the staircase, these strict inequalities always hold, because a floor or a wall that is not positive in certain positions can never be removed from the staircase.
 We begin with the first part.
-It rests on the position of the strips of a positive staircase relative to one another.
+It uses the position of the strips of a positive staircase relative to one another.
 
 #observation[
   Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $T_i$ be a tier of $S$ with anchor $(a, b)$, floor $L$ and wall $M$.
@@ -409,52 +430,50 @@ It rests on the position of the strips of a positive staircase relative to one a
 ] <obs:strips>
 
 #proposition[
-  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with anchor $(a, b)$, floor $L$ and wall $M$, whose tile $T$ has size $(w, h)$ with $w, h > 0$.
+  Let $S$ be a positive real staircase, read in the main rectangle $[0, W] times [0, H]$, and let $p = (i, phi, o)$ be a placement at a tier $T_i$ of $S$, with anchor $(a, b)$, floor $L$ and wall $M$, whose tile $Q$ has size $(w, h)$ with $w, h > 0$.
   Suppose that $w < L$ if $phi$ is narrow, and that $h < M$ if $phi$ is low.
   Let $S'$ be the staircase after the placement, and let $U(S)$ and $U(S')$ be the regions of the two staircases according to @def:region.
   + Every tier of $S$ other than $T_i$ has the same anchor in $S'$, and the tiers that replace $T_i$ have the anchors $(a, b + h)$, if $phi$ is low, followed by $(a + w, b)$, if $phi$ is narrow.
   + $S'$ is positive.
-  + $T subset.eq U(S)$, $U(S') subset.eq U(S)$ and $U(S) subset.eq T union U(S')$, and the interior of $T$ is disjoint from $U(S')$.
+  + $Q subset.eq U(S)$, $U(S') subset.eq U(S)$ and $U(S) subset.eq Q union U(S')$, and the interior of $Q$ is disjoint from $U(S')$.
 ] <prop:step>
 
 #proof[
-  A placement changes the region only inside the strip $R := [a, W] times [b, b + M]$ of its own tier: it removes the tile from the bottom-left corner of $R$, and the two parts of $R$ that are left, above the tile and to its right, become the strips of the new tiers or are absorbed by the strip of the next tier (@fig:region).
+  A placement changes the region only inside the strip $R := [a, W] times [b, b + M]$ of its own tier: it removes the tile from the bottom-left corner of $R$, and the two parts of $R$ that are left, above the tile and to its right, become the strips of the new tiers or become part of the strip of the next tier (@fig:region).
 
   _The anchors._
   In @def:placing, what the tiers that replace $T_i$ lack of the floor $L$ is added to the floor of $T_(i - 1)$, and what they lack of the wall $M$ is added to the wall of $T_(i + 1)$.
   The sums of floors and of walls that give the anchors of the other tiers are therefore unchanged, and the tiers that replace $T_i$ are anchored at the corners of the tile that remain on the boundary of the region, as in @fig:fits.
+
+  _Positivity._
   The floors and walls of $S'$ are those of $S$, possibly increased by $w$ or by $h$, together with $w$, $L - w$ or $L$ and $h$, $M - h$ or $M$ for the new tiers, where $L - w$ occurs only if $phi$ is narrow and $M - h$ only if $phi$ is low; so $S'$ is positive.
 
   _The region._
-  Since $w <= L$ and $h <= M$, the tile $T = [a, a + w] times [b, b + h]$ lies in $R$, hence in $U(S)$, by @obs:strips.
+  Since $w <= L$ and $h <= M$, the tile $Q = [a, a + w] times [b, b + h]$ lies in $R$, hence in $U(S)$, by @obs:strips.
   Let $A := [a, W] times [b + h, b + M]$ and $B := [a + w, W] times [b, b + h]$ be the parts of $R$ above the tile and to its right.
   If $h < M$, then $A$ is the strip of the new tier with anchor $(a, b + h)$.
   If $w < L$, then $B$ is the strip of the new tier with anchor $(a + w, b)$.
   If $w = L$ and $T_i$ is not the last tier, then $B$ lies directly above the strip of $T_(i + 1)$, whose wall the placement increases by $h$, and that strip becomes its union with $B$.
   No other strip changes: the placement otherwise alters only the floor of $T_(i - 1)$ and some flags, on which strips do not depend.
-  Hence $U(S')$ is contained in $U(S)$, and it contains the part of $U(S)$ outside the tile, that is, $U(S) subset.eq T union U(S')$.
-  The interior of $T$ is disjoint from $A$ and from $B$, and from every other strip by @obs:strips; so it is disjoint from $U(S')$.
+  Hence $U(S')$ is contained in $U(S)$, and it contains the part of $U(S)$ outside the tile, that is, $U(S) subset.eq Q union U(S')$.
+  The interior of $Q$ is disjoint from $A$ and from $B$, and from every other strip by @obs:strips; so it is disjoint from $U(S')$.
 
   The verification that the tiers of @def:placing have these anchors for each of the four fits, and the cases in which $A$ or $B$ is a segment, are in the formal proof (@app:formal).
 ]
 
 #figure(
   image("figures/region.svg", width: 100%),
-  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $T$, of the part $A$ above the tile and of the part $B$ to its right. The dashed lines separate the strips of the staircase after the placement, and its anchors are circled. The strip that contains $A$ after the placement is filled with dots, and the strip that contains $B$ is filled with plus signs. For the tile of full width, $B$ is not a strip of its own: it is the part inside $R$ of the strip of the next tier.],
+  caption: [The four placements of @fig:fits, as in the proof of @prop:step. The strip $R$ of the tier of the placement is outlined thick; it consists of the tile $Q$, of the part $A$ above the tile and of the part $B$ to its right. The dashed lines separate the strips of the staircase after the placement, and the anchors of its tiers that are not stale are circled. The strip that contains $A$ after the placement is filled with dots, and the strip that contains $B$ is filled with plus signs. For the tile of full width, $B$ is not a strip of its own: it is the part inside $R$ of the strip of the next tier.],
 ) <fig:region>
 
 @fig:misfit shows a tile placed inside that is wider than its floor, and a tile of full width that is higher than its wall, contrary to the hypothesis of @prop:step.
-
-#figure(
-  image("figures/misfit.svg", width: 62%),
-  caption: [The staircase of @fig:staircase with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The thick lines are the floors and the walls before the placement, the dashed lines separate the strips of the staircase after the placement, and its stale and started tiers are marked as in @fig:rules, with the names of its tiers. Left: a wide tile placed inside is wider than the floor; the second of the tiers that replace $T_1$ has a negative floor, and its anchor is to the right of the anchor of the next tier. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, and the tile meets the strip of $T_0$, which the placement does not change.],
-) <fig:misfit>
 
 For the second part, the positions in which a floor or a wall that is not positive can never be removed from the staircase are the following; a staircase with such a floor or wall cannot be emptied.
 
 #definition(name: [defective staircase])[
   A real staircase is _floor-defective_ if it has a tier that is started and whose floor is not positive, or if the floor of its last tier is not positive.
   It is _wall-defective_ if it has a tier whose wall is not positive and before which every tier is stale.
+  It is _defective_ if it is floor-defective or wall-defective.
 ] <def:doom>
 
 The empty staircase is neither.
@@ -470,6 +489,11 @@ The next statement records what the constraints of a single placement give.
   If the fit is not full, one side of the tile is the positive quantity of $p$, and the other is that side multiplied or divided by $x$ (@def:placement).
   If the fit is full, the size is $(L, M)$ with $L > 0$, and the equation gives $L = x M$ or $M = x L$, so $M > 0$.
 ]
+
+#figure(
+  image("figures/misfit.svg", width: 60%),
+  caption: [The staircase after three placements in the building of the tiling of @fig:staircase, with a tile placed at $T_1$, by @def:placing, that does not satisfy the hypothesis of @prop:step. The thick black lines are the floors and the walls before the placement, the dashed lines separate the strips of the staircase after the placement, and its tiers are marked as in @fig:rules and named. Left: a wide tile placed inside is wider than the floor; the second of the tiers that replace $T_1$ has a negative floor, drawn thick and red from its anchor leftwards, and its anchor is to the right of the anchor of the next tier. Right: a tall tile of full width is higher than the wall; the tier that replaces $T_1$ has a negative wall, drawn thick and red from its anchor downwards, and the tile meets the strip of $T_0$, which the placement does not change.],
+) <fig:misfit>
 
 A defective staircase stays defective under every allowed placement whose constraints hold, because the floor or the wall that is not positive could be made positive only by a placement that one of the two rules forbids.
 @fig:defect shows a staircase of each kind, with allowed placements made on it.
@@ -502,7 +526,7 @@ A defective staircase stays defective under every allowed placement whose constr
 
 #figure(
   image("figures/defect.svg", width: 100%),
-  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and stale and started tiers are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn thick and red, from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn thick and red, from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
+  caption: [Real staircases for $x = 3 slash 2$, obtained by @def:placing from the initial staircase of the unit square; the first panel of each row is the staircase after two inside placements, and the tiers are marked as in @fig:rules. Top row: a wide tile of full height placed at $T_1$ is wider than the floor, and leaves a started tier with a negative floor, drawn thick and red, from its anchor leftwards. The staircase is floor-defective, and it remains so after an allowed placement at $T_0$, at $T_1$ or at $T_2$, where only a low placement is allowed. Bottom row: a tall tile of full width placed at $T_1$ is higher than the wall, and leaves a tier with a negative wall, drawn thick and red, from its anchor downwards, before which the only tier is stale. The staircase is wall-defective, and it remains so after an allowed placement at $T_1$ or at $T_2$; no placement is allowed at $T_0$. The positive quantity of every placement shown is positive.],
 ) <fig:defect>
 
 It follows that no staircase is defective along a record that empties the staircase, and from this that every tile fits.
@@ -529,7 +553,7 @@ It follows that no staircase is defective along a record that empties the stairc
 
 #figure(
   image("figures/unfit.svg", width: 46%),
-  caption: [Two placements on the initial staircase of the unit square for $x = 3 slash 2$, with stale and started tiers marked as in @fig:rules. The first tile is wide and placed inside, with free side $1 slash 2$. The second, tall and of full height at $T_1$, has the positive height $1 slash 2$ and is wider than its floor: it leaves a started tier, the last, with the negative floor $L - w = -1 slash 12$, drawn thick and red, so the staircase is floor-defective.],
+  caption: [Two placements on the initial staircase of the unit square for $x = 3 slash 2$, with the tiers marked as in @fig:rules. The first tile is wide and placed inside, with free side $1 slash 2$. The second, tall and of full height at $T_1$, has the positive height $1 slash 2$ and is wider than its floor: it leaves a started tier, the last, with the negative floor $L - w = -1 slash 12$, drawn thick and red, so the staircase is floor-defective.],
 ) <fig:unfit>
 
 Soundness follows by removing the tiles from the region one at a time.
@@ -547,7 +571,7 @@ Soundness follows by removing the tiles from the region one at a time.
   By the second statement of @prop:fit, applied to $(p_j, dots, p_n)$ on $S_(j - 1)$ for $j = 1, dots, n$ in turn, $Q_j$ fits its tier strictly where its fit requires and $S_j$ is positive.
   So @prop:step applies to every placement: $Q_j subset.eq U(S_(j - 1))$, $U(S_j) subset.eq U(S_(j - 1)) subset.eq Q_j union U(S_j)$, and the interior of $Q_j$ is disjoint from $U(S_j)$.
 
-  Since $U(S_0) = [0, W] times [0, H]$ and $U(S_n)$ is empty, the tiles lie in the main rectangle and cover it, and the interior of $Q_j$ is disjoint from every later tile, which lies in $U(S_j)$.
+  Since $U(S_0) = [0, W] times [0, H]$ and $U(S_n)$ is empty (@fig:regions), the tiles lie in the main rectangle and cover it, and the interior of $Q_j$ is disjoint from every later tile, which lies in $U(S_j)$.
 
   The formal proof (@app:formal) obtains these properties by one induction on the record, from an arbitrary positive real staircase, and keeps account of the numbering of the free sides.
 ]
@@ -560,8 +584,13 @@ Soundness follows by removing the tiles from the region one at a time.
 == Completeness <sec:complete>
 
 For completeness, the tiles of a given tiling must be placed in an order for which both rules are obeyed.
-The order that places, at each stage, the tile at the first tier at which it fits does not always obey the second rule.
+Placing, at each stage, the tile at the anchor of the first tier in which that tile fits does not always obey the second rule (@fig:greedy).
 The following notion gives one that does.
+
+#figure(
+  image("figures/first-fit.svg", width: 78%),
+  caption: [The tiling by five tiles of proportion $1.2606...$, with each tile placed at the anchor of the first tier in which it fits, the tiles numbered in this order and the tiers marked as in @fig:rules. The fourth tile, drawn with a dashed outline, is full at $T_1$ and would lengthen the floor of $T_0$, which is started, so the second rule forbids it. The construction of @prop:extension places the tiles in another order, which obeys both rules.],
+) <fig:greedy>
 
 #definition(name: [extending floor])[
   Let $R_1, dots, R_n$ be a tiling of $[0, W] times [0, H]$ and let $S$ be a real staircase, read in that rectangle.
@@ -569,7 +598,7 @@ The following notion gives one that does.
 ] <def:extends>
 
 The floor extends when the segment on which it lies continues to the right beyond its end $(a + L, b)$, as the top side of a tile lying below it.
-A tile of full height placed at the next tier will then lengthen the floor.
+A tile placed at the next tier with a fit that is not low will then lengthen the floor.
 The construction relies on finding the tiles that lie next to a given point.
 For a point $(c, d)$ and a tile $(a', b', w', h')$, the conditions $a' <= c < a' + w'$ and $b' <= d < b' + h'$ hold exactly if the tile contains the points _just above and to the right_ of $(c, d)$, that is, the points $(c + s, d + t)$ for all sufficiently small $s, t > 0$.
 The conditions $a' <= c < a' + w'$ and $b' < d <= b' + h'$ hold exactly if it contains the points _just below and to the right_ of $(c, d)$, that is, the points $(c + s, d - t)$ for all sufficiently small $s, t > 0$.
@@ -592,11 +621,11 @@ The conditions $a' <= c < a' + w'$ and $b' < d <= b' + h'$ hold exactly if it co
 The record is built one placement at a time, and the following conditions are maintained.
 
 #definition(name: [state of the construction])[
-  Let $R_1, dots, R_n$ be a tiling of $M = [0, W] times [0, H]$.
-  A _state_ consists of a positive real staircase $S$, read in $M$, and of a division of the tiles into _placed_ and _remaining_ ones, such that
-  + the interior of every placed tile is disjoint from $U(S)$;
+  Let $R_1, dots, R_n$ be a tiling of $[0, W] times [0, H]$.
+  A _state_ consists of a positive real staircase $S$, read in that rectangle, and of a division of the tiles into _placed_ and _remaining_ ones, such that
+  + the interior of every placed tile is disjoint from the region $U(S)$ of $S$;
   + the interior of every remaining tile is contained in $U(S)$;
-  + $U(S)$ is contained in $M$;
+  + $U(S)$ is contained in $[0, W] times [0, H]$;
   + the floor of every stale tier of $S$ extends in the tiling, and the floor of no started tier of $S$ does.
 ] <def:state>
 
@@ -609,16 +638,16 @@ In a state, the tile at each anchor is still to be placed.
 #proof[
   The tile that contains the points just above and to the right of the anchor has interior points in the strip of the tier, so it is a remaining tile whose interior lies in the region; and the region has no point just to the left of the anchor or just below it, so the corner of the tile is the anchor.
 
-  Let $(a, b)$, $L$ and $M_i$ be the anchor, the floor and the wall of the tier $T_i$.
-  The anchor lies in the main rectangle, by the third condition of @def:state, and $a < a + L <= W$ and $b < b + M_i <= H$ by @obs:strips.
-  By the first statement of @prop:near, some tile $T = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
-  The set of points $(u, v)$ with $a < u < min(a' + w', a + L)$ and $b < v < min(b' + h', b + M_i)$ is not empty, and it lies in the interior of $T$ and in the strip of $T_i$; so $T$ is not placed, and its interior is contained in $U(S)$.
-  If $a' < a$, the points $(u, v)$ with $a' < u < a$ and $v$ as before lie in the interior of $T$, but not in $U(S)$, by the last statement of @obs:strips.
+  Let $(a, b)$, $L$ and $M$ be the anchor, the floor and the wall of the tier $T_i$.
+  The anchor lies in the main rectangle, by the third condition of @def:state, and $a < a + L <= W$ and $b < b + M <= H$ by @obs:strips.
+  By the first statement of @prop:near, some tile $Q = (a', b', w', h')$ satisfies $a' <= a < a' + w'$ and $b' <= b < b' + h'$.
+  The set of points $(u, v)$ with $a < u < min(a' + w', a + L)$ and $b < v < min(b' + h', b + M)$ is not empty, and it lies in the interior of $Q$ and in the strip of $T_i$; so $Q$ is not placed, and its interior is contained in $U(S)$.
+  If $a' < a$, the points $(u, v)$ with $a' < u < a$ and $v$ as before lie in the interior of $Q$, but not in $U(S)$, by the last statement of @obs:strips.
   If $b' < b$, the same holds of the points with $u$ as before and $b' < v < b$.
   Hence $(a', b') = (a, b)$.
 ]
 
-The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend.
+The placement made in a state is that of the tile at the anchor of the first tier whose floor does not extend (@fig:construction).
 
 #proposition[
   Let $x >= 1$, let $R_1, dots, R_n$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and consider a state whose staircase $S$ is not empty.
@@ -632,7 +661,7 @@ The placement made in a state is that of the tile at the anchor of the first tie
 
 #figure(
   image("figures/construction.svg", width: 100%),
-  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, in the proof of @prop:complete. Before each placement, a floor that extends in the tiling is continued by two dots beyond its right end. The anchor of a stale tier is not marked, as in @fig:rules; the dots here mark the floors that extend, not the tiers that are not started. The tile placed next is the one at the anchor of the first tier whose floor does not extend, which is filled black.],
+  caption: [The construction of the record of a tiling by six tiles, of proportion $3.4675...$, by @prop:extension, as in the proof of @prop:complete. The tiles not yet placed are outlined in grey. Before each placement, a floor that extends in the tiling is continued by a short arrow beyond its right end, and the anchor of a stale tier is not marked, as in @fig:rules. The tile placed next is the one at the anchor, filled black, of the first tier whose floor does not extend.],
 ) <fig:construction>
 
 #proof[
@@ -645,14 +674,14 @@ The placement made in a state is that of the tile at the anchor of the first tie
   _The tile fits._
   Suppose that $w > L$.
   The points just above and to the right of the end $(a + L, b)$ of the floor of $T_i$ are then interior points of $Q$.
-  By the second statement of @prop:near, some tile $T$ contains the points just below and to the right of this end.
+  By the second statement of @prop:near, some tile $Q'$ contains the points just below and to the right of this end.
   It is not $Q$, which has no point below the level $b$, so it contains no interior point of $Q$.
-  Hence the top side of $T$ is at the level $b$, and the floor of $T_i$ extends, contrary to the choice of $T_i$.
+  Hence the top side of $Q'$ is at the level $b$, and the floor of $T_i$ extends, contrary to the choice of $T_i$.
 
   Suppose that $h > M$.
   Then $i > 0$, since the wall of $T_0$ ends on the top side of the main rectangle, which contains $Q$.
   The floor of $T_(i - 1)$ ends at $(a, b + M)$ and extends: some tile has its top side at the level $b + M$ and contains the points just below and to the right of $(a, b + M)$.
-  These are interior points of $Q$, so that tile is $Q$, whose top side is above the level $b + M$.
+  These are interior points of $Q$, so that tile is $Q$, whose top side is above the level $b + M$, a contradiction.
 
   _The placement._
   The tier $T_i$ is not stale, since the floor of a stale tier extends, and if $i > 0$ the tier $T_(i - 1)$ is not started, since its floor extends; so $p$ is allowed at $S$.
@@ -700,11 +729,11 @@ For a square main rectangle, transposition allows the first tile to be taken to 
 #proof[
   Let $rho$ and $s$ be given by @prop:complete.
   If $rho$ is empty there is nothing to prove.
-  Otherwise its first placement is made at the only tier of the initial staircase, so its tile $T = (0, 0, w, h)$ has its corner at the origin.
+  Otherwise its first placement is made at the only tier of the initial staircase, so its tile $Q = (0, 0, w, h)$ has its corner at the origin.
   If $w = x h$ the first placement is wide, and $rho$ suffices.
-  Otherwise $h = x w$, since $T$ has proportion $x$.
+  Otherwise $h = x w$, since $Q$ has proportion $x$.
   The transposes of $R_1, dots, R_n$ form a similar tiling of the same square, of proportion $x$, as in @prop:transposition; let $rho'$ and $s'$ be given by @prop:complete for it.
-  The tile of the first placement of $rho'$ has its corner at the origin and is the transpose of some $R_j$, whose corner is then the origin; the interiors of $R_j$ and $T$ meet, so $R_j = T$.
+  The tile of the first placement of $rho'$ has its corner at the origin and is the transpose of some $R_j$, whose corner is then the origin; the interiors of $R_j$ and $Q$ meet, so $R_j = Q$.
   That tile is thus $(0, 0, h, w)$, and $h = x w$ means that the first placement of $rho'$ is wide.
 ]
 
@@ -721,12 +750,12 @@ $ F_rho := b N - a D $
 of the record, and a root $r >= 1$ of $F_rho$ is the proportion of a tiling with the record $rho$ exactly if every positivity constraint is positive at the solution for $x = r$.
 The search isolates the real roots of $F_rho$ in $[1, infinity)$, identifying each by its minimal polynomial, and determines the signs of the positivity constraints at each of them.
 The record is _regular_ if $D$ is not zero, $F_rho$ is not zero, and $D$ does not vanish at any root of $F_rho$ in $[1, infinity)$; the precise form of this condition is @def:regular.
-At a root of $F_rho$ where $D$ vanishes the system might have further solutions, which the search would not find, so that the search counts the records that are not regular, and its result is _certified_ if there are none.
+At a root of $F_rho$ where $D$ vanishes the system might have further solutions, which the search would not find; the search therefore counts the records that are not regular, and its result is _certified_ if there are none.
 
 The search exists in two forms, which are defined and proved correct in @app:solving.
-The _direct search_ treats each record on its own, by a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots (@def:reference).
-The _incremental search_, which is the one used for the results of @sec:results, explores the records depth first, as paths in the tree of admissible sequences of placements, and uses each equation as soon as its full placement is made to eliminate one unknown from every floor and wall of the current staircase (@def:explore).
-The work done for a sequence of placements is thus shared by all the records that begin with it, and most of the nodes of the tree are close to its leaves, where staircases have one or two tiers.
+The _direct search_ applies to each record on its own the _direct method_ (@def:reference): a fraction-free elimination over $ZZ[x]$ followed by exact determinations of signs at the roots.
+The _incremental search_, which is the one used for the results of @sec:results, explores the records depth first, in the tree whose nodes are the records admissible for $n$ tiles, each followed by its extensions by one placement, and uses each equation as soon as its full placement is made to eliminate one unknown from every floor and wall of the current staircase (@def:explore).
+The work done for a record at a node is thus shared by all the records below it, and most of the nodes of the tree are close to its leaves, where staircases have one or two tiers.
 The incremental search decides the signs at a root by interval arithmetic with outward rounding, and passes a record that it cannot decide in this way to the direct method, which for ten tiles occurs for one record in ten thousand.
 Its cost is about $0.6$ microseconds of processor time per record.
 
@@ -742,13 +771,13 @@ Its cost is about $0.6$ microseconds of processor time per record.
 ]
 
 By @prop:scaling the set $P_n (a, b)$ is $P_n (a slash b)$.
-The implementation counts the singular situations and the records flagged as constant, and both counts were zero in every computation reported in @sec:results; for the computations made with the incremental search, the counts concern the records that it passes to the direct method, which is what @prop:fast requires.
+The implementation counts the records that are not regular, as _singular situations_, where the elimination fails or $D$ vanishes at a root of $F_rho$, and as _constant_ records, where $F_rho = 0$ (@def:reference); both counts were zero in every computation reported in @sec:results; for the computations made with the incremental search, the counts concern the records that it passes to the direct method, which is what @prop:fast requires.
 We have not proved that the counts are always zero.
 When the search is certified, the set $P_n (a slash b)$ is finite, since it is the union of the finite sets reported for the finitely many records; this remark is not part of the formal development.
 
 
 Three features of the problem make the incremental search efficient.
-First, records share their beginnings, and the elimination made for a beginning serves every record that continues it.
+First, records share their beginnings, and the elimination made for a beginning is used by every record that continues it.
 Secondly, different records often lead to the same polynomial: for a square and thirteen tiles, $2.8 times 10^11$ records lead to $2.6 times 10^8$ polynomials with a root in $[1, infinity)$, each of which is factorised once.
 Thirdly, when the sign of a positivity constraint at a root cannot be decided numerically, it is almost always because the constraint is exactly zero there: the solution is then a tiling with fewer tiles, one tile of the record having degenerated, as in @fig:pinwheel.
 About one root in a hundred is of this kind, and an exact test of divisibility by the minimal polynomial of the root decides these cases without recourse to the direct method (@def:check).
@@ -758,15 +787,15 @@ About one root in a hundred is of this kind, and an exact test of divisibility b
   caption: [The pinwheel arrangement of five tiles, with four wide tiles and one tall: the exact solution of the system of its record, with the width of the main rectangle left free, for three values of the proportion. The central tile has height $(x^2 - 1) slash (5 x^2 + 3)$, and the width of the main rectangle is $x (3 x^2 + 5) slash (5 x^2 + 3)$. The main rectangle is a square only for $x = 1$, where the central tile has size zero: the candidate root is rejected, and what remains is a tiling by four squares.],
 ) <fig:pinwheel>
 
-The smallest case in which the search has anything to decide is that of two tiles.
+The smallest case in which the search examines more than one record is that of two tiles.
 
 #example[
   Let $a = b = 1$ and $n = 2$.
-  A first placement that is inside would leave two tiers for one tile, and a full one would leave none for one tile, so the admissible first placements are of full width or of full height, and wide, since the main rectangle is a square; the second placement is full, of either orientation.
+  A first placement that is inside would leave two tiers for one tile, and a full one would leave none for one tile, so the admissible first placements are of full width or of full height, and by @prop:square only the wide ones are examined; the second placement is full, of either orientation.
   There are thus four complete admissible records, shown in @tab:two.
   After a wide tile of full width, of height $1 slash x$, the only tier has floor $1$ and wall $1 - 1 slash x$; a wide full tile requires $1 = x (1 - 1 slash x)$, that is $x = 2$, and a tall one requires $1 - 1 slash x = x$, which has no real solution.
   After a wide tile of full height, of width $x$, the only tier has floor $1 - x$ and wall $1$, and the two equations are $1 - x = x$ and $1 = x (1 - x)$, neither of which has a solution in $[1, infinity)$; indeed the floor $1 - x$ is not positive for $x >= 1$.
-  The search therefore reports the single proportion $2$, and $a(2) = 1$.
+  The search therefore reports the single proportion $2$, and $a(2) = 1$; @fig:two shows the record.
 ] <ex:two>
 
 #figure(
@@ -793,24 +822,26 @@ The smallest case in which the search has anything to decide is that of two tile
 
 All computations were carried out with the Rust implementation of the search, on an M4 Max 128 GB machine.
 All runs used the incremental search, except where stated.
-In every run the implementation's counters for singular systems, for aspect ratios independent of the proportion, and for coefficients exceeding machine integers within the direct method were all zero.
+In every run the implementation's counts of singular situations and of constant records (@sec:solving) were zero; so was its count of the records for which the direct method left the range of machine integers and was repeated with integers of arbitrary size, which does not affect the result.
 In the incremental search these counters concern the records passed to the direct method, so that every unrestricted run of the incremental search was certified in the sense of @def:fastcert, which is the hypothesis under which @prop:fast identifies the numbers found with the achievable proportions; the runs of the direct search, used for comparison, were certified in the sense of @def:regular, as @prop:reference requires.
 The computations restricted to guillotine tilings or to tilings with few tiles in one orientation, used in @app:structure, are made by variants of the search that @sec:systems and @app:solving do not cover.
 
 == The square <sec:square>
 
-@tab:counts lists $a(n)$ for $n <= 13$, with the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic), the number of pairs of a record and a proportion that it realises, which we call _realisations_, and the number of distinct polynomials with a root in $[1, infinity)$ that the search encountered.
-The last number depends on the search method and is not an invariant of the problem.
+@tab:counts lists $a(n)$ for $n <= 13$ with three further numbers.
+The first is the number of records examined, which is $2^(n - 1) B(n)$ in each case, where $B(n)$ is the $n$-th Baxter number (@sec:mosaic).
+The second is the number of _realisations_, the pairs of a record and a proportion that it realises.
+The third is the number of distinct polynomials with a root in $[1, infinity)$ that the search encountered; it depends on the search method and is not an invariant of the problem.
 
 #figure(
   kind: table,
   datatable(csv("data/counts.csv")),
-  caption: [Proportions for the square. A record is an admissible sequence with orientations in which the first tile is wide; a realisation is a record with a proportion that it realises. The last column is the time of the run, in seconds.],
+  caption: [Proportions for the square. The records counted are the complete admissible records for $n$ tiles in which the first tile is wide; a realisation is a record with a proportion that it realises. The last column is the time of the run, in seconds.],
 ) <tab:counts>
 
 The values for $n <= 7$ agree with those of Henderson and Gerbet, the value for $n = 8$ agrees with Henderson's, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
 The values for $n = 11$, $12$ and $13$ are new.
-Those for $n = 11$ and $n = 12$ were each computed twice, with the direct treatment of degenerate tiles and with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
+Those for $n = 11$ and $n = 12$ were each computed twice, once passing degenerate tiles to the direct method and once with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
 
 The search was checked in several further ways.
 For $n <= 9$ the incremental search and the direct search agree on every proportion and on the number of records realising it.
@@ -852,7 +883,7 @@ Every proportion with $n$ tiles has degree at most $n$ @taams2023.
   caption: [Number of proportions for the square, by algebraic degree from $8$ to $13$.],
 ) <tab:degrees-high>
 
-Odd degrees are more frequent than the neighbouring even ones; a heuristic reason is given after @prop:parity-full.
+Except among the three largest degrees for each $n$, odd degrees are more frequent than the neighbouring even ones; a heuristic reason is given after @prop:parity-full.
 Degree $n$ is attained for every $n$ in the table other than $4$.
 
 The proportions of degree one are explained in part by dissections into squares.
@@ -883,11 +914,11 @@ For instance, a rectangle of sides $2$ and $1$ cannot be dissected into six squa
 
 We found no closed form, recurrence or generating function for $a(n)$.
 The sequence satisfies no linear recurrence with constant coefficients of order at most five, and none with polynomial coefficients of the orders and degrees that thirteen terms allow one to test, a test which recovers the recurrence of the Baxter numbers; the usual transforms of the sequence match no entry of the OEIS, and its residues modulo small integers show no pattern.
-The sets of proportions have some structure: proportions persist when tiles are added, the aspect ratio of the main rectangle is a rational function of the proportion of a restricted kind, these functions are counted by the proportions for wide main rectangles, and all but three of the rational proportions for ten or more tiles are explained by dissections into squares.
+The sets of proportions have some structure: proportions persist when tiles are added; the aspect ratio of the main rectangle is a rational function, of a restricted kind, of the proportion; the number of these functions is the number of proportions for sufficiently wide main rectangles; and all but three of the rational proportions for ten or more tiles are explained by dissections into squares.
 These properties, and the conjectures that the computations suggest, are the subject of @app:structure.
 Here we bound the growth of $a(n)$.
 
-The bound rests on the electrical network of a tiling @bsst1940, in which each tile is a resistor: the current in a tile is its width, the potential difference across it is its height, and its resistance is therefore $x$ if the tile is tall and $1 slash x$ if it is wide.
+The bound uses the electrical network of a tiling @bsst1940, in which each tile is a resistor: the current in a tile is its width, the potential difference across it is its height, and its resistance is therefore $x$ if the tile is tall and $1 slash x$ if it is wide.
 For the unit square the total current equals the potential difference between the top side and the bottom side, which makes $x$ a root of a determinant that depends only on the network and on the orientations of the tiles; and the networks of tilings are among the planar maps that Tutte counted.
 The definitions and the statements on which the bound rests are in @app:maps.
 @fig:tiling-map shows the map of a tiling, and the network of its levels, which is used in @sec:tilings-counts.
@@ -896,7 +927,7 @@ The definitions and the statements on which the bound rests are in @app:maps.
   image("figures/tiling-map.svg", width: 100%),
   caption: [Left: a tiling by seven tiles, of proportion $2.3414...$, each tile with its resistance, $1 slash x$ if it is wide and $x$ if it is tall; the thick segments are the maximal segments of the union of the horizontal sides, which correspond to the vertices of the map. Centre: the map of the tiling (@def:tiling-map), with one edge for each tile, directed from the vertex of its top side to that of its bottom side, and the additional edge $e_0$, dashed; the vertices $v_1$, $v_2$ and $v_3$ are drawn at one height. The root is the dart of $e_0$ at $t$, and the edge before the root is that of the tile with corner $(0, 0)$, from $v_2$ to $t$. Right: the network of the levels (@def:height-network), whose vertices are the ordinates of the horizontal sides, drawn at equal distances; the vertices $v_2$ and $v_3$ of the map are at the same level, and are one vertex of this network.],
 ) <fig:tiling-map>
-In brief, a tiling $tau$ of a rectangle has a rooted map $cal(M)(tau)$, whose edges are the tiles and one additional edge $e_0$ between the top side and the bottom side (@def:tiling-map); this map is non-separable and planar, and it has a network on which the tiling is a flow (@prop:tiling-map).
+In brief, a tiling $cal(T)$ of a rectangle has a rooted map $cal(M)(cal(T))$, whose edges are the tiles and one additional edge $e_0$ between the top side and the bottom side (@def:tiling-map); this map is non-separable and planar, and it has a network on which the tiling is a flow (@prop:tiling-map).
 A rooted map $cal(M)$ with a network has a finite set $X(cal(M))$ of real numbers, the real roots of the polynomials of that network for the orientation vectors that are $-1$ at the edge before the root (@def:map-network), and isomorphic rooted maps have the same set (@obs:map-polynomial).
 The statements of this section and of @app:maps are those of the formal development (@app:formal), in which the enumeration of Tutte is a hypothesis; further properties of these networks, which are not formalised, are in @app:structure.
 
@@ -915,10 +946,10 @@ $ M(n) := (2 (3 n)!) / ((2 n + 1)! thin (n + 1)!). $
 ] <prop:upper>
 
 #proof[
-  Let $x in P_n (1)$, and let $tau$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
-  Replacing $tau$ by its transpose if necessary, the tile with corner $(0, 0)$ is wide for $x$.
+  Let $x in P_n (1)$, and let $cal(T)$ be a similar tiling of the unit square of proportion $x$ with $n$ tiles.
+  Replacing $cal(T)$ by its transpose if necessary, the tile with corner $(0, 0)$ is wide for $x$.
   Let $epsilon_T := -1$ if the tile $T$ is wide for $x$, and $epsilon_T := +1$ otherwise, so that $h_T slash w_T = x^(epsilon_T)$.
-  By the first statement of @prop:tiling-map and the third of @obs:network, $x$ is a root of $P_(cal(M)(tau), epsilon)$, and $epsilon$ is $-1$ at the edge before the root, by the second statement of @prop:tiling-map; so $x in X(cal(M)(tau))$.
+  By the first statement of @prop:tiling-map and the third of @obs:network, $x$ is a root of $P_(cal(M)(cal(T)), epsilon)$, and $epsilon$ is $-1$ at the edge before the root, by the second statement of @prop:tiling-map; so $x in X(cal(M)(cal(T)))$.
   This set has at most $n 2^(n - 1)$ elements, since there are $2^(n - 1)$ such orientation vectors and each polynomial is not zero and has degree at most $n$, by @obs:network.
   By @obs:map-polynomial it is the same for two tilings whose maps are isomorphic, and these maps are rooted non-separable planar maps with $n + 1$ edges by @prop:tiling-map.
   So $P_n (1)$ is contained in a union of sets of at most $n 2^(n - 1)$ elements, at most one for each isomorphism class of such maps.
@@ -939,14 +970,14 @@ A map is counted once for all the tilings that have it, whatever their proportio
 ) <fig:isomorphic>
 
 The same bound for the number of realisations of @tab:counts is proved only under three combinatorial hypotheses, which are stated in @sec:mosaic.
-The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $4.80$ at $n = 5$ to $8.68$ at $n = 12$.
+The quotients $a(n + 1) slash a(n)$ increase throughout the range computed, from $1$ at $n = 1$ to $8.68$ at $n = 12$.
 
 #conjecture[
   The sequence $a(n + 1) slash a(n)$ is non-decreasing.
 ] <conj:logconvex>
 
 @conj:logconvex holds for $n <= 12$.
-The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, and hence $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount too small to be detected in the values computed.
+The rate $27 slash 2$ is not attained: @prop:deficit shows that $limsup t(n)^(1 slash n)$, for the number $t(n)$ of tilings of @def:tbc, and hence $limsup a(n)^(1 slash n)$, is smaller than $27 slash 2$, by an amount too small to be detected in the values computed.
 Whether $a(n)^(1 slash n)$ converges is not known (@sec:growth-rate).
 
 == Tilings, classes and bags <sec:tilings-counts>
@@ -954,15 +985,18 @@ Whether $a(n)^(1 slash n)$ converges is not known (@sec:growth-rate).
 The numbers $a(n)$ count proportions, and each proportion is in general realised by many tilings.
 We now count the tilings themselves, in three ways.
 
-#definition(name: [tilings, classes and bags])[
+#definition(name: [tilings and classes])[
   For $n >= 1$, let $t(n)$ be the number of similar tilings of the unit square with $n$ tiles, where a tiling is regarded as a set of rectangles.
-  Let $b(n)$ be the number of orbits of these tilings under the group of the eight symmetries of the square.
-  The _bag_ of a similar tiling of proportion $x$ is the pair of $x$ and the multiset of the short sides of its tiles, and $c(n)$ is the number of bags of similar tilings of the unit square with $n$ tiles.
+  The _classes_ of these tilings are their orbits under the group of the eight symmetries of the square, and $b(n)$ is the number of classes.
 ] <def:tbc>
 
+#definition(name: [bags])[
+  The _bag_ of a similar tiling of proportion $x$ is the pair of $x$ and the multiset of the short sides of its tiles, and $c(n)$ is the number of bags of similar tilings of the unit square with $n$ tiles.
+] <def:bags>
+
 Two tilings have the same bag exactly when the tiles of one can be rearranged, with rotations by a quarter turn allowed, into the other.
-@fig:same-bag shows two tilings with the same bag that are not in the same orbit.
-These numbers are finite.
+@fig:same-bag shows tilings of two classes with the same bag.
+The numbers $t(n)$, $b(n)$ and $c(n)$ are finite.
 The proof uses the network of the levels of a tiling (@def:height-network), whose vertices are the ordinates of the horizontal sides of the tiles.
 
 #proposition[
@@ -972,7 +1006,7 @@ The proof uses the network of the levels of a tiling (@def:height-network), whos
 
 #proof[
   There are finitely many proportions, by @prop:upper; let $x$ be one of them.
-  For a similar tiling $cal(T)$ of the unit square of proportion $x$ with tiles $R_1, dots, R_n$, number the vertices of its network of the levels from $1$ to their number, which is at most $n + 1$, and let $epsilon_j := +1$ if $R_j$ is tall for $x$ and $epsilon_j := -1$ otherwise, so that $R_j$ has resistance $x^(epsilon_j)$.
+  For a similar tiling $cal(T)$ of the unit square of proportion $x$ with tiles $R_1, dots, R_n$, number the vertices of its network of the levels from $1$ to their number, which is at most $n + 1$, and let $epsilon_j := +1$ if $R_j$ is tall for $x$ and $epsilon_j := -1$ otherwise, so that $R_j$ has resistance $x^(epsilon_j)$; for a tiling by squares this differs from the choice made in the proof of @prop:upper, which does not matter there or here.
   By @obs:height-network the ordinates and the widths form a flow of value $1$ for these resistances, with potential $0$ at $t$, and by the first statement of @obs:network it is the only such flow.
   So the numbered network and $epsilon$ determine, for each tile, its width, which is the current, its height, which is the resistance times the current, and the ordinate of its bottom side, which is the potential of its head.
   The same data for the transpose of $cal(T)$ determine the abscissa of the left side of each tile.
@@ -1006,11 +1040,12 @@ The sequence $b(n)$ is the one requested in the entry A359146 @oeisA359146, whic
 ) <fig:classes>
 
 The search described in @sec:solving counts records, not tilings, and the passage from one to the other requires three corrections, each made exactly.
-A tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations; a tiling by squares has $2^n$ orientation vectors.
-A tiling in which four tiles meet at a point arises from several records, as the following propositions make precise.
+First, a tiling of proportion $x > 1$ has one orientation vector, and the search examines it or its transpose, which is a different tiling since transposition exchanges the orientations.
+Secondly, a tiling by squares has $2^n$ orientation vectors.
+Thirdly, a tiling in which four tiles meet at a point, a _crossing_ (@def:crossing), arises from several records, as the following propositions make precise.
 A tiling is identified by its proportion, its orientations and the record described in @prop:representative, since the solution of a reported record at a proportion is unique.
 The order of the coordinates of the sides of its tiles, which determines that record, the crossings and the symmetries, is computed exactly: the coordinates are elements of the number field of the proportion, floating-point enclosures are used only to certify strict inequalities, and equalities are decided by divisibility by the minimal polynomial.
-Both this and the count of bags assume that the polynomial stored for a proportion is its minimal polynomial, which the search for proportions does not need.
+Both this and the count of bags use the fact that the polynomial stored for a proportion is its minimal polynomial, which the factorisation into irreducible factors provides (@sec:candidates); the correctness of the count $a(n)$ does not depend on this fact.
 
 #definition(name: [crossing])[
   Let $cal(T)$ be a tiling of $[0, W] times [0, H]$.
@@ -1021,9 +1056,16 @@ Both this and the count of bags assume that the polynomial stored for a proporti
 #definition(name: [records that yield a tiling])[
   Let $x >= 1$, let $cal(T)$ be a similar tiling of $[0, W] times [0, H]$ of proportion $x$, and let an orientation, wide or tall, be chosen for each tile of $cal(T)$.
   A complete admissible record $rho$ _yields $cal(T)$ with the free sides_ $s$ if $(W, H, s)$ satisfy the constraints of $rho$ at $x$, the tiles of $rho$ for $(x, W, H, s)$ are the tiles of $cal(T)$ in some order, and each placement of $rho$ has the orientation chosen for its tile; it _yields_ $cal(T)$ if it does so with some free sides.
-  It then _places_ a tile _before_ another if the first is the tile of an earlier placement than the second.
-  For a set $X$ of points, the floor of a tier of a real staircase, with anchor $(a, b)$ and floor $L$, _$X$-extends_ if it extends in $cal(T)$ and its _end_ $(a + L, b)$ is not in $X$.
 ] <def:yields>
+
+#definition(name: [order of placement])[
+  A record that yields a tiling _places_ a tile _before_ another if, with some free sides with which it yields the tiling, the first is the tile of an earlier placement than the second.
+] <def:before>
+
+#definition(name: [floor that $X$-extends])[
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$, and let $X$ be a set of points.
+  The floor of a tier of a real staircase, with anchor $(a, b)$ and floor $L$, _$X$-extends_ if it extends in $cal(T)$ and its _end_ $(a + L, b)$ is not in $X$.
+] <def:x-extends>
 
 #observation[
   Let $cal(T)$ be a tiling of $[0, W] times [0, H]$.
@@ -1032,7 +1074,7 @@ Both this and the count of bags assume that the polynomial stored for a proporti
   + If $cal(T)$ is similar, with an orientation chosen for each tile, the tiles of a record that yields $cal(T)$, taken in the order of its placements, are the same for all the free sides with which it yields $cal(T)$.
 ] <obs:crossing>
 
-By the third statement, whether a record that yields $cal(T)$ places a tile before another does not depend on the free sides.
+By the third statement, whether a record that yields $cal(T)$ places a tile before another does not depend on the free sides with which it yields $cal(T)$.
 The tier of each placement is determined by the crossings at which the record places the tile to the upper left first, and so is the record.
 
 #proposition[
@@ -1047,13 +1089,13 @@ The tier of each placement is determined by the crossings at which the record pl
 #proof[
   Let $rho$ place a tile $Q$ at a tier $T_i$.
 
-  A tier before $T_i$ keeps its anchor and its floor until a tile $U$ as high as the wall is placed at the next tier: it is stale once $Q$ is placed, unless $U = Q$, and the staircase cannot be emptied while it is stale.
-  So $U$ lies to the lower right of the end $q$ of that floor, which therefore extends.
-  A tile to the upper left of $q$ has interior points in the strip of the tier, so it is placed after $U$, by @prop:fit and @prop:step; hence $q in.not X$.
+  A tier before $T_i$ keeps its anchor and its floor until a tile $Q'$ as high as the wall is placed at the next tier: it is stale once $Q$ is placed, unless $Q' = Q$, and the staircase cannot be emptied while it is stale.
+  So $Q'$ lies to the lower right of the end $q$ of that floor, which therefore extends.
+  A tile to the upper left of $q$ has interior points in the strip of the tier, so it is placed after $Q'$, by @prop:fit and @prop:step; hence $q in.not X$.
 
-  If a tile $U$ makes the floor of $T_i$ extend, with end $q$, then $T_i$ is not the last tier and $U$ has interior points in the strip of $T_(i + 1)$; so $U$ is still to be placed, lies in the region and, by @obs:strips, lies to the lower right of $q$.
-  Unless $Q$ is as wide as the floor, a started floor then ends at $q$ until a tile as wide as it is placed at its tier, and until then the second rule excludes $U$, which would lengthen it, since the abscissas of the anchors increase strictly and a low tile is strictly lower than its wall.
-  So $Q$ or a later tile lies to the upper left of $q$ and is placed before $U$; hence $q in X$, by @obs:crossing.
+  If a tile $Q'$ makes the floor of $T_i$ extend, with end $q$, then $T_i$ is not the last tier and $Q'$ has interior points in the strip of $T_(i + 1)$; so $Q'$ is still to be placed, lies in the region and, by @obs:strips, lies to the lower right of $q$.
+  Unless $Q$ is as wide as the floor, the floor of a started tier then ends at $q$ until a tile as wide as that floor is placed at its tier, and until then the second rule excludes $Q'$, which would lengthen the floor, since the abscissas of the anchors increase strictly and a low tile is strictly lower than its wall.
+  So $Q$ or a later tile lies to the upper left of $q$ and is placed before $Q'$; hence $q in X$, by @obs:crossing.
 
   Thus $T_i$ is the first tier whose floor does not $X$-extend.
   On the same staircase, a record as in the second statement therefore places at the same tier the same tile, whose corner is the anchor, with the same fit, by @prop:fit, and the same orientation.
@@ -1077,10 +1119,10 @@ The record constructed in the proof of @prop:complete places the tile to the low
   This gives a record $rho_X$ that yields $cal(T)$ and places at the first tier whose floor does not $X$-extend.
 
   _The order at a crossing._
-  Let $U$ and $V$ lie to the lower right and to the upper left of a crossing $q$, and let $rho_X$ place the first of the two at a tier $T_i$ of a staircase, in whose region the other lies.
+  Let $Q'$ and $Q''$ lie to the lower right and to the upper left of a crossing $q$, and let $rho_X$ place the first of the two at a tier $T_i$ of a staircase, in whose region the other lies.
   By @obs:strips, the region has no point to the left of the anchor and below the top of the wall, and none below the floor and to the left of its end.
-  So if $U$ is the first, it is as high as the wall; then $i > 0$, since $V$ lies above $q$, and the floor of $T_(i - 1)$ ends at $q$ and $X$-extends, so that $q in.not X$.
-  If $V$ is the first, it is as wide as the floor, which ends at $q$, extends, and does not $X$-extend, so that $q in X$.
+  So if $Q'$ is the first, it is as high as the wall; then $i > 0$, since $Q''$ lies above $q$, and the floor of $T_(i - 1)$ ends at $q$ and $X$-extends, so that $q in.not X$.
+  If $Q''$ is the first, it is as wide as the floor, which ends at $q$, extends, and does not $X$-extend, so that $q in X$.
   Hence $rho_X$ is as in the first statement.
 
   _The count._
@@ -1094,7 +1136,7 @@ The record constructed in the proof of @prop:complete places the tile to the low
 
 #figure(
   image("figures/crossing.svg", width: 92%),
-  caption: [The two records of a tiling by five tiles, of proportion $2$, with one crossing $q$, marked by a diamond. Each row shows the staircases of one record, with the tiles numbered in the order of placement and stale and started tiers marked as in @fig:rules. In the top row, where $X$ is empty, the tile to the lower right of $q$ is placed second and the tile to its upper left third; in the bottom row, where $X = {q}$, the tile to the upper left is placed second and the tile to the lower right third.],
+  caption: [The two records of a tiling by five tiles, of proportion $2$, with one crossing $q$, marked by a diamond. Each row shows the staircases of one record, with the tiles numbered in the order of placement and the tiers marked as in @fig:rules. In the top row, where $X$ is empty, the tile to the lower right of $q$ is placed second and the tile to its upper left third; in the bottom row, where $X = {q}$ and the diamond is filled as in @fig:crossing-subsets, the tile to the upper left is placed second and the tile to the lower right third.],
 ) <fig:crossing>
 
 #figure(
@@ -1104,9 +1146,9 @@ The record constructed in the proof of @prop:complete places the tile to the low
 
 For $X$ empty, and with a tile chosen to be wide exactly if $w = x h$, the record of @prop:multiplicity is the one constructed in the proof of @prop:complete.
 A tiling of a rectangle with positive sides that has no crossing is thus yielded by exactly one complete admissible record for each choice of orientations that @prop:multiplicity admits: one choice if its proportion is larger than $1$, and $2^n$ for a tiling by $n$ squares.
-This is one half of what the agreement of the number of placement sequences with the Baxter numbers, observed in @sec:mosaic, would require; the other half, that every complete admissible sequence is that of a tiling by rectangles without crossings, and that two such tilings have the same sequence exactly when they are mosaic equivalent, is not proved.
+This is one of the two facts that the agreement of the number of complete admissible records, disregarding orientations, with the Baxter numbers, observed in @sec:mosaic, would require; the other, that every complete admissible record is that of a tiling by rectangles without crossings, and that two such tilings have the same record, disregarding orientations, exactly when they are mosaic equivalent, is not proved.
 The computation agrees with @prop:multiplicity: for $n <= 12$ and each $k$, the records of the tilings with $k$ crossings are $2^k$ times as many as these tilings.
-The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the sequence from the exact order of the coordinates.
+The search for tilings keeps the record described in @prop:representative, which it recognises by rebuilding the record from the exact order of the coordinates.
 
 The values of @tab:tbc were checked as follows.
 For $n <= 8$ all three sequences, the number of tilings fixed by each symmetry and the numbers for each single proportion agree with an independent program, which represents tilings as sets of rectangles with coordinates in the number field and examines all $2^n$ orientation vectors.
@@ -1128,7 +1170,7 @@ Some features of the table can be proved.
   It maps the tile that has its corner at one of them to a tile with the same corner; the two overlap, so they are equal, and a rectangle equal to its reflection in a diagonal through one of its corners is a square.
   The proportion is therefore $1$, and every tile is a square.
 
-  For the first, transposition is an involution on the set of similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point, by the second statement.
+  For the first, transposition is an involution (@fig:symmetric) on the set of similar tilings of the unit square with $n$ tiles and proportion $x > 1$, and it has no fixed point, by the second statement.
   This set is finite, so its number of elements is even.
 
   For the third, a rectangle that contains the centre of the square, other than as one of its corners, overlaps its image under the quarter turn.
@@ -1139,11 +1181,11 @@ Some features of the table can be proved.
 
 #figure(
   image("figures/symmetric.svg", width: 76%),
-  caption: [From left to right: the tiling of @fig:construction and its transpose, each tile keeping its colour, which are two different tilings; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
+  caption: [From left to right: the tiling of @fig:construction and its transpose, which are two different tilings, each tile keeping its colour; and a tiling by eight tiles, of proportion $2$, that is fixed by a quarter turn, with the crossing at its centre marked by a diamond and one orbit of four tiles coloured.],
 ) <fig:symmetric>
 
-Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.
-Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388789$ tilings with twelve tiles, and $8 b(12) slash t(12) = 1.0003$.
+Accordingly $t(n)$ is odd for $n = 1$, $4$, $9$ and $12$ in the range computed, and tilings fixed by a quarter turn, such as the third of @fig:symmetric, occur there only for $n = 1$, $4$, $8$, $9$ and $12$; a tiling by squares fixed by a quarter turn has a tile centred at the centre of the square or a crossing there, so that its number of tiles is congruent to $0$ or $1$ modulo $4$.
+Tilings with a symmetry are rare: there are $#num(2629349)$ of them among the $#num(9213388789)$ tilings with twelve tiles, and $8 b(12) slash t(12) = 1.0003$.
 
 #proposition[
   For every $n >= 6$, $c(n) > a(n)$.
@@ -1155,6 +1197,7 @@ Tilings with a symmetry are rare: there are $2629349$ of them among the $9213388
   The two bags have the same proportion, and they differ: the sums of the short sides differ by $s - s'$.
   Such a tiling $cal(T)$ exists: for $m := n - 4 >= 2$, a wide tile of width $1$ above a row of $m$ congruent wide tiles of width $1 slash m$ is a similar tiling of the square of proportion $(m + 1) slash m$ with $m + 1$ tiles, of two different sizes.
   Every proportion is that of some bag, and the sets are finite; so $c(n) > a(n)$.
+  @fig:bags shows the construction for $n = 6$.
 ]
 
 #figure(
@@ -1179,7 +1222,7 @@ The proportion $2$ has the most bags, and the most classes, for every $n$ from $
 ] <conj:growth-rate>
 
 @conj:growth-quotients holds for $5 <= n <= 11$.
-For @conj:growth-symmetry, the quotient $8 b(n) slash t(n)$ decreases for $3 <= n <= 12$, to $1.0003$.
+For @conj:growth-symmetry, the quotient $8 b(n) slash t(n)$ decreases for $1 <= n <= 12$, to $1.0003$.
 For @conj:growth-rate, the quotient of $t(n)$ by $2^n M(n)$, with $M(n)$ as in @prop:upper, takes the values $0.2850$, $0.2787$, $0.2838$, $0.2859$, $0.2882$, $0.2898$, $0.2911$ and $0.2920$ for $n = 5, dots, 12$, which suggests the rate $27 slash 2$ of $2^n M(n)$; but the limit, if it exists, is smaller than $27 slash 2$ by @prop:deficit, so that this quotient eventually tends to zero.
 The three statements are independent of one another as far as we know.
 
@@ -1368,19 +1411,19 @@ A record is thus regular if the elimination succeeds, $F_rho$ is not zero, and $
 
 == Eager elimination <sec:eager>
 
-The direct search treats every record independently, each at the cost of a symbolic elimination; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
+The direct search treats every record independently, with a symbolic elimination for each; when the main rectangle is a square there are $2^(n - 1) B(n)$ of them for every $n <= 13$, where $B(n)$ is the $n$-th Baxter number, by the count reported in @sec:mosaic.
 The incremental search shares work between records with a common beginning, and replaces nearly all exact sign determinations by certified numerical ones.
-A record that it cannot decide is passed to the direct method, so that its correctness rests on that of the direct method only for such records.
+A record that it cannot decide is passed to the direct method, so that its correctness depends on that of the direct method only for such records.
 
 
-Records are explored depth first, as paths in the tree of admissible sequences, and the linear forms for floors and walls are maintained along the current path.
+Records are explored depth first, in the tree of admissible records described in @sec:solving, and the linear forms for floors and walls are maintained along the current path.
 Instead of collecting equations to be solved at the leaves, each equation is used at once to eliminate one unknown from every floor and wall of the current staircase.
 To keep the system homogeneous, the main rectangle is given sides $a t$ and $b t$ for an unknown scale $t$.
 
 #definition(name: [homogeneous system])[
-  Let $R$ be an integral domain and $X$ a unit of $R$; in the method, $R = ZZ[x, x^(-1)]$ and $X = x$.
+  Let $R$ be an integral domain and $xi$ a unit of $R$; in the method, $R = ZZ[x, x^(-1)]$ and $xi = x$.
   A _form_ over $R$ is a sequence $F = (F_0, F_1, F_2, dots)$ of elements of $R$; it stands for the expression $F_0 t + F_1 s_1 + F_2 s_2 + dots.c$.
-  The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $X$ and by $X^(-1)$.
+  The forms over $R$ are an arithmetic of lengths: sums and differences are taken coefficient by coefficient, and the product and the quotient by $x$ multiply every coefficient by $xi$ and by $xi^(-1)$.
   We write $u_j$ for the form whose coefficient of index $j$ is $1$ and whose other coefficients are zero.
   For integers $a$ and $b$, the _homogeneous system_ of a record $rho$ consists of the positivity constraints $kappa_1, kappa_2, dots$ and of the equations $e_1, e_2, dots$ obtained by placing $rho$ on the initial staircase with floor $a u_0$ and wall $b u_0$, with free sides $u_1, u_2, dots$.
   For a homomorphism $chi$ from $R$ to a field $K$, a form $F$ over $R$, an integer $N >= 1$ and $v = (v_0, dots, v_(N - 1)) in K^N$, the _value_ of $F$ at $v$ is $F[v] := sum_(j < N) chi(F_j) v_j$; for a form $G$ over $K$ we similarly write $G[v] := sum_(j < N) G_j v_j$.
@@ -1391,7 +1434,7 @@ The homogeneous system at scale one is the system of the main rectangle of sides
 
 #proposition[
   Let $rho$ be a record with $k$ inside placements, let $a$ and $b$ be integers, and let $kappa_1, kappa_2, dots$ and $e_1, e_2, dots$ be the positivity constraints and the equations of the homogeneous system of $rho$.
-  + Let $chi$ be a homomorphism from $R$ to the real numbers with $alpha := chi(X) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
+  + Let $chi$ be a homomorphism from $R$ to the real numbers with $alpha := chi(xi) > 0$, and let $v in RR^(k + 1)$ with $v_0 = 1$.
     Then the positivity constraints of $rho$ for $(a, b, (v_1, dots, v_k))$ at $alpha$ are the numbers $kappa_q [v]$, and its equations are the numbers $e_i [v]$.
     Consequently $(a, b, (v_1, dots, v_k))$ satisfy the constraints of $rho$ at $alpha$ if and only if $kappa_q [v] > 0$ for every $q$ and $e_i [v] = 0$ for every $i$.
   + If $b >= 1$, then for every real number $alpha > 0$ there is $s$ such that $(a slash b, 1, s)$ satisfy the constraints of $rho$ at $alpha$ if and only if there is $s'$ such that $(a, b, s')$ satisfy them.
@@ -1400,7 +1443,7 @@ The homogeneous system at scale one is the system of the main rectangle of sides
 #proof[
   Both statements are cases of @obs:transfer.
 
-  For the first, the map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers with proportion $alpha$: it is additive, and $chi(X F_j) = alpha chi(F_j)$ and $chi(X^(-1) F_j) = chi(F_j) slash alpha$.
+  For the first, the map $F |-> F[v]$ is a homomorphism from the forms over $R$ to the real numbers with proportion $alpha$: it is additive, and $chi(xi F_j) = alpha chi(F_j)$ and $chi(xi^(-1) F_j) = chi(F_j) slash alpha$.
   Since $v_0 = 1$, it sends $a u_0$ to $a$, $b u_0$ to $b$, and $u_j$ to $v_j$ for $1 <= j <= k$, so that @obs:transfer gives the first sentence of the statement, and the second follows from @def:system.
 
   For the second, multiplication by a real number $c > 0$ is a homomorphism from the real numbers with proportion $alpha$ to themselves, and it preserves the sign of every number.
@@ -1424,7 +1467,7 @@ The pass along a record keeps, besides the staircase, the coefficient by which t
   + If $j < ell$ and $p_j$ has an equation $E$ on $S$, there is an index $m$ with $1 <= m <= k^+$ and $E_m != 0$ such that the elimination $epsilon = (E, m, pi)$ divides exactly every floor and wall of $S^+$, and $Sigma_j = (epsilon(S^+), E_m, k^+)$, where $epsilon(S^+)$ is obtained by applying $epsilon$ to every floor and wall of $S^+$; the elimination $epsilon$ is _recorded_ with $p_j$.
 ] <def:elimination>
 
-A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, at the cost of multiplying every length by the new pivot and dividing it by the old one.
+A tile placed inside receives as its free side the next unknown multiplied by the current pivot, and each equation removes one unknown from the staircase, after which every length is multiplied by the new pivot and divided by the old one.
 A stage therefore represents lengths up to the factor of its pivot.
 The method makes the pass deterministic by a rule for the choice of the index $m$; the implementation takes an unknown whose coefficient in $E$ has the smallest span of exponents, and the first such unknown in case of a tie.
 The pass _fails_, in the method, when an arithmetic operation exceeds the range of the machine integers, when the rule yields no index $m$ as required, when a division is not exact, and when the staircase is not emptied by the last placement of the record, through a full placement, and by no earlier one.
@@ -1445,7 +1488,7 @@ The forms of a stage are related to those of the homogeneous system, on which no
   A form over $K$ is _carried_ through $epsilon_1, dots, epsilon_r$ by applying $Gamma_r$.
 ] <def:chain>
 
-Each $gamma_epsilon$ is linear over $K$, so it commutes with sums, differences and the multiplication by $psi(X)$ and by its inverse: it is a homomorphism of the arithmetic of the forms over $K$ to itself, and so is each $Gamma_i$.
+Each $gamma_epsilon$ is linear over $K$, so it commutes with sums, differences and the multiplication by $psi(xi)$ and by its inverse: it is a homomorphism of the arithmetic of the forms over $K$ to itself, and so is each $Gamma_i$.
 If $epsilon$ divides $F$ exactly and $psi(pi) != 0$, then $psi(epsilon(F)) = gamma_epsilon (psi(F))$.
 Nothing in the definition of a chain requires the current pivot to have a non-zero image.
 
@@ -1550,9 +1593,9 @@ It is the polynomial whose roots are the candidate proportions.
 
 #proposition[
   Let $rho$ be a complete admissible record with $k$ inside placements, and consider a successful pass along $rho$, from the initial stage for integers $a$ and $b$, with final equation $E_"fin"$.
-  Let $e_1, dots, e_(k + 1)$ be the equations of the homogeneous system of $rho$, and let $M$ be the square matrix of size $k + 1$ over $R$ with entries $(e_i)_j$, for $1 <= i <= k + 1$ and $0 <= j <= k$.
+  Let $e_1, dots, e_(k + 1)$ be the equations of the homogeneous system of $rho$, and let $Theta$ be the square matrix of size $k + 1$ over $R$ with entries $(e_i)_j$, for $1 <= i <= k + 1$ and $0 <= j <= k$.
   + The pass records $k$ eliminations, and
-    $ (E_"fin")_0 = plus.minus det M. $
+    $ (E_"fin")_0 = plus.minus det Theta. $
   + If $chi$ is a homomorphism from $R$ to the real numbers and $w in RR^(k + 1)$ satisfies $w_0 = 1$ and $e_i [w] = 0$ for every $i$, then $chi((E_"fin")_0) = 0$.
 ] <prop:det>
 
@@ -1562,9 +1605,9 @@ It is the polynomial whose roots are the candidate proportions.
   The homogeneous system has $k + 1$ equations, by @prop:count; hence the pass records $k$ eliminations, which form a chain with originals $e_1, dots, e_k$ and current pivot $pi_k != 0$, and $psi(E_"fin") = Gamma_k (psi(e_(k + 1)))$.
   The triple $(E_"fin", 0, pi_k)$, with the original $e_(k + 1)$, therefore extends the chain to one with current pivot $(E_"fin")_0$.
   The indices $m_1, dots, m_k$ lie between $1$ and $k$, by the definition of a pass, and are pairwise distinct, by the sixth statement of @prop:chain; with the index $0$ they are $k + 1$ distinct indices smaller than $k + 1$.
-  The second statement of @prop:minor gives $psi((E_"fin")_0) = plus.minus det psi(M)$, which is the first statement because $psi$ is injective.
+  The second statement of @prop:minor gives $psi((E_"fin")_0) = plus.minus det psi(Theta)$, which is the first statement because $psi$ is injective.
 
-  For the second statement, the real matrix $chi(M)$ sends the vector $w != 0$ to zero, so that $chi(det M) = det chi(M) = 0$.
+  For the second statement, the real matrix $chi(Theta)$ sends the vector $w != 0$ to zero, so that $chi(det Theta) = det chi(Theta) = 0$.
 ]
 
 The second statement holds whether or not a pivot vanishes at the point considered: every solution of the system is among the roots of the final coefficient.
@@ -1594,8 +1637,8 @@ The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the d
 #proposition[
   Let $rho$ be a complete admissible record with $k$ inside placements, let $a$ and $b$ be integers, and consider a successful pass along $rho$ over $R = ZZ[x, x^(-1)]$, from the initial stage for $a$ and $b$, with final equation $E_"fin"$.
   Suppose that the elimination of the direct method succeeds on $rho$, with the notation of @def:reference.
-  Then there are $lambda in ZZ[x]$ and an integer $e$ such that $D = lambda det A$ and
-  $ lambda (E_"fin")_0 = plus.minus x^e F_rho. $
+  Then there are $lambda in ZZ[x]$ and an integer $delta$ such that $D = lambda det A$ and
+  $ lambda (E_"fin")_0 = plus.minus x^delta F_rho. $
 ] <prop:target>
 
 #proof[
@@ -1605,10 +1648,10 @@ The final coefficient is, up to trivial factors, the polynomial $F_rho$ of the d
   which expresses the substitution of $a t$ for $W$ and of $b t$ for $1$.
   A direct verification on the four operations shows that $tau$ is a homomorphism, and it sends the forms $W$, $1$ and $s_j$ to $a u_0$, $b u_0$ and $u_j$.
   By @obs:transfer, the equations of the homogeneous system are $e_i = tau(g_i)$.
-  Hence the matrix $M$ of @prop:det has the entries $M_(i 0) = x^(-d_i) (a A_(i, k + 1) - b c_i)$ and $M_(i j) = x^(-d_i) A_(i j)$ for $1 <= j <= k$: it is obtained from $A$ by replacing the last column by $a$ times itself minus $b$ times the vector $c$, moving that column to the first place, and multiplying the $i$-th row by $x^(-d_i)$.
+  Hence the matrix $Theta$ of @prop:det has the entries $Theta_(i 0) = x^(-d_i) (a A_(i, k + 1) - b c_i)$ and $Theta_(i j) = x^(-d_i) A_(i j)$ for $1 <= j <= k$: it is obtained from $A$ by replacing the last column by $a$ times itself minus $b$ times the vector $c$, moving that column to the first place, and multiplying the $i$-th row by $x^(-d_i)$.
   Since the determinant is linear in the last column,
-  $ det M = plus.minus x^e (a det A - b det A_(k + 1)), quad e := -sum_i d_i, $
-  and multiplying by $lambda$ gives $lambda det M = plus.minus x^e (a D - b N_(k + 1)) = minus.plus x^e F_rho$.
+  $ det Theta = plus.minus x^delta (a det A - b det A_(k + 1)), quad delta := -sum_i d_i, $
+  and multiplying by $lambda$ gives $lambda det Theta = plus.minus x^delta (a D - b N_(k + 1)) = minus.plus x^e F_rho$.
   The statement follows from @prop:det.
 ]
 
@@ -1915,7 +1958,7 @@ Completeness of the incremental search needs less than that of the direct search
 The statements of @sec:tilings, @sec:staircases, @sec:systems, @sec:growth, @sec:tilings-counts, @app:solving and @app:maps have been formalised in Lean 4 with Mathlib, in a development distributed with the implementation, in the directory `lean` of its repository.
 The development contains no unproved statement and no axiom of its own; its main theorems depend only on the three axioms `propext`, `Classical.choice` and `Quot.sound` of Lean and Mathlib.
 The result of Tutte quoted in @sec:growth is not proved: it is a hypothesis of the two theorems that formalise the second statement of @prop:upper and its consequence.
-@tab:formal lists, for each definition and proposition of those sections, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
+@tab:formal lists, for each definition and proposition of those sections, in the order of the paper, the declarations that formalise it, by module of the namespace `Rectiling`; those of the modules `Elimination`, `BackSubstitution`, `Determinant`, `Reduced`, `Certified`, `Fast`, `Search`, `Exact` and `Target` lie in the namespace `Rectiling.Fast`.
 The proofs given in this paper follow those of the development, statement by statement, except where @sec:differences says otherwise.
 
 #let lean-row(statement, ..declarations) = (statement, declarations.pos().join(linebreak()))
@@ -1954,9 +1997,11 @@ The proofs given in this paper follow those of the development, statement by sta
           [`Persistence`: `Rect.isTiling_four`, `Rect.isTiling_six`, `Rect.isTiling_eight`, `TilesWith.add_three`, `TilesWith.add_five`, `TilesWith.add_seven`, `TilesWith.add_of_five_le`, `persistence`],
         ),
         ..lean-row(
-          [@def:staircase],
-          [`Staircase`: `Algebra`, `Tier`, `initial`, `realAlgebra`, `unitAlgebra`, `Algebra.IsHom`, `Tier.map`],
+          [@def:arithmetic],
+          [`Staircase`: `Algebra`, `realAlgebra`, `unitAlgebra`],
         ),
+        ..lean-row([@def:staircase], [`Staircase`: `Tier`, `initial`]),
+        ..lean-row([@def:homomorphism], [`Staircase`: `Algebra.IsHom`, `Tier.map`]),
         ..lean-row([@def:region], [`Layout`: `geom`, `GTier.Mem`, `unfilled`, `region`, `Positive`, `region_initial`]),
         ..lean-row(
           [@def:placement],
@@ -2015,52 +2060,6 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
         ..lean-row([@prop:complete], [`Staircase`: `allowed_map`], [`Completeness`: `complete_from`, `completeness`]),
         ..lean-row([@prop:square], [`Completeness`: `head_tile_origin`, `completeness_square`]),
-        ..lean-row([@def:mosaic], [not formalised]),
-        ..lean-row(
-          [@def:flow],
-          [`Network`: `Network`, `Network.Adj`, `Network.Proper`, `Network.div`, `Network.IsFlow`],
-        ),
-        ..lean-row(
-          [@def:network-polynomial],
-          [`Network`: `Network.system`],
-          [`NetworkPolynomial`: `Network.pairMatrix`, `Network.pairPoly`],
-        ),
-        ..lean-row(
-          [@obs:network],
-          [`Network`: `Network.IsFlow.energy`, `Network.IsFlow.unique`],
-          [`NetworkPolynomial`: `Network.natDegree_pairPoly_le`, `Network.Proper.pairPoly_ne_zero`, `Network.IsFlow.aeval_pairPoly`],
-          [`ProportionBound`: `Network.Iso`, `Network.Iso.pairPoly_eq`],
-          [`MapNetwork`: `Network.reverse`, `Network.pairPoly_reverse`, `Network.UIso`, `Network.UIso.pairPoly_eq`],
-        ),
-        ..lean-row(
-          [@def:map],
-          [`CombinatorialMap`: `CMap`, `CMap.face`, `CMap.Vertex`, `CMap.Edge`, `CMap.Face`, `CMap.Connected`, `CMap.Planar`, `CMap.Loopless`, `CMap.NoCutVertex`, `RootedMap`, `RootedMap.Isomorphic`, `RootedMapClass`, `TutteEnumeration`, `TutteEnumeration.card_eq_tutteM`],
-          [`Growth`: `tutteM`],
-        ),
-        ..lean-row(
-          [@def:map-network],
-          [`MapNetwork`: `CMap.Tile`, `CMap.net`, `CMap.rootSet`, `RootedMap.net`, `RootedMap.poly`, `RootedMap.rootSet`, `RootedMapClass.rootSet`],
-        ),
-        ..lean-row(
-          [@obs:map-polynomial],
-          [`MapNetwork`: `CMap.Iso`, `CMap.Iso.netUIso`, `CMap.Iso.rootSet_subset`, `RootedMap.Isomorphic.poly_eq`, `RootedMap.Isomorphic.rootSet_eq`],
-        ),
-        ..lean-row(
-          [@def:tiling-map],
-          [`TilingMap`: `Dart`, `dartHeight`, `dartStart`, `dartStop`, `nextDart`, `flipDart`, `tilingMap`],
-        ),
-        ..lean-row(
-          [@obs:tiling-map],
-          [`TilingMap`: `IsTiling.eq_of_overlap`, `IsTiling.exists_nw`, `IsTiling.exists_se`, `IsTiling.exists_top_left`, `IsTiling.exists_bottom_right`, `IsRotation`, `IsRotation.height`, `IsRotation.start`, `nextDart_isRotation`, `nextDart_injective`, `IsTilingMap`, `tilingMap_isTilingMap`],
-          [`TilingMapFlow`: `IsTilingMap.height_eq`, `IsTilingMap.vertexHeight`],
-        ),
-        ..lean-row(
-          [@prop:tiling-map],
-          [`TilingMapFlow`: `tilingNet`, `IsTilingMap.sum_stop_sub_start`, `IsTilingMap.tilingNet_isFlow`],
-          [`TilingMapNonseparable`: `IsTilingMap.exists_top_or_poleBot`, `IsTilingMap.exists_bot_or_poleTop`, `IsTilingMap.reach_poleBot`, `IsTilingMap.reach_poleTop`, `IsTilingMap.connected`, `IsTilingMap.loopless`, `IsTilingMap.noCutVertex`, `IsTilingMap.tilingNet_proper`],
-          [`TilingMapPlanar`: `vertexMark`, `faceMark`, `IsTilingMap.exists_vertexMark`, `IsTilingMap.vertex_closure`, `IsTilingMap.vertexMark_unique`, `IsTilingMap.exists_faceMark`, `IsTilingMap.face_closure`, `IsTilingMap.faceMark_unique`, `IsTilingMap.card_vertex`, `IsTilingMap.card_face`, `IsTilingMap.card_edge`, `IsTilingMap.planar`],
-          [`UpperBound`: `IsTilingMap.netUIso`, `IsTilingMap.corner_edge`],
-        ),
         ..lean-row(
           [@prop:upper],
           [`ProportionBound`: `finite_achievable`, `ncard_achievable_le`],
@@ -2069,14 +2068,9 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
         ..lean-row(
           [@def:tbc],
-          [`Counts`: `IsSetTiling`, `IsSimilarSetTiling`, `isSimilarSetTiling_iff`, `SimilarTilings`, `Rect.sym`, `orbit`, `Classes`, `Bags`, `Proportions`, `mem_proportions_iff`, `image_fst_bags`],
+          [`Counts`: `IsSetTiling`, `IsSimilarSetTiling`, `isSimilarSetTiling_iff`, `SimilarTilings`, `Rect.sym`, `orbit`, `Classes`],
         ),
-        ..lean-row([@def:height-network], [`TilingNetwork`: `levels`, `heightNetwork`]),
-        ..lean-row(
-          [@obs:height-network],
-          [`CrossSection`: `IsTiling.sum_generic`, `IsTiling.sum_bottom_eq_sum_top`],
-          [`TilingNetwork`: `IsTiling.heightNetwork_proper`, `IsTiling.heightNetwork_isFlow`],
-        ),
+        ..lean-row([@def:bags], [`Counts`: `Bags`, `Proportions`, `mem_proportions_iff`, `image_fst_bags`]),
         ..lean-row(
           [@prop:tilings-finite],
           [`TilingCount`: `Network.Iso.isFlow`, `heightPair`, `IsSimilarTiling.eq_of_isFlow`, `IsSimilarTiling.eq_of_heightPair_eq`, `finite_similarTilings_of`, `finite_similarTilings`],
@@ -2088,8 +2082,10 @@ The proofs given in this paper follow those of the development, statement by sta
         ),
         ..lean-row(
           [@def:yields],
-          [`Records`: `YieldsWith`, `Yields`, `LowerFirst`, `UpperFirst`, `GTier.tip`, `XExt`, `FirstNot`, `Chooses`],
+          [`Records`: `YieldsWith`, `Yields`],
         ),
+        ..lean-row([@def:before], [`Records`: `LowerFirst`, `UpperFirst`, `Chooses`]),
+        ..lean-row([@def:x-extends], [`Records`: `GTier.tip`, `XExt`, `FirstNot`]),
         ..lean-row(
           [@obs:crossing],
           [`Crossings`: `IsTiling.eq_of_corner`, `isCrossing_iff`, `finite_crossings`],
@@ -2207,6 +2203,58 @@ The proofs given in this paper follow those of the development, statement by sta
         ..lean-row(
           [@prop:fast],
           [`Fast`: `fast_sound`, `fast_complete`, `fast_iff`, `reported_imp_fast`, `Certified.fast`, `fast_iff_reported`],
+        ),
+        ..lean-row([@def:mosaic], [not formalised]),
+        ..lean-row(
+          [@def:flow],
+          [`Network`: `Network`, `Network.Adj`, `Network.Proper`, `Network.div`, `Network.IsFlow`],
+        ),
+        ..lean-row(
+          [@def:network-polynomial],
+          [`Network`: `Network.system`],
+          [`NetworkPolynomial`: `Network.pairMatrix`, `Network.pairPoly`],
+        ),
+        ..lean-row(
+          [@obs:network],
+          [`Network`: `Network.IsFlow.energy`, `Network.IsFlow.unique`],
+          [`NetworkPolynomial`: `Network.natDegree_pairPoly_le`, `Network.Proper.pairPoly_ne_zero`, `Network.IsFlow.aeval_pairPoly`],
+          [`ProportionBound`: `Network.Iso`, `Network.Iso.pairPoly_eq`],
+          [`MapNetwork`: `Network.reverse`, `Network.pairPoly_reverse`, `Network.UIso`, `Network.UIso.pairPoly_eq`],
+        ),
+        ..lean-row(
+          [@def:map],
+          [`CombinatorialMap`: `CMap`, `CMap.face`, `CMap.Vertex`, `CMap.Edge`, `CMap.Face`, `CMap.Connected`, `CMap.Planar`, `CMap.Loopless`, `CMap.NoCutVertex`, `RootedMap`, `RootedMap.Isomorphic`, `RootedMapClass`, `TutteEnumeration`, `TutteEnumeration.card_eq_tutteM`],
+          [`Growth`: `tutteM`],
+        ),
+        ..lean-row(
+          [@def:map-network],
+          [`MapNetwork`: `CMap.Tile`, `CMap.net`, `CMap.rootSet`, `RootedMap.net`, `RootedMap.poly`, `RootedMap.rootSet`, `RootedMapClass.rootSet`],
+        ),
+        ..lean-row(
+          [@obs:map-polynomial],
+          [`MapNetwork`: `CMap.Iso`, `CMap.Iso.netUIso`, `CMap.Iso.rootSet_subset`, `RootedMap.Isomorphic.poly_eq`, `RootedMap.Isomorphic.rootSet_eq`],
+        ),
+        ..lean-row(
+          [@def:tiling-map],
+          [`TilingMap`: `Dart`, `dartHeight`, `dartStart`, `dartStop`, `nextDart`, `flipDart`, `tilingMap`],
+        ),
+        ..lean-row(
+          [@obs:tiling-map],
+          [`TilingMap`: `IsTiling.eq_of_overlap`, `IsTiling.exists_nw`, `IsTiling.exists_se`, `IsTiling.exists_top_left`, `IsTiling.exists_bottom_right`, `IsRotation`, `IsRotation.height`, `IsRotation.start`, `nextDart_isRotation`, `nextDart_injective`, `IsTilingMap`, `tilingMap_isTilingMap`],
+          [`TilingMapFlow`: `IsTilingMap.height_eq`, `IsTilingMap.vertexHeight`],
+        ),
+        ..lean-row(
+          [@prop:tiling-map],
+          [`TilingMapFlow`: `tilingNet`, `IsTilingMap.sum_stop_sub_start`, `IsTilingMap.tilingNet_isFlow`],
+          [`TilingMapNonseparable`: `IsTilingMap.exists_top_or_poleBot`, `IsTilingMap.exists_bot_or_poleTop`, `IsTilingMap.reach_poleBot`, `IsTilingMap.reach_poleTop`, `IsTilingMap.connected`, `IsTilingMap.loopless`, `IsTilingMap.noCutVertex`, `IsTilingMap.tilingNet_proper`],
+          [`TilingMapPlanar`: `vertexMark`, `faceMark`, `IsTilingMap.exists_vertexMark`, `IsTilingMap.vertex_closure`, `IsTilingMap.vertexMark_unique`, `IsTilingMap.exists_faceMark`, `IsTilingMap.face_closure`, `IsTilingMap.faceMark_unique`, `IsTilingMap.card_vertex`, `IsTilingMap.card_face`, `IsTilingMap.card_edge`, `IsTilingMap.planar`],
+          [`UpperBound`: `IsTilingMap.netUIso`, `IsTilingMap.corner_edge`],
+        ),
+        ..lean-row([@def:height-network], [`TilingNetwork`: `levels`, `heightNetwork`]),
+        ..lean-row(
+          [@obs:height-network],
+          [`CrossSection`: `IsTiling.sum_generic`, `IsTiling.sum_bottom_eq_sum_top`],
+          [`TilingNetwork`: `IsTiling.heightNetwork_proper`, `IsTiling.heightNetwork_isFlow`],
         ),
       )
     }),
@@ -2342,8 +2390,8 @@ For $x > 1$ there is exactly one, and for $x = 1$ every orientation vector is on
 == Persistence <sec:persistence>
 
 By @prop:subdivision, proportions persist when three tiles, or five or more, are added, and, for the square, also when four are added.
-The steps of one and two fail: of the $433926$ proportions with ten tiles, only $59264$ recur with eleven.
-Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $3367969$ out of $3446981$.
+The steps of one and two fail: of the $#num(433926)$ proportions with ten tiles, only $#num(59264)$ recur with eleven.
+Most proportions achievable with $n$ tiles are not achievable with fewer, as @tab:structure shows: for eleven tiles, $#num(3367969)$ out of $#num(3446981)$.
 
 The step of four can fail when the main rectangle is not a square, as the examples after @prop:subdivision show.
 According to the search, for the main rectangle of aspect ratio $2$, of the proportions with $2$, $3$, $4$ and $5$ tiles, $2$ of $2$, $3$ of $8$, $15$ of $29$ and $43$ of $127$ are not achievable with four more tiles.
@@ -2475,8 +2523,8 @@ The lines are taken to be the connected components of the union of the horizonta
 @fig:network shows an example.
 
 #definition(name: [network of a tiling])[
-  Let $R_1, dots, R_n$ be a tiling $tau$ of the rectangle $[0, W] times [0, H]$, and let $U$ be the union of the top sides and of the bottom sides of its tiles.
-  The _network_ $frak(N)(tau)$ of the tiling has as its vertices the connected components of $U$, as its poles the top side $s$ and the bottom side $t$ of the main rectangle, and one edge for each tile, whose tail is the component that contains the top side of the tile and whose head is the component that contains its bottom side.
+  Let $R_1, dots, R_n$ be a tiling $cal(T)$ of the rectangle $[0, W] times [0, H]$, and let $U$ be the union of the top sides and of the bottom sides of its tiles.
+  The _network_ $frak(N)(cal(T))$ of the tiling has as its vertices the connected components of $U$, as its poles the top side $s$ and the bottom side $t$ of the main rectangle, and one edge for each tile, whose tail is the component that contains the top side of the tile and whose head is the component that contains its bottom side.
   The _height_ of a component is the common ordinate of its points, and the _resistance_ of a tile $T$ of width $w_T$ and height $h_T$ is $r_T := h_T slash w_T$.
 ] <def:tiling-network>
 
@@ -2491,11 +2539,11 @@ The same holds for the bottom side.
 The tiles of the tiling may have any shape.
 
 #proposition[
-  Let $tau$ be a tiling of $[0, W] times [0, H]$.
-  Then $frak(N)(tau)$ is a network.
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$.
+  Then $frak(N)(cal(T))$ is a network.
   With $phi(C)$ the height of the component $C$ and $i_T := w_T$ for every tile $T$, the pair $(phi, i)$ is a flow of value $W$ for the resistances $r_T$, with $phi(s) - phi(t) = H$.
-  Hence $H slash W$ is the impedance of $frak(N)(tau)$ for the resistances $r_T$.
-  Moreover $frak(N)(tau)$ has an embedding in the plane in which both poles lie on the outer face.
+  Hence $H slash W$ is the impedance of $frak(N)(cal(T))$ for the resistances $r_T$.
+  Moreover $frak(N)(cal(T))$ has an embedding in the plane in which both poles lie on the outer face.
 ] <prop:tiling-network>
 
 #proof[
@@ -2526,11 +2574,11 @@ Keeping the network and the orientations and letting $x$ vary gives a rational f
 ] <def:impedance>
 
 By @prop:multilinear the two determinants are then Laurent polynomials in $x$, and the denominator does not vanish at $x = 1$, by @prop:flow; so the definition makes sense, and by @prop:flow the value of $Z_(frak(N), epsilon)$ at any $x > 0$ is the impedance of the network for the resistances $x^(epsilon_e)$.
-By @prop:tiling-network, a similar tiling $tau$ of $[0, W] times [0, H]$ of proportion $x$, with an orientation vector $epsilon$, satisfies
-$ H / W = Z_(frak(N)(tau), epsilon) (x), $
+By @prop:tiling-network, a similar tiling $cal(T)$ of $[0, W] times [0, H]$ of proportion $x$, with an orientation vector $epsilon$, satisfies
+$ H / W = Z_(frak(N)(cal(T)), epsilon) (x), $
 since the resistance $h_T slash w_T$ of a tile is $x$ if the tile is tall and $1 slash x$ if it is wide.
 The impedance function thus gives the height of the main rectangle over its width.
-The aspect ratio $W slash H$ of @def:counts is the value at $x$ of the inverse $1 slash Z_(frak(N)(tau), epsilon)$, which is again an impedance function: by @prop:dual, which applies to the network of a tiling by @prop:nonseparable, it is that of the dual network with the orientations reversed.
+The aspect ratio $W slash H$ of @def:counts is the value at $x$ of the inverse $1 slash Z_(frak(N)(cal(T)), epsilon)$, which is again an impedance function: by @prop:dual, which applies to the network of a tiling by @prop:nonseparable, it is that of the dual network with the orientations reversed.
 The statements below are therefore made for impedance functions only.
 
 The next statement collects the properties of these functions.
@@ -2693,8 +2741,8 @@ These are the maps that Tutte counted (@sec:growth).
 The graph $G^+$ of the network of a tiling is a non-separable planar map; the upper bound on $a(n)$ uses the counterpart of this statement for the map of @def:tiling-map, which is part of @prop:tiling-map.
 
 #proposition[
-  Let $tau$ be a tiling of a rectangle with $n >= 1$ tiles.
-  Then the plane graph $G^+$ of the plane network $frak(N)(tau)$ is a non-separable planar map with $n + 1$ edges.
+  Let $cal(T)$ be a tiling of a rectangle with $n >= 1$ tiles.
+  Then the plane graph $G^+$ of the plane network $frak(N)(cal(T))$ is a non-separable planar map with $n + 1$ edges.
 ] <prop:nonseparable>
 
 #proof[
@@ -2801,7 +2849,7 @@ The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ til
 #proposition[
   Let $n >= 1$.
   + The set $cal(F)_n$ is finite and closed under $F |-> 1 slash F$, and $F != 1 slash F$ for every $F in cal(F)_n$. So $abs(cal(F)_n)$ is even, and we put $E(n) := abs(cal(F)_n) slash 2$.
-  + If $tau$ is a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $n$ tiles, and $epsilon$ is an orientation vector of $tau$, then $(frak(N)(tau), epsilon)$ is proper and $Z_(frak(N)(tau), epsilon) (x) = H slash W$.
+  + If $cal(T)$ is a similar tiling of $[0, W] times [0, H]$ of proportion $x$ with $n$ tiles, and $epsilon$ is an orientation vector of $cal(T)$, then $(frak(N)(cal(T)), epsilon)$ is proper and $Z_(frak(N)(cal(T)), epsilon) (x) = H slash W$.
   + If $(frak(N), epsilon)$ is proper, then for every $x > 0$ at which no current vanishes, in particular for all but finitely many $x > 0$, there is a tiling of the rectangle $[0, 1] times [0, Z_(frak(N), epsilon) (x)]$ with $n$ tiles in which the tile of the edge $e$ has height $x^(epsilon_e)$ times its width.
 ] <prop:functions>
 
@@ -2818,8 +2866,8 @@ The set $cal(F)_n$ consists of the impedance functions that tilings with $n$ til
 ]
 
 In the third statement, the tiling is similar of proportion $x$ if $x >= 1$.
-By the second and third statements, $cal(F)_n$ is also the set of functions $Z_(frak(N)(tau), epsilon)$ over all similar tilings $tau$ with $n$ tiles, of any proportion and of any main rectangle, and their orientation vectors $epsilon$.
-Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tiling $tau_x$ for all but finitely many $x >= 1$; the networks $frak(N)(tau_x)$, with their edges labelled by those of $frak(N)$, take finitely many values up to isomorphism, so one of them occurs for infinitely many $x$, and by the second statement its function agrees with $Z_(frak(N), epsilon)$ at these $x$, hence everywhere.
+By the second and third statements, $cal(F)_n$ is also the set of functions $Z_(frak(N)(cal(T)), epsilon)$ over all similar tilings $cal(T)$ with $n$ tiles, of any proportion and of any main rectangle, and their orientation vectors $epsilon$.
+Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tiling $cal(T)_x$ for all but finitely many $x >= 1$; the networks $frak(N)(cal(T)_x)$, with their edges labelled by those of $frak(N)$, take finitely many values up to isomorphism, so one of them occurs for infinitely many $x$, and by the second statement its function agrees with $Z_(frak(N), epsilon)$ at these $x$, hence everywhere.
 
 #example[
   The pairs with an identically vanishing current have to be left out.
@@ -2828,7 +2876,7 @@ Indeed, for a proper pair $(frak(N), epsilon)$, the third statement gives a tili
   This function does not belong to $cal(F)_5$.
   Since $cal(F)_5$ is closed under inversion, it suffices to consider $1 slash x$.
   The non-zero currents of a proper pair with five edges have no zero at $x >= 17$, by the fourth step of the proof of @prop:threshold below; if $1 slash x$ were the impedance function of a proper pair with five edges, the third statement of @prop:functions would therefore give a similar tiling of proportion $1009$ of the rectangle $[0, 1] times [0, 1 slash 1009]$ with five tiles, so that $1009 in P_5 (1009)$ by @prop:scaling, and the search finds that this is not so.
-  The exclusion therefore rests on a computation, and on Kirchhoff's formulas, which @prop:threshold assumes.
+  The exclusion therefore depends on a computation, and on Kirchhoff's formulas, which @prop:threshold assumes.
 ] <ex:improper>
 
 By the fifth statement of @prop:reactance, each $F in cal(F)_n$ tends to $infinity$ or to $0$ at infinity.
@@ -2865,8 +2913,8 @@ A function of the first kind takes each large value exactly once on $[1, infinit
   By @prop:scaling, $x_F (w) in P_n (w)$.
 
   _Fifth step._
-  Let $x in P_n (w)$, and let $tau$ be a similar tiling of $[0, w] times [0, 1]$ of proportion $x$ with $n$ tiles, with an orientation vector $epsilon$.
-  By the second and first statements of @prop:functions, $F := 1 slash Z_(frak(N)(tau), epsilon)$ belongs to $cal(F)_n$ and $F(x) = w$.
+  Let $x in P_n (w)$, and let $cal(T)$ be a similar tiling of $[0, w] times [0, 1]$ of proportion $x$ with $n$ tiles, with an orientation vector $epsilon$.
+  By the second and first statements of @prop:functions, $F := 1 slash Z_(frak(N)(cal(T)), epsilon)$ belongs to $cal(F)_n$ and $F(x) = w$.
   If $w$ exceeds every bound $beta_F$ of the first step, then $F in cal(F)_n^infinity$, and $x = x_F (w)$ by the second step.
 
   Let $W(n)$ be the largest of the finitely many bounds of the five steps.
@@ -2946,8 +2994,8 @@ The gap between the width proved sufficient, which is exponential in $n$, and th
 For the first part of @conj:threshold we have no argument: for small $w$ a function can have several solutions and the functions of the other kind contribute as well, and the trivial bound is $a_w (n) <= 2 n E(n)$.
 
 The column of functions in @tab:structure was computed with $w = 1009$, and confirmed with three larger values of $w$ for $n <= 9$ and one for $n = 10$.
-The largest of these, $w = 1000003$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$, so that for these $n$ the column is $E(n)$ by @prop:wide-full and @prop:threshold; for $9 <= n <= 11$ the widths used are below that threshold, and the identification of the column with $E(n)$ depends on the second part of @conj:threshold.
-For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $9865302$ for $n = 11$ is new and was computed once.
+The largest of these, $w = #num(1000003)$, exceeds $n (1 + 4^n slash 2)$ for $n <= 8$, so that for these $n$ the column is $E(n)$ by @prop:wide-full and @prop:threshold; for $9 <= n <= 11$ the widths used are below that threshold, and the identification of the column with $E(n)$ depends on the second part of @conj:threshold.
+For $n <= 10$ the column agrees with the counts of distinct functions reported by Einstein @einstein2023, obtained by enumerating networks; the value $#num(9865302)$ for $n = 11$ is new and was computed once.
 
 
 The number of functions at least triples with each tile.
@@ -3185,7 +3233,7 @@ These give $m - L = 8 slash 3$ and $7 slash 3$.
 ] <conj:exceptional>
 
 The conjecture holds for $10 <= n <= 13$; it was formulated from the cases $n = 10$ and $n = 11$ and then confirmed for $12$ and $13$.
-The last column of @tab:structure extends the eight known terms of A210517 @oeisA210517 by five; a sixth, $155656$ for $n = 14$, was also computed.
+The last column of @tab:structure extends the eight known terms of A210517 @oeisA210517 by five; a sixth, $#num(155656)$ for $n = 14$, was also computed.
 
 There are further exceptions for small $n$.
 For $6 <= n <= 9$, the rational proportions in $P_n (1)$ that are not achieved by $n$ tiles of a single orientation are, according to the search, $5 slash 3$ and $2$ for six tiles; $3 slash 2$ and $3$ for seven; $5 slash 3$, $5 slash 2$ and $4$ for eight; and $8 slash 3$, $16 slash 5$, $7 slash 2$ and $5$ for nine; the first three lists are those of @tab:rational.
@@ -3214,7 +3262,7 @@ For guillotine tilings the functions can be described directly, and are those of
 #definition(name: [guillotine tilings and their functions])[
   A tiling is _guillotine_ if it consists of a single tile, or of two guillotine tilings of the two rectangles into which a segment, parallel to a side and joining two opposite sides, divides its main rectangle.
   Let $cal(G)_1 := {x, 1 slash x}$, and for $n >= 2$ let $cal(G)_n$ be the set of rational functions $A + B$ and $(A^(-1) + B^(-1))^(-1)$ with $A in cal(G)_j$, $B in cal(G)_(n - j)$ and $1 <= j < n$.
-  Let $g(n)$ be the number of those $x in P_n (1)$ for which the unit square has a similar guillotine tiling of proportion $x$ with $n$ tiles.
+  Let $a^"g" (n)$ be the number of those $x in P_n (1)$ for which the unit square has a similar guillotine tiling of proportion $x$ with $n$ tiles.
   Let $sigma_n$ be the number of expressions that define the elements of $cal(G)_n$, considered up to the commutativity and the associativity of the two operations; these are the series–parallel networks with $n$ edges of two kinds.
 ] <def:guillotine>
 
@@ -3226,7 +3274,7 @@ The sequence A338781 of the OEIS @oeisA338781 is half the largest number of dist
 #proposition[
   Let $n >= 1$.
   + The set $cal(G)_n$ is closed under inversion, $F != 1 slash F$ for every $F in cal(G)_n$, and $abs(cal(G)_n) slash 2$ is the $n$-th term of A338781.
-  + $g(n) <= n abs(cal(G)_n) slash 2 <= n sigma_n slash 2$.
+  + $a^"g" (n) <= n abs(cal(G)_n) slash 2 <= n sigma_n slash 2$.
 ] <prop:guillotine>
 
 #proof[
@@ -3252,7 +3300,7 @@ $
   product_(j >= 1) (1 - z^j)^(-beta_j) = 1 + sum_(n >= 1) sigma_n z^n, quad beta_1 = 2, quad beta_j = sigma_j slash 2 quad "for" j >= 2.
 $
 The quotients $sigma_(n + 1) slash sigma_n$, corrected by the factor $(1 - 3 slash (2 n + 2))^(-1)$, are $6.15881$, $6.15887$ and $6.15889$ at $n = 100$, $200$ and $399$.
-So the growth constant of $g(n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
+So the growth constant of $a^"g" (n)$ is at most that of $sigma_n$, which is numerically $6.1589$.
 That $sigma_n$ grows as a constant times $gamma^n n^(-3 slash 2)$ for some $gamma$ is the usual behaviour of such equations, and is not proved here; the value of the constant is known only numerically.
 
 The number of proportions achievable by guillotine tilings is a decreasing share of the total in @tab:structure: $90$ per cent for six tiles, and $13.5$ per cent for twelve.
@@ -3313,16 +3361,16 @@ An isomorphism of plane networks therefore maps a flow to a flow, the function $
 ]
 
 #proposition[
-  + Let $frak(N)$ be a plane network with positive real resistances and a regular flow, and let $tau$ be the tiling of @prop:bsst. Then $e |-> rct(e)$ induces an isomorphism of plane networks from $frak(N)$ to $frak(N)(tau)$, under which the resistance of $e$ is that of the tile $rct(e)$.
-  + Let $tau$ be a tiling of a rectangle. For the plane network $frak(N)(tau)$, with the resistances and the flow of @prop:tiling-network, the rectangles of @prop:bsst are the tiles of $tau$, up to a translation, and the flow is regular.
+  + Let $frak(N)$ be a plane network with positive real resistances and a regular flow, and let $cal(T)$ be the tiling of @prop:bsst. Then $e |-> rct(e)$ induces an isomorphism of plane networks from $frak(N)$ to $frak(N)(cal(T))$, under which the resistance of $e$ is that of the tile $rct(e)$.
+  + Let $cal(T)$ be a tiling of a rectangle. For the plane network $frak(N)(cal(T))$, with the resistances and the flow of @prop:tiling-network, the rectangles of @prop:bsst are the tiles of $cal(T)$, up to a translation, and the flow is regular.
 ] <prop:reconstruction>
 
 #proof[
-  For the first statement, every top side and every bottom side of a tile lies in one of the sets $S_v$, which form a finite family of pairwise disjoint segments; so these sets are the connected components of the union of the top and bottom sides of the tiles, that is, the vertices of $frak(N)(tau)$.
+  For the first statement, every top side and every bottom side of a tile lies in one of the sets $S_v$, which form a finite family of pairwise disjoint segments; so these sets are the connected components of the union of the top and bottom sides of the tiles, that is, the vertices of $frak(N)(cal(T))$.
   The tile $rct(e)$ has its top side in $S_(e^-)$ and its bottom side in $S_(e^+)$, and $S_s$ and $S_t$ are the top and bottom sides of the main rectangle, by @prop:segments.
-  In the embedding of $frak(N)(tau)$ given in the proof of @prop:tiling-network, the edges around a component are, counter-clockwise, the tiles below it from left to right followed by the tiles above it from right to left; at each pole the edge added between the poles occupies the only gap, between the last and the first edge of the network. This is the order given by @prop:segments.
+  In the embedding of $frak(N)(cal(T))$ given in the proof of @prop:tiling-network, the edges around a component are, counter-clockwise, the tiles below it from left to right followed by the tiles above it from right to left; at each pole the edge added between the poles occupies the only gap, between the last and the first edge of the network. This is the order given by @prop:segments.
 
-  For the second, draw $frak(N)(tau)$ as in the proof of @prop:tiling-network, with each tile represented by the vertical segment through its centre and each component contracted to a point; contracting the components does not change the faces, so we describe them before the contraction.
+  For the second, draw $frak(N)(cal(T))$ as in the proof of @prop:tiling-network, with each tile represented by the vertical segment through its centre and each component contracted to a point; contracting the components does not change the faces, so we describe them before the contraction.
   The centre segment cuts the interior of a tile into a left and a right half.
   A point of the main rectangle that lies on no component and on no centre segment is in a half of a tile, or on a vertical side of a tile.
   The left halves of the tiles along the left side of the main rectangle lie in $f_L$ and the right halves of the tiles along its right side in $f_R$, and these two faces are distinct, since $e_0$ separates them.
@@ -3344,18 +3392,18 @@ By the third statement of @prop:segments, a flow is regular whenever no four til
 ] <prop:full-side>
 
 #proof[
-  For the first statement, a tiling $tau$ of proportion $x > 1$ has exactly one orientation vector $epsilon$, and $x$ is a regular point of $(frak(N)(tau), epsilon)$ at which the impedance function is $1$, by @prop:functions and the second statement of @prop:reconstruction, which also shows that $tau$ is determined by the pair and $x$.
-  Conversely, at a regular point $x > 1$ of a pair $(frak(N), epsilon)$ with value $1$, the tiling $tau$ of @prop:bsst for the flow of value $1$ is a similar tiling of the unit square of proportion $x$, with orientation vector $epsilon$, and the pair is isomorphic to $(frak(N)(tau), epsilon)$ by the first statement of @prop:reconstruction.
+  For the first statement, a tiling $cal(T)$ of proportion $x > 1$ has exactly one orientation vector $epsilon$, and $x$ is a regular point of $(frak(N)(cal(T)), epsilon)$ at which the impedance function is $1$, by @prop:functions and the second statement of @prop:reconstruction, which also shows that $cal(T)$ is determined by the pair and $x$.
+  Conversely, at a regular point $x > 1$ of a pair $(frak(N), epsilon)$ with value $1$, the tiling $cal(T)$ of @prop:bsst for the flow of value $1$ is a similar tiling of the unit square of proportion $x$, with orientation vector $epsilon$, and the pair is isomorphic to $(frak(N)(cal(T)), epsilon)$ by the first statement of @prop:reconstruction.
 
   For the second, $F(1)$ is a positive real number, by @prop:reactance.
   The function $1 - 1 slash x$ is $0$ at $1$ and tends to $1$ at infinity, so that $F(x) - 1 + 1 slash x$ is positive at $1$ and negative for large $x$ if $F$ tends to $0$; the function $x slash (x - 1)$ tends to $infinity$ at $1$ from the right and to $1$ at infinity, so that $F(x) - x slash (x - 1)$ is negative near $1$ and positive for large $x$ if $F$ tends to $infinity$.
   By the fifth statement of @prop:reactance one of the two cases holds, and the intermediate value theorem gives the root.
 
-  For the third, let $x > 1$ be a regular full-side root of a pair $(frak(N), epsilon)$, and let $tau$ be the tiling of @prop:bsst for the flow of value $1$; it is a similar tiling of proportion $x$ of a rectangle of width $1$ and height $F(x)$.
-  If $F(x) = 1 - 1 slash x$, adding a tile of width $1$ and height $1 slash x$ above $tau$ gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the top side.
-  If $F(x) = x slash (x - 1)$, the tiling $tau$ scaled by $(x - 1) slash x$ has width $(x - 1) slash x$ and height $1$, and adding a tile of width $1 slash x$ and height $1$ to its left gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the left side.
+  For the third, let $x > 1$ be a regular full-side root of a pair $(frak(N), epsilon)$, and let $cal(T)$ be the tiling of @prop:bsst for the flow of value $1$; it is a similar tiling of proportion $x$ of a rectangle of width $1$ and height $F(x)$.
+  If $F(x) = 1 - 1 slash x$, adding a tile of width $1$ and height $1 slash x$ above $cal(T)$ gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the top side.
+  If $F(x) = x slash (x - 1)$, the tiling $cal(T)$ scaled by $(x - 1) slash x$ has width $(x - 1) slash x$ and height $1$, and adding a tile of width $1 slash x$ and height $1$ to its left gives a similar tiling of the unit square with $n + 1$ tiles, with a tile along the left side.
   A tiling of the unit square with at least two tiles does not have both a tile along the top side and a tile along the left side, since their interiors would meet.
-  So the tiling obtained determines which case holds; it determines $x$, which is its proportion, and $tau$, by removing the tile along the side; and $tau$ determines the pair up to isomorphism, as in the first statement.
+  So the tiling obtained determines which case holds; it determines $x$, which is its proportion, and $cal(T)$, by removing the tile along the side; and $cal(T)$ determines the pair up to isomorphism, as in the first statement.
   Choosing one regular full-side root for each class thus gives $g(n)$ distinct tilings.
 ]
 
@@ -3369,9 +3417,9 @@ The same computation gives $g(n)$.
 ] <conj:full-side>
 
 By the third statement of @prop:full-side, @conj:full-side implies that $t(n + 1) >= t(n)$ for every $n$.
-It holds for $n <= 10$. For $n <= 9$, according to this computation in floating-point arithmetic, $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $2852$, $25380$, $240608$, $2382684$ and $24415502$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
+It holds for $n <= 10$. For $n <= 9$, according to this computation in floating-point arithmetic, $g(1) = 2$, $g(2) = 8$ and $g(3) = 48$, and $g(n)$ is $346$, $#num(2852)$, $#num(25380)$, $#num(240608)$, $#num(2382684)$ and $#num(24415502)$ for $n = 4, dots, 9$, between $3.35$ and $3.89$ times $t(n)$.
 The quotient $t(n) slash g(n)$ is $0.257$, $0.291$, $0.287$, $0.293$, $0.295$ and $0.298$ for $n = 4, dots, 9$; it increases slowly from six tiles onwards, and the values do not show whether it remains below $1$.
-A second computation, in integer arithmetic, certifies regular full-side roots by an exact change of sign on a small interval on which the potentials of the vertices are shown to be pairwise distinct; it certifies $24202856$ pairs for nine tiles, and for ten tiles $77189138$ pairs among the first $80445440$ examined, which exceeds $t(10) = 77188146$.
+A second computation, in integer arithmetic, certifies regular full-side roots by an exact change of sign on a small interval on which the potentials of the vertices are shown to be pairwise distinct; it certifies $#num(24202856)$ pairs for nine tiles, and for ten tiles $#num(77189138)$ pairs among the first $#num(80445440)$ examined, which exceeds $t(10) = 77188146$.
 
 The inequality does not hold for each network separately.
 Let $frak(N)$ be ten blocks in series, each of nine edges in parallel, with $90$ edges in all.
@@ -3457,16 +3505,12 @@ In a tiling, two tiles of the same orientation stacked between the same two segm
 ]
 
 The constant $C$ is numerically $0.25$.
-The bound gives nothing for the values of $n$ computed: the factor $(1 + (2 slash 27)^5)^(-n)$ is $0.99997$ for $n = 13$, and $C (n + 1) lambda^n$ falls below the bound of @prop:upper only for $n$ of the order of $10^7$.
-Its interest is that the rate $27 slash 2$ of the planar maps is not that of the tilings.
+The bound does not improve on @prop:upper for the values of $n$ computed: the factor $(1 + (2 slash 27)^5)^(-n)$ is $0.99997$ for $n = 13$, and $C (n + 1) lambda^n$ falls below the bound of @prop:upper only for $n$ of the order of $10^7$.
+It shows that the rate $27 slash 2$ of the planar maps is not that of the tilings.
 The pattern can be widened, to four edges with $epsilon_a + epsilon_d = epsilon_b + epsilon_c$, which lowers the bound slightly; and other patterns have the same effect.
 For nine tiles $0.6$ per cent of the pairs have a square block, while $3.3$ per cent have no regular full-side root.
 
-Whether the sequences have a rate of growth at all is not known.
-
-#conjecture[
-  The sequence $t(n)^(1 slash n)$ converges.
-] <conj:rate-tilings>
+Whether the sequences have a rate of growth at all is not known; for the tilings this is @conj:growth-rate, and for the proportions it is the following.
 
 #conjecture[
   The sequence $a(n)^(1 slash n)$ converges.
@@ -3497,7 +3541,7 @@ This section records that point of view, which motivates the placement rules; no
 ) <fig:mosaic>
 
 Mosaic classes of tilings in which no four tiles meet at a point are the mosaic floorplans of the literature on rectangulations, which are counted by the Baxter numbers $B(n)$ @yao2003 @ackerman2006 @chung1978; the finer classification that also records the alternation of corners along segments gives the generic rectangulations @reading2012.
-The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started floors fixes it along horizontal ones.
+The staircase construction never distinguishes the order of corners along a vertical segment, and the rule on started tiers fixes it along horizontal ones.
 For every $n <= 13$ the number of complete admissible records for $n$ tiles, disregarding orientations, is $B(n)$ @oeisA001181.
 This agreement is an observation, made by computation.
 That a tiling without a point where four tiles meet arises from only one record, for given orientations, is proved in @prop:representative; the correctness of the search does not depend on it.
@@ -3508,20 +3552,20 @@ The equations of a record express Kirchhoff's laws for this network, which is de
 One therefore expects the equations of every record to have exactly one solution for each $x > 0$, up to scale.
 We have not proved this expectation, and the search does not rely on it: it counts the records for which it fails, in the form made precise in @def:regular, and its results are certified only if there are none.
 
-The same bound for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
+The bound $n 2^(n - 1) M(n)$ of @prop:upper, for the number of realisations of @tab:counts, that is, of the pairs of a record in which the first tile is wide and a proportion that it realises, is proved only conditionally.
 The proof of @prop:upper bounds the number of triples of a rooted map, an orientation vector and a proportion.
 The network of the tiling cannot be used here, since by @prop:multiplicity a tiling with crossings has several records and one network.
 Associate instead with a record the network whose vertices are the horizontal segments created by its placements, where two segments of equal height that meet at a crossing are kept distinct and joined in the order given by the record; the tiling still gives a flow on it, in which no current vanishes.
 The map that sends a record with orientations and a proportion to the triple of this network with the edge joining its poles, the orientations and the proportion is injective provided that, first, different records, disregarding orientations, belong to different mosaic classes, secondly, a mosaic class is determined by its plane network together with the directions of its edges, and, thirdly, the network of a record with the added edge is a non-separable planar map.
 Given the second condition, the class is recovered from the map, the orientations and the proportion, because the directions are those of the currents, which are determined by @prop:flow.
-The first condition is the agreement with the Baxter numbers observed above, which we have not proved, and the third would follow from it if every sequence were that of a tiling by rectangles without crossings.
+The first condition is the agreement with the Baxter numbers observed above, which we have not proved, and the third would follow from it if every complete admissible record, disregarding orientations, were that of a tiling by rectangles without crossings.
 The second is the correspondence between mosaic classes and plane bipolar orientations, both of which are counted by the Baxter numbers @bonichon2010 @felsner2011; it is not proved here, and we have not verified that these references give it in the form needed.
 So the number of realisations with $n$ tiles is at most $n 2^(n - 1) M(n)$ if the three conditions hold, and we do not claim the bound otherwise.
 The correspondence would also explain why $M(5) = 91$ is smaller than the number $92$ of mosaic classes with five tiles: the two pinwheels of five tiles have the same network and differ in the direction of the central edge.
 
 = Networks and maps <app:maps>
 
-This appendix contains the definitions and the statements on which @prop:upper and @prop:tilings-finite rest.
+This appendix contains the definitions and the statements on which the proofs of @prop:upper and @prop:tilings-finite depend.
 All of them are statements of the formal development (@app:formal).
 
 == Networks and their polynomials <sec:maps-networks>
@@ -3575,7 +3619,7 @@ A connected graph embedded in the sphere gives a map: the darts are the two halv
 #definition(name: [network of a rooted map])[
   Let $cal(M)$ be a rooted map with root $r$.
   A _network of_ $cal(M)$ is a network whose vertices are the vertices of $cal(M)$, whose edges are the edges of $cal(M)$ other than that of $r$, in which the tail and the head of each edge are the vertices of its two darts, in either order, and whose poles are $s$, the vertex of $alpha(r)$, and $t$, the vertex of $r$.
-  If $cal(M)$ has a network $frak(N)$, then $P_(cal(M), epsilon) := P_(frak(N), epsilon)$ for every orientation vector $epsilon$ for the edges of $frak(N)$, which does not depend on $frak(N)$ by the fourth statement of @obs:network, and $X(cal(M))$ is the set of the real roots of the polynomials $P_(cal(M), epsilon)$, over the orientation vectors $epsilon$ that are $-1$ at the edge before the root, when this is not the edge of $r$.
+  If $cal(M)$ has a network $frak(N)$, then $P_(cal(M), epsilon) := P_(frak(N), epsilon)$ for every orientation vector $epsilon$ for the edges of $frak(N)$, which does not depend on $frak(N)$ by the fourth statement of @obs:network, and $X(cal(M))$ is the set of the real roots of the polynomials $P_(cal(M), epsilon)$, over the orientation vectors $epsilon$ that are $-1$ at the edge before the root if that edge is not the edge of $r$, and over all orientation vectors otherwise.
 ] <def:map-network>
 
 #observation[
@@ -3587,7 +3631,7 @@ The map of a tiling has two darts for each tile, at its top side and at its bott
 Around each maximal segment of the union of the top sides and of the bottom sides of the tiles, its permutation $sigma$ lists the tiles below the segment from left to right and then the tiles above it from right to left (@fig:network); this description is not used below.
 
 #definition(name: [map of a tiling])[
-  Let $tau$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
   Its _darts_ are an _upper dart_ $overline(T)$ and a _lower dart_ $underline(T)$ for each tile $T$, and two further darts $overline(e)_0$ and $underline(e)_0$.
   The _level_ of $overline(T)$ is the ordinate of the top side of $T$, that of $underline(T)$ is the ordinate of its bottom side, and those of $overline(e)_0$ and $underline(e)_0$ are $H$ and $0$.
   The dart $overline(T)$ _runs_ from the abscissa of the left side of $T$ to that of its right side, $underline(T)$ from the abscissa of the right side of $T$ to that of its left side, $overline(e)_0$ from $W$ to $0$, and $underline(e)_0$ from $0$ to $W$.
@@ -3595,24 +3639,24 @@ Around each maximal segment of the union of the top sides and of the bottom side
   + $sigma(overline(T))$ is $overline(T')$ if a tile $T'$ has its top-left corner at the top-right corner of $T$; otherwise, it is $underline(T')$ if a tile $T'$ has its bottom-right corner at the top-right corner of $T$; otherwise, it is $overline(e)_0$.
   + $sigma(underline(T))$ is $underline(T')$ if a tile $T'$ has its bottom-right corner at the corner of $T$; otherwise, it is $overline(T')$ if a tile $T'$ has its top-left corner at the corner of $T$; otherwise, it is $underline(e)_0$.
   + $sigma(overline(e)_0)$ is $overline(T')$ for the tile $T'$ whose top-left corner is $(0, H)$, and $sigma(underline(e)_0)$ is $underline(T')$ for the tile $T'$ whose bottom-right corner is $(W, 0)$.
-  The _map_ $cal(M)(tau)$ of the tiling consists of these darts with $sigma$ and $alpha$, and its root is $underline(e)_0$.
+  The _map_ $cal(M)(cal(T))$ of the tiling consists of these darts with $sigma$ and $alpha$, and its root is $underline(e)_0$.
 ] <def:tiling-map>
 
 Two tiles with the same top-left corner, or with the same bottom-right corner, have interiors that meet, so the tile $T'$ is unique in each case.
 
 #observation[
-  Let $tau$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
-  + The two tiles of the third clause of @def:tiling-map exist, and $sigma$ is a permutation of the darts, so that $cal(M)(tau)$ is a rooted map.
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$, where $W, H > 0$.
+  + The two tiles of the third clause of @def:tiling-map exist, and $sigma$ is a permutation of the darts, so that $cal(M)(cal(T))$ is a rooted map.
   + For every dart $d$, the dart $sigma(d)$ has the level of $d$, and it runs from the abscissa to which $d$ runs.
-    Consequently the darts at a vertex of $cal(M)(tau)$ have the same level, the _level_ of the vertex.
+    Consequently the darts at a vertex of $cal(M)(cal(T))$ have the same level, the _level_ of the vertex.
 ] <obs:tiling-map>
 
 #proposition[
-  Let $tau$ be a tiling of $[0, W] times [0, H]$ with $n$ tiles, where $W, H > 0$.
-  + The vertices of $cal(M)(tau)$, with one edge for each tile $T$, whose tail is the vertex of $overline(T)$ and whose head is the vertex of $underline(T)$, and with the poles $s$, the vertex of $overline(e)_0$, and $t$, the vertex of $underline(e)_0$, form a network of $cal(M)(tau)$.
+  Let $cal(T)$ be a tiling of $[0, W] times [0, H]$ with $n$ tiles, where $W, H > 0$.
+  + The vertices of $cal(M)(cal(T))$, with one edge for each tile $T$, whose tail is the vertex of $overline(T)$ and whose head is the vertex of $underline(T)$, and with the poles $s$, the vertex of $overline(e)_0$, and $t$, the vertex of $underline(e)_0$, form a network of $cal(M)(cal(T))$.
     With $phi(v)$ the level of the vertex $v$, and with $i_T := w_T$ and $r_T := h_T slash w_T$ for a tile $T$ of width $w_T$ and height $h_T$, the pair $(phi, i)$ is a flow of value $W$ of this network for the resistances $r$, and $phi(s) - phi(t) = H$.
-  + The map $cal(M)(tau)$ is connected and non-separable, it has $n + 1$ edges, and its edge before the root is the edge of the tile with corner $(0, 0)$.
-  + The map $cal(M)(tau)$ is planar.
+  + The map $cal(M)(cal(T))$ is connected and non-separable, it has $n + 1$ edges, and its edge before the root is the edge of the tile with corner $(0, 0)$.
+  + The map $cal(M)(cal(T))$ is planar.
 ] <prop:tiling-map>
 
 #proof[

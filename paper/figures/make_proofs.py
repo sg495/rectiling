@@ -13,7 +13,7 @@ from matplotlib.patches import FancyArrowPatch, Polygon, Rectangle
 from matplotlib.path import Path as MplPath
 
 from make_diagrams import CODES, DATA, EPS, FIT_NAMES, OUT, base_tiling, classes, construction_choice, extends, listing, mark_anchors, moves_of, outline_rest, stages
-from make_figures import COLOURS, Tier, draw, witness_tiles
+from make_figures import COLOURS, Tier, draw, truncated, witness_tiles
 
 LETTERS = {v: k for k, v in CODES.items()}
 
@@ -176,13 +176,13 @@ def region_figure(path, value, wit):
         for u in sts[k + 1]:
             ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.35", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), 1 - t.ax, t.wall, fc="none", ec="k", lw=1.2, zorder=4))
-        ax.text(x + w / 2, y + h / 2, "$T$", fontsize=7, ha="center", va="center", zorder=6)
+        ax.text(x + w / 2, y + h / 2, "$Q$", fontsize=7, ha="center", va="center", zorder=6)
         if t.wall - h > 0.05:
             ax.text((x + 1) / 2, y + h + (t.wall - h) / 2, "$A$", fontsize=7, ha="center", va="center", zorder=6, bbox=dict(fc="w", ec="none", pad=1))
         if 1 - x - w > 0.05:
             ax.text((x + w + 1) / 2, y + h / 2, "$B$", fontsize=7, ha="center", va="center", zorder=6, bbox=dict(fc="w", ec="none", pad=1))
         merged = fit in ("full-width", "full") and i + 1 < len(sts[k])
-        mark_anchors(ax, [Tier(u.ax, u.ay, u.floor, u.wall) for u in sts[k + 1]], size=3.6)
+        mark_anchors(ax, sts[k + 1], size=3.6, hide_stale=True)
         frame(ax)
         ax.set_title(f"placement {k + 1}: {FIT_NAMES[fit]}", fontsize=7, pad=3)
         notes.append((k + 1, fit, i, merged))
@@ -193,7 +193,7 @@ def region_figure(path, value, wit):
 
 
 def misfit_figure(path, value, wit, k, i):
-    """Draws, on a staircase of a listed tiling, a tile of full height that is wider than its floor and a tile of full width that is higher than its wall."""
+    """Draws, on a staircase of a listed tiling, a tile placed inside that is wider than its floor and a tile of full width that is higher than its wall, with the negative floor and wall in red."""
     tiles, sts = stages(value, wit)
     tiers = sts[k]
     x = float(value)
@@ -213,6 +213,11 @@ def misfit_figure(path, value, wit, k, i):
             ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             ax.plot([u.ax, u.ax], [u.ay, u.ay + u.wall], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
         mark_anchors(ax, after, size=4.2, flags=True)
+        for u in after:
+            if u.floor < 0:
+                ax.plot([u.ax, u.ax + u.floor], [u.ay, u.ay], color="red", lw=2.2, solid_capstyle="butt", zorder=5)
+            if u.wall < 0:
+                ax.plot([u.ax, u.ax], [u.ay, u.ay + u.wall], color="red", lw=2.2, solid_capstyle="butt", zorder=5)
         for j, u in enumerate(after):
             ax.text(u.ax + 0.02, u.ay - 0.02, f"$T_{j}$", fontsize=6.5, ha="left", va="top", zorder=7)
         frame(ax)
@@ -546,7 +551,7 @@ def isomorphic_figure(path, choice):
         draw(ax, tiles)
         for x, y, w, h in tiles:
             ax.text(x + w / 2, y + h / 2, "$x$" if h > w else "$1/x$", fontsize=6.5, ha="center", va="center")
-        ax.set_title(f"$x = {float(value):.4f}$", fontsize=7, pad=3)
+        ax.set_title(f"$x = {truncated(value)}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
@@ -631,21 +636,74 @@ def crossing_figure(path, value, wit):
         order, moves, sts = build(base, chosen)
         drawn = witness_tiles(value, witness(moves))
         assert all(same(t, g) for t, g in zip(drawn, order))
-        rows.append((drawn, [next(j for j, g in enumerate(base) if same(t, g)) for t in drawn], sts, moves))
+        rows.append((drawn, [next(j for j, g in enumerate(base) if same(t, g)) for t in drawn], sts, moves, chosen))
     n = len(base)
     fig, axes = plt.subplots(2, n, figsize=(6.2, 2.75))
-    for row, (drawn, ids, sts, moves), label in zip(axes, rows, ("$X = \\emptyset$", "$X = \\{q\\}$")):
+    for row, (drawn, ids, sts, moves, chosen), label in zip(axes, rows, ("$X = \\emptyset$", "$X = \\{q\\}$")):
         for k, ax in enumerate(row):
             numbered(ax, drawn, ids, k + 1, n)
             mark_anchors(ax, sts[k + 1], size=3.4, flags=True)
-            ax.plot([q[0]], [q[1]], marker="D", mfc="w", mec="k", ms=3.4, zorder=8)
+            ax.plot([q[0]], [q[1]], marker="D", mfc="k" if q in chosen else "w", mec="k", ms=3.4, zorder=8)
         row[0].text(-0.12, 0.5, label, fontsize=7, rotation=90, ha="right", va="center")
     fig.tight_layout(pad=0.2, w_pad=0.3, h_pad=0.6)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     lower = next(j for j, t in enumerate(base) if abs(t[0] - q[0]) < EPS and abs(t[1] + t[3] - q[1]) < EPS)
     upper = next(j for j, t in enumerate(base) if abs(t[0] + t[2] - q[0]) < EPS and abs(t[1] - q[1]) < EPS)
-    return q, [witness(m) for _, _, _, m in rows], [(ids.index(upper) + 1, ids.index(lower) + 1) for _, ids, _, _ in rows]
+    return q, [witness(m) for _, _, _, m, _ in rows], [(ids.index(upper) + 1, ids.index(lower) + 1) for _, ids, _, _, _ in rows]
+
+
+def first_fit(tiles):
+    """Places the tiles of a tiling of the unit square, at each stage at the anchor of the first tier in which the tile there fits, until a placement breaks a rule; returns the tiles placed, the staircases and the index of the tier of each placement."""
+    tiers = [Tier(0.0, 0.0, 1.0, 1.0)]
+    left, order, sts, at = list(tiles), [], [tiers], []
+    while tiers:
+        for i, t in enumerate(tiers):
+            q = next((r for r in left if abs(r[0] - t.ax) < EPS and abs(r[1] - t.ay) < EPS), None)
+            if q is not None and q[2] <= t.floor + EPS and q[3] <= t.wall + EPS:
+                break
+        w, h = q[2], q[3]
+        narrow, low = w < t.floor - EPS, h < t.wall - EPS
+        fit = "inside" if narrow and low else "full-height" if narrow else "full-width" if low else "full"
+        order.append(q)
+        at.append(i)
+        if t.stale or (not low and i > 0 and tiers[i - 1].started):
+            return order, sts, at
+        tiers = fplace_tile(tiers, i, fit, w, h)
+        left.remove(q)
+        sts.append(tiers)
+    return order, sts, at
+
+
+def first_fit_figure(path):
+    """Draws the listed tiling with fewest tiles in which placing each tile at the first tier where it fits breaks the second rule, up to the placement that breaks it."""
+    for n in range(3, 8):
+        for value, wit in listing(n):
+            tiles = witness_tiles(value, wit)
+            order, sts, at = first_fit(tiles)
+            if len(order) > len(sts) - 1 and not sts[-1][at[-1]].stale:
+                break
+        else:
+            continue
+        break
+    k = len(order) - 1
+    i = at[-1]
+    assert i > 0 and sts[k][i - 1].started
+    ids = [next(j for j, g in enumerate(tiles) if same(t, g)) for t in order]
+    fig, axes = plt.subplots(1, k + 1, figsize=(1.6 * (k + 1), 1.85))
+    for j, ax in enumerate(axes):
+        numbered(ax, order, ids, j + 1, len(tiles))
+        if j < k:
+            mark_anchors(ax, sts[j + 1], size=3.4, flags=True)
+        else:
+            mark_anchors(ax, sts[k], size=3.4, flags=True)
+            x, y, w, h = order[k]
+            ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="k", lw=1.0, ls=(0, (3, 1.5)), zorder=6))
+        ax.set_title(f"placement {j + 1}" + (": not allowed" if j == k else ""), fontsize=6.5, pad=3)
+    fig.tight_layout(pad=0.2, w_pad=0.5)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
+    plt.close(fig)
+    return value, wit, [(a, round(t[2], 3), round(t[3], 3)) for a, t in zip(at, order)]
 
 
 def grid_tiling(columns, rows):
@@ -742,6 +800,7 @@ def main():
     value, wit, k = base_tiling()
     print("region:", region_figure(OUT / "region.svg", value, wit))
     print("misfit:", misfit_figure(OUT / "misfit.svg", value, wit, 3, 1))
+    print("first fit:", first_fit_figure(OUT / "first-fit.svg"))
     for note in defect_figure(OUT / "defect.svg"):
         print("defect:", note)
     print("unfit:", unfit_figure(OUT / "unfit.svg"))

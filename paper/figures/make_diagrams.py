@@ -16,7 +16,7 @@ from matplotlib.patches import FancyArrowPatch, Rectangle
 from matplotlib.path import Path as MplPath
 from matplotlib.transforms import offset_copy
 
-from make_figures import COLOURS, Tier, X, draw, place, replay, witness_tiles
+from make_figures import COLOURS, Tier, X, draw, place, replay, truncated, witness_tiles
 
 OUT = Path(__file__).parent
 DATA = OUT.parent / "data"
@@ -67,10 +67,10 @@ def continue_floor(ax, x, y, width=1.1):
         ax.plot([x], [y], marker="s", ms=width, mfc="k", mec="k", mew=0, transform=shift, zorder=4, clip_on=False)
 
 
-def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False, open_floors=True):
+def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False, open_floors=True, hide_stale=False):
     """Marks the anchors of a staircase, in black for a chosen one; with flags, the floors are drawn thick, the anchor of a stale tier is not marked and, unless disabled, the floor of a tier that is neither started nor last is continued by two dots."""
     for j, t in enumerate(tiers):
-        if not (flags and t.stale):
+        if not ((flags or hide_stale) and t.stale):
             ax.plot([t.ax], [t.ay], marker="o", mfc="k" if t is chosen else "w", mec="k", ms=size, zorder=6)
         if flags:
             ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
@@ -158,7 +158,7 @@ def fits_figure(path, value, witness):
         ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="k", lw=0.6, zorder=5))
         ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
         ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
-        mark_anchors(ax, [Tier(u.ax, u.ay, u.floor, u.wall) for u in sts[k + 1]], size=3.6)
+        mark_anchors(ax, sts[k + 1], size=3.6, hide_stale=True)
         ax.set_title(f"placement {k + 1}: {FIT_NAMES[fit]}", fontsize=7, pad=3)
         chosen.append((fit, k + 1, i, len(sts[k]), len(sts[k + 1])))
     fig.tight_layout(pad=0.2, w_pad=0.5)
@@ -248,7 +248,7 @@ def construction_figure(path, value, witness):
             ext = extends(tiles, t.ax + t.floor, t.ay)
             ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
             if ext:
-                continue_floor(ax, t.ax + t.floor, t.ay)
+                ax.annotate("", xy=(t.ax + t.floor + 0.11, t.ay), xytext=(t.ax + t.floor, t.ay), arrowprops=dict(arrowstyle="-|>", color="k", lw=0.9, mutation_scale=5, shrinkA=0, shrinkB=0), zorder=4)
             if not ext and first is None:
                 first = j
         assert first == moves[k][0], (k, first, moves[k])
@@ -371,7 +371,7 @@ def classes_figure(path, n, columns, size):
         tiles = witness_tiles(value, witness)
         assert abs(sum(w * h for _, _, w, h in tiles) - 1) < 1e-9
         draw(ax, tiles)
-        ax.set_title(f"{float(value):.4f} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
+        ax.set_title(f"{truncated(value)} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
         total += count
     fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
@@ -460,7 +460,7 @@ def mosaic_figure(path, choice):
     fig, axes = plt.subplots(1, len(choice), figsize=(1.75 * len(choice), 1.95))
     for ax, (order, (value, witness)) in zip(axes, choice):
         draw(ax, witness_tiles(value, witness))
-        ax.set_title(f"$x = {float(value):.4f}$", fontsize=7, pad=3)
+        ax.set_title(f"$x = {truncated(value)}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
@@ -569,6 +569,9 @@ def main():
     """Generates all diagrams and prints the facts on which their captions rely."""
     value, witness, k = base_tiling()
     print("base tiling:", value, witness, "staircase after", k, "placements")
+    _, sts = stages(value, witness)
+    k = next(j for j, st in enumerate(sts) if len(st) == 3 and not any(t.stale for t in st))
+    print("staircase after", k, "placements")
     staircase_figure(OUT / "staircase.svg", value, witness, k)
     print("fits:", fits_figure(OUT / "fits.svg", value, witness))
     for note in rules_figure(OUT / "rules.svg", value, witness):

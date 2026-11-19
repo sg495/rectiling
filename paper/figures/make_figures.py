@@ -148,6 +148,11 @@ def tilings(n):
     return found
 
 
+def truncated(value):
+    """Writes a positive number with four decimals, truncated."""
+    return f"{int(float(value) * 10**4 + 1e-6) / 10**4:.4f}"
+
+
 def draw(ax, tiles, width=1.0, height=1.0, outline=True):
     """Draws outlined tiles in the colours of the palette of Okabe and Ito, in placement order."""
     for k, (x, y, w, h) in enumerate(tiles):
@@ -207,7 +212,7 @@ def catalogue(n, columns, path, size, labels=True):
     for ax, (value, _, _, _, witness) in zip(axes.flat, rows):
         draw(ax, witness_tiles(value, witness))
         if labels:
-            ax.set_title(f"{float(value):.4f}", fontsize=5.5, pad=1.5)
+            ax.set_title(truncated(value), fontsize=5.5, pad=1.5)
     fig.tight_layout(pad=0.15, h_pad=0.25, w_pad=0.1)
     fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
@@ -256,9 +261,9 @@ def main():
     three = tilings(3)
     four = tilings(4)
     assert len(distinct(three)) == 3 and len(distinct(four)) == 11
-    grid([t for _, t, _ in three], 7, OUT / "three-tiles.svg", [f"{v:.4f}" for v, _, _ in three])
+    grid([t for _, t, _ in three], 7, OUT / "three-tiles.svg", [truncated(v) for v, _, _ in three])
     picks = distinct(four)
-    grid([t for _, t, _ in picks], 6, OUT / "four-tiles.svg", [f"{v:.4f}" for v, _, _ in picks])
+    grid([t for _, t, _ in picks], 6, OUT / "four-tiles.svg", [truncated(v) for v, _, _ in picks])
     cubic = [(v, t, m) for v, t, m in four if abs(v - 1.5436890127) < 1e-6]
     grid([t for _, t, _ in cubic], len(cubic), OUT / "shared-cubic.svg")
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
