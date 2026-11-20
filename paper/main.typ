@@ -841,7 +841,7 @@ The third is the number of distinct polynomials with a root in $[1, infinity)$ t
 
 The values for $n <= 7$ agree with those of Henderson and Gerbet, the value for $n = 8$ agrees with Henderson's, and the values for $n = 9$ and $n = 10$ agree with those reported by Einstein.
 The values for $n = 11$, $12$ and $13$ are new.
-Those for $n = 11$ and $n = 12$ were each computed twice, once passing degenerate tiles to the direct method and once with the certificate of @def:check, with identical results; the value for $n = 13$ was computed once and took three hours.
+Those for $n = 11$ and $n = 12$ were each computed twice, once passing degenerate tiles to the direct method and once with the certificate of @def:check, with identical results; the value for $n = 13$ was computed twice with the certificate, before and after a reduction of the memory used by the search, with identical results, and each computation took between three and three and a half hours.
 
 The search was checked in several further ways.
 For $n <= 9$ the incremental search and the direct search agree on every proportion and on the number of records realising it.
