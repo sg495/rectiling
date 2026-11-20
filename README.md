@@ -47,7 +47,7 @@ For the tilings themselves it finds 1, 2, 14, 89, 830, 7278, 70410, … tilings 
 - `tests/` — integration tests, exercising the crate through its public interface.
 - `benches/` — timings of the search, run with `cargo bench`.
 - `tools/` — an independent reference program in Python that counts tilings by exact coordinates, for cross-checks, and programs that count rooted non-separable planar maps.
-- `paper/` — a paper on the method and the results, in Typst, with the programs that draw its figures.
+- `paper/` — a paper on the method and the results, in Typst, with the programs that draw its figures; the compiled paper is [paper/rectiling.pdf](paper/rectiling.pdf).
 - `knowledge/` — curated notes on the problem, the theory, the algorithms used, the results and their analysis.
 - `lean/` — a Lean 4 development proving that both search methods are sound and complete, that proportions persist when tiles are added, and the other propositions of the main body of the paper; see [lean/README.md](lean/README.md).
 
