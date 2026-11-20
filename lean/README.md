@@ -2,6 +2,7 @@
 
 A Lean 4 development, on top of Mathlib, proving that the staircase enumeration of `rectiling` is sound and complete for tilings of a rectangle by similar rectangles, that the reference ("exact") method reports exactly the proportions of such tilings, and that the default ("fast") method does too, given specifications of the arithmetic primitives of each.
 It also proves the persistence of proportions: a proportion that serves for n ≥ 2 tiles in a square serves for n + k tiles, for every k ≥ 3.
+Finally it proves the statements on the records of a tiling, the finiteness of the numbers of tilings, classes, bags and proportions, and the bound a(n) ≤ n·2^(n−1)·M(n) with its consequence on the rate of growth, the last two with the enumeration of Tutte as an explicit hypothesis (`TutteEnumeration`).
 
 ## Building
 
@@ -13,11 +14,11 @@ lake build
 ```
 
 The build prints the axioms of each main theorem (module `Rectiling.Audit`); all of them depend on `propext`, `Classical.choice` and `Quot.sound` only.
-The development contains no `sorry`, no `admit` and no `axiom`.
+The development contains no `sorry`, no `admit` and no `axiom`; the enumeration of Tutte enters only as a hypothesis of the theorems that use it.
 
 ## Modules
 
-The modules fall into five groups.
+The modules fall into six groups.
 
 Geometry:
 
