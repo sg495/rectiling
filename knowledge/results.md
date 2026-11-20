@@ -22,7 +22,7 @@ Every run reported no singular system, no case with aspect ratio independent of 
 | 13 | 250056983 | new                                                |
 
 The values for n = 11, 12 and 13 come from this computation alone and have not been confirmed by a second method.
-The values for n = 11 and n = 12 were each obtained twice, before and after a substantial reworking of the search, with identical counts of tilings and identical degree distributions; the value for n = 13 was computed once.
+The values for n = 11 and n = 12 were each obtained twice, before and after a substantial reworking of the search, with identical counts of tilings and identical degree distributions; the value for n = 13 was also obtained twice, before the tables were made more compact and with version 1.0.0, with identical counts of cases, tilings and polynomials and identical degree distributions.
 
 ### Work performed
 
@@ -59,8 +59,9 @@ The values, the degree distributions and the counters are unchanged; the figures
 | 11 | 8 bands      |                 | 319            |                | 0.28 GB       |
 | 12 | single       | 888             | 915            | 6.5 GB         | 4.4 GB        |
 | 12 | 8 bands      |                 | 4037           |                | 1.2 GB        |
+| 13 | single       | 11175           | 12140          | 41 GB          | 30.3 GB       |
 
-- A single search takes the same time as before and about two thirds of the memory; between n = 11 and n = 12 the memory grows by some 120 bytes for each further proportion equation, against 170 before.
+- A single search takes the same time as before, or some 9% more for n = 13, and between two thirds and three quarters of the memory; between n = 11 and n = 12 the memory grows by some 120 bytes for each further proportion equation, against 170 before.
 - A pass over one of K bands takes a fraction of about 1/2 + 1/(2K) of the time of a single search, so eight bands take 4.4 times as long, with a peak memory smaller by a factor of 3.7 for n = 12. The factor is below eight because a few hundred megabytes belong to the threads and not to the tables.
 - The eight passes for n = 12 give 28799493 proportions, the same degree distribution and the same 4758270004 tilings as the single search, which is a further check of a(12), though not an independent one.
 
@@ -135,4 +136,4 @@ $ ./target/release/rectiling --list 7
 $ ./target/release/rectiling 9 3 2
 ```
 
-The first command line computes a(13), which takes about three hours and 41 GB of memory on the machine above, the second lists the 1372 proportions for seven tiles with their minimal polynomials, and the third treats a main rectangle of aspect ratio 3/2 with nine tiles.
+The first command line computes a(13), which takes about three and a half hours and 30 GB of memory on the machine above, the second lists the 1372 proportions for seven tiles with their minimal polynomials, and the third treats a main rectangle of aspect ratio 3/2 with nine tiles.
