@@ -1,5 +1,6 @@
 -- SPDX-License-Identifier: LGPL-3.0-or-later
 import Rectiling.Refinement
+import Rectiling.Scaling
 
 /-!
 # Persistence of proportions
@@ -204,6 +205,29 @@ def TilesWith (x : ℝ) (R : Rect) (n : ℕ) : Prop :=
 def Achievable (n : ℕ) (x : ℝ) : Prop :=
   TilesWith x (Rect.main 1 1) n
 
+/-- The transpose of a rectangle that can be cut into `n` rectangles of proportion `x` can be cut likewise. -/
+theorem TilesWith.transpose {x : ℝ} {R : Rect} {n : ℕ} (h : TilesWith x R n) :
+    TilesWith x R.transpose n := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  exact ⟨tiles.map Rect.transpose, by simp [hlen], htil.transpose⟩
+
+/-- The image under a homothety of a rectangle that can be cut into `n` rectangles of proportion `x` can be cut likewise. -/
+theorem TilesWith.scale {x c : ℝ} {R : Rect} {n : ℕ} (hc : 0 < c) (h : TilesWith x R n) :
+    TilesWith x (R.scale c) n := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  exact ⟨tiles.map (Rect.scale c), by simp [hlen], htil.scale hc⟩
+
+/-- **Inverse aspect ratio.** The main rectangles of aspect ratios `w` and `1 / w` can be cut into `n` rectangles of the same proportions. -/
+theorem tilesWith_main_inv {x w : ℝ} {n : ℕ} (hw : 0 < w) :
+    TilesWith x (Rect.main w 1) n ↔ TilesWith x (Rect.main (1 / w) 1) n := by
+  have key : ∀ {v : ℝ}, 0 < v → TilesWith x (Rect.main v 1) n → TilesWith x (Rect.main (1 / v) 1) n := by
+    intro v hv h
+    have h' := h.transpose.scale (one_div_pos.mpr hv)
+    have e : (Rect.main v 1).transpose.scale (1 / v) = Rect.main (1 / v) 1 := by
+      simp [Rect.transpose, Rect.scale, Rect.main, hv.ne']
+    rwa [e] at h'
+  exact ⟨key hw, fun h => by simpa using key (one_div_pos.mpr hw) h⟩
+
 /-- A tiling of a rectangle with positive sides has at least one tile. -/
 theorem IsTiling.exists_cons {R : Rect} {tiles : List Rect} (hR : R.Nondegenerate)
     (h : IsTiling R tiles) : ∃ t rest, tiles = t :: rest := by
@@ -241,6 +265,27 @@ theorem TilesWith.add_five {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
 
 theorem nondegenerate_main_one : (Rect.main 1 1).Nondegenerate :=
   ⟨one_pos, one_pos⟩
+
+/-- **Seven more tiles.** A tile is cut into eight rectangles similar to it and with its orientation. -/
+theorem TilesWith.add_seven {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
+    (h : TilesWith x R n) : TilesWith x R (n + 7) := by
+  obtain ⟨tiles, hlen, htil⟩ := h
+  obtain ⟨t, rest, rfl⟩ := htil.toIsTiling.exists_cons hR
+  have ht := htil.nondegenerate t (List.mem_cons_self ..)
+  have hp := htil.proportion t (List.mem_cons_self ..)
+  refine ⟨t.eight ++ rest, ?_, htil.refine (Rect.isTiling_eight ht) (Rect.hasProportion_eight hp)⟩
+  rw [List.length_cons] at hlen
+  simp only [List.length_append, Rect.eight, List.length_cons, List.length_nil]
+  omega
+
+/-- **Five or more tiles.** A rectangle that can be cut into `n` rectangles of proportion `x` can be cut into `n + k`, for every `k ≥ 5`. -/
+theorem TilesWith.add_of_five_le {x : ℝ} {R : Rect} {n : ℕ} (hR : R.Nondegenerate)
+    (h : TilesWith x R n) : ∀ k : ℕ, 5 ≤ k → TilesWith x R (n + k)
+  | 0, hk | 1, hk | 2, hk | 3, hk | 4, hk => by omega
+  | 5, _ => h.add_five hR
+  | 6, _ => (h.add_three hR).add_three hR
+  | 7, _ => h.add_seven hR
+  | k + 8, _ => (TilesWith.add_of_five_le hR h (k + 5) (by omega)).add_three hR
 
 /-- **Four more tiles.** For a proportion greater than one, a pinwheel of four tiles surrounds a reduced copy of the tiling. -/
 theorem Achievable.add_four {x : ℝ} {n : ℕ} (hx : 1 < x) (h : Achievable n x) :

@@ -264,6 +264,24 @@ theorem positives_hom (X : Rˣ) (a b : ℤ) (path : List Placement) (v : ℕ →
   rw [hinit, hcongr.2.1] at hpos
   exact hpos
 
+/-- The equations over the reals are the values of those of the homogeneous system. -/
+theorem equations_hom (X : Rˣ) (a b : ℤ) (path : List Placement) (v : ℕ → ℝ) (hv : v 0 = 1) :
+    equations (realAlgebra (φ X)) (fun j => v (j + 1)) (initial (a : ℝ) (b : ℝ)) 0 path =
+      (homEquations X a b path).map (val φ (finalIndex 0 path + 1) v) := by
+  have hom := val_isHom φ X (finalIndex 0 path + 1) v
+  have hinit : (homInitial a b).map (Tier.map (val φ (finalIndex 0 path + 1) v)) =
+      initial (a : ℝ) (b : ℝ) := by
+    simp [homInitial, initial, Tier.map, val_scale, hv]
+  have hcongr := run_congr (realAlgebra (φ X))
+    (f := val φ (finalIndex 0 path + 1) v ∘ trueFresh) (g := fun j => v (j + 1)) path
+    (initial (a : ℝ) (b : ℝ)) 0 (by
+      intro j _ hj
+      simp only [Function.comp_apply, trueFresh]
+      exact val_unitVec φ _ v (by omega))
+  have heq := equations_map hom trueFresh (homInitial a b) 0 path
+  rw [hinit, hcongr.2.2] at heq
+  exact heq
+
 theorem val_congr (N : ℕ) {v w : ℕ → ℝ} (h : ∀ j < N, w j = v j) (F : Vec R) :
     val φ N w F = val φ N v F := by
   unfold val dot
