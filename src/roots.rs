@@ -193,6 +193,22 @@ impl RealRoot {
         }
     }
 
+    /// Comparison of the root with a dyadic rational, for a root of an irreducible polynomial of degree at least two.
+    pub fn cmp_dyadic(&mut self, v: &Dyadic) -> Ordering {
+        loop {
+            if self.is_exact() {
+                return self.lo.cmp_value(v);
+            }
+            if self.hi.cmp_value(v) != Ordering::Greater {
+                return Ordering::Less;
+            }
+            if self.lo.cmp_value(v) != Ordering::Less {
+                return Ordering::Greater;
+            }
+            self.refine();
+        }
+    }
+
     /// Floats enclosing the root.
     pub fn enclosure(&self) -> (f64, f64) {
         (self.lo.to_f64_down(), self.hi.to_f64_up())

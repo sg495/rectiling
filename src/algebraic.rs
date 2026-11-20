@@ -2,7 +2,9 @@
 
 //! Canonical real algebraic numbers not smaller than one, and a shared registry of them.
 
-use crate::cache::hash_bytes;
+use crate::band::Band;
+use crate::cache::{append, hash_bytes};
+use crate::chunked::Chunked;
 use crate::factor::factor;
 use crate::pack::{pack, packed_len, unpack};
 use crate::poly::Poly;
@@ -13,6 +15,7 @@ use num_traits::ToPrimitive;
 use smallvec::SmallVec;
 use std::collections::HashMap;
 use std::sync::RwLock;
+use std::sync::atomic::{AtomicUsize, Ordering};
 
 /// Real algebraic number not smaller than one, identified by its minimal polynomial and the position of the root.
 #[derive(Clone, PartialEq, Eq, Hash, Debug)]
@@ -61,90 +64,123 @@ pub struct RootRef {
     pub hi: f64,
 }
 
-const BIG: u64 = 1 << 63;
+const SHARD_BITS: u32 = 12;
+const BIG: u32 = 1 << 31;
+const MET: u8 = 1 << 7;
 
+/// Registered number: the floats enclosing it, the place of its minimal polynomial and its position amongst the roots.
 #[derive(Clone, Copy)]
+#[repr(C, packed(4))]
 struct Entry {
-    /// Offset of the encoded minimal polynomial, or the position of an arbitrary-precision one with the top bit set.
-    source: u64,
     lo: f64,
-    hi: f64,
-    index: u16,
+    gap: f32,
+    offset: u32,
+    tag: u32,
+}
+
+impl Entry {
+    fn new(lo: f64, hi: f64, offset: u32, tag: u32) -> Self {
+        let width = hi - lo;
+        let mut gap = width as f32;
+        if (gap as f64) < width {
+            gap = gap.next_up();
+        }
+        Entry {
+            lo,
+            gap,
+            offset,
+            tag,
+        }
+    }
+
+    fn hi(&self) -> f64 {
+        let (lo, gap) = (self.lo, self.gap);
+        lo + gap as f64
+    }
+
+    fn index(&self) -> u32 {
+        self.tag & 0xff
+    }
+
+    fn reference(&self, id: u32) -> RootRef {
+        RootRef {
+            id,
+            lo: self.lo,
+            hi: self.hi(),
+        }
+    }
+}
+
+/// Irreducible polynomials with machine-integer coefficients whose hashes share their leading bits, each encoded and followed by the identifier of its first root and the number of its roots.
+#[derive(Default)]
+struct Shard {
+    table: HashTable<u32>,
+    arena: Vec<u8>,
+}
+
+impl Shard {
+    fn find(&self, key: &[u8], hash: u64) -> Option<usize> {
+        let arena = &self.arena;
+        Some(*self.table.find(hash, |&o| arena[o as usize..].starts_with(key))? as usize + key.len())
+    }
+
+    fn span(&self, at: usize) -> (u32, u32) {
+        let first = u32::from_le_bytes(self.arena[at..at + 4].try_into().expect("four bytes"));
+        (first, (self.arena[at + 4] & !MET) as u32)
+    }
 }
 
 #[derive(Default)]
-struct Inner {
-    entries: Vec<Entry>,
-    arena: Vec<u8>,
-    table: HashTable<u64>,
-    big_polys: Vec<Poly<BigInt>>,
-    big_table: HashMap<Poly<BigInt>, (u32, u32)>,
+struct Big {
+    polys: Vec<Poly<BigInt>>,
+    table: HashMap<Poly<BigInt>, (u32, u32)>,
 }
 
 /// Registry assigning stable identifiers to the algebraic numbers encountered during a computation.
-#[derive(Default)]
 pub struct Registry {
-    inner: RwLock<Inner>,
+    shards: Box<[RwLock<Shard>]>,
+    entries: RwLock<Chunked<Entry>>,
+    big: RwLock<Big>,
+    band: Option<Band>,
+    met: AtomicUsize,
+}
+
+impl Default for Registry {
+    fn default() -> Self {
+        Registry {
+            shards: (0..1usize << SHARD_BITS).map(|_| RwLock::default()).collect(),
+            entries: RwLock::default(),
+            big: RwLock::default(),
+            band: None,
+            met: AtomicUsize::new(0),
+        }
+    }
 }
 
 fn rational_root(f: &Poly<BigInt>) -> (BigInt, BigInt) {
     (-&f.coeffs()[0], f.coeffs()[1].clone())
 }
 
-fn locate(f: &Poly<BigInt>) -> Vec<(f64, f64)> {
+/// The roots not smaller than one of an irreducible polynomial that lie in the band, if any is given, each with its position amongst all such roots and floats enclosing it.
+fn locate(f: &Poly<BigInt>, band: Option<&Band>) -> Vec<(u32, f64, f64)> {
     let mut out = Vec::new();
     if f.degree() == Some(1) {
         let (num, den) = rational_root(f);
-        if num >= den {
+        if num >= den && band.is_none_or(|b| b.holds_rational(&num, &den)) {
             let v = num.to_f64().unwrap_or(f64::NAN) / den.to_f64().unwrap_or(f64::NAN);
-            out.push(if num == den { (1.0, 1.0) } else { (v * (1.0 - 1e-14), v * (1.0 + 1e-14)) });
+            out.push(if num == den { (0, 1.0, 1.0) } else { (0, v * (1.0 - 1e-14), v * (1.0 + 1e-14)) });
         }
     } else {
-        for mut root in isolate_roots_above_one(f) {
+        for (index, mut root) in isolate_roots_above_one(f).into_iter().enumerate() {
+            if band.is_some_and(|b| !b.holds_root(&mut root)) {
+                continue;
+            }
             root.refine_to(64);
-            out.push(root.enclosure());
+            let (lo, hi) = root.enclosure();
+            out.push((index as u32, lo, hi));
         }
     }
     out
-}
-
-impl Inner {
-    fn range(&self, first: u32, count: u32) -> SmallVec<[RootRef; 2]> {
-        (first..first + count)
-            .map(|id| {
-                let e = &self.entries[id as usize];
-                RootRef { id, lo: e.lo, hi: e.hi }
-            })
-            .collect()
-    }
-
-    fn find(&self, key: &[u8], hash: u64) -> Option<(u32, u32)> {
-        let arena = &self.arena;
-        let at = *self.table.find(hash, |&o| arena[o as usize..].starts_with(key))? as usize + key.len();
-        let first = u32::from_le_bytes(arena[at..at + 4].try_into().expect("four bytes"));
-        Some((first, arena[at + 4] as u32))
-    }
-
-    fn push_entries(&mut self, source: u64, located: &[(f64, f64)]) -> (u32, u32) {
-        let first = self.entries.len() as u32;
-        for (index, &(lo, hi)) in located.iter().enumerate() {
-            self.entries.push(Entry {
-                source,
-                lo,
-                hi,
-                index: index as u16,
-            });
-        }
-        (first, located.len() as u32)
-    }
-
-    fn min_poly(&self, entry: &Entry) -> Poly<BigInt> {
-        if entry.source & BIG != 0 {
-            self.big_polys[(entry.source & !BIG) as usize].clone()
-        } else {
-            Poly::from_i64s(&unpack(&self.arena[entry.source as usize..]))
-        }
-    }
 }
 
 impl Registry {
@@ -153,61 +189,136 @@ impl Registry {
         Self::default()
     }
 
+    /// An empty registry that admits only the numbers in the given band.
+    pub fn banded(band: Band) -> Self {
+        Registry {
+            band: Some(band),
+            ..Self::default()
+        }
+    }
+
+    /// The band to which the registry is restricted, if any.
+    pub fn band(&self) -> Option<&Band> {
+        self.band.as_ref()
+    }
+
+    fn shard(&self, hash: u64) -> (u32, &RwLock<Shard>) {
+        let index = (hash >> (64 - SHARD_BITS)) as u32;
+        (index, &self.shards[index as usize])
+    }
+
+    fn range(&self, first: u32, count: u32) -> SmallVec<[RootRef; 2]> {
+        if count == 0 {
+            return SmallVec::new();
+        }
+        let entries = self.entries.read().expect("registry lock");
+        (first..first + count).map(|id| entries.get(id as usize).reference(id)).collect()
+    }
+
+    fn entry(&self, id: u32) -> Entry {
+        self.entries.read().expect("registry lock").get(id as usize)
+    }
+
+    fn push_entries(&self, offset: u32, tag: u32, located: &[(u32, f64, f64)]) -> (u32, u32) {
+        let mut entries = self.entries.write().expect("registry lock");
+        let first = entries.len();
+        assert!(first + located.len() <= u32::MAX as usize, "too many algebraic numbers for one registry");
+        for &(index, lo, hi) in located {
+            assert!(index < 0x100, "too many roots of one polynomial");
+            entries.push(Entry::new(lo, hi, offset, tag | index));
+        }
+        (first as u32, located.len() as u32)
+    }
+
+    /// The registered roots of the polynomial with the given encoding and hash, if it is a registered irreducible polynomial, which is then marked as met as an equation.
+    pub(crate) fn equation_roots(&self, key: &[u8], hash: u64) -> Option<SmallVec<[RootRef; 2]>> {
+        let (_, lock) = self.shard(hash);
+        let (first, count, met) = {
+            let shard = lock.read().expect("registry lock");
+            let at = shard.find(key, hash)?;
+            let (first, count) = shard.span(at);
+            (first, count, shard.arena[at + 4] & MET != 0)
+        };
+        if !met {
+            let mut shard = lock.write().expect("registry lock");
+            let at = shard.find(key, hash)?;
+            if shard.arena[at + 4] & MET == 0 {
+                shard.arena[at + 4] |= MET;
+                self.met.fetch_add(1, Ordering::Relaxed);
+            }
+        }
+        Some(self.range(first, count))
+    }
+
+    /// The number of registered polynomials met as equations.
+    pub(crate) fn equations(&self) -> usize {
+        self.met.load(Ordering::Relaxed)
+    }
+
     fn factor_roots(&self, f: &Poly<BigInt>) -> SmallVec<[RootRef; 2]> {
         let words: Option<SmallVec<[i64; 16]>> = f.coeffs().iter().map(|c| c.to_i64()).collect();
         let Some(words) = words.filter(|w| w.len() <= u8::MAX as usize) else {
             return self.big_factor_roots(f);
         };
-        let mut key: SmallVec<[u8; 64]> = SmallVec::new();
-        let mut buffer = Vec::with_capacity(64);
-        pack(&words, &mut buffer);
-        key.extend_from_slice(&buffer);
+        let mut key = Vec::with_capacity(64);
+        pack(&words, &mut key);
         let hash = hash_bytes(&key);
+        let (index, lock) = self.shard(hash);
         {
-            let inner = self.inner.read().expect("registry lock");
-            if let Some((first, count)) = inner.find(&key, hash) {
-                return inner.range(first, count);
+            let shard = lock.read().expect("registry lock");
+            if let Some(at) = shard.find(&key, hash) {
+                let (first, count) = shard.span(at);
+                drop(shard);
+                return self.range(first, count);
             }
         }
-        let located = locate(f);
-        let mut inner = self.inner.write().expect("registry lock");
-        if let Some((first, count)) = inner.find(&key, hash) {
-            return inner.range(first, count);
-        }
-        let offset = inner.arena.len() as u64;
-        let (first, count) = inner.push_entries(offset, &located);
-        inner.arena.extend_from_slice(&key);
-        inner.arena.extend_from_slice(&first.to_le_bytes());
-        inner.arena.push(count as u8);
-        let inner = &mut *inner;
-        let arena = &inner.arena;
-        inner.table.insert_unique(hash, offset, |&o| {
-            let rest = &arena[o as usize..];
-            hash_bytes(&rest[..packed_len(rest)])
-        });
-        inner.range(first, count)
+        let located = locate(f, self.band.as_ref());
+        assert!(located.len() < MET as usize, "too many roots of one polynomial");
+        let (first, count) = {
+            let mut shard = lock.write().expect("registry lock");
+            if let Some(at) = shard.find(&key, hash) {
+                shard.span(at)
+            } else {
+                let offset = u32::try_from(shard.arena.len()).expect("registry shard within four gigabytes");
+                let span = self.push_entries(offset, index << 8, &located);
+                append(&mut shard.arena, &key);
+                append(&mut shard.arena, &span.0.to_le_bytes());
+                shard.arena.push(span.1 as u8);
+                let shard = &mut *shard;
+                let arena = &shard.arena;
+                shard.table.insert_unique(hash, offset, |&o| {
+                    let rest = &arena[o as usize..];
+                    hash_bytes(&rest[..packed_len(rest)])
+                });
+                span
+            }
+        };
+        self.range(first, count)
     }
 
     fn big_factor_roots(&self, f: &Poly<BigInt>) -> SmallVec<[RootRef; 2]> {
-        {
-            let inner = self.inner.read().expect("registry lock");
-            if let Some(&(first, count)) = inner.big_table.get(f) {
-                return inner.range(first, count);
+        let known = self.big.read().expect("registry lock").table.get(f).copied();
+        let (first, count) = match known {
+            Some(span) => span,
+            None => {
+                let located = locate(f, self.band.as_ref());
+                let mut big = self.big.write().expect("registry lock");
+                match big.table.get(f) {
+                    Some(&span) => span,
+                    None => {
+                        let offset = big.polys.len() as u32;
+                        big.polys.push(f.clone());
+                        let span = self.push_entries(offset, BIG, &located);
+                        big.table.insert(f.clone(), span);
+                        span
+                    }
+                }
             }
-        }
-        let located = locate(f);
-        let mut inner = self.inner.write().expect("registry lock");
-        if let Some(&(first, count)) = inner.big_table.get(f) {
-            return inner.range(first, count);
-        }
-        let source = BIG | inner.big_polys.len() as u64;
-        inner.big_polys.push(f.clone());
-        let (first, count) = inner.push_entries(source, &located);
-        inner.big_table.insert(f.clone(), (first, count));
-        inner.range(first, count)
+        };
+        self.range(first, count)
     }
 
-    /// The distinct real roots not smaller than one of a non-zero polynomial, in no particular order.
+    /// The distinct real roots not smaller than one of a non-zero polynomial, in no particular order, restricted to the band of the registry if it has one.
     pub fn roots_from_one(&self, p: &Poly<BigInt>) -> SmallVec<[RootRef; 2]> {
         let mut refs = SmallVec::new();
         for (f, _) in factor(p) {
@@ -221,13 +332,8 @@ impl Registry {
         if ids.is_empty() {
             return SmallVec::new();
         }
-        let inner = self.inner.read().expect("registry lock");
-        ids.iter()
-            .map(|&id| {
-                let e = &inner.entries[id as usize];
-                RootRef { id, lo: e.lo, hi: e.hi }
-            })
-            .collect()
+        let entries = self.entries.read().expect("registry lock");
+        ids.iter().map(|&id| entries.get(id as usize).reference(id)).collect()
     }
 
     /// Sign of a polynomial at a registered number.
@@ -245,45 +351,55 @@ impl Registry {
         root.sign_of(q)
     }
 
+    fn words(&self, entry: &Entry) -> SmallVec<[i64; 16]> {
+        let shard = self.shards[(entry.tag >> 8 & ((1 << SHARD_BITS) - 1)) as usize].read().expect("registry lock");
+        unpack(&shard.arena[entry.offset as usize..])
+    }
+
     /// The coefficients of the minimal polynomial of a registered number, if they are machine integers.
     pub(crate) fn min_poly_words(&self, id: u32) -> Option<Box<[i64]>> {
-        let inner = self.inner.read().expect("registry lock");
-        let entry = inner.entries[id as usize];
-        (entry.source & BIG == 0).then(|| unpack(&inner.arena[entry.source as usize..]).as_slice().into())
+        let entry = self.entry(id);
+        (entry.tag & BIG == 0).then(|| self.words(&entry).as_slice().into())
+    }
+
+    fn min_poly(&self, entry: &Entry) -> Poly<BigInt> {
+        if entry.tag & BIG != 0 {
+            self.big.read().expect("registry lock").polys[entry.offset as usize].clone()
+        } else {
+            Poly::from_i64s(&self.words(entry))
+        }
     }
 
     /// The algebraic degree of a registered number.
     pub fn degree(&self, id: u32) -> usize {
-        let inner = self.inner.read().expect("registry lock");
-        let entry = inner.entries[id as usize];
-        if entry.source & BIG != 0 {
-            inner.big_polys[(entry.source & !BIG) as usize].degree().unwrap_or(0)
+        let entry = self.entry(id);
+        if entry.tag & BIG != 0 {
+            self.big.read().expect("registry lock").polys[entry.offset as usize].degree().unwrap_or(0)
         } else {
-            inner.arena[entry.source as usize] as usize - 1
+            let shard = self.shards[(entry.tag >> 8 & ((1 << SHARD_BITS) - 1)) as usize].read().expect("registry lock");
+            shard.arena[entry.offset as usize] as usize - 1
         }
     }
 
     /// A float approximating a registered number.
     pub fn approx(&self, id: u32) -> f64 {
-        let inner = self.inner.read().expect("registry lock");
-        let entry = inner.entries[id as usize];
-        0.5 * (entry.lo + entry.hi)
+        let entry = self.entry(id);
+        0.5 * (entry.lo + entry.hi())
     }
 
     /// The registered number with the given identifier.
     pub fn get(&self, id: u32) -> Algebraic {
-        let inner = self.inner.read().expect("registry lock");
-        let entry = inner.entries[id as usize];
+        let entry = self.entry(id);
         Algebraic {
-            min_poly: inner.min_poly(&entry),
-            index: entry.index as u32,
-            approx: (entry.lo.to_bits(), entry.hi.to_bits()),
+            min_poly: self.min_poly(&entry),
+            index: entry.index(),
+            approx: (entry.lo.to_bits(), entry.hi().to_bits()),
         }
     }
 
     /// The number of registered numbers.
     pub fn len(&self) -> usize {
-        self.inner.read().expect("registry lock").entries.len()
+        self.entries.read().expect("registry lock").len()
     }
 
     /// Whether no number has been registered.

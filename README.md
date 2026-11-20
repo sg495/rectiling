@@ -27,10 +27,13 @@ $ ./target/release/rectiling --minority 1 9
 $ ./target/release/rectiling --tilings 9
 $ ./target/release/rectiling --bags 8
 $ ./target/release/rectiling --classes 4
+$ ./target/release/rectiling --bands 8 11
+$ ./target/release/rectiling --band 3 8 11
 ```
 
 It prints the number of distinct proportions, their distribution by algebraic degree and counters describing the search; with `--list` it also prints each proportion with its degree, the number of tilings that realise it and its minimal polynomial.
 With `--guillotine` only guillotine tilings are considered, and with `--minority K` only tilings with at most K tiles in the less frequent orientation.
+With `--bands COUNT` the search is run once for each of COUNT bands of proportions and the totals are printed, which divides the memory needed by about COUNT at the cost of more time; with `--band INDEX COUNT` only the band with that index, from 1, is searched, so that the passes can be run separately. COUNT must divide 64.
 With `--tilings` it also prints the number of tilings as sets of rectangles, the number of their classes under the symmetries of the main rectangle, computed in two ways, and the numbers of tilings with each kind of symmetry; with `--bags` it adds the number of distinct bags of tiles, and with `--classes` it lists one tiling from each class with the coordinates of its tiles.
 With `--exact` every tiling is solved and compared by the reference method, which is slower.
 The same searches are available from Rust as `rectiling::Search`.

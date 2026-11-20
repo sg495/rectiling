@@ -4,9 +4,10 @@
 
 use crate::algebraic::{Registry, RootRef};
 use crate::bags::Bags;
-use crate::cache::{PolyCache, Roots, WordMap};
+use crate::cache::{LocalCache, PolyCache, Roots, WordMap, hash_bytes};
 use crate::exact;
 use crate::interval::Iv;
+use crate::pack::pack;
 use crate::search::{Search, Shared, Tally, encode_witness, within};
 use crate::staircase::{Algebra, FITS, Fit, Placement, Staircase, Unit};
 use crate::tilings::{Analyst, MAX_TILES, Verdict as Examined};
@@ -15,7 +16,8 @@ use smallvec::SmallVec;
 const SLOTS: usize = 8;
 const NO_SLOT: u8 = u8::MAX;
 const LIMIT: i128 = 1 << 55;
-const LOCAL_CACHE_LIMIT: usize = 1 << 19;
+const LOCAL_CACHE_LIMIT: usize = 1 << 18;
+const MIN_POLY_LIMIT: usize = 1 << 14;
 
 /// Linear form in the scale of the main rectangle and the free tile sides, as identifiers of coefficient polynomials.
 type Form = [u32; SLOTS];
@@ -40,7 +42,11 @@ impl Arena {
     fn new() -> Self {
         Arena {
             coeffs: Vec::with_capacity(1 << 16),
-            heads: vec![Head { start: 0, len: 0, lo: 0 }],
+            heads: vec![Head {
+                start: 0,
+                len: 0,
+                lo: 0,
+            }],
             scratch: Vec::new(),
             quotient: Vec::new(),
             failed: false,
@@ -364,7 +370,7 @@ pub(crate) struct Engine<'a> {
     shared: &'a Shared,
     symbols: Symbols,
     path: Vec<Step>,
-    local: WordMap<Box<[i64]>, Roots>,
+    local: LocalCache,
     min_polys: WordMap<u32, Box<[i64]>>,
     key: Vec<i64>,
     scratch: Vec<u8>,
@@ -401,7 +407,7 @@ impl<'a> Engine<'a> {
                 fresh_form: [0; SLOTS],
             },
             path: Vec::new(),
-            local: WordMap::default(),
+            local: LocalCache::new(LOCAL_CACHE_LIMIT),
             min_polys: WordMap::default(),
             key: Vec::new(),
             scratch: Vec::new(),
@@ -641,14 +647,18 @@ impl<'a> Engine<'a> {
     }
 
     fn roots(&mut self) -> Roots {
-        if let Some(r) = self.local.get(self.key.as_slice()) {
-            return r.clone();
+        self.scratch.clear();
+        pack(&self.key, &mut self.scratch);
+        let hash = hash_bytes(&self.scratch);
+        if let Some(r) = self.local.find(&self.scratch, hash) {
+            return r;
         }
-        let r = self.cache.roots(&self.key, &mut self.scratch, self.registry);
-        if self.local.len() >= LOCAL_CACHE_LIMIT {
-            self.local.clear();
-        }
-        self.local.insert(self.key.as_slice().into(), r.clone());
+        let r = if self.registry.band().is_some_and(|b| b.excludes(&self.key)) {
+            Roots::new()
+        } else {
+            self.cache.roots_packed(&self.key, &self.scratch, hash, self.registry)
+        };
+        self.local.insert(&self.scratch, hash, &r);
         r
     }
 
@@ -724,7 +734,7 @@ impl<'a> Engine<'a> {
 
     fn min_poly(&mut self, id: u32) -> Option<&[i64]> {
         if !self.min_polys.contains_key(&id) {
-            if self.min_polys.len() >= LOCAL_CACHE_LIMIT {
+            if self.min_polys.len() >= MIN_POLY_LIMIT {
                 self.min_polys.clear();
             }
             let words = self.registry.min_poly_words(id)?;
@@ -772,7 +782,10 @@ impl<'a> Engine<'a> {
     }
 
     fn check(&mut self, root: &RootRef) -> Verdict {
-        let x = Iv { lo: root.lo, hi: root.hi };
+        let x = Iv {
+            lo: root.lo,
+            hi: root.hi,
+        };
         let arena = &self.symbols.arena;
         let mut val = [Iv::point(0.0); SLOTS];
         val[0] = Iv::point(1.0);
