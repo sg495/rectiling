@@ -12,9 +12,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import sympy as sp
-from matplotlib.patches import Rectangle
+from matplotlib.patches import FancyArrowPatch, Rectangle
+from matplotlib.path import Path as MplPath
+from matplotlib.transforms import offset_copy
 
-from make_figures import COLOURS, Tier, X, draw, place, replay, witness_tiles
+from make_figures import COLOURS, Tier, X, draw, place, replay, truncated, witness_tiles
 
 OUT = Path(__file__).parent
 DATA = OUT.parent / "data"
@@ -58,11 +60,22 @@ def outline_rest(ax, tiles):
         ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="0.72", lw=0.35, zorder=2))
 
 
-def mark_anchors(ax, tiers, size=4.0, chosen=None):
-    """Circles the anchors of a staircase, in grey for stale tiers and in black for a chosen one."""
-    for t in tiers:
-        colour = "k" if t is chosen else ("0.7" if t.stale else "w")
-        ax.plot([t.ax], [t.ay], marker="o", mfc=colour, mec="k", ms=size, zorder=6)
+def continue_floor(ax, x, y, width=1.1):
+    """Continues a floor beyond its right end by two dots as thick as the floor."""
+    for k in (1, 2):
+        shift = offset_copy(ax.transData, fig=ax.figure, x=2.2 * width * k, y=0, units="points")
+        ax.plot([x], [y], marker="s", ms=width, mfc="k", mec="k", mew=0, transform=shift, zorder=4, clip_on=False)
+
+
+def mark_anchors(ax, tiers, size=4.0, chosen=None, flags=False, open_floors=True, hide_stale=False):
+    """Marks the anchors of a staircase, in black for a chosen one; with flags, the floors are drawn thick, the anchor of a stale tier is not marked and, unless disabled, the floor of a tier that is neither started nor last is continued by two dots."""
+    for j, t in enumerate(tiers):
+        if not ((flags or hide_stale) and t.stale):
+            ax.plot([t.ax], [t.ay], marker="o", mfc="k" if t is chosen else "w", mec="k", ms=size, zorder=6)
+        if flags:
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+        if flags and open_floors and not t.started and j < len(tiers) - 1:
+            continue_floor(ax, t.ax + t.floor, t.ay)
 
 
 def excluded(tiers):
@@ -107,21 +120,20 @@ def staircase_figure(path, value, witness, k):
     tiers = sts[k]
     fig, ax = plt.subplots(figsize=(3.9, 3.9))
     draw(ax, tiles[:k])
-    outline_rest(ax, tiles[k:])
     ax.set_xlim(-0.16, 1.14)
     ax.set_ylim(-0.12, 1.06)
     for j, t in enumerate(tiers):
         ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="lightgray", zorder=1))
         ax.plot([t.ax, 1], [t.ay + t.wall, t.ay + t.wall], color="0.5", lw=0.5, ls=(0, (3, 2)), zorder=3)
-        ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=2.2, solid_capstyle="butt", zorder=4)
-        ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=2.2, solid_capstyle="butt", zorder=4)
+        ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+        ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
         ax.text(t.ax - 0.018, t.ay - 0.02, f"$(a_{j}, b_{j})$", fontsize=6.3, ha="right", va="top", zorder=7)
         ax.text(t.ax + t.floor / 2, t.ay + 0.016, f"$L_{j}$", fontsize=7.5, ha="center", va="bottom", zorder=7)
         ax.text(t.ax + 0.016, t.ay + t.wall / 2, f"$M_{j}$", fontsize=7.5, ha="left", va="center", zorder=7)
         ax.text(1.03, t.ay + t.wall / 2, f"$T_{j}$", fontsize=9, ha="left", va="center", color="0.3", zorder=7)
     mark_anchors(ax, [Tier(t.ax, t.ay, t.floor, t.wall) for t in tiers], size=5.5)
     fig.tight_layout(pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -131,8 +143,8 @@ def fits_figure(path, value, witness):
     moves = moves_of(witness)
     fig, axes = plt.subplots(1, 4, figsize=(6.6, 2.0))
     chosen = []
-    for ax, fit in zip(axes, CODES.values()):
-        k = max((k for k, (_, f, _) in enumerate(moves) if f == fit), key=lambda k: min(tiles[k][2], tiles[k][3]))
+    picks = sorted((max((k for k, (_, f, _) in enumerate(moves) if f == fit), key=lambda k: min(tiles[k][2], tiles[k][3])), fit) for fit in CODES.values())
+    for ax, (k, fit) in zip(axes, picks):
         i = moves[k][0]
         t = sts[k][i]
         x, y, w, h = tiles[k]
@@ -140,16 +152,17 @@ def fits_figure(path, value, witness):
         assert abs(x - t.ax) < EPS and abs(y - t.ay) < EPS and w <= t.floor + EPS and h <= t.wall + EPS
         assert (narrow, low) == (fit in ("inside", "full-height"), fit in ("inside", "full-width")), (fit, k)
         draw(ax, tiles[: k + 1])
-        outline_rest(ax, tiles[k + 1 :])
+        for u in sts[k]:
+            ax.plot([u.ax, 1], [u.ay + u.wall, u.ay + u.wall], color="0.4", lw=0.5, ls=(0, (3, 2)), zorder=4)
         ax.add_patch(Rectangle((t.ax, t.ay), t.floor, t.wall, fc="none", hatch="//", lw=0, ec="0.45", zorder=3))
-        ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="k", lw=1.1, zorder=5))
-        ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=2.4, solid_capstyle="butt", zorder=4)
-        ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=2.4, solid_capstyle="butt", zorder=4)
-        mark_anchors(ax, [Tier(u.ax, u.ay, u.floor, u.wall) for u in sts[k + 1]], size=3.6)
+        ax.add_patch(Rectangle((x, y), w, h, fc="none", ec="k", lw=0.6, zorder=5))
+        ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+        ax.plot([t.ax, t.ax], [t.ay, t.ay + t.wall], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+        mark_anchors(ax, sts[k + 1], size=3.6, hide_stale=True)
         ax.set_title(f"placement {k + 1}: {FIT_NAMES[fit]}", fontsize=7, pad=3)
         chosen.append((fit, k + 1, i, len(sts[k]), len(sts[k + 1])))
     fig.tight_layout(pad=0.2, w_pad=0.5)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return chosen
 
@@ -158,21 +171,19 @@ def rules_figure(path, value, witness):
     """Draws the staircases of a listed tiling that carry the most flags, marking stale tiers and started floors."""
     tiles, sts = stages(value, witness)
     ranked = sorted(range(1, len(sts) - 1), key=lambda k: (-any(r != "stale" for _, r in excluded(sts[k])), -any(t.stale for t in sts[k]), -len(sts[k]), k))
-    picks = sorted(ranked[:3])
-    fig, axes = plt.subplots(1, 3, figsize=(6.6, 2.45))
+    picks = sorted(set(ranked[:3]) | {5})
+    fig, axes = plt.subplots(1, len(picks), figsize=(6.8, 1.95))
     notes = []
     for ax, k in zip(axes, picks):
         draw(ax, tiles[:k])
         outline_rest(ax, tiles[k:])
         for j, t in enumerate(sts[k]):
-            style = dict(color="tab:red", lw=2.6, ls=(0, (2, 1.2))) if t.started else dict(color="k", lw=1.8)
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], solid_capstyle="butt", zorder=4, **style)
             ax.text(t.ax + 0.025, t.ay + 0.022, f"$T_{j}$", fontsize=7, ha="left", va="bottom", zorder=7)
-        mark_anchors(ax, sts[k], size=4.6)
-        ax.set_title(f"after {k} placements", fontsize=7, pad=3)
+        mark_anchors(ax, sts[k], size=4.6, flags=True)
+        ax.set_title(f"after {k} placement{'' if k == 1 else 's'}", fontsize=7, pad=3)
         notes.append((k, [(j, t.stale, t.started) for j, t in enumerate(sts[k])], excluded(sts[k]), moves_of(witness)[k]))
     fig.tight_layout(pad=0.2, w_pad=0.5)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return notes
 
@@ -195,8 +206,8 @@ def example_figure(path):
         ax.annotate("", (side, y), (side, y + h), arrowprops=dict(arrowstyle="<->", lw=0.5))
         ax.text(side - 0.02 if k < 2 else side + 0.02, y + h / 2, labels[k][1], fontsize=7, ha="right" if k < 2 else "left", va="center", rotation=90)
         ax.set_title(("full width, wide", "full height, tall", "full, wide")[k], fontsize=7, pad=3)
-    fig.tight_layout(pad=0.2, w_pad=0.4)
-    fig.savefig(path)
+    fig.tight_layout(pad=0.6, w_pad=0.4)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -235,14 +246,16 @@ def construction_figure(path, value, witness):
         first = None
         for j, t in enumerate(sts[k]):
             ext = extends(tiles, t.ax + t.floor, t.ay)
-            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="tab:red" if ext else "k", lw=1.8, ls=(0, (2, 1.2)) if ext else "-", solid_capstyle="butt", zorder=4)
+            ax.plot([t.ax, t.ax + t.floor], [t.ay, t.ay], color="k", lw=1.1, solid_capstyle="butt", zorder=4)
+            if ext:
+                ax.annotate("", xy=(t.ax + t.floor + 0.11, t.ay), xytext=(t.ax + t.floor, t.ay), arrowprops=dict(arrowstyle="-|>", color="k", lw=0.9, mutation_scale=5, shrinkA=0, shrinkB=0), zorder=4)
             if not ext and first is None:
                 first = j
         assert first == moves[k][0], (k, first, moves[k])
-        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first])
-        ax.set_title(f"before placement {k + 1}", fontsize=6, pad=2)
+        mark_anchors(ax, sts[k], size=3.6, chosen=sts[k][first], flags=True, open_floors=False)
+        ax.set_title("no placement" if k == 0 else f"after {k} placement{'' if k == 1 else 's'}", fontsize=6, pad=2)
     fig.tight_layout(pad=0.15, w_pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -320,30 +333,9 @@ def sporadic_figure(path):
         ax.set_title(label, fontsize=7, pad=2)
         out.append(witness)
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return out
-
-
-def persistence_figure(path):
-    """Draws a listed tiling by three tiles and the tiling by seven obtained from it by the pinwheel, the latter from its record."""
-    value, witness = next((v, w) for v, w in listing(3) if abs(float(v) - 1.7548776662) < 1e-6)
-    inner = witness_tiles(value, witness)
-    x = float(value)
-    p = x / (x + 1)
-    scale = (x - 1) / (x + 1)
-    built = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
-    built += [(1 - p + scale * a, 1 - p + scale * b, scale * w, scale * h) for a, b, w, h in inner]
-    record = record_of(built)
-    tiles = witness_tiles(value, record)
-    assert all(abs(a - b) < 1e-8 for t, g in zip(sorted(tiles), sorted(built)) for a, b in zip(t, g))
-    fig, axes = plt.subplots(1, 2, figsize=(3.6, 1.85))
-    draw(axes[0], inner)
-    draw(axes[1], tiles)
-    fig.tight_layout(pad=0.3)
-    fig.savefig(path)
-    plt.close(fig)
-    return record
 
 
 def classes(n):
@@ -379,10 +371,10 @@ def classes_figure(path, n, columns, size):
         tiles = witness_tiles(value, witness)
         assert abs(sum(w * h for _, _, w, h in tiles) - 1) < 1e-9
         draw(ax, tiles)
-        ax.set_title(f"{float(value):.4f} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
+        ax.set_title(f"{truncated(value)} ({count})", fontsize=5.2 if size < 0.7 else 6.5, pad=1.5)
         total += count
     fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return len(items), total
 
@@ -413,28 +405,30 @@ def network_figure(path, tiles):
     fig, (left, right) = plt.subplots(1, 2, figsize=(4.6, 2.3))
     draw(left, tiles)
     for x, y, w, h in tiles:
-        left.plot([x + w / 2, x + w / 2], [y, y + h], color="k", lw=0.5)
+        left.plot([x + w / 2, x + w / 2], [y, y + h], color="k", lw=0.4)
     for c in comps:
-        left.plot([c[0], c[1]], [c[2], c[2]], color="k", lw=1.6, solid_capstyle="butt")
+        left.plot([c[0], c[1]], [c[2], c[2]], color="k", lw=1.1, solid_capstyle="butt")
         left.text(c[1] + 0.03 if c[1] > 1 - EPS else c[0] - 0.03, c[2], f"${names[c]}$", fontsize=7, va="center", ha="left" if c[1] > 1 - EPS else "right")
     left.set_xlim(-0.14, 1.14)
     for k, (x, y, w, h) in enumerate(tiles):
         top = next(c for c in comps if abs(c[2] - y - h) < EPS and c[0] - EPS <= x and x + w <= c[1] + EPS)
         bottom = next(c for c in comps if abs(c[2] - y) < EPS and c[0] - EPS <= x and x + w <= c[1] + EPS)
-        bend = 0.9 * (x + w / 2 - (nodes[top][0] + nodes[bottom][0]) / 2) / max(h, 0.2)
+        bend = -1.6 * (x + w / 2 - (nodes[top][0] + nodes[bottom][0]) / 2) / max(h, 0.35)
         right.annotate("", xy=nodes[bottom], xytext=nodes[top], arrowprops=dict(arrowstyle="-|>", color=COLOURS[k % len(COLOURS)], lw=1.2, shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle=f"arc3,rad={bend:.3f}"))
     top, bottom = next(c for c in comps if c[2] > 1 - EPS), next(c for c in comps if c[2] < EPS)
-    right.annotate("", xy=nodes[top], xytext=nodes[bottom], arrowprops=dict(arrowstyle="-|>", color="k", lw=0.6, ls="--", shrinkA=3, shrinkB=3, mutation_scale=7, connectionstyle="arc3,rad=1.1"))
-    right.text(1.16, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
+    (sx, sy), (tx, ty), reach = nodes[top], nodes[bottom], 0.95
+    curve = MplPath([(tx + 0.03, ty), (tx + reach, ty), (sx + reach, sy), (sx + 0.03, sy)], [MplPath.MOVETO, MplPath.CURVE4, MplPath.CURVE4, MplPath.CURVE4])
+    right.add_patch(FancyArrowPatch(path=curve, arrowstyle="-|>", color="k", lw=0.6, ls="--", mutation_scale=7))
+    right.text(sx + 0.75 * reach + 0.03, 0.5, "$e_0$", fontsize=7, va="center", ha="left")
     for c, (x, y) in nodes.items():
         right.plot([x], [y], marker="o", mfc="w", mec="k", ms=4, zorder=3)
         right.text(x - 0.06, y, f"${names[c]}$", fontsize=7, va="center", ha="right")
-    right.set_xlim(-0.14, 1.34)
+    right.set_xlim(-0.14, 1.52)
     right.set_ylim(-0.07, 1.07)
     right.set_aspect("equal")
     right.axis("off")
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return len(comps)
 
@@ -466,26 +460,62 @@ def mosaic_figure(path, choice):
     fig, axes = plt.subplots(1, len(choice), figsize=(1.75 * len(choice), 1.95))
     for ax, (order, (value, witness)) in zip(axes, choice):
         draw(ax, witness_tiles(value, witness))
-        ax.set_title(f"$x = {float(value):.4f}$", fontsize=7, pad=3)
+        ax.set_title(f"$x = {truncated(value)}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
-def symmetry_figure(path, value, witness):
-    """Draws a listed tiling, its transpose, and the tiling obtained by cutting one tile into four."""
+def persistence_figure(path, value, witness):
+    """Draws a listed tiling and the tilings with three, four, five and seven more tiles obtained by cutting a tile into four, by the pinwheel and by cutting a tile into six and into eight, each from its record, the tiles of the listed tiling keeping their colours and the new tiles being grey."""
     tiles = witness_tiles(value, witness)
-    fig, axes = plt.subplots(1, 3, figsize=(4.8, 1.75))
-    draw(axes[0], tiles)
-    draw(axes[1], [(y, x, h, w) for x, y, w, h in tiles])
     k = max(range(len(tiles)), key=lambda j: tiles[j][2] * tiles[j][3])
-    x, y, w, h = tiles[k]
-    quarters = [(x, y, w / 2, h / 2), (x + w / 2, y, w / 2, h / 2), (x, y + h / 2, w / 2, h / 2), (x + w / 2, y + h / 2, w / 2, h / 2)]
-    draw(axes[2], tiles[:k] + tiles[k + 1 :] + quarters)
-    for ax, title in zip(axes, ("a tiling", "its transpose", "three more tiles")):
+    a, b, w, h = tiles[k]
+    kept = {j: t for j, t in enumerate(tiles) if j != k}
+    four = [(a + w * u / 2, b + h * v / 2, w / 2, h / 2) for u in range(2) for v in range(2)]
+    six = [(a, b, 2 * w / 3, 2 * h / 3)] + [(a + w * u / 3, b + h * v / 3, w / 3, h / 3) for u, v in ((2, 0), (2, 1), (2, 2), (1, 2), (0, 2))]
+    eight = [(a, b, 3 * w / 4, 3 * h / 4)] + [(a + w * u / 4, b + h * v / 4, w / 4, h / 4) for u, v in ((3, 0), (3, 1), (3, 2), (3, 3), (2, 3), (1, 3), (0, 3))]
+    x = float(value)
+    p = x / (x + 1)
+    scale = (x - 1) / (x + 1)
+    pinwheel = [(0, 0, p, 1 - p), (p, 0, 1 - p, p), (1 - p, p, p, 1 - p), (0, 1 - p, 1 - p, p)]
+    copy = {j: (1 - p + scale * u, 1 - p + scale * v, scale * c, scale * d) for j, (u, v, c, d) in enumerate(tiles)}
+    cases = ((dict(enumerate(tiles)), []), (kept, four), (copy, pinwheel), (kept, six), (kept, eight))
+    records = []
+    fig, axes = plt.subplots(1, 5, figsize=(7.2, 1.62))
+    for ax, (old, new) in zip(axes, cases):
+        built = list(old.values()) + new
+        record = record_of(built)
+        drawn = witness_tiles(value, record)
+        assert len(drawn) == len(built) and all(any(max(abs(c - d) for c, d in zip(t, g)) < 1e-8 for g in built) for t in drawn)
+        for t in drawn:
+            index = next((j for j, g in old.items() if max(abs(c - d) for c, d in zip(t, g)) < 1e-8), None)
+            ax.add_patch(Rectangle(t[:2], t[2], t[3], fc="#d9d9d9" if index is None else COLOURS[index], ec="k", lw=0.35))
+        ax.add_patch(Rectangle((0, 0), 1, 1, fc="none", ec="k", lw=0.6))
+        ax.set_xlim(-0.05, 1.05)
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_aspect("equal")
+        ax.axis("off")
+        records.append(record)
+    for ax, title in zip(axes, ("a tiling", "three more tiles", "four more tiles (square)", "five more tiles", "seven more tiles")):
         ax.set_title(title, fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
+    plt.close(fig)
+    return records
+
+
+def steps_figure(path):
+    """Draws three tilings found by the search whose proportions do not recur with one or two more tiles in the square, or with four more in the other two main rectangles."""
+    cases = (("2.0", "0wW 0fW", 1, 1, "$2 \\in P_2(1)$"), ("1.5", "0fW", 3, 2, "$3/2 \\in P_1(3/2)$"), ("4.0", "0wW 0fW", 2, 1, "$4 \\in P_2(2)$"))
+    fig, axes = plt.subplots(1, 3, figsize=(4.6, 1.3), gridspec_kw={"width_ratios": [width / height for _, _, width, height, _ in cases]})
+    for ax, (value, witness, width, height, title) in zip(axes, cases):
+        tiles = [tuple(c / height for c in tile) for tile in witness_tiles(value, witness, width, height)]
+        draw(ax, tiles, width / height, 1.0)
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_title(title, fontsize=7, pad=3)
+    fig.tight_layout(pad=0.2, w_pad=0.8)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -515,7 +545,7 @@ def pinwheel_figure(path):
         draw(ax, concrete_tiles, width=w, height=1.0)
         ax.set_title(f"$x = {float(x):.1f}$, width ${w:.3f}$", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return width, centre
 
@@ -530,7 +560,7 @@ def two_tiles_figure(path):
         mark_anchors(ax, sts[k + 1], size=4)
         ax.set_title(f"after placement {k + 1}", fontsize=7, pad=3)
     fig.tight_layout(pad=0.2, w_pad=0.6)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
     return value, witness
 
@@ -539,6 +569,9 @@ def main():
     """Generates all diagrams and prints the facts on which their captions rely."""
     value, witness, k = base_tiling()
     print("base tiling:", value, witness, "staircase after", k, "placements")
+    _, sts = stages(value, witness)
+    k = next(j for j, st in enumerate(sts) if len(st) == 3 and not any(t.stale for t in st))
+    print("staircase after", k, "placements")
     staircase_figure(OUT / "staircase.svg", value, witness, k)
     print("fits:", fits_figure(OUT / "fits.svg", value, witness))
     for note in rules_figure(OUT / "rules.svg", value, witness):
@@ -550,13 +583,12 @@ def main():
     choice = mosaic_choice()
     print("mosaic:", choice)
     mosaic_figure(OUT / "mosaic.svg", choice)
-    value, witness = next((v, w) for v, w in listing(5) if "i" in w and "T" in w)
-    print("symmetry:", value, witness)
-    symmetry_figure(OUT / "symmetry.svg", value, witness)
+    value, witness = next((v, w) for v, w in listing(5) if w == "0iW 0wW 1wT 1fT 0fW")
+    print("persistence:", value, witness, persistence_figure(OUT / "persistence.svg", value, witness))
+    steps_figure(OUT / "steps.svg")
     print("pinwheel:", pinwheel_figure(OUT / "pinwheel.svg"))
     print("two tiles:", two_tiles_figure(OUT / "two-tiles.svg"))
     print("sporadic:", sporadic_figure(OUT / "sporadic.svg"))
-    print("persistence:", persistence_figure(OUT / "persistence.svg"))
     print("classes:", classes_figure(OUT / "classes-4.svg", 4, 8, 0.8), classes_figure(OUT / "classes-5.svg", 5, 11, 0.6))
     tiles, witness = regenerated(*SPORADIC_SIX)
     print("network:", witness, network_figure(OUT / "network.svg", tiles), "components")

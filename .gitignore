@@ -2,3 +2,4 @@
 /target
 /paper/main.pdf
 /lean/.lake
+/paper/figures/__pycache__

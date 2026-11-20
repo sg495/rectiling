@@ -4,6 +4,13 @@ import Rectiling.Search
 import Rectiling.Exact
 import Rectiling.Target
 import Rectiling.Persistence
+import Rectiling.Counts
+import Rectiling.Multiplicity
+import Rectiling.ProportionBound
+import Rectiling.TilingCount
+import Rectiling.CountsFinite
+import Rectiling.CombinatorialMap
+import Rectiling.UpperBound
 
 /-!
 # Axioms of the main theorems
@@ -64,3 +71,83 @@ Prints the axioms on which each main theorem depends.
 #print axioms Rectiling.achievable_one
 #print axioms Rectiling.persistence
 #print axioms Rectiling.persistence_of_one_lt
+#print axioms Rectiling.isTiling_iff_isSetTiling
+#print axioms Rectiling.IsTiling.toFinset_eq_iff_perm
+#print axioms Rectiling.isSimilarSetTiling_iff
+#print axioms Rectiling.mem_similarTilings_iff
+#print axioms Rectiling.mem_proportions_iff
+#print axioms Rectiling.image_fst_bags
+#print axioms Rectiling.image_sym_mem_similarTilings
+#print axioms Rectiling.orbit_eq_of_mem
+#print axioms Rectiling.IsSimilarSetTiling.squares_of_reflection
+#print axioms Rectiling.image_transpose_ne
+#print axioms Rectiling.even_ncard_oblongTilings
+#print axioms Rectiling.ncard_similarTilings_mod_two
+#print axioms Rectiling.IsSimilarSetTiling.quarter_turn
+#print axioms Rectiling.exists_two_sizes
+#print axioms Rectiling.exists_bags_ne
+#print axioms Rectiling.exists_two_bags
+#print axioms Rectiling.not_injOn_fst_bags
+#print axioms Rectiling.ncard_proportions_lt_ncard_bags
+#print axioms Rectiling.isCrossing_iff
+#print axioms Rectiling.YieldsWith.chooses
+#print axioms Rectiling.YieldsWith.tiles_eq
+#print axioms Rectiling.representative
+#print axioms Rectiling.yieldsWith_unique
+#print axioms Rectiling.yields_unique_of_no_crossing
+#print axioms Rectiling.exists_record
+#print axioms Rectiling.multiplicity
+#print axioms Rectiling.bijOn_upperFirstSet
+#print axioms Rectiling.ncard_records
+
+#print axioms Rectiling.Network.Proper.exists_isFlow
+#print axioms Rectiling.Network.IsFlow.unique
+#print axioms Rectiling.Network.IsFlow.impedance_eq
+#print axioms Rectiling.Network.Proper.impedance_pos
+#print axioms Rectiling.Network.Proper.pairPoly_ne_zero
+#print axioms Rectiling.Network.natDegree_pairPoly_le
+#print axioms Rectiling.Network.IsFlow.aeval_pairPoly
+#print axioms Rectiling.IsTiling.sum_bottom_eq_sum_top
+#print axioms Rectiling.IsTiling.heightNetwork_isFlow
+#print axioms Rectiling.IsTiling.heightNetwork_proper
+#print axioms Rectiling.IsTiling.impedance_heightNetwork
+#print axioms Rectiling.IsSimilarTiling.aeval_pairPoly
+#print axioms Rectiling.Network.Iso.pairPoly_eq
+#print axioms Rectiling.Achievable.exists_class
+#print axioms Rectiling.finite_achievable
+#print axioms Rectiling.ncard_achievable_le
+#print axioms Rectiling.IsSimilarTiling.eq_of_heightPair_eq
+#print axioms Rectiling.finite_similarTilings
+#print axioms Rectiling.finite_similarTilingSets
+#print axioms Rectiling.tutteM_le
+#print axioms Rectiling.limsup_le_of_le_tutteM
+#print axioms Rectiling.TutteEnumeration.card_eq_tutteM
+#print axioms Rectiling.finite_similarTilingFinsets
+#print axioms Rectiling.finite_squareTilings
+#print axioms Rectiling.finite_oblongTilings
+#print axioms Rectiling.finite_classes
+#print axioms Rectiling.finite_bags
+#print axioms Rectiling.finite_proportions
+#print axioms Rectiling.parity_ncard_similarTilings
+#print axioms Rectiling.ncard_proportions_lt_ncard_bags'
+#print axioms Rectiling.ncard_orbit_le
+#print axioms Rectiling.bag_eq_of_mem_orbit
+#print axioms Rectiling.ncard_chain
+#print axioms Rectiling.IsTiling.isCrossing_iff_isSetCrossing
+#print axioms Rectiling.IsSetTiling.isSetCrossing_iff
+#print axioms Rectiling.IsSimilarSetTiling.quarter_turn_isCrossing
+#print axioms Rectiling.Network.pairPoly_reverse
+#print axioms Rectiling.Network.UIso.pairPoly_eq
+#print axioms Rectiling.RootedMap.Isomorphic.poly_eq
+#print axioms Rectiling.RootedMap.Isomorphic.rootSet_eq
+#print axioms Rectiling.tilingMap_isTilingMap
+#print axioms Rectiling.IsTilingMap.tilingNet_isFlow
+#print axioms Rectiling.IsSimilarTiling.aeval_tilingNet
+#print axioms Rectiling.IsTilingMap.connected
+#print axioms Rectiling.IsTilingMap.loopless
+#print axioms Rectiling.IsTilingMap.noCutVertex
+#print axioms Rectiling.IsTilingMap.tilingNet_proper
+#print axioms Rectiling.IsTilingMap.planar
+#print axioms Rectiling.Achievable.exists_rootedMapClass
+#print axioms Rectiling.ncard_achievable_le_tutte
+#print axioms Rectiling.limsup_achievable_le

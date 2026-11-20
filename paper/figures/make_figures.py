@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: LGPL-3.0-or-later
 """Generates the figures of the paper from staircase placement sequences."""
 
+import csv
+from math import factorial
 from dataclasses import dataclass
 from itertools import product
 from pathlib import Path
@@ -8,12 +10,11 @@ from pathlib import Path
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import sympy as sp
 from matplotlib.patches import Rectangle
 
-COLOURS = tuple(mcolors.TABLEAU_COLORS)
+COLOURS = ("#E69F00", "#56B4E9", "#009E73", "#0072B2", "#D55E00", "#CC79A7", "#F0E442")
 FITS = ("inside", "full-height", "full-width", "full")
 X = sp.Symbol("x", positive=True)
 OUT = Path(__file__).parent
@@ -147,10 +148,15 @@ def tilings(n):
     return found
 
 
+def truncated(value):
+    """Writes a positive number with four decimals, truncated."""
+    return f"{int(float(value) * 10**4 + 1e-6) / 10**4:.4f}"
+
+
 def draw(ax, tiles, width=1.0, height=1.0, outline=True):
-    """Draws tiles in the colours of the default Matplotlib cycle, in placement order."""
+    """Draws outlined tiles in the colours of the palette of Okabe and Ito, in placement order."""
     for k, (x, y, w, h) in enumerate(tiles):
-        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0))
+        ax.add_patch(Rectangle((x, y), w, h, fc=COLOURS[k % len(COLOURS)], ec="k", lw=0.35))
     if outline:
         ax.add_patch(Rectangle((0, 0), width, height, fc="none", ec="k", lw=0.6))
     ax.set_xlim(-0.05 * width, 1.05 * width)
@@ -171,7 +177,7 @@ def grid(items, columns, path, labels=None):
         if labels is not None:
             ax.set_title(labels[k], fontsize=7, pad=2)
     fig.tight_layout(pad=0.3)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
@@ -184,11 +190,11 @@ def distinct(found):
     return out
 
 
-def witness_tiles(value, witness):
-    """Computes the tiles of the tiling described by a proportion and a witness sequence from the search tool."""
+def witness_tiles(value, witness, width=1, height=1):
+    """Computes the tiles of the tiling of a main rectangle of integer sides described by a proportion and a witness sequence from the search tool."""
     codes = {"i": "inside", "h": "full-height", "w": "full-width", "f": "full"}
     moves = [(int(m[0]), codes[m[1]], m[2] == "T") for m in witness.split()]
-    _, tiles, equations, sides = replay(moves)
+    _, tiles, equations, sides = replay(moves, width, height)
     x = sp.Float(value, 30)
     solution = {}
     if sides:
@@ -206,31 +212,48 @@ def catalogue(n, columns, path, size, labels=True):
     for ax, (value, _, _, _, witness) in zip(axes.flat, rows):
         draw(ax, witness_tiles(value, witness))
         if labels:
-            ax.set_title(f"{float(value):.4f}", fontsize=5.5, pad=1.5)
+            ax.set_title(truncated(value), fontsize=5.5, pad=1.5)
     fig.tight_layout(pad=0.15, h_pad=0.25, w_pad=0.1)
-    fig.savefig(path)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
 
 
-def full_degree(path, columns=10, size=0.66):
-    """Draws one tiling for each proportion whose algebraic degree equals the number of tiles, for up to seven tiles."""
-    items = []
-    for n in range(3, 8):
-        for line in (OUT.parent / "data" / f"tilings-{n}.tsv").read_text().splitlines():
-            value, degree, _, _, witness = line.split("\t")
-            if int(degree) == n:
-                items.append((n, value, witness))
-    count = -(-len(items) // columns)
-    fig, axes = plt.subplots(count, columns, figsize=(size * columns, size * 1.2 * count), squeeze=False)
-    for ax in axes.flat:
-        ax.axis("off")
-    for ax, (n, value, witness) in zip(axes.flat, items):
-        draw(ax, witness_tiles(value, witness))
-        ax.set_title(f"$n = {n}$: {float(value):.4f}", fontsize=4.6, pad=1.5)
-    fig.tight_layout(pad=0.15, h_pad=0.3, w_pad=0.1)
-    fig.savefig(path)
+def sequences_plot(path):
+    """Plots the numbers of proportions, bags, classes and tilings for a square on a logarithmic scale."""
+    rows = list(csv.reader((OUT.parent / "data" / "tilings-counts.csv").read_text().splitlines()[2:]))
+    proportions = [row[1] for row in csv.reader((OUT.parent / "data" / "counts.csv").read_text().splitlines()[2:])]
+    number = lambda cell: int(cell.replace(",", "")) if cell else None
+    series = {
+        "$t(n)$": ([number(r[4]) for r in rows], "#0072B2", "o"),
+        "$b(n)$": ([number(r[3]) for r in rows], "#E69F00", "s"),
+        "$c(n)$": ([number(r[2]) for r in rows], "#009E73", "^"),
+        "$a(n)$": ([number(v) for v in proportions], "#D55E00", "D"),
+    }
+    fig, ax = plt.subplots(figsize=(4.6, 3.1))
+    for name, (values, colour, marker) in series.items():
+        points = [(n, v) for n, v in enumerate(values, start=1) if v]
+        ax.plot(*zip(*points), color=colour, marker=marker, ms=3.2, lw=0.9, mec="w", mew=0.4, label=name)
+    ax.set_yscale("log")
+    maps = lambda n: 2 * factorial(3 * n) // (factorial(2 * n + 1) * factorial(n + 1))
+    shape = [(n, 2**n * maps(n)) for n in range(1, 15)]
+    faint = dict(lw=0.8, alpha=0.45, zorder=1)
+    ax.plot(*zip(*[(n, 0.295 * v) for n, v in shape]), color=series["$t(n)$"][1], ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n)$", **faint)
+    ax.plot(*zip(*[(n, 0.295 * v / 8) for n, v in shape]), color=series["$b(n)$"][1], ls=(0, (4, 2)), label="$0.295 \\cdot 2^n M(n) / 8$", **faint)
+    ax.plot(*zip(*[(n, 0.676 * 13.5**n * n**-5.5) for n in range(4, 15)]), color=series["$a(n)$"][1], ls=(0, (4, 2)), label="$0.676 \\cdot (27/2)^n n^{-11/2}$", **faint)
+    ax.set_xlim(0.5, 13.6)
+    ax.set_ylim(0.3, 1.2e12)
+    ax.set_xticks(range(1, 14))
+    ax.set_xlabel("$n$", fontsize=8)
+    ax.tick_params(labelsize=7, width=0.4, length=2.5)
+    ax.grid(True, which="major", color="0.88", lw=0.4)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    for side in ("left", "bottom"):
+        ax.spines[side].set_linewidth(0.4)
+    ax.legend(fontsize=6.5, frameon=False, loc="upper left")
+    fig.tight_layout(pad=0.3)
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.04)
     plt.close(fig)
-    return len(items)
 
 
 def main():
@@ -238,14 +261,14 @@ def main():
     three = tilings(3)
     four = tilings(4)
     assert len(distinct(three)) == 3 and len(distinct(four)) == 11
-    grid([t for _, t, _ in three], 7, OUT / "three-tiles.svg", [f"{v:.4f}" for v, _, _ in three])
+    grid([t for _, t, _ in three], 7, OUT / "three-tiles.svg", [truncated(v) for v, _, _ in three])
     picks = distinct(four)
-    grid([t for _, t, _ in picks], 6, OUT / "four-tiles.svg", [f"{v:.4f}" for v, _, _ in picks])
+    grid([t for _, t, _ in picks], 6, OUT / "four-tiles.svg", [truncated(v) for v, _, _ in picks])
     cubic = [(v, t, m) for v, t, m in four if abs(v - 1.5436890127) < 1e-6]
     grid([t for _, t, _ in cubic], len(cubic), OUT / "shared-cubic.svg")
     catalogue(5, 9, OUT / "five-tiles.svg", 0.72)
     catalogue(6, 14, OUT / "six-tiles.svg", 0.47)
-    print("proportions of full degree:", full_degree(OUT / "full-degree.svg"))
+    sequences_plot(OUT / "sequences.svg")
     print("three tiles:", [(round(v, 6), m) for v, _, m in three])
     print("tilings with four tiles:", len(four), "sharing the cubic:", len(cubic))
 

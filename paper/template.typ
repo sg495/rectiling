@@ -4,16 +4,52 @@
 /// Metrics of the LaTeX `article` class at each base size, in TeX points.
 #let class-metrics = (
   "10pt": (
-    normal: 10, baseline: 12, small: 9, footnote: 8, large: 12, Large: 14.4, LARGE: 17.28,
-    parindent: 15, textwidth: 345, topsep: 8, itemsep: 4, parsep: 4, display: 10, footins: 9,
+    normal: 10,
+    baseline: 12,
+    small: 9,
+    footnote: 8,
+    large: 12,
+    Large: 14.4,
+    LARGE: 17.28,
+    parindent: 15,
+    textwidth: 345,
+    topsep: 8,
+    itemsep: 2,
+    parsep: 4,
+    display: 10,
+    footins: 9,
   ),
   "11pt": (
-    normal: 10.95, baseline: 13.6, small: 10, footnote: 9, large: 12, Large: 14.4, LARGE: 17.28,
-    parindent: 17, textwidth: 360, topsep: 9, itemsep: 4.5, parsep: 4.5, display: 11, footins: 10,
+    normal: 10.95,
+    baseline: 13.6,
+    small: 10,
+    footnote: 9,
+    large: 12,
+    Large: 14.4,
+    LARGE: 17.28,
+    parindent: 17,
+    textwidth: 360,
+    topsep: 9,
+    itemsep: 2.25,
+    parsep: 4.5,
+    display: 11,
+    footins: 10,
   ),
   "12pt": (
-    normal: 12, baseline: 14.5, small: 10.95, footnote: 10, large: 14.4, Large: 17.28, LARGE: 20.74,
-    parindent: 18, textwidth: 390, topsep: 9, itemsep: 5, parsep: 5, display: 12, footins: 10.8,
+    normal: 12,
+    baseline: 14.5,
+    small: 10.95,
+    footnote: 10,
+    large: 14.4,
+    Large: 17.28,
+    LARGE: 20.74,
+    parindent: 18,
+    textwidth: 390,
+    topsep: 9,
+    itemsep: 2.5,
+    parsep: 5,
+    display: 12,
+    footins: 10.8,
   ),
 )
 
@@ -25,6 +61,7 @@
   theorem: "plain",
   lemma: "plain",
   proposition: "plain",
+  observation: "plain",
   corollary: "plain",
   conjecture: "plain",
   definition: "definition",
@@ -217,7 +254,7 @@
     it
   }
 
-  show raw: set text(font: ("New Computer Modern Mono", "DejaVu Sans Mono"), size: 1.25em, features: (calt: 0))
+  show raw: set text(font: ("New Computer Modern Mono", "DejaVu Sans Mono"), size: 1.05em, features: (calt: 0))
   show link: set text(fill: link-colour)
   show ref: set text(fill: link-colour)
   show cite: set text(fill: link-colour)
@@ -367,6 +404,9 @@
 
 /// Typesets a proposition.
 #let proposition(name: none, body) = statement("Proposition", name: name, style: statement-styles.proposition, body)
+
+/// Typesets an observation.
+#let observation(name: none, body) = statement("Observation", name: name, style: statement-styles.observation, body)
 
 /// Typesets a corollary.
 #let corollary(name: none, body) = statement("Corollary", name: name, style: statement-styles.corollary, body)
